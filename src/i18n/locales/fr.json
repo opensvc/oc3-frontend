@@ -773,5 +773,12 @@
         "disk_dg": "Groupe de disques"
       }
     }
+  },
+  "objectTags": {
+    "title": "Tags",
+    "none": "Aucun tag.",
+    "open": "Ouvrir dans la vue Tags",
+    "data": "Données : {{data}}",
+    "exclude": "Exclut les tags correspondant à {{pattern}}"
   }
 }

@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
+import { useServiceTags } from "./related/queries";
 import { SERVICE_RELATED_TABS } from "./related/service-related";
 import { formatDateTime } from "@/lib/format";
 
@@ -140,6 +142,7 @@ export function ServiceDetailPanel({
   });
 
   const open = svcId !== undefined;
+  const tags = useServiceTags(svcId);
 
   return (
     <RelatedTabsPanel
@@ -154,6 +157,11 @@ export function ServiceDetailPanel({
       propertiesFamily="service"
       label={t("services.related.label")}
     >
+      <ObjectTags
+        tags={tags.data}
+        isPending={open && tags.isPending}
+        errorMessage={tags.isError ? tags.error.message : null}
+      />
       <DetailContent
         groups={GROUPS}
         row={service}

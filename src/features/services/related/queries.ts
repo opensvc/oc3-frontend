@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import { toTagRows } from "@/features/tags/tag-row";
 
 type DiskRow = components["schemas"]["DiskRow"];
 type HbaRow = components["schemas"]["HbaRow"];
@@ -70,6 +71,21 @@ export function useServiceHbas(svcId: string | undefined) {
         }),
       );
       return perNode.sort((a, b) => a.nodename.localeCompare(b.nodename));
+    },
+  });
+}
+
+/** Tags attachés au service. `GET /…/tags` renvoie le `ListResponse` générique : lu par `toTagRows`. */
+export function useServiceTags(svcId: string | undefined) {
+  return useQuery({
+    queryKey: ["service", svcId, "tags"],
+    enabled: svcId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/services/{svc_id}/tags", {
+        params: { path: { svc_id: svcId ?? "" }, query: { orderby: "tag_name", limit: 0 } },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return toTagRows(data.data);
     },
   });
 }

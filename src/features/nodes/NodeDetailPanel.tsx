@@ -4,7 +4,9 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { NODE_RELATED_TABS } from "./related/node-related";
+import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
+import { useNodeTags } from "./related/queries";
 import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { TrashIcon } from "@/components/ui/icons";
 import { problemText } from "@/lib/api/problem";
@@ -249,6 +251,7 @@ export function NodeDetailPanel({
   });
 
   const open = nodeId !== undefined;
+  const tags = useNodeTags(nodeId);
 
   return (
     <RelatedTabsPanel
@@ -263,6 +266,11 @@ export function NodeDetailPanel({
       propertiesFamily="node"
       label={t("nodes.related.label")}
     >
+      <ObjectTags
+        tags={tags.data}
+        isPending={open && tags.isPending}
+        errorMessage={tags.isError ? tags.error.message : null}
+      />
       <DetailContent
         groups={GROUPS}
         row={node}

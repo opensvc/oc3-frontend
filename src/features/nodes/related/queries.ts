@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import { toTagRows } from "@/features/tags/tag-row";
 
 type NodeHardwareRow = components["schemas"]["NodeHardwareRow"];
 type AlertRow = components["schemas"]["AlertRow"];
@@ -124,6 +125,21 @@ export function useNodeHbas(nodeId: string | undefined) {
       if (error !== undefined) throw new Error(problemText(error));
       const rows: HbaRow[] = Array.isArray(data.data) ? data.data : [];
       return rows;
+    },
+  });
+}
+
+/** Tags attachés au node. `GET /…/tags` renvoie le `ListResponse` générique : lu par `toTagRows`. */
+export function useNodeTags(nodeId: string | undefined) {
+  return useQuery({
+    queryKey: ["node", nodeId, "tags"],
+    enabled: nodeId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/nodes/{node_id}/tags", {
+        params: { path: { node_id: nodeId ?? "" }, query: { orderby: "tag_name", limit: 0 } },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return toTagRows(data.data);
     },
   });
 }
