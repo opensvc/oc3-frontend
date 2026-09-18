@@ -382,6 +382,32 @@
     },
     "delete": {
       "question": "Delete the record for {{addr}} on {{nodename}}? If the node still reports this address, it comes back on the next asset push."
+    },
+    "create": {
+      "open": "New network",
+      "title": "New network",
+      "intro": "Declare an IPv4 network. The collector does not list declared networks: node addresses inside the range will show its name, gateway and range in the Network column.",
+      "noRow": "The network was created but not returned.",
+      "hostBits": "This address has host bits set; the network address is {{network}}.",
+      "useNetwork": "Use {{network}}",
+      "preview_one": "{{formatted}} usable address, broadcast {{broadcast}}",
+      "preview_other": "{{formatted}} usable addresses, broadcast {{broadcast}}",
+      "nameHint": "Optional, but must be unique.",
+      "gatewayOutside": "This gateway is outside the network.",
+      "teamDefault": "My primary group (default)",
+      "submit": "Create",
+      "submitting": "Creating…",
+      "done": "Network {{name}} declared ({{range}}).",
+      "fields": {
+        "network": "Network address",
+        "netmask": "Prefix",
+        "name": "Name",
+        "gateway": "Gateway",
+        "pvid": "VLAN",
+        "prio": "Priority",
+        "team_responsible": "Responsible team",
+        "comment": "Comment"
+      }
     }
   },
   "disks": {

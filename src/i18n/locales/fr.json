@@ -382,6 +382,32 @@
     },
     "delete": {
       "question": "Supprimer le relevé de {{addr}} sur {{nodename}} ? Si le node remonte encore cette adresse, elle réapparaîtra à la prochaine remontée d'inventaire."
+    },
+    "create": {
+      "open": "Nouveau réseau",
+      "title": "Nouveau réseau",
+      "intro": "Déclarer un réseau IPv4. Le collector ne liste pas les réseaux déclarés : les adresses de node comprises dans la plage afficheront son nom, sa passerelle et sa plage dans la colonne Réseau.",
+      "noRow": "Le réseau a été créé mais n'a pas été renvoyé.",
+      "hostBits": "Cette adresse a des bits d'hôte ; l'adresse du réseau est {{network}}.",
+      "useNetwork": "Utiliser {{network}}",
+      "preview_one": "{{formatted}} adresse utilisable, diffusion {{broadcast}}",
+      "preview_other": "{{formatted}} adresses utilisables, diffusion {{broadcast}}",
+      "nameHint": "Facultatif, mais unique.",
+      "gatewayOutside": "Cette passerelle est hors du réseau.",
+      "teamDefault": "Mon groupe principal (par défaut)",
+      "submit": "Créer",
+      "submitting": "Création…",
+      "done": "Réseau {{name}} déclaré ({{range}}).",
+      "fields": {
+        "network": "Adresse du réseau",
+        "netmask": "Préfixe",
+        "name": "Nom",
+        "gateway": "Passerelle",
+        "pvid": "VLAN",
+        "prio": "Priorité",
+        "team_responsible": "Équipe responsable",
+        "comment": "Commentaire"
+      }
     }
   },
   "disks": {

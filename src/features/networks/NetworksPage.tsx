@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DateTime } from "@/components/ui/DateTime";
 import { useNavigate, useSearch } from "@tanstack/react-router";
@@ -13,9 +14,11 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { CreateNetworkPanel } from "./CreateNetworkPanel";
 import { NetworkDetailPanel } from "./NetworkDetailPanel";
 
 type IpRow = components["schemas"]["IpRow"];
+type NetworkRow = components["schemas"]["NetworkRow"];
 
 /**
  * Vide : apicollector refuse tout `orderby` sur cet endpoint. Le mapping `node_ip`
@@ -161,13 +164,41 @@ export function NetworksPage() {
   }
 
   const selected = data?.rows.find((row) => String(row.id) === search.sel);
+  const [creating, setCreating] = useState(false);
+  // Le réseau créé n'apparaît que par ses adresses : on confirme sa création ici.
+  const [created, setCreated] = useState<NetworkRow | null>(null);
 
   return (
     <section>
-      <h1 className="mb-3 flex items-center gap-2 text-title font-semibold">
-        <ObjectIcon kind="network" className="h-5 w-5" />
-        {t("networks.title")}
-      </h1>
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <h1 className="flex items-center gap-2 text-title font-semibold">
+          <ObjectIcon kind="network" className="h-5 w-5" />
+          {t("networks.title")}
+        </h1>
+        <button
+          type="button"
+          onClick={() => {
+            // Les deux tiroirs partagent le bord droit : ouvrir la création ferme le détail.
+            update({ sel: undefined });
+            setCreating(true);
+          }}
+          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+        >
+          {t("networks.create.open")}
+        </button>
+        {created !== null && (
+          <span role="status" className="text-ink-muted">
+            ●{" "}
+            {t("networks.create.done", {
+              name:
+                created.name === "" || created.name === undefined
+                  ? `${created.network ?? ""}/${String(created.netmask ?? "")}`
+                  : created.name,
+              range: `${created.begin ?? ""} – ${created.end ?? ""}`,
+            })}
+          </span>
+        )}
+      </div>
 
       <CollectorList
         columns={COLUMNS}
@@ -185,8 +216,16 @@ export function NetworksPage() {
         selectAllMatching={allIds}
       />
 
+      <CreateNetworkPanel
+        open={creating}
+        onClose={() => {
+          setCreating(false);
+        }}
+        onCreated={setCreated}
+      />
+
       <NetworkDetailPanel
-        ipId={search.sel}
+        ipId={creating ? undefined : search.sel}
         label={selected?.addr ?? ""}
         onClose={() => {
           update({ sel: undefined });
