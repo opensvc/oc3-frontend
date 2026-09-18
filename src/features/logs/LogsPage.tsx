@@ -12,6 +12,7 @@ import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { DateTime } from "@/components/ui/DateTime";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -142,7 +143,10 @@ export function LogsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   const columns: ListColumn<LogRow>[] = LOG_PROPS.map((prop) => ({

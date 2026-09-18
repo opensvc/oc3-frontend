@@ -13,6 +13,7 @@ import { StatusBadge } from "@/components/opensvc/StatusBadge";
 import { statusBadge } from "@/components/opensvc/status";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -210,7 +211,10 @@ export function ServicesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   const selected = data?.rows.find((row) => row.svc_id === search.sel);

@@ -10,6 +10,7 @@ import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { DateTime } from "@/components/ui/DateTime";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -88,7 +89,10 @@ export function FiltersetsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   const columns: ListColumn<FiltersetRow>[] = FILTERSET_PROPS.map((prop) => ({

@@ -9,6 +9,7 @@ import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -95,7 +96,10 @@ export function GroupsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   // La lettre stockée en base ne dit rien à l'écran : on affiche sa nature.

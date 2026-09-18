@@ -14,6 +14,7 @@ import { RelativeTime } from "@/components/ui/RelativeTime";
 import { formatSizeMiB } from "@/lib/format";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -310,7 +311,10 @@ export function NodesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   const selected = data?.rows.find((row) => row.node_id === search.sel);

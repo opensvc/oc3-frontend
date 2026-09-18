@@ -10,6 +10,7 @@ import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { formatSizeMiB } from "@/lib/format";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -150,7 +151,10 @@ export function DisksPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   const selected = data?.rows.find((row) => row.disk_id === search.sel);

@@ -10,6 +10,7 @@ import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -160,7 +161,10 @@ export function NetworksPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   const selected = data?.rows.find((row) => String(row.id) === search.sel);

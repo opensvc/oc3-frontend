@@ -7,6 +7,7 @@ import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorLi
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -85,7 +86,10 @@ export function TagsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   const selected = data?.rows.find((row) => row.tag_id === search.sel);

@@ -11,6 +11,7 @@ import { DateTime } from "@/components/ui/DateTime";
 import { RefreshIcon } from "@/components/ui/icons";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -132,7 +133,10 @@ export function ObsolescencePage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   const columns: ListColumn<ObsolescenceSettingRow>[] = OBSOLESCENCE_PROPS.map((prop) => ({

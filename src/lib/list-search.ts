@@ -132,3 +132,21 @@ export function visibleProps(
   const kept = allProps.filter((prop) => cols.includes(prop));
   return kept.length === 0 ? defaultCols : kept;
 }
+
+/**
+ * États qui ne remplacent pas les lignes affichées : panneau de détail ouvert, son
+ * onglet, colonnes visibles.
+ */
+const IN_PLACE_KEYS = new Set<keyof ResolvedListSearch>(["sel", "tab", "cols"]);
+
+/**
+ * Faut-il remonter en haut de page après cette mise à jour de l'URL ?
+ *
+ * Le routeur le fait par défaut à chaque navigation. C'est voulu quand la page, le
+ * tri ou le filterset changent les lignes affichées, mais pas quand on ouvre le
+ * détail d'une ligne atteinte en faisant défiler : la liste sauterait sous le
+ * panneau et on perdrait sa place en le refermant.
+ */
+export function resetsScroll(next: Partial<ResolvedListSearch>): boolean {
+  return Object.keys(next).some((key) => !IN_PLACE_KEYS.has(key as keyof ResolvedListSearch));
+}

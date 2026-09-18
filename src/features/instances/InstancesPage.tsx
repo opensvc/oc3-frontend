@@ -13,6 +13,7 @@ import { DateTime } from "@/components/ui/DateTime";
 import { RelativeTime } from "@/components/ui/RelativeTime";
 import {
   resolveListSearch,
+  resetsScroll,
   toSearchParams,
   visibleProps,
   type ResolvedListSearch,
@@ -202,7 +203,10 @@ export function InstancesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
+    void navigate({
+      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      resetScroll: resetsScroll(next),
+    });
   }
 
   const selected = data?.rows.find((row) => toInstanceId(row.svc_id, row.node_id) === search.sel);
