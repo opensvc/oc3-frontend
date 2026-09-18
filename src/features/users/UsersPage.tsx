@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -12,6 +13,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { CreateUserPanel } from "./CreateUserPanel";
 import { UserDetailPanel } from "./UserDetailPanel";
 
 type UserRow = components["schemas"]["UserRow"];
@@ -148,6 +150,7 @@ export function UsersPage() {
     void navigate({ search: (previous) => ({ ...previous, ...toSearchParams(next) }) });
   }
 
+  const [creating, setCreating] = useState(false);
   const selected = data?.rows.find((row) => String(row.id) === search.sel);
 
   return (
@@ -157,6 +160,17 @@ export function UsersPage() {
           <ObjectIcon kind="user" className="h-5 w-5" />
           {t("users.title")}
         </h1>
+        <button
+          type="button"
+          onClick={() => {
+            // Les deux tiroirs partagent le bord droit : ouvrir la création ferme le détail.
+            update({ sel: undefined });
+            setCreating(true);
+          }}
+          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+        >
+          {t("users.create.open")}
+        </button>
       </div>
 
       <CollectorList
@@ -175,8 +189,19 @@ export function UsersPage() {
         selectAllMatching={allIds}
       />
 
+      <CreateUserPanel
+        open={creating}
+        onClose={() => {
+          setCreating(false);
+        }}
+        onCreated={(id) => {
+          // Le nouvel utilisateur s'ouvre dans le détail.
+          if (id !== undefined) update({ sel: String(id) });
+        }}
+      />
+
       <UserDetailPanel
-        userId={search.sel}
+        userId={creating ? undefined : search.sel}
         label={selected?.email ?? ""}
         onClose={() => {
           update({ sel: undefined });

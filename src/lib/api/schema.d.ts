@@ -2178,7 +2178,12 @@ export interface paths {
          */
         get: operations["GetUsers"];
         put?: never;
-        post?: never;
+        /**
+         * @description Create a user, with its private group "user_<id>". Requires the UserManager
+         *     privilege. An email or username already in use is refused with a 409. Without
+         *     a password the account exists but cannot sign in.
+         */
+        post: operations["PostUsers"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9884,6 +9889,43 @@ export interface operations {
                     "application/json": components["schemas"]["UserListResponse"];
                 };
             };
+            500: components["responses"]["500"];
+        };
+    };
+    PostUsers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email: string;
+                    first_name?: string;
+                    last_name?: string;
+                    /** @description At least 8 characters. Stored as a web2py hash. */
+                    password?: string;
+                    phone_work?: string;
+                    username?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            409: components["responses"]["409"];
             500: components["responses"]["500"];
         };
     };

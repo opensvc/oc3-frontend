@@ -518,6 +518,21 @@
         "notifications": "Notifications",
         "restrictions": "Restrictions et quotas"
       }
+    },
+    "create": {
+      "open": "Nouvel utilisateur",
+      "title": "Nouvel utilisateur",
+      "intro": "Le collector crée aussi le groupe privé de l'utilisateur. Seul l'e-mail est obligatoire.",
+      "password": "Mot de passe",
+      "confirm": "Confirmation du mot de passe",
+      "noPassword": "Sans mot de passe, le compte existe mais ne peut pas se connecter.",
+      "passwordHint_one": "Au moins {{count}} caractère.",
+      "passwordHint_other": "Au moins {{count}} caractères.",
+      "tooShort_one": "Au moins {{count}} caractère.",
+      "tooShort_other": "Au moins {{count}} caractères.",
+      "mismatch": "Les deux mots de passe diffèrent.",
+      "submit": "Créer",
+      "submitting": "Création…"
     }
   },
   "profile": {
