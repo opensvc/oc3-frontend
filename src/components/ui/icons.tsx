@@ -1,0 +1,369 @@
+import type { SVGProps } from "react";
+
+/**
+ * Icônes du menu, dessinées ici plutôt qu'importées d'une bibliothèque.
+ *
+ * Le collector historique utilise des glyphes Font Awesome 5 pleins ; on reste dans
+ * ce registre — silhouettes pleines sur une grille de 24, pas de contour fin — sans
+ * ajouter de dépendance npm ni embarquer une police entière pour sept pictogrammes.
+ * Les tracés sont écrits à la main : reprendre ceux de Font Awesome imposerait son
+ * attribution CC BY.
+ *
+ * Chaque icône hérite de `currentColor`, la couleur étant portée par la classe de
+ * l'appelant.
+ */
+type IconProps = SVGProps<SVGSVGElement>;
+
+function Svg({ children, ...props }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      {children}
+    </svg>
+  );
+}
+
+/** Dashboard : le triangle d'alerte du collector (fa-exclamation-triangle). */
+export function AlertTriangleIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 3.2c.6 0 1.1.3 1.4.8l8.2 14.2c.6 1-.1 2.3-1.3 2.3H3.7c-1.2 0-1.9-1.3-1.3-2.3l8.2-14.2c.3-.5.8-.8 1.4-.8Zm0 5a1 1 0 0 0-1 1.1l.4 4.6a.6.6 0 0 0 1.2 0l.4-4.6a1 1 0 0 0-1-1.1Zm0 8a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z" />
+    </Svg>
+  );
+}
+
+/** Nodes : le serveur en rack (fa-server). */
+export function ServerIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3.5 4h17c.8 0 1.5.7 1.5 1.5v3c0 .8-.7 1.5-1.5 1.5h-17C2.7 10 2 9.3 2 8.5v-3C2 4.7 2.7 4 3.5 4Zm2 1.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Zm3.2 0a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2ZM3.5 14h17c.8 0 1.5.7 1.5 1.5v3c0 .8-.7 1.5-1.5 1.5h-17C2.7 20 2 19.3 2 18.5v-3c0-.8.7-1.5 1.5-1.5Zm2 1.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Zm3.2 0a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Z" />
+    </Svg>
+  );
+}
+
+/**
+ * Services : une pile d'objets. Le collector historique utilise un disque plein
+ * (fa-circle), mais ce glyphe sert déjà à l'état « up » dans StatusBadge : le
+ * reprendre dans le menu rendrait les deux confondables.
+ */
+export function StackIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 2.6 22 7.3l-10 4.7L2 7.3l10-4.7Zm8.4 8.2 1.6.7-10 4.7-10-4.7 1.6-.7L12 14.6l8.4-3.8Zm0 4.6 1.6.8-10 4.7-10-4.7 1.6-.8L12 19.2l8.4-3.8Z" />
+    </Svg>
+  );
+}
+
+/** Réseaux : les nœuds câblés (fa-network-wired). */
+export function NetworkIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M9 3h6c.6 0 1 .4 1 1v3c0 .6-.4 1-1 1h-2v2h5.5c.3 0 .5.2.5.5V13h1c.6 0 1 .4 1 1v3c0 .6-.4 1-1 1h-4c-.6 0-1-.4-1-1v-3c0-.6.4-1 1-1h1v-1.5h-11V13h1c.6 0 1 .4 1 1v3c0 .6-.4 1-1 1H3c-.6 0-1-.4-1-1v-3c0-.6.4-1 1-1h1v-1.5c0-.3.2-.5.5-.5H11V8H9c-.6 0-1-.4-1-1V4c0-.6.4-1 1-1Z" />
+    </Svg>
+  );
+}
+
+/** Disques : le cylindre de base de données (fa-database). */
+export function DatabaseIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 2.5c4.4 0 8 1.2 8 2.8S16.4 8 12 8 4 6.8 4 5.3s3.6-2.8 8-2.8ZM4 8.2C5.6 9.2 8.6 9.8 12 9.8s6.4-.6 8-1.6v3.1c0 1.5-3.6 2.7-8 2.7s-8-1.2-8-2.7V8.2Zm0 5.7c1.6 1 4.6 1.6 8 1.6s6.4-.6 8-1.6v4.8c0 1.5-3.6 2.8-8 2.8s-8-1.3-8-2.8v-4.8Z" />
+    </Svg>
+  );
+}
+
+/** Codes application : l'astérisque du collector (fa-asterisk). */
+export function AsteriskIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M10.6 3h2.8v6l5.2-3 1.4 2.4-5.2 3 5.2 3-1.4 2.4-5.2-3v6h-2.8v-6l-5.2 3L4 14.4l5.2-3-5.2-3L5.4 6l5.2 3V3Z" />
+    </Svg>
+  );
+}
+
+/** Groupes : les silhouettes du collector (fa-users). */
+/** Instance de service : le disque à moitié plein du collector (fa-adjust, `svcinstance`). */
+export function InstanceIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 2.5a9.5 9.5 0 1 1 0 19 9.5 9.5 0 0 1 0-19Zm0 2.2v14.6a7.3 7.3 0 0 0 0-14.6Z" />
+    </Svg>
+  );
+}
+
+/** Obsolescence : la bouée du collector (fa-life-ring, `obs16`). */
+export function LifeRingIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M12 2.5a9.5 9.5 0 1 1 0 19 9.5 9.5 0 0 1 0-19Zm-4.6 3.3A7.3 7.3 0 0 0 5.8 7.4l2.5 2.5c.4-.7.9-1.2 1.6-1.6L7.4 5.8Zm9.2 0-2.5 2.5c.7.4 1.2.9 1.6 1.6l2.5-2.5a7.3 7.3 0 0 0-1.6-1.6ZM12 9.4a2.6 2.6 0 1 0 0 5.2 2.6 2.6 0 0 0 0-5.2Zm-3.7 4.7-2.5 2.5c.5.6 1 1.1 1.6 1.6l2.5-2.5c-.7-.4-1.2-.9-1.6-1.6Zm7.4 0c-.4.7-.9 1.2-1.6 1.6l2.5 2.5c.6-.5 1.1-1 1.6-1.6l-2.5-2.5Z"
+      />
+    </Svg>
+  );
+}
+
+/** Rafraîchissement : les deux flèches en cercle (fa-sync). */
+export function RefreshIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 4.5a7.5 7.5 0 0 1 6.9 4.5H16a1 1 0 1 0 0 2h5a1 1 0 0 0 1-1V5a1 1 0 1 0-2 0v2.1A9.5 9.5 0 0 0 2.6 10.8a1 1 0 0 0 2 .3A7.5 7.5 0 0 1 12 4.5Zm8.6 7.8a1 1 0 0 0-1.2.9A7.5 7.5 0 0 1 5.1 15H8a1 1 0 1 0 0-2H3a1 1 0 0 0-1 1v5a1 1 0 1 0 2 0v-2.1a9.5 9.5 0 0 0 17.4-3.7 1 1 0 0 0-.8-1Z" />
+    </Svg>
+  );
+}
+
+/** Journal : l'horloge qui remonte le temps du collector (fa-history, `log16`). */
+export function HistoryIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12.5 3a9 9 0 1 1-8.3 12.5 1 1 0 0 1 1.9-.8A7 7 0 1 0 6 8.4h2.3a1 1 0 1 1 0 2H3.7a1 1 0 0 1-1-1V4.8a1 1 0 0 1 2 0v1.8A9 9 0 0 1 12.5 3Zm-.2 4c.6 0 1 .4 1 1v3.6l2.6 1.6a1 1 0 1 1-1 1.7l-3.1-1.9a1 1 0 0 1-.5-.9V8c0-.6.4-1 1-1Z" />
+    </Svg>
+  );
+}
+
+/** Filtre : l'entonnoir du collector (fa-filter, `filter16`). */
+export function FilterIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3.5 4h17a1 1 0 0 1 .8 1.6L14.5 14v5.4a1 1 0 0 1-.5.9l-3 1.7a1 1 0 0 1-1.5-.9V14L2.7 5.6A1 1 0 0 1 3.5 4Z" />
+    </Svg>
+  );
+}
+
+/** Utilisateur : la silhouette seule du collector (fa-user, `guy16`). */
+export function UserIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 1.8c-3.9 0-8 2-8 4.7V21h16v-2.5c0-2.7-4.1-4.7-8-4.7Z" />
+    </Svg>
+  );
+}
+
+export function UsersIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M8.5 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm8.2.2a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8.5 12.6c-3.2 0-6.5 1.6-6.5 3.7V20h13v-3.7c0-2.1-3.3-3.7-6.5-3.7Zm8.2.3c-.7 0-1.4.1-2 .3 1.3 1 2.1 2.3 2.1 3.7V20H22v-3.3c0-1.9-2.6-3.1-5.3-3.1Z" />
+    </Svg>
+  );
+}
+
+/* --- Icônes utilitaires. Neutres : ce sont des commandes, pas des objets. --- */
+
+/** Ouverture d'un menu déroulant. */
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M5.3 8.3a1 1 0 0 1 1.4 0L12 13.6l5.3-5.3a1 1 0 1 1 1.4 1.4l-6 6a1 1 0 0 1-1.4 0l-6-6a1 1 0 0 1 0-1.4Z" />
+    </Svg>
+  );
+}
+
+/** Déconnexion (fa-sign-out-alt). */
+export function SignOutIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M5 3h7a1 1 0 1 1 0 2H5v14h7a1 1 0 1 1 0 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm11.3 4.3a1 1 0 0 1 1.4 0l4 4a1 1 0 0 1 0 1.4l-4 4a1 1 0 0 1-1.4-1.4l2.3-2.3H9a1 1 0 1 1 0-2h9.6l-2.3-2.3a1 1 0 0 1 0-1.4Z" />
+    </Svg>
+  );
+}
+
+/** Sélecteur de colonnes. */
+export function ColumnsIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3.5 4h4c.3 0 .5.2.5.5v15c0 .3-.2.5-.5.5h-4a.5.5 0 0 1-.5-.5v-15c0-.3.2-.5.5-.5Zm6.5 0h4c.3 0 .5.2.5.5v15c0 .3-.2.5-.5.5h-4a.5.5 0 0 1-.5-.5v-15c0-.3.2-.5.5-.5Zm6.5 0h4c.3 0 .5.2.5.5v15c0 .3-.2.5-.5.5h-4a.5.5 0 0 1-.5-.5v-15c0-.3.2-.5.5-.5Z" />
+    </Svg>
+  );
+}
+
+/** Champ de filtre. */
+export function SearchIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M10.5 3a7.5 7.5 0 1 1-4.7 13.3l-2.6 2.6a1.2 1.2 0 0 1-1.7-1.7l2.6-2.6A7.5 7.5 0 0 1 10.5 3Zm0 2.4a5.1 5.1 0 1 0 0 10.2 5.1 5.1 0 0 0 0-10.2Z" />
+    </Svg>
+  );
+}
+
+/** Retour aux valeurs par défaut. */
+export function ResetIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 4a8 8 0 1 1-7.6 10.5 1.2 1.2 0 0 1 2.3-.8A5.6 5.6 0 1 0 12 6.4c-1.4 0-2.7.5-3.7 1.4l1.9 1.9c.4.4.1 1-.4 1H4.3a.6.6 0 0 1-.6-.6V4.6c0-.5.6-.8 1-.4l1.6 1.6A8 8 0 0 1 12 4Z" />
+    </Svg>
+  );
+}
+
+/** Fermeture d'un panneau. */
+export function CloseIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M6.2 4.5 12 10.3l5.8-5.8a1.2 1.2 0 0 1 1.7 1.7L13.7 12l5.8 5.8a1.2 1.2 0 0 1-1.7 1.7L12 13.7l-5.8 5.8a1.2 1.2 0 0 1-1.7-1.7l5.8-5.8-5.8-5.8a1.2 1.2 0 0 1 1.7-1.7Z" />
+    </Svg>
+  );
+}
+
+/** Suppression. */
+export function TrashIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M9.4 2.5h5.2c.6 0 1.1.5 1.1 1.1v1.1h4a1 1 0 1 1 0 2h-.7l-.9 12.1a2.2 2.2 0 0 1-2.2 2.1H8.1a2.2 2.2 0 0 1-2.2-2.1L5 6.7h-.7a1 1 0 1 1 0-2h4V3.6c0-.6.5-1.1 1.1-1.1Zm.7 2.2h3.8v-.2h-3.8v.2ZM9.9 9a.8.8 0 0 0-.8.8v7.6a.8.8 0 0 0 1.6 0V9.8a.8.8 0 0 0-.8-.8Zm4.2 0a.8.8 0 0 0-.8.8v7.6a.8.8 0 0 0 1.6 0V9.8a.8.8 0 0 0-.8-.8Z" />
+    </Svg>
+  );
+}
+
+/* --- Familles de colonnes, reprises des classes du collector historique. --- */
+
+/** Cluster (fa-circle-notch). */
+export function ClusterIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 3a9 9 0 1 1-8.3 5.5 1.2 1.2 0 1 1 2.2.9A6.6 6.6 0 1 0 12 5.4a1.2 1.2 0 0 1 0-2.4Z" />
+    </Svg>
+  );
+}
+
+/** Environnement (fa-clone). */
+export function EnvIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M8.5 3h11c.8 0 1.5.7 1.5 1.5v11c0 .8-.7 1.5-1.5 1.5h-11c-.8 0-1.5-.7-1.5-1.5v-11C7 3.7 7.7 3 8.5 3ZM4.5 7H6v9.5c0 .8.7 1.5 1.5 1.5H17v1.5c0 .8-.7 1.5-1.5 1.5h-11c-.8 0-1.5-.7-1.5-1.5v-11C3 7.7 3.7 7 4.5 7Z" />
+    </Svg>
+  );
+}
+
+/** Zone de sécurité (fa-fire). */
+export function FirewallIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 2.2c.3 2.6-.8 4.2-2.1 5.7-1.4 1.6-3 3.1-3 6.1a5.1 5.1 0 0 0 10.2 0c0-1.4-.5-2.5-1.2-3.5-.3.7-.9 1.2-1.7 1.2-1.1 0-1.8-.8-1.8-2 0-2.1.7-4.6-.4-7.5Zm0 11.1c1 1.3 1.6 2 1.6 3a1.6 1.6 0 0 1-3.2 0c0-1 .6-1.7 1.6-3Z" />
+    </Svg>
+  );
+}
+
+/** Localisation (fa-map-marker). */
+export function LocationIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 2.2a7 7 0 0 0-7 7c0 5 6.2 12 6.4 12.3.3.4.9.4 1.2 0 .2-.3 6.4-7.3 6.4-12.3a7 7 0 0 0-7-7Zm0 9.8a2.9 2.9 0 1 1 0-5.8 2.9 2.9 0 0 1 0 5.8Z" />
+    </Svg>
+  );
+}
+
+/** Hyperviseur (fa-cloud). */
+export function CloudIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M17.6 10.1a5.6 5.6 0 0 0-10.5-1.7A4.6 4.6 0 0 0 7.6 19h9.6a4.5 4.5 0 0 0 .4-8.9Z" />
+    </Svg>
+  );
+}
+
+/** Système d'exploitation. */
+export function OsIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M4 4h16c.8 0 1.5.7 1.5 1.5v13c0 .8-.7 1.5-1.5 1.5H4c-.8 0-1.5-.7-1.5-1.5v-13C2.5 4.7 3.2 4 4 4Zm0 4.6v9.4h16V8.6H4Zm1.6-3.1a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm2.8 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" />
+    </Svg>
+  );
+}
+
+/** Processeur (fa-microchip). */
+export function CpuIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M9.2 2a.8.8 0 0 1 .8.8V4h1.2V2.8a.8.8 0 1 1 1.6 0V4H14V2.8a.8.8 0 1 1 1.6 0V4h1.1c1.3 0 2.3 1 2.3 2.3v1.1h1.2a.8.8 0 1 1 0 1.6H19v1.2h1.2a.8.8 0 1 1 0 1.6H19v1.2h1.2a.8.8 0 1 1 0 1.6H19v1.1c0 1.3-1 2.3-2.3 2.3h-1.1V20a.8.8 0 1 1-1.6 0v-1.2h-1.2V20a.8.8 0 1 1-1.6 0v-1.2H10V20a.8.8 0 1 1-1.6 0v-1.2H7.3A2.3 2.3 0 0 1 5 16.5v-1.1H3.8a.8.8 0 1 1 0-1.6H5v-1.2H3.8a.8.8 0 1 1 0-1.6H5V9.8H3.8a.8.8 0 1 1 0-1.6H5V7.1c0-1.3 1-2.3 2.3-2.3h1.1V2.8c0-.4.4-.8.8-.8Zm-.7 6.2c-.3 0-.5.2-.5.5v6.6c0 .3.2.5.5.5h6.6c.3 0 .5-.2.5-.5V8.7c0-.3-.2-.5-.5-.5H8.5Z" />
+    </Svg>
+  );
+}
+
+/** Mémoire (fa-memory). */
+export function MemoryIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M2.8 6h18.4c.7 0 1.3.6 1.3 1.3V11h-.8c-.7 0-1.2.6-1.2 1.3s.5 1.2 1.2 1.2h.8v3.2c0 .7-.6 1.3-1.3 1.3H2.8c-.7 0-1.3-.6-1.3-1.3v-3.2h.8c.7 0 1.2-.5 1.2-1.2s-.5-1.3-1.2-1.3h-.8V7.3C1.5 6.6 2.1 6 2.8 6Zm3.4 3.2v4.2h2.2V9.2H6.2Zm4.5 0v4.2h2.2V9.2h-2.2Zm4.5 0v4.2h2.2V9.2h-2.2Z" />
+    </Svg>
+  );
+}
+
+/** Horodatage (fa-clock). */
+export function ClockIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 2.5a9.5 9.5 0 1 1 0 19 9.5 9.5 0 0 1 0-19Zm0 2.2a7.3 7.3 0 1 0 0 14.6 7.3 7.3 0 0 0 0-14.6Zm-.1 2.3c.5 0 1 .4 1 1v4.3l3 1.8c.4.3.6.9.3 1.3-.3.5-.9.6-1.3.3l-3.5-2.1a1 1 0 0 1-.5-.9V8a1 1 0 0 1 1-1Z" />
+    </Svg>
+  );
+}
+
+/** Date, devant un horodatage dans les listes (fa-calendar-alt). */
+export function CalendarIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M8 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V3a1 1 0 0 1 1-1ZM5 10v9h14v-9H5Zm2 2h4v4H7v-4Z"
+      />
+    </Svg>
+  );
+}
+
+/** Alimentation (fa-bolt). */
+export function PowerIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M14.6 2 5.8 12.4c-.4.5-.1 1.2.6 1.2h4.2l-1.4 8 8.9-10.4c.4-.5.1-1.2-.6-1.2h-4.2l1.3-8Z" />
+    </Svg>
+  );
+}
+
+/** Notifications (fa-bell). */
+export function BellIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 2.2c.9 0 1.6.7 1.6 1.6v.6a6.2 6.2 0 0 1 4.6 6v2.8l1.5 2.4c.4.6 0 1.4-.8 1.4H5.1c-.7 0-1.2-.8-.8-1.4l1.5-2.4v-2.8a6.2 6.2 0 0 1 4.6-6v-.6c0-.9.7-1.6 1.6-1.6Zm0 19.6a2.6 2.6 0 0 1-2.5-2h5a2.6 2.6 0 0 1-2.5 2Z" />
+    </Svg>
+  );
+}
+
+/** Plan de secours (fa-bomb, classe `drp16` du collector). */
+export function DrpIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M17.6 3a1 1 0 0 1 1 1v.6h.6a1 1 0 1 1 0 2h-.6v.6a1 1 0 1 1-2 0v-.6H16a1 1 0 1 1 0-2h.6V4a1 1 0 0 1 1-1Zm-3.1 3.6 1.3 1.3-1.5 1.5a7.5 7.5 0 1 1-2.1-1.4l1.4-1.4ZM9.5 11a4.5 4.5 0 0 0-3.2 1.3 1 1 0 1 0 1.4 1.4A2.5 2.5 0 0 1 9.5 13a1 1 0 1 0 0-2Z" />
+    </Svg>
+  );
+}
+
+/** État d'un objet, rendu en badge. */
+export function StateIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M7.5 6.5h9a5.5 5.5 0 0 1 0 11h-9a5.5 5.5 0 0 1 0-11Zm0 2a3.5 3.5 0 1 0 0 7h9a3.5 3.5 0 1 0 0-7h-9Zm0 1.6a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8Z" />
+    </Svg>
+  );
+}
+
+/** Édition. */
+export function PencilIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M17.6 2.6c.5 0 1 .2 1.4.6l1.8 1.8a2 2 0 0 1 0 2.8L9.2 19.4l-5.7 1.9a.7.7 0 0 1-.9-.9l1.9-5.7L16.2 3.2c.4-.4.9-.6 1.4-.6Zm-2.2 3.9L6 15.9l-1 3.1 3.1-1 9.4-9.4-2.1-2.1Z" />
+    </Svg>
+  );
+}
+
+/** Validation d'une saisie. */
+export function CheckIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M20.3 5.6a1.2 1.2 0 0 1 0 1.7L10 17.6a1.2 1.2 0 0 1-1.7 0l-4.6-4.6a1.2 1.2 0 1 1 1.7-1.7l3.7 3.7 9.5-9.4a1.2 1.2 0 0 1 1.7 0Z" />
+    </Svg>
+  );
+}

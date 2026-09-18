@@ -1,0 +1,72 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Expose les tokens comme utilitaires Tailwind : bg-surface, text-ink, border-line, text-state-down... */
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-state-up: var(--state-up);
+  --color-state-up-soft: var(--state-up-soft);
+  --color-state-warn: var(--state-warn);
+  --color-state-warn-soft: var(--state-warn-soft);
+  --color-state-down: var(--state-down);
+  --color-state-down-soft: var(--state-down-soft);
+  --color-state-unknown: var(--state-unknown);
+  --color-state-unknown-soft: var(--state-unknown-soft);
+
+  --color-icon-dashboard: var(--icon-dashboard);
+  --color-icon-node: var(--icon-node);
+  --color-icon-service: var(--icon-service);
+  --color-icon-network: var(--icon-network);
+  --color-icon-disk: var(--icon-disk);
+  --color-icon-app: var(--icon-app);
+  --color-icon-group: var(--icon-group);
+
+  --font-sans: var(--font-sans);
+  --text-data: var(--text-data);
+  --text-ui: var(--text-ui);
+  --text-title: var(--text-title);
+  --radius-control: var(--radius-control);
+  --radius-panel: var(--radius-panel);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    font-size: 100%;
+    color: var(--ink);
+    background: var(--surface);
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    font-size: var(--text-ui);
+    line-height: 1.45;
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 1px;
+  }
+  /* Les chiffres s'alignent en colonne dans toutes les données tabulaires */
+  table,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

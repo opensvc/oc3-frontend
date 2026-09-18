@@ -1,0 +1,90 @@
+/*
+ * Tokens de design du collector oc3.
+ * Ce fichier est le contrat d'identité visuelle : la webapp pourra le reprendre tel quel.
+ * Les composants ne consomment jamais une couleur en dur, uniquement ces variables.
+ */
+
+:root {
+  /* Surfaces et encre : neutre froid, pensé pour de longues sessions sur des tables denses */
+  --surface: #f6f7f5;
+  --surface-raised: #ffffff;
+  --surface-sunken: #eceeeb;
+  --ink: #1a2229;
+  --ink-muted: #5b6770;
+  --line: #d9dedb;
+  --line-strong: #b9c1bd;
+
+  /* Accent : pétrole, réservé à la navigation, au focus et à la sélection */
+  --accent: #0f5b66;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcebec;
+  --focus-ring: #0f5b66;
+
+  /* États métier OpenSVC. Toujours doublés d'une icône ou d'un libellé, jamais la couleur seule */
+  --state-up: #2e7d4f;
+  --state-up-soft: #e0f0e6;
+  --state-warn: #a86b12;
+  --state-warn-soft: #f7ecd9;
+  --state-down: #b8322a;
+  --state-down-soft: #f6e1df;
+  --state-unknown: #6f7a82;
+  --state-unknown-soft: #e8ebec;
+
+  /* Couleurs des icônes du menu. Une teinte par entrée, comme dans le collector
+     historique, mais désaturée : l'icône identifie la vue, elle ne doit pas
+     concurrencer les couleurs d'état ni l'accent. Chacune est tenue à distance de
+     up / warn / down pour qu'aucune icône ne se lise comme un statut. L'entrée
+     racine garde l'encre : l'ambre du collector historique est trop proche de
+     l'état warn pour servir de décor permanent. */
+  --icon-dashboard: #1a2229;
+  --icon-node: #3d6fb4;
+  --icon-service: #2f7d6a;
+  --icon-network: #2f7f8c;
+  --icon-disk: #7d7a1e;
+  --icon-app: #a32a72;
+  --icon-group: #a55446;
+
+  /* Typographie */
+  --font-sans: "IBM Plex Sans Variable", system-ui, sans-serif;
+  --text-data: 0.8125rem; /* 13px : cellules de tables */
+  --text-ui: 0.875rem; /* 14px : contrôles et texte courant */
+  --text-title: 1.125rem;
+
+  /* Densité */
+  --row-height: 1.75rem;
+  --radius-control: 3px;
+  --radius-panel: 6px;
+}
+
+.dark {
+  --surface: #151c21;
+  --surface-raised: #1c252b;
+  --surface-sunken: #10161a;
+  --ink: #e3e8e6;
+  --ink-muted: #95a1a8;
+  --line: #2b363d;
+  --line-strong: #3d4a52;
+
+  --accent: #5fb3bd;
+  --accent-ink: #0c1417;
+  --accent-soft: #1d3a3f;
+  --focus-ring: #5fb3bd;
+
+  --state-up: #5cbf83;
+  --state-up-soft: #1b3326;
+  --state-warn: #e0a64a;
+  --state-warn-soft: #3a2d17;
+  --state-down: #ec6f66;
+  --state-down-soft: #3d1f1d;
+  --state-unknown: #9aa5ac;
+  --state-unknown-soft: #262f35;
+
+  /* Mêmes teintes, éclaircies et adoucies pour un fond sombre. */
+  --icon-dashboard: #e3e8e6;
+  --icon-node: #7fa9e0;
+  --icon-service: #5fb8a2;
+  --icon-network: #5fb0bd;
+  --icon-disk: #b8b45c;
+  --icon-app: #d178ab;
+  --icon-group: #d1907f;
+}

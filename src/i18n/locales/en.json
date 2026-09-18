@@ -1,0 +1,736 @@
+{
+  "nav": {
+    "nodes": "Nodes",
+    "services": "Services",
+    "dashboard": "Dashboard",
+    "main": "Main",
+    "hideMenu": "Hide the menu",
+    "showMenu": "Show the menu",
+    "categories": {
+      "infrastructure": "Infrastructure",
+      "dataManagement": "Data Management",
+      "administration": "Administration"
+    },
+    "apps": "Apps",
+    "networks": "Networks",
+    "disks": "Disks",
+    "groups": "Groups",
+    "tags": "Tags",
+    "users": "Users",
+    "instances": "Service Instances",
+    "obsolescence": "Obsolescence",
+    "logs": "Logs",
+    "filters": "Filters",
+    "filtersets": "Filtersets"
+  },
+  "header": {
+    "search": "Search the collector",
+    "sessionFilter": "Session filter",
+    "noFilter": "None",
+    "actionQueue": "Action queue",
+    "accountMenu": "Account menu"
+  },
+  "state": {
+    "up": "up",
+    "warn": "warn",
+    "down": "down",
+    "unknown": "n/a"
+  },
+  "nodes": {
+    "title": "Nodes",
+    "fields": {
+      "nodename": "Name",
+      "fqdn": "FQDN",
+      "node_id": "Node id",
+      "app": "App",
+      "node_env": "Environment",
+      "status": "Status",
+      "team_responsible": "Responsible team",
+      "team_integ": "Integration team",
+      "team_support": "Support team",
+      "manufacturer": "Manufacturer",
+      "model": "Model",
+      "serial": "Serial number",
+      "type": "Type",
+      "cpu_vendor": "CPU vendor",
+      "cpu_model": "CPU model",
+      "cpu_freq": "CPU frequency",
+      "cpu_cores": "Cores",
+      "cpu_threads": "Threads",
+      "cpu_dies": "Dies",
+      "mem_bytes": "Memory",
+      "mem_banks": "Memory banks",
+      "mem_slots": "Memory slots",
+      "power_supply_nb": "Power supplies",
+      "enclosure": "Enclosure",
+      "enclosureslot": "Enclosure slot",
+      "os_name": "OS",
+      "os_release": "Release",
+      "os_vendor": "OS vendor",
+      "os_arch": "Architecture",
+      "os_kernel": "Kernel",
+      "os_update": "OS update",
+      "tz": "Timezone",
+      "last_boot": "Last boot",
+      "loc_country": "Country",
+      "loc_city": "City",
+      "loc_addr": "Address",
+      "loc_zip": "Postal code",
+      "loc_building": "Building",
+      "loc_floor": "Floor",
+      "loc_room": "Room",
+      "loc_rack": "Rack",
+      "sec_zone": "Security zone",
+      "version": "Agent version",
+      "cluster_id": "Cluster id",
+      "listener_port": "Listener port",
+      "connect_to": "Connect to",
+      "last_comm": "Last contact",
+      "updated": "Updated",
+      "node_frozen": "Frozen",
+      "warranty_end": "Warranty end",
+      "maintenance_end": "Maintenance end",
+      "os_segment": "OS segment",
+      "os_concat": "OS (full)",
+      "assetname": "Asset name",
+      "asset_env": "Asset environment",
+      "role": "Role",
+      "power_cabinet1": "Power cabinet 1",
+      "power_cabinet2": "Power cabinet 2",
+      "power_protect": "Power protection",
+      "power_protect_breaker": "Protection breaker",
+      "power_breaker1": "Breaker 1",
+      "power_breaker2": "Breaker 2",
+      "blade_cabinet": "Blade cabinet",
+      "hv": "Hypervisor",
+      "hvpool": "Hypervisor pool",
+      "hvvdc": "Virtual datacenter",
+      "collector": "Collector",
+      "sp_version": "Service processor version",
+      "bios_version": "BIOS version",
+      "node_frozen_at": "Frozen at",
+      "snooze_till": "Snoozed until",
+      "notifications": "Notifications",
+      "action_type": "Action type",
+      "hw_obs_warn_date": "Hardware obsolescence warning",
+      "hw_obs_alert_date": "Hardware obsolescence alert",
+      "os_obs_warn_date": "OS obsolescence warning",
+      "os_obs_alert_date": "OS obsolescence alert"
+    },
+    "detail": {
+      "title": "Node details",
+      "groups": {
+        "identity": "Identity",
+        "hardware": "Hardware",
+        "system": "System",
+        "location": "Location",
+        "collector": "Collector"
+      }
+    },
+    "create": {
+      "open": "New node",
+      "title": "New node",
+      "intro": "A node normally registers itself from the agent. Create one by hand only when you need the record before the agent reports.",
+      "defaultApp": "Default for my account",
+      "exists": "A node named {{nodename}} already exists. Creating it again would modify it.",
+      "submit": "Create",
+      "submitting": "Creating…"
+    },
+    "delete": {
+      "question": "Delete {{nodename}}? Its instances, alerts and collected records go with it. This cannot be undone."
+    },
+    "related": {
+      "label": "Node data",
+      "hardware": "Hardware inventory",
+      "alerts": "Alerts",
+      "networks": "Networks",
+      "storage": "Storage"
+    },
+    "hardware": {
+      "reported": "Reported by the agent",
+      "empty": "No hardware inventory: the agent has not reported any for this node.",
+      "types": {
+        "mem": "Memory",
+        "cpu": "Processors",
+        "pci": "PCI devices",
+        "usb": "USB devices",
+        "disk": "Disks"
+      },
+      "fields": {
+        "hw_path": "Address",
+        "hw_class": "Class",
+        "hw_description": "Description",
+        "hw_driver": "Driver"
+      }
+    },
+    "alerts": {
+      "open": "Open in the dashboard",
+      "empty": "No alert on this node."
+    },
+    "networks": {
+      "empty": "No IP address reported for this node.",
+      "open": "Open in the Networks view",
+      "undeclared": "Not in a declared network",
+      "deprecated": "deprecated",
+      "fields": {
+        "addr": "Address",
+        "type": "Family",
+        "net_name": "Network",
+        "net_gateway": "Gateway",
+        "flag_deprecated": "State"
+      }
+    }
+  },
+  "auth": {
+    "title": "Sign in",
+    "intro": "The collector uses HTTP Basic authentication for now. OIDC comes later.",
+    "user": "User",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "signOut": "Sign out",
+    "rejected": "The collector refused these credentials."
+  },
+  "list": {
+    "filterset": "Filterset",
+    "noFilterset": "No filterset",
+    "perPage": "Per page",
+    "range": "{{from}}–{{to}}",
+    "previous": "Previous",
+    "next": "Next",
+    "loading": "Loading…",
+    "error": "Could not load the list: {{message}}",
+    "empty": "Nothing to show.",
+    "sortHint": "Click a column to sort. Shift-click to add a secondary key.",
+    "columns": "Columns ({{shown}}/{{total}})",
+    "filterColumns": "Filter columns",
+    "resetColumns": "Reset to default columns",
+    "selected": "{{count}} selected",
+    "clearSelection": "Clear",
+    "selectAll": "Select every row on this page",
+    "selectRow": "Select this row",
+    "selected_other": "{{count}} selected",
+    "selectEverything": "Select all matching rows",
+    "selectingEverything": "Selecting…",
+    "selectedEverywhere": "{{count}} selected, every page",
+    "selectedEverywhere_other": "{{count}} selected, every page"
+  },
+  "detail": {
+    "close": "Close",
+    "loading": "Loading details…",
+    "error": "Could not load the details: {{message}}",
+    "missing": "This object no longer exists.",
+    "delete": "Delete",
+    "deleteConfirm": "Delete",
+    "deleting": "Deleting…",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "editHint": "Only attributes the agent does not report are editable. The others are overwritten on the next asset push.",
+    "editField": "Edit {{field}}",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "services": {
+    "title": "Services",
+    "fields": {
+      "svcname": "Name",
+      "svc_id": "Service id",
+      "svc_app": "App",
+      "svc_env": "Environment",
+      "cluster_id": "Cluster id",
+      "svc_comment": "Comment",
+      "svc_availstatus": "Availability",
+      "svc_status": "Overall status",
+      "svc_frozen": "Frozen",
+      "svc_provisioned": "Provisioned",
+      "svc_status_updated": "Status updated",
+      "svc_snooze_till": "Snoozed until",
+      "svc_notifications": "Notifications",
+      "svc_topology": "Topology",
+      "svc_placement": "Placement",
+      "svc_nodes": "Nodes",
+      "svc_ha": "High availability",
+      "svc_autostart": "Autostart",
+      "svc_flex_min_nodes": "Flex min nodes",
+      "svc_flex_max_nodes": "Flex max nodes",
+      "svc_flex_target": "Flex target",
+      "svc_flex_cpu_low_threshold": "Flex CPU low threshold",
+      "svc_flex_cpu_high_threshold": "Flex CPU high threshold",
+      "svc_wave": "Wave",
+      "svc_drpnode": "DR node",
+      "svc_drpnodes": "DR nodes",
+      "svc_drptype": "DR type",
+      "svc_metrocluster": "Metrocluster",
+      "svc_drnoaction": "No DR action",
+      "svc_created": "Created",
+      "svc_config_updated": "Config updated",
+      "updated": "Updated",
+      "svc_hostid": "Host id",
+      "id": "Record id",
+      "svc_config": "Configuration"
+    },
+    "detail": {
+      "title": "Service details",
+      "groups": {
+        "identity": "Identity",
+        "state": "State",
+        "placement": "Placement",
+        "disasterRecovery": "Disaster recovery",
+        "collector": "Collector"
+      }
+    },
+    "related": {
+      "label": "Service data",
+      "storage": "Storage"
+    }
+  },
+  "alerts": {
+    "fields": {
+      "id": "Alert id",
+      "dash_type": "Type",
+      "dash_severity": "Severity",
+      "alert": "Message",
+      "object": "Object",
+      "dash_env": "Environment",
+      "dash_instance": "Instance",
+      "dash_created": "Raised",
+      "dash_updated": "Updated",
+      "services.svcname": "Service",
+      "nodes.nodename": "Node",
+      "svc_id": "Service id",
+      "node_id": "Node id",
+      "dash_fmt": "Message template",
+      "dash_dict": "Message values",
+      "dash_dict_md5": "Values checksum"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "severity": {
+      "critical": "Critical",
+      "warning": "Warning",
+      "info": "Informational"
+    },
+    "detail": {
+      "title": "Alert details",
+      "groups": {
+        "alert": "Alert",
+        "object": "Object",
+        "raw": "Raw entry"
+      }
+    }
+  },
+  "apps": {
+    "fields": {
+      "app": "Code",
+      "description": "Description",
+      "app_domain": "Domain",
+      "app_team_ops": "Ops team",
+      "id": "Record id",
+      "updated": "Updated"
+    },
+    "title": "Application codes",
+    "detail": {
+      "title": "Application code",
+      "groups": {
+        "identity": "Properties"
+      }
+    },
+    "create": {
+      "open": "New app",
+      "title": "New application code",
+      "submit": "Create",
+      "submitting": "Creating…"
+    },
+    "delete": {
+      "question": "Delete the {{app}} code? Its responsibles and publications go with it. This cannot be undone."
+    }
+  },
+  "networks": {
+    "fields": {
+      "id": "Record id",
+      "node_id": "Node id",
+      "nodename": "Node",
+      "intf": "Interface",
+      "mac": "MAC address",
+      "type": "Address type",
+      "addr": "Address",
+      "mask": "Mask",
+      "updated": "Updated",
+      "flag_deprecated": "Deprecated",
+      "net_id": "Network id",
+      "net_name": "Network",
+      "net_network": "Network address",
+      "net_netmask": "Network mask",
+      "net_broadcast": "Broadcast",
+      "net_gateway": "Gateway",
+      "net_begin": "Range start",
+      "net_end": "Range end",
+      "net_pvid": "VLAN (PVID)",
+      "net_prio": "Priority",
+      "net_comment": "Comment",
+      "net_team_responsible": "Responsible team"
+    },
+    "title": "Networks",
+    "detail": {
+      "title": "IP address",
+      "groups": {
+        "address": "Address",
+        "network": "Network"
+      }
+    },
+    "delete": {
+      "question": "Delete the record for {{addr}} on {{nodename}}? If the node still reports this address, it comes back on the next asset push."
+    }
+  },
+  "disks": {
+    "fields": {
+      "disk_id": "Disk id",
+      "disk_name": "Name",
+      "disk_devid": "Device id",
+      "disk_vendor": "Vendor",
+      "disk_model": "Model",
+      "disk_size": "Size",
+      "disk_used": "Used",
+      "disk_alloc": "Allocated",
+      "disk_raid": "RAID",
+      "disk_group": "Disk group",
+      "disk_level": "RAID level",
+      "disk_arrayid": "Array",
+      "disk_dg": "Array disk group",
+      "disk_region": "Region",
+      "node_id": "Node id",
+      "nodename": "Node",
+      "svc_id": "Service id",
+      "svcname": "Service",
+      "app": "App",
+      "updated": "Updated"
+    },
+    "title": "Disks",
+    "detail": {
+      "title": "Disk",
+      "groups": {
+        "disk": "Disk",
+        "capacity": "Capacity",
+        "attachment": "Attachment"
+      }
+    }
+  },
+  "groups": {
+    "fields": {
+      "id": "Record id",
+      "role": "Name",
+      "privilege": "Privileged",
+      "description": "Description"
+    },
+    "title": "Groups",
+    "privilege": {
+      "T": "Privilege",
+      "F": "Ordinary"
+    },
+    "detail": {
+      "title": "Group",
+      "groups": {
+        "identity": "Properties"
+      }
+    },
+    "create": {
+      "open": "New group",
+      "title": "New group",
+      "intro": "A privilege group grants a right across the collector. An ordinary group only gathers users, to hold responsibilities.",
+      "exists": "A group named {{role}} already exists. Creating it again would modify it.",
+      "submit": "Create",
+      "submitting": "Creating…"
+    },
+    "delete": {
+      "question": "Delete the group {{role}}? Its memberships, responsibilities and publications go with it. This cannot be undone."
+    }
+  },
+  "tags": {
+    "fields": {
+      "tag_name": "Name",
+      "tag_exclude": "Excludes",
+      "tag_data": "Data",
+      "tag_id": "Tag id",
+      "tag_created": "Created"
+    },
+    "title": "Tags",
+    "detail": {
+      "title": "Tag",
+      "groups": {
+        "identity": "Properties"
+      }
+    }
+  },
+  "users": {
+    "title": "Users",
+    "fields": {
+      "id": "Record id",
+      "username": "Username",
+      "email": "Email",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "phone_work": "Work phone",
+      "im_type": "IM type",
+      "im_username": "IM username",
+      "email_notifications": "Email notifications",
+      "im_notifications": "IM notifications",
+      "email_log_level": "Email log level",
+      "im_log_level": "IM log level",
+      "email_notifications_delay": "Email notification delay",
+      "im_notifications_delay": "IM notification delay",
+      "lock_filter": "Locked filter",
+      "quota_app": "App quota",
+      "quota_org_group": "Organisation group quota",
+      "quota_docker_registries": "Docker registry quota"
+    },
+    "detail": {
+      "title": "User",
+      "groups": {
+        "identity": "Identity",
+        "notifications": "Notifications",
+        "restrictions": "Restrictions and quotas"
+      }
+    }
+  },
+  "profile": {
+    "title": "My profile"
+  },
+  "instances": {
+    "title": "Service Instances",
+    "fields": {
+      "services.svcname": "Service",
+      "nodes.nodename": "Node",
+      "svc_id": "Service id",
+      "node_id": "Node id",
+      "mon_svctype": "Service type",
+      "mon_availstatus": "Availability",
+      "mon_overallstatus": "Overall status",
+      "mon_smon_status": "Monitor status",
+      "mon_smon_global_expect": "Global expect",
+      "mon_ipstatus": "IP status",
+      "mon_fsstatus": "Filesystem status",
+      "mon_diskstatus": "Disk status",
+      "mon_containerstatus": "Container status",
+      "mon_sharestatus": "Share status",
+      "mon_syncstatus": "Sync status",
+      "mon_appstatus": "App status",
+      "mon_hbstatus": "Heartbeat status",
+      "mon_frozen": "Frozen",
+      "mon_frozen_at": "Frozen at",
+      "mon_encap_frozen_at": "Encapsulated frozen at",
+      "mon_vmname": "VM name",
+      "mon_vmtype": "VM type",
+      "mon_guestos": "Guest OS",
+      "mon_vcpus": "vCPUs",
+      "mon_vmem": "VM memory",
+      "mon_updated": "Updated",
+      "mon_changed": "Changed"
+    },
+    "detail": {
+      "title": "Service instance",
+      "groups": {
+        "identity": "Identity",
+        "state": "State",
+        "resources": "Resource status",
+        "virtualization": "Virtualization"
+      }
+    }
+  },
+  "obsolescence": {
+    "title": "Obsolescence",
+    "intro": "Warning and alert dates for each hardware model and OS release reported by nodes. The collector applies them to the matching nodes and raises dashboard alerts when they are reached.",
+    "fields": {
+      "id": "Record id",
+      "obs_type": "Type",
+      "obs_name": "Model or OS release",
+      "obs_count": "Nodes",
+      "obs_warn_date": "Warning date",
+      "obs_alert_date": "Alert date",
+      "obs_warn_date_updated_by": "Warning date set by",
+      "obs_warn_date_updated": "Warning date set on",
+      "obs_alert_date_updated_by": "Alert date set by",
+      "obs_alert_date_updated": "Alert date set on"
+    },
+    "type": {
+      "hw": "Hardware",
+      "os": "Operating system"
+    },
+    "refresh": {
+      "open": "Add missing settings",
+      "pending": "Adding…",
+      "done": "Settings are up to date with the inventory.",
+      "hint": "Creates a setting for every hardware model and OS release reported by nodes that has none yet. Existing settings and their dates are left unchanged."
+    },
+    "detail": {
+      "title": "Obsolescence setting",
+      "groups": {
+        "target": "Applies to",
+        "deadlines": "Deadlines"
+      },
+      "editHint": "Only the deadlines can be changed; clearing one removes it. A change applies to the matching nodes and updates their obsolescence alerts on the dashboard."
+    }
+  },
+  "logs": {
+    "title": "Logs",
+    "corrupted": "unreadable values",
+    "fields": {
+      "log_date": "Date",
+      "log_level": "Level",
+      "services.svcname": "Service",
+      "nodes.nodename": "Node",
+      "log_user": "User",
+      "log_action": "Action",
+      "log_fmt": "Message",
+      "log_raw_fmt": "Message template",
+      "log_dict": "Message values",
+      "id": "Record id",
+      "svc_id": "Service id",
+      "node_id": "Node id",
+      "log_entry_id": "Entry id",
+      "log_gtalk_sent": "Sent by IM",
+      "log_email_sent": "Sent by email"
+    },
+    "detail": {
+      "title": "Log event",
+      "groups": {
+        "event": "Event",
+        "object": "Object",
+        "raw": "Record"
+      }
+    }
+  },
+  "filters": {
+    "title": "Filters",
+    "intro": "A filter is one condition on a column of a collector table. Filtersets combine filters to select nodes and services.",
+    "fields": {
+      "f_label": "Filter",
+      "f_table": "Table",
+      "f_field": "Column",
+      "f_op": "Operator",
+      "f_value": "Value",
+      "f_author": "Last changed by",
+      "f_updated": "Last changed",
+      "id": "Record id",
+      "f_cksum": "Checksum"
+    },
+    "form": {
+      "open": "New filter",
+      "createTitle": "New filter",
+      "editTitle": "Edit filter",
+      "createIntro": "The collector checks that the column exists in the table and that no filter has the same definition.",
+      "editIntro": "Filtersets using this filter will select according to the new definition.",
+      "fieldPlaceholder": "e.g. os_name",
+      "valueHint": "With LIKE, % matches any text. With IN, separate values with commas.",
+      "preview": "Definition:",
+      "edit": "Edit",
+      "saveCreate": "Create",
+      "saveEdit": "Save",
+      "saving": "Saving…"
+    },
+    "delete": {
+      "question": "Delete the filter {{label}}? It is also removed from the filtersets using it. This cannot be undone."
+    },
+    "detail": {
+      "title": "Filter",
+      "groups": {
+        "definition": "Definition",
+        "record": "Record"
+      }
+    }
+  },
+  "filtersets": {
+    "title": "Filtersets",
+    "intro": "A filterset combines filters, and other filtersets, with logical operators. Views and compliance rulesets use filtersets to select nodes and services.",
+    "fields": {
+      "fset_name": "Name",
+      "fset_stats": "Stats filterset",
+      "fset_author": "Last changed by",
+      "fset_updated": "Last changed",
+      "id": "Record id"
+    },
+    "create": {
+      "open": "New filterset",
+      "title": "New filterset",
+      "intro": "Create the filterset, then add its filters in the detail panel.",
+      "exists": "A filterset named {{name}} already exists. Creating it again would modify it.",
+      "statsHint": "A stats filterset restricts the statistics views.",
+      "submit": "Create",
+      "submitting": "Creating…"
+    },
+    "detail": {
+      "title": "Filterset",
+      "editHint": "The name and the stats type can be changed. Renaming keeps the composition and its uses.",
+      "groups": {
+        "properties": "Properties"
+      }
+    },
+    "composition": {
+      "title": "Composition",
+      "intro": "Entries are evaluated in order, each joined to the previous ones by its operator.",
+      "empty": "No filter yet: the filterset selects nothing.",
+      "operatorFor": "Operator for {{label}}",
+      "openFilterset": "Open this filterset",
+      "up": "Move {{label}} up",
+      "down": "Move {{label}} down",
+      "remove": "Remove {{label}}",
+      "addOperator": "Operator of the new entry",
+      "addKind": "Type of the new entry",
+      "addTarget": "Entry to add",
+      "kindFilter": "Filter",
+      "kindFilterset": "Filterset",
+      "choose": "Choose…",
+      "add": "Add"
+    },
+    "matches": {
+      "title": "Selection",
+      "nodes_one": "{{count}} node",
+      "nodes_other": "{{count}} nodes",
+      "services_one": "{{count}} service",
+      "services_other": "{{count}} services"
+    },
+    "usage": {
+      "title": "Used by",
+      "none": "Not used by any filterset, ruleset or check threshold.",
+      "filtersets": "Filtersets",
+      "rulesets": "Rulesets",
+      "thresholds": "Check thresholds"
+    },
+    "delete": {
+      "question": "Delete the filterset {{name}}? Its composition goes with it. This cannot be undone.",
+      "questionUsed": "Delete the filterset {{name}}? It is used in {{count}} place(s), which lose it. Its composition goes with it. This cannot be undone."
+    }
+  },
+  "related": {
+    "properties": "Properties",
+    "count_one": "{{count}} item",
+    "count_other": "{{count}} items"
+  },
+  "storage": {
+    "hbas": {
+      "title": "Host bus adapters",
+      "empty": "No host bus adapter reported.",
+      "fields": {
+        "hba_id": "Identifier",
+        "hba_type": "Type",
+        "updated": "Reported"
+      }
+    },
+    "disks": {
+      "title": "Disks",
+      "empty": "No disk reported.",
+      "open": "Open in the Disks view",
+      "unassigned": "Not used by a service",
+      "total_one": "{{count}} disk, {{size}} in total",
+      "total_other": "{{count}} disks, {{size}} in total",
+      "fields": {
+        "disk_id": "Disk",
+        "disk_size": "Size",
+        "disk_used": "Used",
+        "disk_model": "Vendor and model",
+        "disk_dg": "Disk group"
+      }
+    }
+  }
+}

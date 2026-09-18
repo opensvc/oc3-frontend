@@ -1,0 +1,32 @@
+node_modules
+dist
+.env
+.env.local
+*.tsbuildinfo
+.DS_Store
+
+# Markdown files are ignored unless whitelisted below.
+*.md
+!src/assets/**/README.md
+
+# Local env files: Vite loads .env.development.local, .env.production.local… by mode.
+# They may carry machine-specific URLs or credentials; only the example is shared.
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Tool caches and reports
+.eslintcache
+coverage/
+test-results/
+playwright-report/
+
+# Editors and OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+Thumbs.db

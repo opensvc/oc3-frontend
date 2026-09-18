@@ -1,0 +1,164 @@
+import { useState, type FormEvent } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { api } from "@/lib/api/client";
+import { problemText } from "@/lib/api/problem";
+import { SlideOver } from "@/components/ui/SlideOver";
+
+const FIELDS = ["nodename", "node_env", "team_responsible", "fqdn", "loc_city"] as const;
+type Field = (typeof FIELDS)[number];
+
+const EMPTY: Record<Field, string> = {
+  nodename: "",
+  node_env: "",
+  team_responsible: "",
+  fqdn: "",
+  loc_city: "",
+};
+
+/** Codes application, pour proposer un choix plutôt qu'une saisie libre. */
+function useAppCodes() {
+  return useQuery({
+    queryKey: ["apps", "codes"],
+    queryFn: async () => {
+      const { data, error } = await api.GET("/apps", {
+        params: { query: { props: "app", orderby: "app", limit: 500 } },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      const rows = Array.isArray(data.data) ? data.data : [];
+      return rows.map((row) => row.app).filter((app): app is string => typeof app === "string");
+    },
+  });
+}
+
+/**
+ * Création d'un node à la main, comme l'entrée « add node » de la gestion de données
+ * du collector historique. En marche normale un node se crée tout seul, en
+ * s'enregistrant depuis l'agent.
+ *
+ * `POST /nodes` crée ou met à jour : un nodename déjà pris modifierait le node
+ * existant au lieu d'échouer. Un formulaire de création ne doit pas faire ça en
+ * silence, d'où la vérification préalable.
+ */
+export function CreateNodePanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [values, setValues] = useState<Record<Field, string>>(EMPTY);
+  const [app, setApp] = useState("");
+  const appCodes = useAppCodes();
+
+  const create = useMutation({
+    mutationFn: async () => {
+      const { response } = await api.GET("/nodes/{node_id}", {
+        params: { path: { node_id: values.nodename }, query: { props: "node_id" } },
+      });
+      if (response.status !== 404) {
+        throw new Error(t("nodes.create.exists", { nodename: values.nodename }));
+      }
+
+      const { data, error } = await api.POST("/nodes", {
+        body: {
+          nodename: values.nodename,
+          node_env: values.node_env,
+          team_responsible: values.team_responsible,
+          fqdn: values.fqdn,
+          loc_city: values.loc_city,
+          app,
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return data;
+    },
+    onSuccess: async () => {
+      setValues(EMPTY);
+      setApp("");
+      await queryClient.invalidateQueries({ queryKey: ["nodes"] });
+      onClose();
+    },
+  });
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    create.mutate();
+  }
+
+  return (
+    <SlideOver
+      open={open}
+      title={t("nodes.create.title")}
+      onClose={onClose}
+      closeLabel={t("detail.close")}
+    >
+      <p className="mb-3 text-ink-muted">{t("nodes.create.intro")}</p>
+
+      <form onSubmit={onSubmit}>
+        <div className="mb-3">
+          <label className="mb-1 block font-medium" htmlFor="create-node-nodename">
+            {t("nodes.fields.nodename")}
+          </label>
+          <input
+            id="create-node-nodename"
+            required
+            value={values.nodename}
+            onChange={(event) => {
+              setValues((previous) => ({ ...previous, nodename: event.target.value }));
+            }}
+            className="h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2"
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="mb-1 block font-medium" htmlFor="create-node-app">
+            {t("nodes.fields.app")}
+          </label>
+          <select
+            id="create-node-app"
+            value={app}
+            onChange={(event) => {
+              setApp(event.target.value);
+            }}
+            className="h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2"
+          >
+            {/* Vide : le serveur retient alors le code application par défaut de l'utilisateur. */}
+            <option value="">{t("nodes.create.defaultApp")}</option>
+            {(appCodes.data ?? []).map((code) => (
+              <option key={code} value={code}>
+                {code}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {FIELDS.filter((field) => field !== "nodename").map((field) => (
+          <div key={field} className="mb-3">
+            <label className="mb-1 block font-medium" htmlFor={`create-node-${field}`}>
+              {t(`nodes.fields.${field}`)}
+            </label>
+            <input
+              id={`create-node-${field}`}
+              value={values[field]}
+              onChange={(event) => {
+                setValues((previous) => ({ ...previous, [field]: event.target.value }));
+              }}
+              className="h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2"
+            />
+          </div>
+        ))}
+
+        {create.isError && (
+          <p role="alert" className="mb-3 text-state-down">
+            ■ {create.error.message}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={create.isPending}
+          className="h-8 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink disabled:opacity-60"
+        >
+          {create.isPending ? t("nodes.create.submitting") : t("nodes.create.submit")}
+        </button>
+      </form>
+    </SlideOver>
+  );
+}

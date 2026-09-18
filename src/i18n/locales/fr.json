@@ -1,0 +1,736 @@
+{
+  "nav": {
+    "nodes": "Nodes",
+    "services": "Services",
+    "dashboard": "Dashboard",
+    "main": "Principal",
+    "hideMenu": "Masquer le menu",
+    "showMenu": "Afficher le menu",
+    "categories": {
+      "infrastructure": "Infrastructure",
+      "dataManagement": "Gestion des données",
+      "administration": "Administration"
+    },
+    "apps": "Codes application",
+    "networks": "Réseaux",
+    "disks": "Disques",
+    "groups": "Groupes",
+    "tags": "Tags",
+    "users": "Utilisateurs",
+    "instances": "Instances de service",
+    "obsolescence": "Obsolescence",
+    "logs": "Journaux",
+    "filters": "Filtres",
+    "filtersets": "Filtersets"
+  },
+  "header": {
+    "search": "Rechercher dans le collector",
+    "sessionFilter": "Filtre de session",
+    "noFilter": "Aucun",
+    "actionQueue": "File d'actions",
+    "accountMenu": "Menu du compte"
+  },
+  "state": {
+    "up": "up",
+    "warn": "warn",
+    "down": "down",
+    "unknown": "n/a"
+  },
+  "nodes": {
+    "title": "Nodes",
+    "fields": {
+      "nodename": "Nom",
+      "fqdn": "FQDN",
+      "node_id": "Identifiant",
+      "app": "Application",
+      "node_env": "Environnement",
+      "status": "Statut",
+      "team_responsible": "Équipe responsable",
+      "team_integ": "Équipe d'intégration",
+      "team_support": "Équipe de support",
+      "manufacturer": "Constructeur",
+      "model": "Modèle",
+      "serial": "Numéro de série",
+      "type": "Type",
+      "cpu_vendor": "Fondeur CPU",
+      "cpu_model": "Modèle de CPU",
+      "cpu_freq": "Fréquence CPU",
+      "cpu_cores": "Cœurs",
+      "cpu_threads": "Threads",
+      "cpu_dies": "Dies",
+      "mem_bytes": "Mémoire",
+      "mem_banks": "Bancs mémoire",
+      "mem_slots": "Emplacements mémoire",
+      "power_supply_nb": "Alimentations",
+      "enclosure": "Châssis",
+      "enclosureslot": "Emplacement châssis",
+      "os_name": "OS",
+      "os_release": "Version",
+      "os_vendor": "Éditeur de l'OS",
+      "os_arch": "Architecture",
+      "os_kernel": "Noyau",
+      "os_update": "Mise à jour de l'OS",
+      "tz": "Fuseau horaire",
+      "last_boot": "Dernier démarrage",
+      "loc_country": "Pays",
+      "loc_city": "Ville",
+      "loc_addr": "Adresse",
+      "loc_zip": "Code postal",
+      "loc_building": "Bâtiment",
+      "loc_floor": "Étage",
+      "loc_room": "Salle",
+      "loc_rack": "Baie",
+      "sec_zone": "Zone de sécurité",
+      "version": "Version de l'agent",
+      "cluster_id": "Identifiant de cluster",
+      "listener_port": "Port d'écoute",
+      "connect_to": "Adresse de connexion",
+      "last_comm": "Dernier contact",
+      "updated": "Mis à jour",
+      "node_frozen": "Gelé",
+      "warranty_end": "Fin de garantie",
+      "maintenance_end": "Fin de maintenance",
+      "os_segment": "Segment de l'OS",
+      "os_concat": "OS (complet)",
+      "assetname": "Nom d'inventaire",
+      "asset_env": "Environnement d'inventaire",
+      "role": "Rôle",
+      "power_cabinet1": "Armoire électrique 1",
+      "power_cabinet2": "Armoire électrique 2",
+      "power_protect": "Protection électrique",
+      "power_protect_breaker": "Disjoncteur de protection",
+      "power_breaker1": "Disjoncteur 1",
+      "power_breaker2": "Disjoncteur 2",
+      "blade_cabinet": "Châssis de lames",
+      "hv": "Hyperviseur",
+      "hvpool": "Pool d'hyperviseurs",
+      "hvvdc": "Datacenter virtuel",
+      "collector": "Collector",
+      "sp_version": "Version du processeur de service",
+      "bios_version": "Version du BIOS",
+      "node_frozen_at": "Gelé le",
+      "snooze_till": "Alertes suspendues jusqu'à",
+      "notifications": "Notifications",
+      "action_type": "Type d'action",
+      "hw_obs_warn_date": "Avertissement d'obsolescence matérielle",
+      "hw_obs_alert_date": "Alerte d'obsolescence matérielle",
+      "os_obs_warn_date": "Avertissement d'obsolescence de l'OS",
+      "os_obs_alert_date": "Alerte d'obsolescence de l'OS"
+    },
+    "detail": {
+      "title": "Détail du node",
+      "groups": {
+        "identity": "Identité",
+        "hardware": "Matériel",
+        "system": "Système",
+        "location": "Localisation",
+        "collector": "Collector"
+      }
+    },
+    "create": {
+      "open": "Nouveau node",
+      "title": "Nouveau node",
+      "intro": "Un node s'enregistre normalement tout seul depuis l'agent. La création à la main sert quand la fiche doit exister avant la première remontée.",
+      "defaultApp": "Par défaut pour mon compte",
+      "exists": "Un node nommé {{nodename}} existe déjà. Le recréer le modifierait.",
+      "submit": "Créer",
+      "submitting": "Création…"
+    },
+    "delete": {
+      "question": "Supprimer {{nodename}} ? Ses instances, ses alertes et ses relevés partent avec lui. C'est irréversible."
+    },
+    "related": {
+      "label": "Données du node",
+      "hardware": "Inventaire matériel",
+      "alerts": "Alertes",
+      "networks": "Réseaux",
+      "storage": "Stockage"
+    },
+    "hardware": {
+      "reported": "Remonté par l'agent",
+      "empty": "Aucun inventaire matériel : l'agent n'en a pas remonté pour ce node.",
+      "types": {
+        "mem": "Mémoire",
+        "cpu": "Processeurs",
+        "pci": "Périphériques PCI",
+        "usb": "Périphériques USB",
+        "disk": "Disques"
+      },
+      "fields": {
+        "hw_path": "Adresse",
+        "hw_class": "Classe",
+        "hw_description": "Description",
+        "hw_driver": "Pilote"
+      }
+    },
+    "alerts": {
+      "open": "Ouvrir dans le dashboard",
+      "empty": "Aucune alerte sur ce node."
+    },
+    "networks": {
+      "empty": "Aucune adresse IP remontée pour ce node.",
+      "open": "Ouvrir dans la vue Réseaux",
+      "undeclared": "Hors réseau déclaré",
+      "deprecated": "obsolète",
+      "fields": {
+        "addr": "Adresse",
+        "type": "Famille",
+        "net_name": "Réseau",
+        "net_gateway": "Passerelle",
+        "flag_deprecated": "État"
+      }
+    }
+  },
+  "auth": {
+    "title": "Connexion",
+    "intro": "Le collector utilise pour l'instant l'authentification HTTP Basic. OIDC viendra ensuite.",
+    "user": "Utilisateur",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "signingIn": "Connexion…",
+    "signOut": "Se déconnecter",
+    "rejected": "Le collector a refusé ces identifiants."
+  },
+  "list": {
+    "filterset": "Filterset",
+    "noFilterset": "Aucun filterset",
+    "perPage": "Par page",
+    "range": "{{from}}–{{to}}",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "loading": "Chargement…",
+    "error": "Impossible de charger la liste : {{message}}",
+    "empty": "Rien à afficher.",
+    "sortHint": "Cliquez une colonne pour trier. Maj+clic pour ajouter une clé secondaire.",
+    "columns": "Colonnes ({{shown}}/{{total}})",
+    "filterColumns": "Filtrer les colonnes",
+    "resetColumns": "Revenir aux colonnes par défaut",
+    "selected": "{{count}} sélectionnée",
+    "selected_other": "{{count}} sélectionnées",
+    "clearSelection": "Effacer",
+    "selectAll": "Sélectionner toutes les lignes de la page",
+    "selectRow": "Sélectionner cette ligne",
+    "selectEverything": "Sélectionner toutes les lignes",
+    "selectingEverything": "Sélection…",
+    "selectedEverywhere": "{{count}} sélectionnée, toutes pages",
+    "selectedEverywhere_other": "{{count}} sélectionnées, toutes pages"
+  },
+  "detail": {
+    "close": "Fermer",
+    "loading": "Chargement du détail…",
+    "error": "Impossible de charger le détail : {{message}}",
+    "missing": "Cet objet n'existe plus.",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer",
+    "deleting": "Suppression…",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "editHint": "Seuls les attributs que l'agent ne remonte pas sont modifiables. Les autres seraient écrasés à la prochaine remontée d'inventaire.",
+    "editField": "Modifier {{field}}",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "services": {
+    "title": "Services",
+    "fields": {
+      "svcname": "Nom",
+      "svc_id": "Identifiant",
+      "svc_app": "Application",
+      "svc_env": "Environnement",
+      "cluster_id": "Identifiant de cluster",
+      "svc_comment": "Commentaire",
+      "svc_availstatus": "Disponibilité",
+      "svc_status": "Statut global",
+      "svc_frozen": "Gelé",
+      "svc_provisioned": "Provisionné",
+      "svc_status_updated": "Statut mis à jour",
+      "svc_snooze_till": "Alertes suspendues jusqu'à",
+      "svc_notifications": "Notifications",
+      "svc_topology": "Topologie",
+      "svc_placement": "Placement",
+      "svc_nodes": "Nodes",
+      "svc_ha": "Haute disponibilité",
+      "svc_autostart": "Démarrage automatique",
+      "svc_flex_min_nodes": "Nodes flex minimum",
+      "svc_flex_max_nodes": "Nodes flex maximum",
+      "svc_flex_target": "Cible flex",
+      "svc_flex_cpu_low_threshold": "Seuil CPU flex bas",
+      "svc_flex_cpu_high_threshold": "Seuil CPU flex haut",
+      "svc_wave": "Vague",
+      "svc_drpnode": "Node de secours",
+      "svc_drpnodes": "Nodes de secours",
+      "svc_drptype": "Type de secours",
+      "svc_metrocluster": "Metrocluster",
+      "svc_drnoaction": "Pas d'action de secours",
+      "svc_created": "Créé",
+      "svc_config_updated": "Configuration mise à jour",
+      "updated": "Mis à jour",
+      "svc_hostid": "Identifiant d'hôte",
+      "id": "Identifiant d'enregistrement",
+      "svc_config": "Configuration"
+    },
+    "detail": {
+      "title": "Détail du service",
+      "groups": {
+        "identity": "Identité",
+        "state": "État",
+        "placement": "Placement",
+        "disasterRecovery": "Plan de secours",
+        "collector": "Collector"
+      }
+    },
+    "related": {
+      "label": "Données du service",
+      "storage": "Stockage"
+    }
+  },
+  "alerts": {
+    "fields": {
+      "id": "Identifiant",
+      "dash_type": "Type",
+      "dash_severity": "Sévérité",
+      "alert": "Message",
+      "object": "Objet",
+      "dash_env": "Environnement",
+      "dash_instance": "Instance",
+      "dash_created": "Levée le",
+      "dash_updated": "Mise à jour",
+      "services.svcname": "Service",
+      "nodes.nodename": "Node",
+      "svc_id": "Identifiant de service",
+      "node_id": "Identifiant de node",
+      "dash_fmt": "Gabarit du message",
+      "dash_dict": "Valeurs du message",
+      "dash_dict_md5": "Empreinte des valeurs"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "severity": {
+      "critical": "Critique",
+      "warning": "Avertissement",
+      "info": "Information"
+    },
+    "detail": {
+      "title": "Détail de l'alerte",
+      "groups": {
+        "alert": "Alerte",
+        "object": "Objet",
+        "raw": "Entrée brute"
+      }
+    }
+  },
+  "apps": {
+    "fields": {
+      "app": "Code",
+      "description": "Description",
+      "app_domain": "Domaine",
+      "app_team_ops": "Équipe d'exploitation",
+      "id": "Identifiant",
+      "updated": "Mis à jour"
+    },
+    "title": "Codes application",
+    "detail": {
+      "title": "Code application",
+      "groups": {
+        "identity": "Propriétés"
+      }
+    },
+    "create": {
+      "open": "Nouveau code",
+      "title": "Nouveau code application",
+      "submit": "Créer",
+      "submitting": "Création…"
+    },
+    "delete": {
+      "question": "Supprimer le code {{app}} ? Ses responsables et ses publications partent avec lui. C'est irréversible."
+    }
+  },
+  "networks": {
+    "fields": {
+      "id": "Identifiant d'enregistrement",
+      "node_id": "Identifiant de node",
+      "nodename": "Node",
+      "intf": "Interface",
+      "mac": "Adresse MAC",
+      "type": "Type d'adresse",
+      "addr": "Adresse",
+      "mask": "Masque",
+      "updated": "Mis à jour",
+      "flag_deprecated": "Obsolète",
+      "net_id": "Identifiant de réseau",
+      "net_name": "Réseau",
+      "net_network": "Adresse du réseau",
+      "net_netmask": "Masque du réseau",
+      "net_broadcast": "Diffusion",
+      "net_gateway": "Passerelle",
+      "net_begin": "Début de plage",
+      "net_end": "Fin de plage",
+      "net_pvid": "VLAN (PVID)",
+      "net_prio": "Priorité",
+      "net_comment": "Commentaire",
+      "net_team_responsible": "Équipe responsable"
+    },
+    "title": "Réseaux",
+    "detail": {
+      "title": "Adresse IP",
+      "groups": {
+        "address": "Adresse",
+        "network": "Réseau"
+      }
+    },
+    "delete": {
+      "question": "Supprimer le relevé de {{addr}} sur {{nodename}} ? Si le node remonte encore cette adresse, elle réapparaîtra à la prochaine remontée d'inventaire."
+    }
+  },
+  "disks": {
+    "fields": {
+      "disk_id": "Identifiant de disque",
+      "disk_name": "Nom",
+      "disk_devid": "Identifiant d'équipement",
+      "disk_vendor": "Fournisseur",
+      "disk_model": "Modèle",
+      "disk_size": "Taille",
+      "disk_used": "Utilisé",
+      "disk_alloc": "Alloué",
+      "disk_raid": "RAID",
+      "disk_group": "Groupe de disques",
+      "disk_level": "Niveau de RAID",
+      "disk_arrayid": "Baie",
+      "disk_dg": "Groupe de la baie",
+      "disk_region": "Région",
+      "node_id": "Identifiant de node",
+      "nodename": "Node",
+      "svc_id": "Identifiant de service",
+      "svcname": "Service",
+      "app": "Application",
+      "updated": "Mis à jour"
+    },
+    "title": "Disques",
+    "detail": {
+      "title": "Disque",
+      "groups": {
+        "disk": "Disque",
+        "capacity": "Capacité",
+        "attachment": "Rattachement"
+      }
+    }
+  },
+  "groups": {
+    "fields": {
+      "id": "Identifiant",
+      "role": "Nom",
+      "privilege": "Privilégié",
+      "description": "Description"
+    },
+    "title": "Groupes",
+    "privilege": {
+      "T": "Privilège",
+      "F": "Ordinaire"
+    },
+    "detail": {
+      "title": "Groupe",
+      "groups": {
+        "identity": "Propriétés"
+      }
+    },
+    "create": {
+      "open": "Nouveau groupe",
+      "title": "Nouveau groupe",
+      "intro": "Un groupe de privilège accorde un droit dans tout le collector. Un groupe ordinaire ne fait que rassembler des utilisateurs, pour porter des responsabilités.",
+      "exists": "Un groupe nommé {{role}} existe déjà. Le recréer le modifierait.",
+      "submit": "Créer",
+      "submitting": "Création…"
+    },
+    "delete": {
+      "question": "Supprimer le groupe {{role}} ? Ses appartenances, ses responsabilités et ses publications partent avec lui. C'est irréversible."
+    }
+  },
+  "tags": {
+    "fields": {
+      "tag_name": "Nom",
+      "tag_exclude": "Exclut",
+      "tag_data": "Données",
+      "tag_id": "Identifiant",
+      "tag_created": "Créé"
+    },
+    "title": "Tags",
+    "detail": {
+      "title": "Tag",
+      "groups": {
+        "identity": "Propriétés"
+      }
+    }
+  },
+  "users": {
+    "title": "Utilisateurs",
+    "fields": {
+      "id": "Identifiant",
+      "username": "Nom d'utilisateur",
+      "email": "E-mail",
+      "first_name": "Prénom",
+      "last_name": "Nom",
+      "phone_work": "Téléphone professionnel",
+      "im_type": "Type de messagerie",
+      "im_username": "Identifiant de messagerie",
+      "email_notifications": "Notifications par e-mail",
+      "im_notifications": "Notifications par messagerie",
+      "email_log_level": "Niveau de journal par e-mail",
+      "im_log_level": "Niveau de journal par messagerie",
+      "email_notifications_delay": "Délai des notifications par e-mail",
+      "im_notifications_delay": "Délai des notifications par messagerie",
+      "lock_filter": "Filtre verrouillé",
+      "quota_app": "Quota de codes application",
+      "quota_org_group": "Quota de groupes d'organisation",
+      "quota_docker_registries": "Quota de registres Docker"
+    },
+    "detail": {
+      "title": "Utilisateur",
+      "groups": {
+        "identity": "Identité",
+        "notifications": "Notifications",
+        "restrictions": "Restrictions et quotas"
+      }
+    }
+  },
+  "profile": {
+    "title": "Mon profil"
+  },
+  "instances": {
+    "title": "Instances de service",
+    "fields": {
+      "services.svcname": "Service",
+      "nodes.nodename": "Node",
+      "svc_id": "Identifiant du service",
+      "node_id": "Identifiant du node",
+      "mon_svctype": "Type de service",
+      "mon_availstatus": "Disponibilité",
+      "mon_overallstatus": "État global",
+      "mon_smon_status": "État du moniteur",
+      "mon_smon_global_expect": "Attente globale",
+      "mon_ipstatus": "État des IP",
+      "mon_fsstatus": "État des systèmes de fichiers",
+      "mon_diskstatus": "État des disques",
+      "mon_containerstatus": "État des conteneurs",
+      "mon_sharestatus": "État des partages",
+      "mon_syncstatus": "État des synchronisations",
+      "mon_appstatus": "État des applications",
+      "mon_hbstatus": "État des heartbeats",
+      "mon_frozen": "Gelée",
+      "mon_frozen_at": "Gelée le",
+      "mon_encap_frozen_at": "Encapsulée gelée le",
+      "mon_vmname": "Nom de VM",
+      "mon_vmtype": "Type de VM",
+      "mon_guestos": "OS invité",
+      "mon_vcpus": "vCPU",
+      "mon_vmem": "Mémoire de VM",
+      "mon_updated": "Mise à jour",
+      "mon_changed": "Changement"
+    },
+    "detail": {
+      "title": "Instance de service",
+      "groups": {
+        "identity": "Identité",
+        "state": "État",
+        "resources": "État des ressources",
+        "virtualization": "Virtualisation"
+      }
+    }
+  },
+  "obsolescence": {
+    "title": "Obsolescence",
+    "intro": "Dates d'avertissement et d'alerte pour chaque modèle matériel et chaque version d'OS remontés par les nodes. Le collector les applique aux nodes concernés et lève des alertes au dashboard à leur échéance.",
+    "fields": {
+      "id": "Identifiant",
+      "obs_type": "Type",
+      "obs_name": "Modèle ou version d'OS",
+      "obs_count": "Nodes",
+      "obs_warn_date": "Date d'avertissement",
+      "obs_alert_date": "Date d'alerte",
+      "obs_warn_date_updated_by": "Avertissement fixé par",
+      "obs_warn_date_updated": "Avertissement fixé le",
+      "obs_alert_date_updated_by": "Alerte fixée par",
+      "obs_alert_date_updated": "Alerte fixée le"
+    },
+    "type": {
+      "hw": "Matériel",
+      "os": "Système d'exploitation"
+    },
+    "refresh": {
+      "open": "Ajouter les réglages manquants",
+      "pending": "Ajout…",
+      "done": "Les réglages sont à jour de l'inventaire.",
+      "hint": "Crée un réglage pour chaque modèle matériel et chaque version d'OS remontés par les nodes qui n'en ont pas encore. Les réglages existants et leurs dates ne changent pas."
+    },
+    "detail": {
+      "title": "Réglage d'obsolescence",
+      "groups": {
+        "target": "S'applique à",
+        "deadlines": "Échéances"
+      },
+      "editHint": "Seules les échéances se modifient ; en vider une la supprime. Une modification s'applique aux nodes concernés et met à jour leurs alertes d'obsolescence au dashboard."
+    }
+  },
+  "logs": {
+    "title": "Journaux",
+    "corrupted": "valeurs illisibles",
+    "fields": {
+      "log_date": "Date",
+      "log_level": "Niveau",
+      "services.svcname": "Service",
+      "nodes.nodename": "Node",
+      "log_user": "Utilisateur",
+      "log_action": "Action",
+      "log_fmt": "Message",
+      "log_raw_fmt": "Modèle du message",
+      "log_dict": "Valeurs du message",
+      "id": "Identifiant",
+      "svc_id": "Identifiant du service",
+      "node_id": "Identifiant du node",
+      "log_entry_id": "Identifiant d'entrée",
+      "log_gtalk_sent": "Envoyé par messagerie",
+      "log_email_sent": "Envoyé par e-mail"
+    },
+    "detail": {
+      "title": "Événement du journal",
+      "groups": {
+        "event": "Événement",
+        "object": "Objet",
+        "raw": "Enregistrement"
+      }
+    }
+  },
+  "filters": {
+    "title": "Filtres",
+    "intro": "Un filtre est une condition sur une colonne d'une table du collector. Les filtersets combinent des filtres pour sélectionner nodes et services.",
+    "fields": {
+      "f_label": "Filtre",
+      "f_table": "Table",
+      "f_field": "Colonne",
+      "f_op": "Opérateur",
+      "f_value": "Valeur",
+      "f_author": "Modifié par",
+      "f_updated": "Modifié le",
+      "id": "Identifiant",
+      "f_cksum": "Somme de contrôle"
+    },
+    "form": {
+      "open": "Nouveau filtre",
+      "createTitle": "Nouveau filtre",
+      "editTitle": "Modifier le filtre",
+      "createIntro": "Le collector vérifie que la colonne existe dans la table et qu'aucun filtre n'a la même définition.",
+      "editIntro": "Les filtersets qui utilisent ce filtre sélectionneront selon la nouvelle définition.",
+      "fieldPlaceholder": "par ex. os_name",
+      "valueHint": "Avec LIKE, % remplace n'importe quel texte. Avec IN, séparer les valeurs par des virgules.",
+      "preview": "Définition :",
+      "edit": "Modifier",
+      "saveCreate": "Créer",
+      "saveEdit": "Enregistrer",
+      "saving": "Enregistrement…"
+    },
+    "delete": {
+      "question": "Supprimer le filtre {{label}} ? Il est aussi retiré des filtersets qui l'utilisent. C'est irréversible."
+    },
+    "detail": {
+      "title": "Filtre",
+      "groups": {
+        "definition": "Définition",
+        "record": "Enregistrement"
+      }
+    }
+  },
+  "filtersets": {
+    "title": "Filtersets",
+    "intro": "Un filterset combine des filtres, et d'autres filtersets, par des opérateurs logiques. Les vues et les rulesets de conformité s'en servent pour sélectionner nodes et services.",
+    "fields": {
+      "fset_name": "Nom",
+      "fset_stats": "Filterset de statistiques",
+      "fset_author": "Modifié par",
+      "fset_updated": "Modifié le",
+      "id": "Identifiant"
+    },
+    "create": {
+      "open": "Nouveau filterset",
+      "title": "Nouveau filterset",
+      "intro": "Créer le filterset, puis ajouter ses filtres dans le panneau de détail.",
+      "exists": "Un filterset nommé {{name}} existe déjà. Le recréer le modifierait.",
+      "statsHint": "Un filterset de statistiques restreint les vues statistiques.",
+      "submit": "Créer",
+      "submitting": "Création…"
+    },
+    "detail": {
+      "title": "Filterset",
+      "editHint": "Le nom et le type statistique se modifient. Renommer conserve la composition et les usages.",
+      "groups": {
+        "properties": "Propriétés"
+      }
+    },
+    "composition": {
+      "title": "Composition",
+      "intro": "Les entrées s'évaluent dans l'ordre, chacune jointe aux précédentes par son opérateur.",
+      "empty": "Aucun filtre pour l'instant : le filterset ne sélectionne rien.",
+      "operatorFor": "Opérateur de {{label}}",
+      "openFilterset": "Ouvrir ce filterset",
+      "up": "Monter {{label}}",
+      "down": "Descendre {{label}}",
+      "remove": "Retirer {{label}}",
+      "addOperator": "Opérateur de la nouvelle entrée",
+      "addKind": "Type de la nouvelle entrée",
+      "addTarget": "Entrée à ajouter",
+      "kindFilter": "Filtre",
+      "kindFilterset": "Filterset",
+      "choose": "Choisir…",
+      "add": "Ajouter"
+    },
+    "matches": {
+      "title": "Sélection",
+      "nodes_one": "{{count}} node",
+      "nodes_other": "{{count}} nodes",
+      "services_one": "{{count}} service",
+      "services_other": "{{count}} services"
+    },
+    "usage": {
+      "title": "Utilisé par",
+      "none": "Utilisé par aucun filterset, ruleset ni seuil de check.",
+      "filtersets": "Filtersets",
+      "rulesets": "Rulesets",
+      "thresholds": "Seuils de check"
+    },
+    "delete": {
+      "question": "Supprimer le filterset {{name}} ? Sa composition part avec lui. C'est irréversible.",
+      "questionUsed": "Supprimer le filterset {{name}} ? Il est utilisé à {{count}} endroit(s), qui le perdent. Sa composition part avec lui. C'est irréversible."
+    }
+  },
+  "related": {
+    "properties": "Propriétés",
+    "count_one": "{{count}} élément",
+    "count_other": "{{count}} éléments"
+  },
+  "storage": {
+    "hbas": {
+      "title": "Adaptateurs de bus hôte",
+      "empty": "Aucun adaptateur de bus hôte remonté.",
+      "fields": {
+        "hba_id": "Identifiant",
+        "hba_type": "Type",
+        "updated": "Remonté"
+      }
+    },
+    "disks": {
+      "title": "Disques",
+      "empty": "Aucun disque remonté.",
+      "open": "Ouvrir dans la vue Disques",
+      "unassigned": "Utilisés par aucun service",
+      "total_one": "{{count}} disque, {{size}} au total",
+      "total_other": "{{count}} disques, {{size}} au total",
+      "fields": {
+        "disk_id": "Disque",
+        "disk_size": "Taille",
+        "disk_used": "Utilisé",
+        "disk_model": "Fabricant et modèle",
+        "disk_dg": "Groupe de disques"
+      }
+    }
+  }
+}
