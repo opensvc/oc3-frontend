@@ -44,6 +44,13 @@
   --icon-app: #a32a72;
   --icon-group: #a55446;
 
+  /* Tags attachés à un objet : la sarcelle du collector historique (.tag_attached),
+     distincte de l'accent pétrole pour qu'une puce ne se lise pas comme une
+     sélection. Blanc sur #008099 : contraste 4,6:1. */
+  --tag: #008099;
+  --tag-hover: #006b7a;
+  --tag-ink: #ffffff;
+
   /* Typographie */
   --font-sans: "IBM Plex Sans Variable", system-ui, sans-serif;
   --text-data: 0.8125rem; /* 13px : cellules de tables */
@@ -87,4 +94,9 @@
   --icon-disk: #b8b45c;
   --icon-app: #d178ab;
   --icon-group: #d1907f;
+
+  /* Fond éclairci, encre sombre : contraste 5,6:1. */
+  --tag: #3a9aa8;
+  --tag-hover: #4fb0be;
+  --tag-ink: #0c1417;
 }

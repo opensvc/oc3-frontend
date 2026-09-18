@@ -84,7 +84,7 @@ export function ObjectTags({
                   to="/tags"
                   search={{ sel: tag.tag_id }}
                   title={details.length === 0 ? t("objectTags.open") : details.join("\n")}
-                  className="inline-flex items-center rounded-full border border-line bg-surface px-2 py-0.5 text-data hover:border-line-strong hover:text-ink"
+                  className="inline-flex items-center rounded-full bg-tag px-2 py-0.5 text-data font-medium text-tag-ink hover:bg-tag-hover"
                 >
                   {tag.tag_name}
                 </Link>

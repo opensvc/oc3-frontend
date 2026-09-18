@@ -32,6 +32,10 @@
   --color-icon-app: var(--icon-app);
   --color-icon-group: var(--icon-group);
 
+  --color-tag: var(--tag);
+  --color-tag-hover: var(--tag-hover);
+  --color-tag-ink: var(--tag-ink);
+
   --font-sans: var(--font-sans);
   --text-data: var(--text-data);
   --text-ui: var(--text-ui);
