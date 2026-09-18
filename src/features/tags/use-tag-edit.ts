@@ -2,29 +2,34 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
-import type { TagAttachControl } from "@/components/opensvc/ObjectTags";
+import type { TagEditControl } from "@/components/opensvc/ObjectTags";
 import { toTagRows } from "./tag-row";
 
 export type TagTargetKind = "node" | "service";
 
 /**
- * Rattachement d'un tag à un node ou à un service depuis son panneau de détail.
+ * Rattachement et détachement des tags d'un node ou d'un service depuis son panneau
+ * de détail.
  *
  * Les tags proposés viennent de `GET /…/candidate_tags`, qui écarte ceux déjà
  * attachés et ceux qu'exclut un tag déjà en place ; la liste n'est demandée qu'à
  * l'ouverture du sélecteur. Le rattachement passe par `POST /tags/nodes` et
  * `/tags/services`, qui acceptent le `tag_id` char(36) que renvoient les listes,
- * contrairement à `/tags/{tag_id}/…` qui attend l'identifiant entier (voir notes.md).
- * Comme dans l'ancien collector, le bouton n'est proposé qu'au responsable de
+ * contrairement à `/tags/{tag_id}/…` qui attend l'identifiant entier (voir notes.md) ;
+ * le détachement, par `DELETE` sur les mêmes routes. Comme dans l'ancien collector,
+ * ces actions ne sont proposées qu'au responsable de
  * l'objet (`am_i_responsible`) ; la compatibilité des exclusions reste vérifiée par
  * l'API, dont le refus s'affiche tel quel.
  */
-export function useTagAttach(kind: TagTargetKind, objectId: string | undefined): TagAttachControl {
+export function useTagEdit(kind: TagTargetKind, objectId: string | undefined): TagEditControl {
   const queryClient = useQueryClient();
   // Rattaché à l'objet plutôt qu'un simple booléen : passer à un autre node referme
   // le sélecteur sans effet de bord.
   const [pickingFor, setPickingFor] = useState<string | undefined>(undefined);
   const picking = objectId !== undefined && pickingFor === objectId;
+  // Même précaution pour la confirmation : une question laissée ouverte ne doit pas
+  // détacher le tag d'un autre objet.
+  const [confirming, setConfirming] = useState<{ objectId: string; tagId: string } | null>(null);
 
   // 200 si l'utilisateur est responsable, 403 sinon : seul le statut compte.
   const responsible = useQuery({
@@ -63,6 +68,13 @@ export function useTagAttach(kind: TagTargetKind, objectId: string | undefined):
     },
   });
 
+  const invalidate = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: [kind, objectId, "tags"] }),
+      queryClient.invalidateQueries({ queryKey: [kind, objectId, "candidate_tags"] }),
+      queryClient.invalidateQueries({ queryKey: ["tags"] }),
+    ]);
+
   const attach = useMutation({
     mutationFn: async (tagId: string) => {
       const { error } =
@@ -71,13 +83,18 @@ export function useTagAttach(kind: TagTargetKind, objectId: string | undefined):
           : await api.POST("/tags/services", { body: { tag_id: tagId, svc_id: objectId ?? "" } });
       if (error !== undefined) throw new Error(problemText(error));
     },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: [kind, objectId, "tags"] }),
-        queryClient.invalidateQueries({ queryKey: [kind, objectId, "candidate_tags"] }),
-        queryClient.invalidateQueries({ queryKey: ["tags"] }),
-      ]);
+    onSuccess: invalidate,
+  });
+
+  const detach = useMutation({
+    mutationFn: async (tagId: string) => {
+      const { error } =
+        kind === "node"
+          ? await api.DELETE("/tags/nodes", { body: { tag_id: tagId, node_id: objectId ?? "" } })
+          : await api.DELETE("/tags/services", { body: { tag_id: tagId, svc_id: objectId ?? "" } });
+      if (error !== undefined) throw new Error(problemText(error));
     },
+    onSuccess: invalidate,
   });
 
   return {
@@ -95,5 +112,17 @@ export function useTagAttach(kind: TagTargetKind, objectId: string | undefined):
     },
     attaching: attach.isPending,
     attachError: attach.isError ? attach.error.message : null,
+    confirmingDetach:
+      confirming !== null && confirming.objectId === objectId ? confirming.tagId : null,
+    askDetach: (tagId) => {
+      detach.reset();
+      setConfirming(tagId === null || objectId === undefined ? null : { objectId, tagId });
+    },
+    detach: (tagId) => {
+      setConfirming(null);
+      detach.mutate(tagId);
+    },
+    detaching: detach.isPending ? (detach.variables ?? null) : null,
+    detachError: detach.isError ? detach.error.message : null,
   };
 }

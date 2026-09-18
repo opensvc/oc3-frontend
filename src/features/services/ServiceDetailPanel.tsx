@@ -4,7 +4,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
-import { useTagAttach } from "@/features/tags/use-tag-attach";
+import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
 import { useServiceTags } from "./related/queries";
 import { SERVICE_RELATED_TABS } from "./related/service-related";
@@ -144,7 +144,7 @@ export function ServiceDetailPanel({
 
   const open = svcId !== undefined;
   const tags = useServiceTags(svcId);
-  const tagAttach = useTagAttach("service", svcId);
+  const tagEdit = useTagEdit("service", svcId);
 
   return (
     <RelatedTabsPanel
@@ -163,7 +163,7 @@ export function ServiceDetailPanel({
         tags={tags.data}
         isPending={open && tags.isPending}
         errorMessage={tags.isError ? tags.error.message : null}
-        attach={tagAttach}
+        edit={tagEdit}
       />
       <DetailContent
         groups={GROUPS}

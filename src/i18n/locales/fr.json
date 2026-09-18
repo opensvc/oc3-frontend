@@ -788,6 +788,11 @@
       "pending": "Rattachement…",
       "close": "Fermer",
       "noCandidate": "Aucun autre tag ne peut être attaché."
+    },
+    "detach": {
+      "label": "Détacher le tag {{name}}",
+      "question": "Détacher le tag {{name}} ?",
+      "confirm": "Détacher"
     }
   }
 }

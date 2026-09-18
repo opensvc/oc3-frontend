@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { TagRow } from "@/features/tags/tag-row";
-import { PlusIcon } from "@/components/ui/icons";
+import { CloseIcon, PlusIcon } from "@/components/ui/icons";
 import { ColumnFamilyIcon } from "./ColumnFamily";
 
 const CONTROL = "h-7 rounded-(--radius-control) border border-line bg-surface px-1";
 
-/** Sélecteur de rattachement, tenu par l'appelant (voir `useTagAttach`). */
-export interface TagAttachControl {
-  /** Faux tant que le droit de rattacher n'est pas établi : le bouton reste masqué. */
+/** Rattachement et détachement, tenus par l'appelant (voir `useTagEdit`). */
+export interface TagEditControl {
+  /** Faux tant que le droit de modifier n'est pas établi : les boutons restent masqués. */
   allowed: boolean;
   picking: boolean;
   setPicking: (picking: boolean) => void;
@@ -20,6 +20,14 @@ export interface TagAttachControl {
   attach: (tagId: string) => void;
   attaching: boolean;
   attachError: string | null;
+  /** `tag_id` du tag dont le détachement attend confirmation. */
+  confirmingDetach: string | null;
+  /** Demande confirmation pour ce tag, ou l'abandonne avec `null`. */
+  askDetach: (tagId: string | null) => void;
+  detach: (tagId: string) => void;
+  /** `tag_id` du tag en cours de détachement. */
+  detaching: string | null;
+  detachError: string | null;
 }
 
 /**
@@ -27,34 +35,39 @@ export interface TagAttachControl {
  * disent à quoi l'objet sert ou ce qui lui est promis. Chaque tag mène à sa fiche
  * dans la vue Tags ; ses données et son motif d'exclusion sont en infobulle.
  *
- * Avec `attach`, et pour qui en a le droit, un bouton ouvre un sélecteur des tags encore rattachables. Il
- * reste ouvert après un rattachement, pour en enchaîner plusieurs.
+ * Avec `edit`, et pour qui en a le droit, chaque puce porte une croix qui détache
+ * le tag après confirmation, et un bouton ouvre un sélecteur des tags encore
+ * rattachables. Le sélecteur reste ouvert après un rattachement, pour en enchaîner plusieurs.
  */
 export function ObjectTags({
   tags,
   isPending,
   errorMessage,
-  attach,
+  edit,
 }: {
   tags: TagRow[] | undefined;
   isPending: boolean;
   errorMessage: string | null;
-  attach?: TagAttachControl;
+  edit?: TagEditControl;
 }) {
   const { t } = useTranslation();
+  const editable = edit?.allowed === true;
+  const section = useRef<HTMLElement>(null);
+  const confirming =
+    edit === undefined ? undefined : tags?.find((tag) => tag.tag_id === edit.confirmingDetach);
   return (
-    <section className="mb-4">
+    <section ref={section} className="mb-4">
       <div className="mb-1 flex items-center gap-2">
         <h3 className="flex items-center gap-2 font-semibold text-ink-muted">
           <ColumnFamilyIcon family="app" />
           {t("objectTags.title")}
           {tags !== undefined && <span className="font-normal tabular-nums">({tags.length})</span>}
         </h3>
-        {attach?.allowed === true && !attach.picking && (
+        {editable && !edit.picking && (
           <button
             type="button"
             onClick={() => {
-              attach.setPicking(true);
+              edit.setPicking(true);
             }}
             className="ml-auto inline-flex h-7 items-center gap-1 rounded-(--radius-control) border border-line px-2 text-ink-muted hover:border-line-strong hover:text-ink"
           >
@@ -78,27 +91,121 @@ export function ObjectTags({
               tag.tag_data === "" ? "" : t("objectTags.data", { data: tag.tag_data }),
               tag.tag_exclude === "" ? "" : t("objectTags.exclude", { pattern: tag.tag_exclude }),
             ].filter((line) => line !== "");
+            const detaching = edit?.detaching === tag.tag_id;
             return (
-              <li key={tag.tag_id || tag.tag_name}>
+              <li
+                key={tag.tag_id || tag.tag_name}
+                className={`inline-flex items-stretch overflow-hidden rounded-full bg-tag text-data font-medium text-tag-ink ${detaching ? "opacity-60" : ""}`}
+              >
                 <Link
                   to="/tags"
                   search={{ sel: tag.tag_id }}
                   title={details.length === 0 ? t("objectTags.open") : details.join("\n")}
-                  className="inline-flex items-center rounded-full bg-tag px-2 py-0.5 text-data font-medium text-tag-ink hover:bg-tag-hover"
+                  className={`inline-flex items-center py-0.5 hover:bg-tag-hover ${editable ? "pr-1.5 pl-2" : "px-2"}`}
                 >
                   {tag.tag_name}
                 </Link>
+                {editable && (
+                  <button
+                    type="button"
+                    data-detach={tag.tag_id}
+                    disabled={edit.detaching !== null}
+                    aria-expanded={edit.confirmingDetach === tag.tag_id}
+                    aria-label={t("objectTags.detach.label", { name: tag.tag_name })}
+                    title={t("objectTags.detach.label", { name: tag.tag_name })}
+                    onClick={() => {
+                      edit.askDetach(tag.tag_id);
+                    }}
+                    className="inline-flex items-center border-l border-tag-ink/30 pr-1.5 pl-1 hover:bg-tag-hover disabled:cursor-wait"
+                  >
+                    <CloseIcon width={10} height={10} />
+                  </button>
+                )}
               </li>
             );
           })}
         </ul>
       )}
-      {attach?.picking === true && <AttachForm attach={attach} />}
+      {edit !== undefined && confirming !== undefined && (
+        <DetachConfirm
+          name={confirming.tag_name}
+          onConfirm={() => {
+            edit.detach(confirming.tag_id);
+          }}
+          onCancel={() => {
+            edit.askDetach(null);
+            // Le focus revient sur la croix qui a ouvert la question.
+            section.current
+              ?.querySelector<HTMLButtonElement>(`[data-detach="${CSS.escape(confirming.tag_id)}"]`)
+              ?.focus();
+          }}
+        />
+      )}
+      {edit?.detachError != null && (
+        <p role="alert" className="mt-2 text-state-down">
+          ■ {edit.detachError}
+        </p>
+      )}
+      {edit?.picking === true && <AttachForm attach={edit} />}
     </section>
   );
 }
 
-function AttachForm({ attach }: { attach: TagAttachControl }) {
+/**
+ * Question posée sous les puces, sur le modèle de `ConfirmButton` : le bouton de
+ * confirmation prend le focus, ce qui énonce la question aux lecteurs d'écran, et
+ * Échap l'abandonne.
+ */
+function DetachConfirm({
+  name,
+  onConfirm,
+  onCancel,
+}: {
+  name: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const { t } = useTranslation();
+  const confirm = useRef<HTMLButtonElement>(null);
+  const question = t("objectTags.detach.question", { name });
+
+  useEffect(() => {
+    confirm.current?.focus();
+  }, [name]);
+
+  return (
+    <div
+      role="group"
+      aria-label={question}
+      className="mt-2 flex flex-wrap items-center gap-2"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.stopPropagation();
+          onCancel();
+        }
+      }}
+    >
+      <p>{question}</p>
+      <button
+        ref={confirm}
+        type="button"
+        onClick={onConfirm}
+        className="h-7 rounded-(--radius-control) bg-state-down px-3 font-medium text-surface-raised"
+      >
+        {t("objectTags.detach.confirm")}
+      </button>
+      <button
+        type="button"
+        onClick={onCancel}
+        className="h-7 rounded-(--radius-control) border border-line px-3"
+      >
+        {t("detail.cancel")}
+      </button>
+    </div>
+  );
+}
+
+function AttachForm({ attach }: { attach: TagEditControl }) {
   const { t } = useTranslation();
   const [choice, setChoice] = useState("");
   const candidates = attach.candidates ?? [];

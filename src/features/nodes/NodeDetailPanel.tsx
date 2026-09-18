@@ -5,7 +5,7 @@ import { api } from "@/lib/api/client";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { NODE_RELATED_TABS } from "./related/node-related";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
-import { useTagAttach } from "@/features/tags/use-tag-attach";
+import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
 import { useNodeTags } from "./related/queries";
 import { ConfirmButton } from "@/components/ui/ConfirmButton";
@@ -253,7 +253,7 @@ export function NodeDetailPanel({
 
   const open = nodeId !== undefined;
   const tags = useNodeTags(nodeId);
-  const tagAttach = useTagAttach("node", nodeId);
+  const tagEdit = useTagEdit("node", nodeId);
 
   return (
     <RelatedTabsPanel
@@ -272,7 +272,7 @@ export function NodeDetailPanel({
         tags={tags.data}
         isPending={open && tags.isPending}
         errorMessage={tags.isError ? tags.error.message : null}
-        attach={tagAttach}
+        edit={tagEdit}
       />
       <DetailContent
         groups={GROUPS}
