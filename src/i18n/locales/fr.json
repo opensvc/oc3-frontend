@@ -783,11 +783,12 @@
     "attach": {
       "open": "Attacher un tag",
       "choose": "Tag à attacher",
-      "placeholder": "Choisir un tag…",
+      "placeholder": "Saisir pour chercher un tag…",
       "submit": "Attacher",
       "pending": "Rattachement…",
       "close": "Fermer",
-      "noCandidate": "Aucun autre tag ne peut être attaché."
+      "noCandidate": "Aucun autre tag ne peut être attaché.",
+      "noMatch": "Aucun tag ne correspond."
     },
     "detach": {
       "label": "Détacher le tag {{name}}",

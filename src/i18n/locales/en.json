@@ -783,11 +783,12 @@
     "attach": {
       "open": "Attach a tag",
       "choose": "Tag to attach",
-      "placeholder": "Choose a tag…",
+      "placeholder": "Type to search a tag…",
       "submit": "Attach",
       "pending": "Attaching…",
       "close": "Close",
-      "noCandidate": "No other tag can be attached."
+      "noCandidate": "No other tag can be attached.",
+      "noMatch": "No matching tag."
     },
     "detach": {
       "label": "Detach tag {{name}}",

@@ -2,10 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { TagRow } from "@/features/tags/tag-row";
+import { Combobox } from "@/components/ui/Combobox";
 import { CloseIcon, PlusIcon } from "@/components/ui/icons";
 import { ColumnFamilyIcon } from "./ColumnFamily";
-
-const CONTROL = "h-7 rounded-(--radius-control) border border-line bg-surface px-1";
 
 /** Rattachement et détachement, tenus par l'appelant (voir `useTagEdit`). */
 export interface TagEditControl {
@@ -37,7 +36,7 @@ export interface TagEditControl {
  *
  * Avec `edit`, et pour qui en a le droit, chaque puce porte une croix qui détache
  * le tag après confirmation, et un bouton ouvre un sélecteur des tags encore
- * rattachables. Le sélecteur reste ouvert après un rattachement, pour en enchaîner plusieurs.
+ * rattachables, filtrable à la saisie. Le sélecteur reste ouvert après un rattachement, pour en enchaîner plusieurs.
  */
 export function ObjectTags({
   tags,
@@ -211,6 +210,13 @@ function AttachForm({ attach }: { attach: TagEditControl }) {
   const candidates = attach.candidates ?? [];
   // Un tag qui vient d'être rattaché sort de la liste : la sélection retombe à vide.
   const selected = candidates.some((tag) => tag.tag_id === choice) ? choice : "";
+  const input = useRef<HTMLInputElement>(null);
+
+  // Le champ prend le focus à l'ouverture, et le reprend après chaque rattachement
+  // pour enchaîner : le bouton, désactivé pendant l'envoi, l'aurait perdu.
+  useEffect(() => {
+    if (!attach.attaching) input.current?.focus();
+  }, [attach.attaching, attach.candidatesPending]);
 
   return (
     <div className="mt-2">
@@ -232,22 +238,16 @@ function AttachForm({ attach }: { attach: TagEditControl }) {
             <p className="text-ink-muted">{t("objectTags.attach.noCandidate")}</p>
           ) : (
             <>
-              <select
-                aria-label={t("objectTags.attach.choose")}
+              <Combobox
+                label={t("objectTags.attach.choose")}
+                placeholder={t("objectTags.attach.placeholder")}
+                emptyText={t("objectTags.attach.noMatch")}
+                options={candidates.map((tag) => ({ value: tag.tag_id, label: tag.tag_name }))}
                 value={selected}
-                disabled={attach.attaching}
-                onChange={(event) => {
-                  setChoice(event.target.value);
-                }}
-                className={`${CONTROL} min-w-0 flex-1`}
-              >
-                <option value="">{t("objectTags.attach.placeholder")}</option>
-                {candidates.map((tag) => (
-                  <option key={tag.tag_id} value={tag.tag_id}>
-                    {tag.tag_name}
-                  </option>
-                ))}
-              </select>
+                onChange={setChoice}
+                inputRef={input}
+                className="min-w-0 flex-1"
+              />
               <button
                 type="submit"
                 disabled={attach.attaching || selected === ""}
