@@ -779,6 +779,15 @@
     "none": "No tag.",
     "open": "Open in the Tags view",
     "data": "Data: {{data}}",
-    "exclude": "Excludes tags matching {{pattern}}"
+    "exclude": "Excludes tags matching {{pattern}}",
+    "attach": {
+      "open": "Attach a tag",
+      "choose": "Tag to attach",
+      "placeholder": "Choose a tag…",
+      "submit": "Attach",
+      "pending": "Attaching…",
+      "close": "Close",
+      "noCandidate": "No other tag can be attached."
+    }
   }
 }

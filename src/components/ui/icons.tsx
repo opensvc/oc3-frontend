@@ -367,3 +367,12 @@ export function CheckIcon(props: IconProps) {
     </Svg>
   );
 }
+
+/** Ajout d'un élément à une liste. */
+export function PlusIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 3.5c.7 0 1.2.5 1.2 1.2v6.1h6.1a1.2 1.2 0 1 1 0 2.4h-6.1v6.1a1.2 1.2 0 1 1-2.4 0v-6.1H4.7a1.2 1.2 0 1 1 0-2.4h6.1V4.7c0-.7.5-1.2 1.2-1.2Z" />
+    </Svg>
+  );
+}
