@@ -21,6 +21,7 @@ import {
 } from "@/lib/list-search";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { InstanceDetailPanel } from "./InstanceDetailPanel";
+import { FrozenMark } from "@/components/opensvc/FrozenMark";
 import { InstanceActionsMenu } from "./InstanceActionsMenu";
 import { toInstanceId } from "./instance-id";
 
@@ -70,7 +71,6 @@ const DEFAULT_COLS: string[] = [
   "mon_availstatus",
   "mon_overallstatus",
   "mon_smon_status",
-  "mon_frozen",
   "mon_updated",
 ];
 
@@ -167,7 +167,8 @@ const ALL_PROPS = COLUMNS.map((column) => column.prop);
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
   const extra: string[] = [];
-  return [...new Set(["svc_id", "node_id", ...shown, ...extra])].join(",");
+  // `mon_frozen` toujours demandé : le gel se signale même colonne masquée.
+  return [...new Set(["svc_id", "node_id", "mon_frozen", ...shown, ...extra])].join(",");
 }
 
 function useInstances(search: ResolvedListSearch) {
@@ -260,6 +261,7 @@ export function InstancesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        rowLead={(row) => <FrozenMark frozen={row.mon_frozen === "1"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
       />

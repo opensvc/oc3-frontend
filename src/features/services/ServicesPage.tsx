@@ -9,6 +9,7 @@ import { api } from "@/lib/api/client";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { CrossLink } from "@/components/opensvc/CrossLink";
+import { FrozenMark } from "@/components/opensvc/FrozenMark";
 import { ServiceActionsMenu } from "./ServiceActionsMenu";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -171,8 +172,10 @@ const COLUMNS: ListColumn<ServiceRow>[] = SERVICE_PROPS.map((prop) => ({
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
 /** Ne demander que les colonnes affichées : apicollector fait le pushdown en base. */
+/** `svc_frozen` est toujours demandé : le gel se signale même colonne masquée. */
 function queryProps(cols: string[] | undefined): string {
-  return [...new Set(["svc_id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
+  const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
+  return [...new Set(["svc_id", "svc_frozen", ...shown])].join(",");
 }
 
 function useServices(search: ResolvedListSearch) {
@@ -266,6 +269,7 @@ export function ServicesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        rowLead={(row) => <FrozenMark frozen={row.svc_frozen === "frozen"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
       />

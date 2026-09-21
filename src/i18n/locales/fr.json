@@ -38,7 +38,8 @@
     "up": "up",
     "warn": "warn",
     "down": "down",
-    "unknown": "n/a"
+    "unknown": "n/a",
+    "frozen": "Gelé"
   },
   "nodes": {
     "title": "Nodes",

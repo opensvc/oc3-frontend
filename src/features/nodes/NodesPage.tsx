@@ -10,6 +10,7 @@ import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorLi
 import { CrossLink } from "@/components/opensvc/CrossLink";
 import { TeamLink } from "@/features/groups/TeamLink";
 import { NodeActionsMenu } from "./NodeActionsMenu";
+import { FrozenMark } from "@/components/opensvc/FrozenMark";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { OsLogo } from "@/components/opensvc/OsLogo";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -271,8 +272,10 @@ const ALL_PROPS = COLUMNS.map((column) => column.prop);
  * Ne demander que les colonnes affichées : apicollector ne lit en base que les props
  * demandés.
  */
+/** `node_frozen` est toujours demandé : le gel se signale même colonne masquée. */
 function queryProps(cols: string[] | undefined): string {
-  return [...new Set(["node_id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
+  const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
+  return [...new Set(["node_id", "node_frozen", ...shown])].join(",");
 }
 
 function useNodes(search: ResolvedListSearch) {
@@ -379,6 +382,7 @@ export function NodesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        rowLead={(row) => <FrozenMark frozen={row.node_frozen === "T"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
       />

@@ -78,6 +78,7 @@ export function CollectorList<T>({
   errorMessage,
   hasMore,
   onSelectionChange,
+  rowLead,
   selectAllMatching,
 }: {
   columns: ListColumn<T>[];
@@ -98,6 +99,11 @@ export function CollectorList<T>({
    * par position.
    */
   onSelectionChange?: (ids: string[]) => void;
+  /**
+   * Marque placée en tête de ligne, quelles que soient les colonnes affichées : le
+   * gel d'un objet, par exemple, que masquer sa colonne ne doit pas cacher.
+   */
+  rowLead?: (row: T) => ReactNode;
   /**
    * Identifiants de toutes les lignes de la sélection courante, pages suivantes
    * comprises. Seule la vue sait interroger son endpoint ; elle renvoie ici la même
@@ -557,7 +563,10 @@ export function CollectorList<T>({
                       const content = flexRender(cell.column.columnDef.cell, cell.getContext());
                       return index === 0 ? (
                         <th key={cell.id} scope="row" className="px-2 text-left font-medium">
-                          {content}
+                          <span className="inline-flex items-center gap-1.5">
+                            {rowLead?.(row.original)}
+                            {content}
+                          </span>
                         </th>
                       ) : (
                         <td
