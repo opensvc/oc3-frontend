@@ -582,7 +582,16 @@
     }
   },
   "profile": {
-    "title": "My profile"
+    "title": "My profile",
+    "theme": {
+      "title": "Color theme",
+      "hint": "Saved with your account, and applied wherever you sign in.",
+      "options": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    }
   },
   "instances": {
     "title": "Service Instances",

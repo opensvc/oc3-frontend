@@ -1,7 +1,9 @@
+import { useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { api } from "./api/client";
 import { problemText } from "./api/problem";
 import type { ResolvedListSearch } from "./list-search";
+import { applyTheme, cachedTheme, isTheme, watchSystemTheme, type Theme } from "./theme";
 
 /**
  * Préférences de l'utilisateur, telles que l'ancien collector les range dans la
@@ -15,6 +17,8 @@ import type { ResolvedListSearch } from "./list-search";
  */
 export interface UserPrefs {
   tables?: Record<string, { visible_columns?: string[] } | undefined>;
+  /** Thème choisi ; absent vaut « système ». */
+  theme?: string;
   [key: string]: unknown;
 }
 
@@ -52,24 +56,16 @@ export function useViewColumns(view: string) {
   const prefs = useUserPrefs();
 
   const save = useMutation({
-    mutationFn: async (cols: string[] | undefined) => {
-      // Relire avant d'écrire : le serveur remplace l'objet entier, et une autre vue
-      // a pu enregistrer ses colonnes entre-temps.
-      const current = await ensurePrefs(queryClient);
-      const tables = { ...current.tables };
-      if (cols === undefined || cols.length === 0) {
-        delete tables[view];
-      } else {
-        tables[view] = { ...tables[view], visible_columns: cols };
-      }
-      const next: UserPrefs = { ...current, tables };
-      const { error } = await api.POST("/users/{user_id}/prefs", {
-        params: { path: { user_id: "self" } },
-        body: { data: next },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      queryClient.setQueryData(PREFS_KEY, next);
-    },
+    mutationFn: async (cols: string[] | undefined) =>
+      savePrefs(queryClient, (current) => {
+        const tables = { ...current.tables };
+        if (cols === undefined || cols.length === 0) {
+          delete tables[view];
+        } else {
+          tables[view] = { ...tables[view], visible_columns: cols };
+        }
+        return { ...current, tables };
+      }),
   });
 
   return {
@@ -95,6 +91,25 @@ async function ensurePrefs(queryClient: QueryClient): Promise<UserPrefs> {
 }
 
 /**
+ * Applique une modification à l'objet de préférences et l'enregistre.
+ *
+ * L'objet est relu avant d'être réécrit : le serveur remplace le tout, et une autre
+ * vue a pu enregistrer ses colonnes entre-temps.
+ */
+export async function savePrefs(
+  queryClient: QueryClient,
+  change: (current: UserPrefs) => UserPrefs,
+): Promise<void> {
+  const next = change(await ensurePrefs(queryClient));
+  const { error } = await api.POST("/users/{user_id}/prefs", {
+    params: { path: { user_id: "self" } },
+    body: { data: next },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  queryClient.setQueryData(PREFS_KEY, next);
+}
+
+/**
  * Applique les colonnes enregistrées à l'état d'URL d'une vue : l'URL l'emporte,
  * les préférences ne comblent que son absence.
  */
@@ -103,4 +118,43 @@ export function withSavedCols(
   saved: string[] | undefined,
 ): ResolvedListSearch {
   return search.cols === undefined && saved !== undefined ? { ...search, cols: saved } : search;
+}
+
+/**
+ * Thème choisi, appliqué et enregistré.
+ *
+ * Le thème mis en cache localement s'applique dès le démarrage (`src/main.tsx`) ;
+ * dès que les préférences du compte arrivent, c'est leur valeur qui fait foi, pour
+ * qu'un même compte retrouve son thème sur une autre machine.
+ */
+export function useThemePref() {
+  const queryClient = useQueryClient();
+  const prefs = useUserPrefs();
+  const stored = prefs.data?.theme;
+  const theme: Theme = isTheme(stored) ? stored : prefs.isSuccess ? "system" : cachedTheme();
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  // Le thème du système peut changer pendant la session, écran veille ou horaire.
+  const current = useRef(theme);
+  current.current = theme;
+  useEffect(() => watchSystemTheme(() => current.current), []);
+
+  const save = useMutation({
+    mutationFn: async (next: Theme) => {
+      applyTheme(next);
+      await savePrefs(queryClient, (currentPrefs) => ({ ...currentPrefs, theme: next }));
+    },
+  });
+
+  return {
+    theme,
+    setTheme: (next: Theme) => {
+      save.mutate(next);
+    },
+    isSaving: save.isPending,
+    errorMessage: save.isError ? save.error.message : null,
+  };
 }

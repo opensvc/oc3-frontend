@@ -7,10 +7,10 @@ import "@/styles/index.css";
 import "@/i18n";
 import { queryClient } from "@/lib/query";
 import { router } from "@/app/router";
+import { applyTheme, cachedTheme } from "@/lib/theme";
 
-if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-  document.documentElement.classList.add("dark");
-}
+// Avant le premier rendu : le choix mis en cache, sinon le thème du système.
+applyTheme(cachedTheme());
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
