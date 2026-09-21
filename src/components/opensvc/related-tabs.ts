@@ -1,10 +1,22 @@
 import type { ReactNode } from "react";
 
-/** Résumé d'un onglet : son effectif, et une gravité quand elle a un sens. */
+/** Part d'un effectif, affichée dans sa propre pastille. */
+export interface SummaryPart {
+  key: string;
+  count: number;
+  /** Classes de fond et d'encre, par tokens. */
+  box: string;
+  /** Libellé complet, pluriel compris : infobulle et lecteurs d'écran. */
+  label: string;
+}
+
+/**
+ * Résumé d'un onglet : son effectif, et sa répartition quand elle a un sens (les
+ * alertes par gravité). Les parts vides ne sont pas affichées.
+ */
 export interface RelatedSummary {
   count: number | undefined;
-  /** Palier de gravité pour teinter le compteur : 0 neutre, 2 avertissement, 3 critique. */
-  severity?: number;
+  parts?: SummaryPart[];
 }
 
 /**

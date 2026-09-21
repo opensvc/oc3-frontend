@@ -312,6 +312,14 @@
       "warning": "Warning",
       "info": "Informational"
     },
+    "severityCount": {
+      "critical_one": "{{count}} critical alert",
+      "critical_other": "{{count}} critical alerts",
+      "warning_one": "{{count}} warning",
+      "warning_other": "{{count}} warnings",
+      "info_one": "{{count}} informational alert",
+      "info_other": "{{count}} informational alerts"
+    },
     "detail": {
       "title": "Alert details",
       "groups": {

@@ -1,4 +1,6 @@
+import { useTranslation } from "react-i18next";
 import type { RelatedTab } from "@/components/opensvc/related-tabs";
+import { SEVERITY_LEVELS, severityLevel } from "@/components/opensvc/severity";
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import { NodeAlerts } from "./NodeAlerts";
 import { NodeHardware } from "./NodeHardware";
@@ -40,10 +42,21 @@ export const NODE_RELATED_TABS: RelatedTab[] = [
     labelKey: "nodes.related.alerts",
     icon: <ColumnFamilyIcon family="alert" />,
     useSummary: (nodeId) => {
+      const { t } = useTranslation();
       const rows = useNodeAlerts(nodeId).data;
       return {
         count: rows?.length,
-        severity: rows?.reduce((max, row) => Math.max(max, row.dash_severity ?? 0), 0),
+        parts: SEVERITY_LEVELS.map((level) => {
+          const count = (rows ?? []).filter(
+            (row) => severityLevel(row.dash_severity ?? 0).key === level.key,
+          ).length;
+          return {
+            key: level.key,
+            count,
+            box: level.box,
+            label: t(`dashboard.severityCount.${level.key}`, { count }),
+          };
+        }),
       };
     },
     render: (nodeId, locale) => <NodeAlerts nodeId={nodeId} locale={locale} />,

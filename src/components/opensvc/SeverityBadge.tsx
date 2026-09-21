@@ -1,21 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { severityLevel } from "./severity";
 
-/**
- * Sévérité d'une entrée du dashboard. Le collector la stocke en entier de 0 à 5
- * sans libellé : on garde donc le chiffre affiché, et on n'ajoute qu'un palier de
- * lecture. Comme pour les états d'objet, chaque palier a sa forme propre, pour
- * rester lisible sans la couleur.
- */
-const levels = [
-  { min: 3, box: "bg-state-down-soft text-state-down", glyph: "■", key: "critical" },
-  { min: 2, box: "bg-state-warn-soft text-state-warn", glyph: "▲", key: "warning" },
-  { min: 0, box: "bg-state-unknown-soft text-state-unknown", glyph: "○", key: "info" },
-] as const;
-
+/** Sévérité d'une entrée du dashboard : chiffre brut, palier de lecture (`severity.ts`). */
 export function SeverityBadge({ severity, className }: { severity: number; className?: string }) {
   const { t } = useTranslation();
-  const level = levels.find((candidate) => severity >= candidate.min) ?? levels[2];
+  const level = severityLevel(severity);
   return (
     <span
       className={cn(
