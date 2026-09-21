@@ -187,3 +187,42 @@ export function useThemePref() {
     errorMessage: save.isError ? save.error.message : null,
   };
 }
+
+/**
+ * Oublie les colonnes et le tri enregistrés pour toutes les vues.
+ *
+ * Seules ces deux clés sont retirées : l'ancienne interface range dans le même objet
+ * la taille de page, ses filtres de colonne et l'état plié de ses sections, qui ne
+ * sont pas les nôtres à effacer. Une vue dont il ne reste rien disparaît de `tables`.
+ */
+export function useResetViewPrefs() {
+  const queryClient = useQueryClient();
+  const reset = useMutation({
+    mutationFn: async () =>
+      savePrefs(queryClient, (current) => {
+        const tables: Record<string, ViewPrefs | undefined> = {};
+        for (const [view, entry] of Object.entries(current.tables ?? {})) {
+          const rest = { ...entry };
+          delete rest.visible_columns;
+          delete rest.sort;
+          if (Object.keys(rest).length > 0) tables[view] = rest;
+        }
+        return { ...current, tables };
+      }),
+  });
+  return {
+    reset: () => {
+      reset.mutate();
+    },
+    isPending: reset.isPending,
+    isDone: reset.isSuccess,
+    errorMessage: reset.isError ? reset.error.message : null,
+  };
+}
+
+/** Vrai si au moins une vue a des colonnes ou un tri enregistrés. */
+export function hasSavedViewPrefs(prefs: UserPrefs | undefined): boolean {
+  return Object.values(prefs?.tables ?? {}).some(
+    (entry) => entry?.visible_columns !== undefined || entry?.sort !== undefined,
+  );
+}

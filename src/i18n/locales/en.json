@@ -591,6 +591,16 @@
         "light": "Light",
         "dark": "Dark"
       }
+    },
+    "viewPrefs": {
+      "title": "Saved view settings",
+      "hint": "The columns and sort order you chose in each list follow your account.",
+      "reset": "Forget saved columns and sorting",
+      "question": "Forget the columns and sort order saved for every view?",
+      "confirm": "Forget",
+      "pending": "Forgetting…",
+      "done": "Saved columns and sorting forgotten. Every list is back to its defaults.",
+      "none": "No view has saved columns or sort order."
     }
   },
   "instances": {

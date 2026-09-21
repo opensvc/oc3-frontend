@@ -7,7 +7,9 @@ import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { problemText } from "@/lib/api/problem";
 import { USER_GROUPS, USER_PROPS_QUERY } from "@/features/users/user-fields";
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
-import { useThemePref } from "@/lib/user-prefs";
+import { hasSavedViewPrefs, useResetViewPrefs, useThemePref, useUserPrefs } from "@/lib/user-prefs";
+import { ConfirmButton } from "@/components/ui/ConfirmButton";
+import { ResetIcon } from "@/components/ui/icons";
 import { THEMES } from "@/lib/theme";
 
 type UserRow = components["schemas"]["UserRow"];
@@ -23,6 +25,8 @@ type UserRow = components["schemas"]["UserRow"];
 export function ProfilePage() {
   const { t } = useTranslation();
   const theme = useThemePref();
+  const prefs = useUserPrefs();
+  const resetViews = useResetViewPrefs();
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["user", "self"],
     queryFn: async () => {
@@ -91,6 +95,35 @@ export function ProfilePage() {
         {theme.errorMessage !== null && (
           <p role="alert" className="mt-2 text-state-down">
             ■ {theme.errorMessage}
+          </p>
+        )}
+      </section>
+
+      <section className="mt-6">
+        <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
+          <ColumnFamilyIcon family="team" />
+          {t("profile.viewPrefs.title")}
+        </h2>
+        <p className="mb-2 text-ink-muted">{t("profile.viewPrefs.hint")}</p>
+        {hasSavedViewPrefs(prefs.data) ? (
+          <ConfirmButton
+            icon={<ResetIcon />}
+            label={t("profile.viewPrefs.reset")}
+            question={t("profile.viewPrefs.question")}
+            confirmLabel={t("profile.viewPrefs.confirm")}
+            cancelLabel={t("detail.cancel")}
+            pendingLabel={t("profile.viewPrefs.pending")}
+            pending={resetViews.isPending}
+            onConfirm={resetViews.reset}
+          />
+        ) : (
+          <p role="status" className="text-ink-muted">
+            {resetViews.isDone ? t("profile.viewPrefs.done") : t("profile.viewPrefs.none")}
+          </p>
+        )}
+        {resetViews.errorMessage !== null && (
+          <p role="alert" className="mt-2 text-state-down">
+            ■ {resetViews.errorMessage}
           </p>
         )}
       </section>

@@ -591,6 +591,16 @@
         "light": "Clair",
         "dark": "Sombre"
       }
+    },
+    "viewPrefs": {
+      "title": "Réglages de vue enregistrés",
+      "hint": "Les colonnes et le tri choisis dans chaque liste suivent votre compte.",
+      "reset": "Oublier les colonnes et le tri",
+      "question": "Oublier les colonnes et le tri enregistrés pour toutes les vues ?",
+      "confirm": "Oublier",
+      "pending": "Effacement…",
+      "done": "Colonnes et tri oubliés. Chaque liste retrouve ses réglages par défaut.",
+      "none": "Aucune vue n'a de colonnes ou de tri enregistrés."
     }
   },
   "instances": {
