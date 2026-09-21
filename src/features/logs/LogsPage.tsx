@@ -7,7 +7,6 @@ import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
-import { OsLogo } from "@/components/opensvc/OsLogo";
 import { StatusBadge } from "@/components/opensvc/StatusBadge";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { DateTime } from "@/components/ui/DateTime";
@@ -91,7 +90,7 @@ function queryProps(cols: string[] | undefined): string {
   const extra = [
     ...(shown.includes("log_fmt") ? ["log_dict"] : []),
     // Les noms joints sont des puces vers leur vue : il leur faut leur identifiant.
-    ...(shown.includes("nodes.nodename") ? ["nodes.os_name", "node_id"] : []),
+    ...(shown.includes("nodes.nodename") ? ["node_id"] : []),
     ...(shown.includes("services.svcname") ? ["svc_id"] : []),
   ];
   return [...new Set(["id", ...shown, ...extra])].join(",");
@@ -180,12 +179,9 @@ export function LogsPage() {
         );
       if (prop === "nodes.nodename")
         return value === null || value === undefined ? undefined : (
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-            <OsLogo osName={row["nodes.os_name"] ?? undefined} />
-            <CrossLink kind="node" id={row.node_id}>
-              {value}
-            </CrossLink>
-          </span>
+          <CrossLink kind="node" id={row.node_id}>
+            {value}
+          </CrossLink>
         );
       if (prop === "log_fmt") {
         const message = formatLogMessage(row.log_fmt, row.log_dict);

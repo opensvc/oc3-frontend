@@ -247,11 +247,13 @@ const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
           {value}
         </CrossLink>
       );
-    if (prop === "nodename")
+    // Le logo accompagne le nom du système, et lui seul : la version complète
+    // (`os_concat`) le répéterait sans rien dire de plus.
+    if (prop === "os_name")
       return (
         <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
           <OsLogo osName={row.os_name} />
-          {row.nodename}
+          {value}
         </span>
       );
     // Ce qu'on lit du dernier contact, c'est son ancienneté : une date complète
@@ -267,12 +269,10 @@ const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
 /**
  * Ne demander que les colonnes affichées : apicollector ne lit en base que les props
- * demandés. `os_name` s'y ajoute dès que le nom est affiché, pour son logo.
+ * demandés.
  */
 function queryProps(cols: string[] | undefined): string {
-  const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
-  const extra = shown.includes("nodename") ? ["os_name"] : [];
-  return [...new Set(["node_id", ...shown, ...extra])].join(",");
+  return [...new Set(["node_id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
 
 function useNodes(search: ResolvedListSearch) {

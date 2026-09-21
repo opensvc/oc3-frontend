@@ -8,6 +8,7 @@ import { TeamLink } from "@/features/groups/TeamLink";
 import { NODE_RELATED_TABS } from "./related/node-related";
 import { NodeActionsMenu } from "./NodeActionsMenu";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
+import { OsLogo } from "@/components/opensvc/OsLogo";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
 import { useNodeTags } from "./related/queries";
@@ -148,7 +149,17 @@ const GROUPS: DetailGroup<NodeRow>[] = [
     key: "system",
     family: "os",
     fields: [
-      field("os_name"),
+      {
+        prop: "os_name",
+        format: text("os_name"),
+        // Même logo que dans la liste, à côté du nom du système.
+        render: (row: NodeRow) => (
+          <span className="inline-flex items-center gap-1.5">
+            <OsLogo osName={row.os_name} />
+            {row.os_name}
+          </span>
+        ),
+      },
       field("os_release"),
       field("os_vendor"),
       field("os_arch"),

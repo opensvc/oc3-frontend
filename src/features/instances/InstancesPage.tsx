@@ -7,7 +7,6 @@ import { api } from "@/lib/api/client";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
-import { OsLogo } from "@/components/opensvc/OsLogo";
 import { StatusBadge } from "@/components/opensvc/StatusBadge";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { statusBadge } from "@/components/opensvc/status";
@@ -138,12 +137,9 @@ const COLUMNS: ListColumn<InstanceRow>[] = INSTANCE_PROPS.map((prop) => ({
     const value = row[prop];
     if (prop === "nodes.nodename")
       return (
-        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-          <OsLogo osName={row["nodes.os_name"] ?? undefined} />
-          <CrossLink kind="node" id={row.node_id}>
-            {value}
-          </CrossLink>
-        </span>
+        <CrossLink kind="node" id={row.node_id}>
+          {value}
+        </CrossLink>
       );
     if (prop === "services.svcname")
       return (
@@ -170,7 +166,7 @@ const ALL_PROPS = COLUMNS.map((column) => column.prop);
  */
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
-  const extra = shown.includes("nodes.nodename") ? ["nodes.os_name"] : [];
+  const extra: string[] = [];
   return [...new Set(["svc_id", "node_id", ...shown, ...extra])].join(",");
 }
 
