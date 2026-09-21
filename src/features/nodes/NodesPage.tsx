@@ -20,6 +20,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
 import { CreateNodePanel } from "./CreateNodePanel";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 
@@ -291,7 +292,11 @@ function useNodes(search: ResolvedListSearch) {
 
 export function NodesPage() {
   const { t } = useTranslation();
-  const search = resolveListSearch(useSearch({ from: "/nodes" }), DEFAULT_SORT);
+  const prefs = useViewColumns("nodes");
+  const search = withSavedCols(
+    resolveListSearch(useSearch({ from: "/nodes" }), DEFAULT_SORT),
+    prefs.cols,
+  );
   const navigate = useNavigate({ from: "/nodes" });
   const { data, isPending, isError, error, isFetching } = useNodes(search);
   const filtersets = useFiltersets();
@@ -315,6 +320,8 @@ export function NodesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.save(next.cols);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),

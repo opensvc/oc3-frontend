@@ -14,6 +14,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
 import { CreateUserPanel } from "./CreateUserPanel";
 import { UserDetailPanel } from "./UserDetailPanel";
 
@@ -130,7 +131,11 @@ function useUsers(search: ResolvedListSearch) {
 
 export function UsersPage() {
   const { t } = useTranslation();
-  const search = resolveListSearch(useSearch({ from: "/users" }), DEFAULT_SORT);
+  const prefs = useViewColumns("users");
+  const search = withSavedCols(
+    resolveListSearch(useSearch({ from: "/users" }), DEFAULT_SORT),
+    prefs.cols,
+  );
   const navigate = useNavigate({ from: "/users" });
   const { data, isPending, isError, error, isFetching } = useUsers(search);
 
@@ -148,6 +153,8 @@ export function UsersPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.save(next.cols);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),

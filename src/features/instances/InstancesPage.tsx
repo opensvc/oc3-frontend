@@ -19,6 +19,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
 import { InstanceDetailPanel } from "./InstanceDetailPanel";
 import { InstanceActionsMenu } from "./InstanceActionsMenu";
 import { toInstanceId } from "./instance-id";
@@ -188,7 +189,11 @@ function useInstances(search: ResolvedListSearch) {
 
 export function InstancesPage() {
   const { t } = useTranslation();
-  const search = resolveListSearch(useSearch({ from: "/instances" }), DEFAULT_SORT);
+  const prefs = useViewColumns("instances");
+  const search = withSavedCols(
+    resolveListSearch(useSearch({ from: "/instances" }), DEFAULT_SORT),
+    prefs.cols,
+  );
   const navigate = useNavigate({ from: "/instances" });
   const { data, isPending, isError, error, isFetching } = useInstances(search);
 
@@ -205,6 +210,8 @@ export function InstancesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.save(next.cols);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),

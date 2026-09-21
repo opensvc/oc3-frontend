@@ -14,6 +14,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
 import { CreateGroupPanel } from "./CreateGroupPanel";
 import { GroupDetailPanel } from "./GroupDetailPanel";
 
@@ -77,7 +78,11 @@ function useGroups(search: ResolvedListSearch) {
 
 export function GroupsPage() {
   const { t } = useTranslation();
-  const search = resolveListSearch(useSearch({ from: "/groups" }), DEFAULT_SORT);
+  const prefs = useViewColumns("groups");
+  const search = withSavedCols(
+    resolveListSearch(useSearch({ from: "/groups" }), DEFAULT_SORT),
+    prefs.cols,
+  );
   const navigate = useNavigate({ from: "/groups" });
   const { data, isPending, isError, error, isFetching } = useGroups(search);
   const [creating, setCreating] = useState(false);
@@ -96,6 +101,8 @@ export function GroupsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.save(next.cols);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),

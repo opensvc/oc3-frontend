@@ -15,6 +15,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
 import { AlertDetailPanel } from "./AlertDetailPanel";
 
 type AlertRow = components["schemas"]["AlertRow"];
@@ -126,7 +127,11 @@ function useSeverityCounts() {
 
 export function DashboardPage() {
   const { t } = useTranslation();
-  const search = resolveListSearch(useSearch({ from: "/" }), DEFAULT_SORT);
+  const prefs = useViewColumns("dashboard");
+  const search = withSavedCols(
+    resolveListSearch(useSearch({ from: "/" }), DEFAULT_SORT),
+    prefs.cols,
+  );
   const navigate = useNavigate({ from: "/" });
   const { data, isPending, isError, error, isFetching } = useAlerts(search);
   const severities = useSeverityCounts();
@@ -146,6 +151,8 @@ export function DashboardPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.save(next.cols);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),

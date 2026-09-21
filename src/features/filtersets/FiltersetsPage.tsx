@@ -15,6 +15,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
 import { CreateFiltersetPanel } from "./CreateFiltersetPanel";
 import { FiltersetDetailPanel } from "./FiltersetDetailPanel";
 
@@ -71,7 +72,11 @@ function useFiltersetList(search: ResolvedListSearch) {
 
 export function FiltersetsPage() {
   const { t } = useTranslation();
-  const search = resolveListSearch(useSearch({ from: "/filtersets" }), DEFAULT_SORT);
+  const prefs = useViewColumns("filtersets");
+  const search = withSavedCols(
+    resolveListSearch(useSearch({ from: "/filtersets" }), DEFAULT_SORT),
+    prefs.cols,
+  );
   const navigate = useNavigate({ from: "/filtersets" });
   const { data, isPending, isError, error, isFetching } = useFiltersetList(search);
   const [creating, setCreating] = useState(false);
@@ -89,6 +94,8 @@ export function FiltersetsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.save(next.cols);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),

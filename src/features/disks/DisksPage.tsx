@@ -15,6 +15,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
 import { DiskDetailPanel } from "./DiskDetailPanel";
 
 type DiskRow = components["schemas"]["DiskRow"];
@@ -136,7 +137,11 @@ function useDisks(search: ResolvedListSearch) {
 
 export function DisksPage() {
   const { t } = useTranslation();
-  const search = resolveListSearch(useSearch({ from: "/disks" }), DEFAULT_SORT);
+  const prefs = useViewColumns("disks");
+  const search = withSavedCols(
+    resolveListSearch(useSearch({ from: "/disks" }), DEFAULT_SORT),
+    prefs.cols,
+  );
   const navigate = useNavigate({ from: "/disks" });
   const { data, isPending, isError, error, isFetching } = useDisks(search);
 
@@ -151,6 +156,8 @@ export function DisksPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.save(next.cols);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),

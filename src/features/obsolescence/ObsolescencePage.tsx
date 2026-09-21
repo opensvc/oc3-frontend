@@ -16,6 +16,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
 import { ObsolescenceDetailPanel } from "./ObsolescenceDetailPanel";
 
 type ObsolescenceSettingRow = components["schemas"]["ObsolescenceSettingRow"];
@@ -99,7 +100,11 @@ function useSettings(search: ResolvedListSearch) {
 export function ObsolescencePage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const search = resolveListSearch(useSearch({ from: "/obsolescence" }), DEFAULT_SORT);
+  const prefs = useViewColumns("obsolescence");
+  const search = withSavedCols(
+    resolveListSearch(useSearch({ from: "/obsolescence" }), DEFAULT_SORT),
+    prefs.cols,
+  );
   const navigate = useNavigate({ from: "/obsolescence" });
   const { data, isPending, isError, error, isFetching } = useSettings(search);
 
@@ -133,6 +138,8 @@ export function ObsolescencePage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.save(next.cols);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),
