@@ -3,16 +3,17 @@ import { cn } from "@/lib/utils";
 
 export type ObjectState = "up" | "warn" | "down" | "unknown";
 
-const styles: Record<ObjectState, { box: string; glyph: string }> = {
-  up: { box: "bg-state-up-soft text-state-up", glyph: "●" },
-  warn: { box: "bg-state-warn-soft text-state-warn", glyph: "▲" },
-  down: { box: "bg-state-down-soft text-state-down", glyph: "■" },
-  unknown: { box: "bg-state-unknown-soft text-state-unknown", glyph: "○" },
+const styles: Record<ObjectState, { ink: string; glyph: string }> = {
+  up: { ink: "text-state-up", glyph: "●" },
+  warn: { ink: "text-state-warn", glyph: "▲" },
+  down: { ink: "text-state-down", glyph: "■" },
+  unknown: { ink: "text-state-unknown", glyph: "○" },
 };
 
 /**
- * Badge d'état d'un objet OpenSVC. Chaque état a une forme distincte en plus de sa couleur,
- * pour rester lisible en cas de daltonisme ou d'impression en niveaux de gris.
+ * État d'un objet OpenSVC : une forme, une teinte et un libellé, sans fond coloré.
+ * La forme distingue les états sans la couleur, pour rester lisible en cas de
+ * daltonisme ou d'impression en niveaux de gris.
  *
  * Largeur fixe, taillée pour le libellé le plus long (« stdby down ») : dans une
  * colonne, les badges s'alignent en un bloc régulier, glyphes compris, quel que soit
@@ -33,8 +34,8 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex w-[6.5rem] items-center gap-1 rounded-(--radius-control) px-1.5 text-data leading-5 font-medium whitespace-nowrap",
-        s.box,
+        "inline-flex w-[6.5rem] items-center gap-1 text-data leading-5 font-medium whitespace-nowrap",
+        s.ink,
         className,
       )}
     >
