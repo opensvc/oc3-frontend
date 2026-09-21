@@ -914,6 +914,20 @@
       "svc_id": "Service id",
       "nodes.nodename": "Node",
       "services.svcname": "Service"
+    },
+    "queueActions": {
+      "open": "Actions",
+      "items": {
+        "cancel": "Cancel",
+        "redo": "Redo"
+      },
+      "question_one": "{{action}} this queued action?",
+      "question_other": "{{action}} {{count}} queued actions?",
+      "confirm": "Apply",
+      "queueing": "Applying…",
+      "queued_one": "{{action}} applied to 1 action.",
+      "queued_other": "{{action}} applied to {{count}} actions.",
+      "failure": "{{name}}: {{message}}"
     }
   }
 }

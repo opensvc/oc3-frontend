@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -19,6 +20,7 @@ import {
 } from "@/lib/list-search";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ActionDetailPanel } from "./ActionDetailPanel";
+import { ActionQueueMenu } from "./ActionQueueMenu";
 import { ACTION_PROPS, isPending, realDate, toActionRows, type ActionRow } from "./action-row";
 
 /** La file se lit de la plus récente à la plus ancienne, comme le journal. */
@@ -137,6 +139,9 @@ export function ActionsPage() {
   );
   const navigate = useNavigate({ from: "/actions" });
   const { data, isPending: loading, isError, error, isFetching } = useActions(search);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // Une action se nomme par sa commande dans les messages ; l'identifiant sinon.
+  const commands = Object.fromEntries((data?.rows ?? []).map((row) => [row.id, row.command]));
 
   async function allIds(): Promise<string[]> {
     const { data: page, error: failure } = await api.GET("/actions", {
@@ -158,10 +163,13 @@ export function ActionsPage() {
 
   return (
     <section>
-      <h1 className="mb-3 flex items-center gap-2 text-title font-semibold">
-        <ObjectIcon kind="log" className="h-5 w-5" />
-        {t("actions.title")}
-      </h1>
+      <div className="mb-3 flex items-center gap-3">
+        <h1 className="flex items-center gap-2 text-title font-semibold">
+          <ObjectIcon kind="log" className="h-5 w-5" />
+          {t("actions.title")}
+        </h1>
+        <ActionQueueMenu actions={selectedIds.map((id) => ({ id, name: commands[id] ?? id }))} />
+      </div>
 
       <CollectorList
         columns={COLUMNS}
@@ -176,6 +184,7 @@ export function ActionsPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
       />
 

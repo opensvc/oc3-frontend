@@ -914,6 +914,20 @@
       "svc_id": "Identifiant du service",
       "nodes.nodename": "Node",
       "services.svcname": "Service"
+    },
+    "queueActions": {
+      "open": "Actions",
+      "items": {
+        "cancel": "Annuler",
+        "redo": "Refaire"
+      },
+      "question_one": "{{action}} cette action de la file ?",
+      "question_other": "{{action}} {{count}} actions de la file ?",
+      "confirm": "Appliquer",
+      "queueing": "Application…",
+      "queued_one": "{{action}} appliqué à 1 action.",
+      "queued_other": "{{action}} appliqué à {{count}} actions.",
+      "failure": "{{name}} : {{message}}"
     }
   }
 }

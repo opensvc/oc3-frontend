@@ -7,6 +7,7 @@ import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { StatusBadge } from "@/components/opensvc/StatusBadge";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { DateTime } from "@/components/ui/DateTime";
+import { ActionQueueMenu } from "./ActionQueueMenu";
 import { isPending, realDate, toActionRows, type ActionRow } from "./action-row";
 
 const OUTPUT =
@@ -78,6 +79,9 @@ export function ActionDetailPanel({
         <p className="text-ink-muted">{t("actions.detail.missing")}</p>
       ) : (
         <>
+          <div className="mb-4">
+            <ActionQueueMenu actions={[{ id: row.id, name: row.command }]} />
+          </div>
           <dl className="mb-4">
             {field(
               "actions.fields.status",
