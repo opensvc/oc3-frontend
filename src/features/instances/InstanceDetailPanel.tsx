@@ -30,7 +30,7 @@ const date = (prop: keyof InstanceRow) => ({
   },
 });
 
-/** Détail d'une instance, en lecture seule : c'est l'agent qui en tient l'état. */
+/** Detail of an instance, read-only: the agent is what holds its state. */
 const GROUPS: DetailGroup<InstanceRow>[] = [
   {
     key: "identity",
@@ -61,7 +61,7 @@ const GROUPS: DetailGroup<InstanceRow>[] = [
       field("mon_overallstatus"),
       field("mon_smon_status"),
       field("mon_smon_global_expect"),
-      // 0 / 1 en base : un vrai booléen, contrairement au `svc_frozen` du service.
+      // 0 / 1 in the database: a real boolean, unlike the service's `svc_frozen`.
       { ...field("mon_frozen"), input: "boolean" as const },
       date("mon_frozen_at"),
       date("mon_encap_frozen_at"),
@@ -130,8 +130,8 @@ export function InstanceDetailPanel({
     },
   });
 
-  // Les tags sont ceux du service de l'instance : une instance n'en porte pas. Même
-  // clé de cache que le panneau de service, qui voit donc les mêmes changements.
+  // The tags are those of the instance's service: an instance carries none. Same
+  // cache key as the service panel, which therefore sees the same changes.
   const svcId = key?.svcId;
   const tags = useServiceTags(svcId);
   const tagEdit = useTagEdit("service", svcId);
@@ -150,7 +150,7 @@ export function InstanceDetailPanel({
       title={title}
       onClose={onClose}
       groups={GROUPS}
-      // Un identifiant d'URL malformé ne désigne rien : on le dit plutôt que d'attendre.
+      // A malformed URL id names nothing: it is said rather than waited on.
       row={key === null && instanceId !== undefined ? null : instance}
       labelPrefix="instances.fields"
       groupPrefix="instances.detail.groups"

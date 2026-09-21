@@ -1,11 +1,11 @@
 /*
  * Tokens de design du collector oc3.
- * Ce fichier est le contrat d'identité visuelle : la webapp pourra le reprendre tel quel.
+ * This file is the visual identity contract: the webapp will be able to take it as it is.
  * Les composants ne consomment jamais une couleur en dur, uniquement ces variables.
  */
 
 :root {
-  /* Surfaces et encre : neutre froid, pensé pour de longues sessions sur des tables denses */
+  /* Surfaces and ink: cool neutral, meant for long sessions over dense tables */
   --surface: #f6f7f5;
   --surface-raised: #ffffff;
   --surface-sunken: #eceeeb;
@@ -14,13 +14,13 @@
   --line: #d9dedb;
   --line-strong: #b9c1bd;
 
-  /* Accent : pétrole, réservé à la navigation, au focus et à la sélection */
+  /* Accent: petrol, reserved for navigation, focus and selection */
   --accent: #0f5b66;
   --accent-ink: #ffffff;
   --accent-soft: #dcebec;
   --focus-ring: #0f5b66;
 
-  /* États métier OpenSVC. Toujours doublés d'une icône ou d'un libellé, jamais la couleur seule */
+  /* OpenSVC business states. Always doubled by an icon or a label, never colour alone */
   --state-up: #2e7d4f;
   --state-up-soft: #e0f0e6;
   --state-warn: #a86b12;
@@ -30,12 +30,12 @@
   --state-unknown: #6f7a82;
   --state-unknown-soft: #e8ebec;
 
-  /* Couleurs des icônes du menu. Une teinte par entrée, comme dans le collector
-     historique, mais désaturée : l'icône identifie la vue, elle ne doit pas
-     concurrencer les couleurs d'état ni l'accent. Chacune est tenue à distance de
-     up / warn / down pour qu'aucune icône ne se lise comme un statut. L'entrée
-     racine garde l'encre : l'ambre du collector historique est trop proche de
-     l'état warn pour servir de décor permanent. */
+  /* Colours of the menu icons. One tint per entry, as in the historical collector
+     but desaturated: the icon identifies the view, it must not compete with the
+     state colours nor with the accent. Each is kept at a distance from up / warn /
+     down so that no icon reads as a status. The root entry keeps the ink: the amber
+     of the historical collector is too close to the warn state to serve as permanent
+     decoration. */
   --icon-dashboard: #1a2229;
   --icon-node: #3d6fb4;
   --icon-service: #2f7d6a;
@@ -44,9 +44,9 @@
   --icon-app: #a32a72;
   --icon-group: #a55446;
 
-  /* Tags attachés à un objet : la sarcelle du collector historique (.tag_attached),
-     distincte de l'accent pétrole pour qu'une puce ne se lise pas comme une
-     sélection. Blanc sur #008099 : contraste 4,6:1. */
+  /* Tags attached to an object: the teal of the historical collector
+     (.tag_attached), distinct from the petrol accent so that a badge does not read as
+     a selection. White on #008099: contrast 4.6:1. */
   --tag: #008099;
   --tag-hover: #006b7a;
   --tag-ink: #ffffff;
@@ -54,10 +54,10 @@
   /* Typographie */
   --font-sans: "IBM Plex Sans Variable", system-ui, sans-serif;
   --text-data: 0.8125rem; /* 13px : cellules de tables */
-  --text-ui: 0.875rem; /* 14px : contrôles et texte courant */
+  --text-ui: 0.875rem; /* 14px: controls and running text */
   --text-title: 1.125rem;
 
-  /* Densité */
+  /* Density */
   --row-height: 1.75rem;
   --radius-control: 3px;
   --radius-panel: 6px;
@@ -86,7 +86,7 @@
   --state-unknown: #9aa5ac;
   --state-unknown-soft: #262f35;
 
-  /* Mêmes teintes, éclaircies et adoucies pour un fond sombre. */
+  /* Same tints, lightened and softened for a dark background. */
   --icon-dashboard: #e3e8e6;
   --icon-node: #7fa9e0;
   --icon-service: #5fb8a2;
@@ -95,7 +95,7 @@
   --icon-app: #d178ab;
   --icon-group: #d1907f;
 
-  /* Fond éclairci, encre sombre : contraste 5,6:1. */
+  /* Lightened background, dark ink: contrast 5.6:1. */
   --tag: #3a9aa8;
   --tag-hover: #4fb0be;
   --tag-ink: #0c1417;

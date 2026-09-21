@@ -20,7 +20,7 @@ export function NodeNetworks({ nodeId }: { nodeId: string }) {
   const ips = useNodeIps(nodeId);
   const rows = ips.data ?? [];
 
-  // Regroupées par interface : c'est ainsi qu'on lit la configuration réseau d'un hôte.
+  // Grouped by interface: this is how the network configuration of a host reads.
   const interfaces = [...new Set(rows.map((row) => row.intf ?? ""))].sort(collator.compare);
   const groups = interfaces.map((intf) => {
     const members = rows.filter((row) => (row.intf ?? "") === intf).sort(compareIps);
@@ -59,7 +59,7 @@ export function NodeNetworks({ nodeId }: { nodeId: string }) {
       key: "net_name",
       label: t("nodes.networks.fields.net_name"),
       grow: true,
-      // Adresse hors de tout réseau déclaré au collector : on le dit plutôt que de laisser un vide.
+      // Address outside any network declared to the collector: said rather than left blank.
       render: (row) =>
         row.net_name !== undefined && row.net_name !== "" ? (
           <>

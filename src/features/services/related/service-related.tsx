@@ -4,9 +4,9 @@ import { ServiceStorage } from "./ServiceStorage";
 import { useServiceDisks } from "./queries";
 
 /**
- * Données rattachées à un service, un onglet chacune, sur le modèle du node
- * (`NODE_RELATED_TABS`). Ajouter instances, ressources, alertes ou tags revient à
- * écrire le composant et à l'ajouter ici.
+ * Data attached to a service, one tab each, on the model of the node
+ * (`NODE_RELATED_TABS`). Adding instances, resources, alerts or tags amounts to
+ * writing the component and adding it here.
  */
 export const SERVICE_RELATED_TABS: RelatedTab[] = [
   {

@@ -8,7 +8,7 @@ import { SlideOver } from "@/components/ui/SlideOver";
 
 const INPUT = "h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2";
 
-/** Longueur minimale imposée par `POST /users`. */
+/** Minimum length imposed by `POST /users`. */
 const MIN_PASSWORD = 8;
 
 function optional(value: string): string | undefined {
@@ -17,9 +17,9 @@ function optional(value: string): string | undefined {
 }
 
 /**
- * Création d'un utilisateur. Le collector lui crée aussi son groupe privé
- * `user_<id>`. Sans mot de passe, le compte existe mais ne peut pas se connecter,
- * comme dans le collector historique : le formulaire le dit plutôt que de l'interdire.
+ * Creating a user. The collector also creates their private group `user_<id>`.
+ * Without a password the account exists but cannot sign in, as in the historical
+ * collector: the form says so rather than forbidding it.
  */
 export function CreateUserPanel({
   open,
@@ -105,7 +105,7 @@ export function CreateUserPanel({
 
   return (
     <SlideOver
-      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      // Data-entry drawer: a click beside it must not clear what has been typed.
       closeOnOutsideClick={false}
       open={open}
       title={t("users.create.title")}

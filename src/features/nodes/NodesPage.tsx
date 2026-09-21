@@ -32,9 +32,10 @@ type NodeRow = components["schemas"]["NodeRow"];
 const DEFAULT_SORT = ["nodename"];
 
 /**
- * Toutes les propriétés de node exposées par apicollector, dans l'ordre de son
- * `meta.available_props`. `satisfies` les confronte au schéma généré : un prop
- * renommé côté oc3 casse le typecheck au lieu de disparaître en silence.
+ * Every node property exposed by apicollector, in the order of its
+ * `meta.available_props`. `satisfies` confronts them with the generated schema: a
+ * prop renamed on the oc3 side breaks the typecheck instead of disappearing
+ * silently.
  */
 const NODE_PROPS = [
   "node_id",
@@ -116,10 +117,10 @@ const NODE_PROPS = [
   "updated",
 ] as const satisfies readonly (keyof NodeRow)[];
 
-/** Colonnes affichées par défaut : de quoi identifier un node, pas de quoi l'auditer. */
+/** Columns shown by default: enough to identify a node, not to audit it. */
 const DEFAULT_COLS: string[] = ["nodename", "app", "node_env", "os_concat", "last_comm"];
 
-/** Props entiers du mapping `node` d'oc3 (helper `colInt`), alignés à droite. */
+/** Integer props of the oc3 `node` mapping (the `colInt` helper), aligned right. */
 const NUMERIC_PROPS = new Set<string>([
   "cpu_cores",
   "cpu_dies",
@@ -147,8 +148,8 @@ const DATE_PROPS = new Set<string>([
 ]);
 
 /**
- * Famille de chaque colonne, reprise du sélecteur de colonnes du collector
- * historique : l'icône dit de quoi parle la colonne, pas le type de sa valeur.
+ * Family of each column, taken from the column picker of the historical collector:
+ * the icon says what the column speaks of, not the type of its value.
  */
 const FAMILY: Record<string, ColumnFamily> = {
   node_id: "node",
@@ -237,9 +238,9 @@ const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
   family: FAMILY[prop] ?? "node",
   render: (row: NodeRow, locale: string) => {
     const value = row[prop];
-    // La colonne mémoire est en mébioctets malgré son nom, voir lib/format.
+    // The memory column is in mebibytes despite its name, see lib/format.
     if (prop === "mem_bytes") return formatSizeMiB(row.mem_bytes, locale);
-    // Comme dans le collector historique, le logo du système précède le nom.
+    // As in the historical collector, the system logo precedes the name.
     if (prop === "team_responsible" || prop === "team_integ" || prop === "team_support")
       return <TeamLink name={value} />;
     if (prop === "app")
@@ -248,8 +249,8 @@ const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
           {value}
         </CrossLink>
       );
-    // Le logo accompagne le nom du système, et lui seul : la version complète
-    // (`os_concat`) le répéterait sans rien dire de plus.
+    // The logo goes with the name of the system, and with it alone: the full version
+    // (`os_concat`) would repeat it without saying anything more.
     if (prop === "os_name")
       return (
         <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
@@ -257,8 +258,8 @@ const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
           {value}
         </span>
       );
-    // Ce qu'on lit du dernier contact, c'est son ancienneté : une date complète
-    // obligerait à la soustraire de tête pour repérer un node qui ne parle plus.
+    // What one reads from the last contact is its age: a full date would have to be
+    // subtracted mentally to spot a node that has stopped speaking.
     if (prop === "last_comm") return <RelativeTime value={row.last_comm} locale={locale} />;
     if (DATE_PROPS.has(prop) && typeof value === "string")
       return <DateTime value={value} locale={locale} />;
@@ -269,10 +270,10 @@ const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
 /**
- * Ne demander que les colonnes affichées : apicollector ne lit en base que les props
- * demandés.
+ * Ask only for the columns shown: apicollector reads from the database only the props
+ * requested.
  */
-/** `node_frozen` est toujours demandé : le gel se signale même colonne masquée. */
+/** `node_frozen` is always requested: freezing is marked even with the column hidden. */
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
   return [...new Set(["node_id", "node_frozen", ...shown])].join(",");
@@ -282,8 +283,8 @@ function useNodes(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["nodes", search.sort, search.offset, search.limit, search.fset, search.cols],
     queryFn: async () => {
-      // apicollector ne renvoie pas le total d'une sélection : on demande une ligne
-      // de plus que la page pour savoir s'il en reste après celle-ci.
+      // apicollector does not return the total of a selection: one row more than the
+      // page is requested, to know whether any remain after it.
       const query = {
         props: queryProps(search.cols),
         orderby: search.sort.join(","),
@@ -314,11 +315,11 @@ export function NodesPage() {
   const { data, isPending, isError, error, isFetching } = useNodes(search);
   const filtersets = useFiltersets();
   const [creating, setCreating] = useState(false);
-  // Sélection tenue par la liste ; la page n'en garde que les identifiants, pour le
-  // menu d'actions. Les noms viennent de la page affichée, d'où le repli sur l'id.
+  // Selection held by the list; the page keeps only its ids, for the actions menu.
+  // The names come from the page on display, hence the fallback to the id.
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  /** Identifiants de toute la sélection, filterset compris, sans pagination. */
+  /** Ids of the whole selection, filterset included, without pagination. */
   async function allIds(): Promise<string[]> {
     const query = { props: "node_id", limit: 0 };
     const response =
@@ -333,7 +334,7 @@ export function NodesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -343,8 +344,8 @@ export function NodesPage() {
   }
 
   const selected = data?.rows.find((row) => row.node_id === search.sel);
-  // Noms de la page affichée : une sélection étendue aux pages suivantes ne les a
-  // pas tous, l'identifiant sert alors de repli dans les messages.
+  // Names from the page on display: a selection extended to the following pages does
+  // not have them all, so the id then serves as a fallback in the messages.
   const nodeNames = Object.fromEntries(
     (data?.rows ?? []).map((row) => [row.node_id ?? "", row.nodename ?? ""]),
   );
@@ -359,7 +360,7 @@ export function NodesPage() {
         <button
           type="button"
           onClick={() => {
-            // Les deux tiroirs partagent le bord droit : ouvrir la création ferme le détail.
+            // The two drawers share the right edge: opening the creation closes the detail.
             update({ sel: undefined });
             setCreating(true);
           }}

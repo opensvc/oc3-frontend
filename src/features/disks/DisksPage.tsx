@@ -24,8 +24,8 @@ type DiskRow = components["schemas"]["DiskRow"];
 const DEFAULT_SORT = ["nodename", "disk_id"];
 
 /**
- * Toutes les propriétés de disque exposées par apicollector, dans l'ordre de son
- * `meta.available_props`. `satisfies` les confronte au schéma généré.
+ * Every disk property exposed by apicollector, in the order of its
+ * `meta.available_props`. `satisfies` confronts them with the generated schema.
  */
 const DISK_PROPS = [
   "disk_id",
@@ -50,7 +50,7 @@ const DISK_PROPS = [
   "updated",
 ] as const satisfies readonly (keyof DiskRow)[];
 
-/** Colonnes par défaut : quel disque, de quelle taille, rattaché à quoi. */
+/** Default columns: which disk, of which size, attached to what. */
 const DEFAULT_COLS: string[] = [
   "disk_id",
   "disk_model",
@@ -60,10 +60,10 @@ const DEFAULT_COLS: string[] = [
   "svcname",
 ];
 
-/** Props entiers du mapping `disk` d'oc3 (helper `colInt`), alignés à droite. */
+/** Integer props of the oc3 `disk` mapping (the `colInt` helper), aligned right. */
 const NUMERIC_PROPS = new Set<string>(["disk_size", "disk_used", "disk_alloc", "disk_level"]);
 
-/** Tailles en mébioctets, comme la mémoire des nodes. */
+/** Sizes in mebibytes, like node memory. */
 const SIZE_PROPS = new Set<string>(["disk_size", "disk_used", "disk_alloc"]);
 
 /** Props que le collector stocke en datetime. */
@@ -128,8 +128,8 @@ const COLUMNS: ListColumn<DiskRow>[] = DISK_PROPS.map((prop) => ({
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
 /**
- * Colonnes affichées et identifiant, plus les identifiants du node et du service :
- * leurs noms sont des puces qui ouvrent leur vue, et il leur faut leur cible.
+ * Columns shown and the id, plus the ids of the node and the service: their names are
+ * badges that open their view, and those need their target.
  */
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
@@ -144,7 +144,7 @@ function useDisks(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["disks", search.sort, search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/disks", {
         params: {
           query: {
@@ -172,7 +172,7 @@ export function DisksPage() {
   const navigate = useNavigate({ from: "/disks" });
   const { data, isPending, isError, error, isFetching } = useDisks(search);
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/disks", {
       params: { query: { props: "disk_id", limit: 0 } },
@@ -183,7 +183,7 @@ export function DisksPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({

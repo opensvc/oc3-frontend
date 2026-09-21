@@ -49,10 +49,10 @@ function queryProps(cols: string[] | undefined): string {
 
 function useFiltersetList(search: ResolvedListSearch) {
   return useQuery({
-    // Sous « filtersets » : une modification invalide aussi la liste déroulante des vues.
+    // Under "filtersets": an edit also invalidates the dropdown of the views.
     queryKey: ["filtersets", "list", search.sort, search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/filtersets", {
         params: {
           query: {
@@ -94,7 +94,7 @@ export function FiltersetsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -120,7 +120,7 @@ export function FiltersetsPage() {
     },
   }));
 
-  // Un lien vers un filterset encapsulé le désigne par son nom : la ligne se retrouve aussi.
+  // A link to a nested filterset names it by name: the row is found that way too.
   const selected = data?.rows.find(
     (row) => String(row.id) === search.sel || row.fset_name === search.sel,
   );

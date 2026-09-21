@@ -14,9 +14,9 @@ const text = (prop: keyof ObsolescenceSettingRow) => (row: ObsolescenceSettingRo
 };
 
 /**
- * Seules les deux échéances se modifient : le type et le nom désignent ce que vise
- * le réglage, et apicollector ne les accepte pas en écriture. Vider une échéance la
- * supprime.
+ * Only the two deadlines can be edited: the type and the name say what the setting
+ * aims at, and apicollector does not accept them for writing. Clearing a deadline
+ * removes it.
  */
 function groups(t: (key: string) => string): DetailGroup<ObsolescenceSettingRow>[] {
   return [
@@ -65,7 +65,7 @@ function groups(t: (key: string) => string): DetailGroup<ObsolescenceSettingRow>
   ];
 }
 
-/** Corps de la modification : seules les deux échéances, et seulement en chaîne. */
+/** Body of the update: the two deadlines only, and only as strings. */
 function toBody(changes: Record<string, string | number | boolean>) {
   const body: { obs_warn_date?: string; obs_alert_date?: string } = {};
   if (typeof changes.obs_warn_date === "string") body.obs_warn_date = changes.obs_warn_date;
@@ -102,8 +102,8 @@ export function ObsolescenceDetailPanel({
     },
   });
 
-  // Côté collector, la modification répercute aussi les dates sur les nodes visés et
-  // recalcule leurs alertes d'obsolescence du dashboard.
+  // On the collector side, the update also carries the dates over to the nodes aimed
+  // at and recomputes their obsolescence alerts on the dashboard.
   const save = useMutation({
     mutationFn: async (changes: Record<string, string | number | boolean>) => {
       const { error: failure } = await api.POST("/obsolescence/settings/{id}", {

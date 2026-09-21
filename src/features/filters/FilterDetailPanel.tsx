@@ -55,7 +55,7 @@ export function FilterDetailPanel({
   const queryClient = useQueryClient();
   const { data: filter, isPending, isError, error } = useFilter(filterId);
 
-  // Le collector détache aussi le filtre des filtersets qui l'utilisent.
+  // The collector also detaches the filter from the filtersets that use it.
   const remove = useMutation({
     mutationFn: async () => {
       const { error: failure } = await api.DELETE("/filters/{filter_id}", {

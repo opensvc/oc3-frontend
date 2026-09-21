@@ -6,37 +6,38 @@ import { Combobox } from "@/components/ui/Combobox";
 import { CloseIcon, PlusIcon } from "@/components/ui/icons";
 import { ColumnFamilyIcon } from "./ColumnFamily";
 
-/** Rattachement et détachement, tenus par l'appelant (voir `useTagEdit`). */
+/** Attaching and detaching, held by the caller (see `useTagEdit`). */
 export interface TagEditControl {
-  /** Faux tant que le droit de modifier n'est pas établi : les boutons restent masqués. */
+  /** False until the right to edit is established: the buttons stay hidden. */
   allowed: boolean;
   picking: boolean;
   setPicking: (picking: boolean) => void;
-  /** Tags rattachables, chargés à l'ouverture du sélecteur. */
+  /** Attachable tags, loaded when the picker opens. */
   candidates: TagRow[] | undefined;
   candidatesPending: boolean;
   candidatesError: string | null;
   attach: (tagId: string) => void;
   attaching: boolean;
   attachError: string | null;
-  /** `tag_id` du tag dont le détachement attend confirmation. */
+  /** `tag_id` of the tag whose detachment awaits confirmation. */
   confirmingDetach: string | null;
   /** Demande confirmation pour ce tag, ou l'abandonne avec `null`. */
   askDetach: (tagId: string | null) => void;
   detach: (tagId: string) => void;
-  /** `tag_id` du tag en cours de détachement. */
+  /** `tag_id` of the tag being detached. */
   detaching: string | null;
   detachError: string | null;
 }
 
 /**
- * Tags d'un objet (node, service), en tête de ses propriétés : quelques mots qui
- * disent à quoi l'objet sert ou ce qui lui est promis. Chaque tag mène à sa fiche
- * dans la vue Tags ; ses données et son motif d'exclusion sont en infobulle.
+ * Tags of an object (node, service), at the head of its properties: a few words that
+ * say what the object is for or what is promised about it. Each tag leads to its
+ * record in the Tags view; its data and its exclusion pattern are in the tooltip.
  *
- * Avec `edit`, et pour qui en a le droit, chaque puce porte une croix qui détache
- * le tag après confirmation, et un bouton ouvre un sélecteur des tags encore
- * rattachables, filtrable à la saisie. Le sélecteur reste ouvert après un rattachement, pour en enchaîner plusieurs.
+ * With `edit`, and for whoever has the right, each badge carries a cross that
+ * detaches the tag after confirmation, and a button opens a picker of the tags still
+ * attachable, filtered as one types. The picker stays open after an attachment, to
+ * chain several.
  */
 export function ObjectTags({
   tags,
@@ -151,9 +152,9 @@ export function ObjectTags({
 }
 
 /**
- * Question posée sous les puces, sur le modèle de `ConfirmButton` : le bouton de
- * confirmation prend le focus, ce qui énonce la question aux lecteurs d'écran, et
- * Échap l'abandonne.
+ * Question asked under the badges, on the model of `ConfirmButton`: the confirm
+ * button takes the focus, which reads the question out to screen readers, and Escape
+ * abandons it.
  */
 function DetachConfirm({
   name,
@@ -208,12 +209,12 @@ function AttachForm({ attach }: { attach: TagEditControl }) {
   const { t } = useTranslation();
   const [choice, setChoice] = useState("");
   const candidates = attach.candidates ?? [];
-  // Un tag qui vient d'être rattaché sort de la liste : la sélection retombe à vide.
+  // A tag just attached leaves the list: the selection falls back to empty.
   const selected = candidates.some((tag) => tag.tag_id === choice) ? choice : "";
   const input = useRef<HTMLInputElement>(null);
 
-  // Le champ prend le focus à l'ouverture, et le reprend après chaque rattachement
-  // pour enchaîner : le bouton, désactivé pendant l'envoi, l'aurait perdu.
+  // The field takes the focus when the picker opens, and takes it back after each
+  // attachment to chain them: the button, disabled while sending, would have lost it.
   useEffect(() => {
     if (!attach.attaching) input.current?.focus();
   }, [attach.attaching, attach.candidatesPending]);

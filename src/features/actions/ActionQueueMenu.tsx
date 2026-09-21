@@ -5,20 +5,19 @@ import { ActionsMenu, type ActionTarget } from "@/components/opensvc/ActionsMenu
 import { readProp } from "@/lib/row";
 
 /**
- * Ce qu'on peut faire d'une ligne de la file, avec le statut que l'API attend :
- * annuler une action qui n'a pas encore été dépilée, ou remettre en file une action
- * terminée ou annulée. L'API refuse les autres combinaisons (`post_actions.go`,
- * repris de `api_action_queue.py`) : annuler une action terminée, ou refaire une
- * action qui attend déjà.
+ * What can be done with a row of the queue, with the status the API expects: cancel
+ * an action not yet taken, or queue again an action finished or cancelled. The API
+ * refuses the other combinations (`post_actions.go`, taken from
+ * `api_action_queue.py`): cancelling a finished action, or redoing an action that is
+ * already waiting.
  */
 const STATUS: Record<string, string> = { cancel: "C", redo: "W" };
 
 const ACTIONS = [{ action: "cancel" }, { action: "redo" }] as const;
 
 /**
- * Menu des actions de la file, sur le modèle de celui des nodes : une entrée
- * choisie, confirmée, puis appliquée à chaque ligne visée, et un compte rendu qui
- * nomme les refus.
+ * Actions menu of the queue, on the model of the one for nodes: an entry chosen,
+ * confirmed, then applied to each row aimed at, and a report that names the refusals.
  */
 export function ActionQueueMenu({ actions }: { actions: ActionTarget[] }) {
   const queryClient = useQueryClient();
@@ -33,7 +32,7 @@ export function ActionQueueMenu({ actions }: { actions: ActionTarget[] }) {
           body: { id: target.id, status: STATUS[action] ?? "" },
         });
         if (error !== undefined) return problemText(error);
-        // L'API rend ses refus en 200 avec une clé `error`, comme l'ancien collector.
+        // The API returns its refusals as 200 with an `error` key, like the old collector.
         const refusal = readProp(data, "error");
         if (typeof refusal === "string" && refusal !== "") return refusal;
         await Promise.all([

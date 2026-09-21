@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { severityLevel } from "./severity";
 
-/** Sévérité d'une entrée du dashboard : chiffre brut, palier de lecture (`severity.ts`). */
+/** Severity of a dashboard entry: raw number, reading tier (`severity.ts`). */
 export function SeverityBadge({ severity, className }: { severity: number; className?: string }) {
   const { t } = useTranslation();
   const level = severityLevel(severity);

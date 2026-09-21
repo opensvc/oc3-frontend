@@ -1,9 +1,9 @@
 /**
- * Interrupteur pour une valeur booléenne.
+ * Switch for a boolean value.
  *
- * L'état se lit à la position du curseur autant qu'à la couleur, et `role="switch"`
- * avec `aria-checked` le restitue aux technologies d'assistance : il ne repose donc
- * pas sur la seule couleur. Désactivé, il reste lisible et sert d'affichage.
+ * The state reads from the knob position as much as from the colour, and
+ * `role="switch"` with `aria-checked` conveys it to assistive technologies: it does
+ * not rely on colour alone. Disabled, it stays readable and serves as a display.
  */
 export function Switch({
   checked,
@@ -13,9 +13,9 @@ export function Switch({
   onChange,
 }: {
   checked: boolean;
-  /** Nom de la propriété, pour l'étiquette accessible. */
+  /** Name of the property, for the accessible label. */
   label: string;
-  /** Libellé de l'état courant, annoncé et affiché en infobulle. */
+  /** Label of the current state, announced and shown as a tooltip. */
   stateLabel: string;
   disabled?: boolean;
   onChange?: (checked: boolean) => void;

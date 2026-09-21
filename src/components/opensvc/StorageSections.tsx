@@ -9,7 +9,7 @@ import { formatSizeMiB } from "@/lib/format";
 type DiskRow = components["schemas"]["DiskRow"];
 type HbaRow = components["schemas"]["HbaRow"];
 
-/** Libellés usuels des transports : le collector stocke « iscsi », « fc »… */
+/** Usual labels of the transports: the collector stores "iscsi", "fc"… */
 const HBA_TYPES: Record<string, string> = {
   iscsi: "iSCSI",
   fc: "Fibre Channel",
@@ -30,10 +30,9 @@ function count<T>(section: Loaded<T>): number | undefined {
 }
 
 /**
- * Stockage d'un objet : ses adaptateurs de bus hôte, puis ses disques, chacun sous un
- * intitulé avec son effectif. Les adaptateurs d'abord : ce sont eux qui donnent accès
- * aux disques partagés. Chaque objet choisit ses regroupements — par service pour un
- * node, par node pour un service.
+ * Storage of an object: its host bus adapters, then its disks, each under a heading
+ * with its count. The adapters first: they are what gives access to the shared disks.
+ * Each object chooses its groupings — by service for a node, by node for a service.
  */
 export function StorageSections({
   hbas,

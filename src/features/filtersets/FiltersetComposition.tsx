@@ -45,13 +45,13 @@ function useFilters() {
 }
 
 /**
- * Entrées d'un filterset, dans l'ordre : filtres et filtersets encapsulés, chacun joint
- * au précédent par un opérateur logique.
+ * Entries of a filterset, in order: filters and nested filtersets, each joined to the
+ * previous one by a logical operator.
  *
- * Chaque changement est un appel d'attachement : `POST` sur une entrée existante met à
- * jour sa position et son opérateur, `DELETE` la détache. Un déplacement renumérote
- * toute la liste de 1 à n et n'envoie que les positions qui changent : les positions
- * stockées peuvent avoir des trous ou des doublons.
+ * Every change is an attach call: `POST` on an existing entry updates its position
+ * and its operator, `DELETE` detaches it. A move renumbers the whole list from 1 to n
+ * and sends only the positions that change: the stored positions may have gaps or
+ * duplicates.
  */
 export function FiltersetComposition({
   filtersetId,
@@ -94,7 +94,7 @@ export function FiltersetComposition({
       : { filterset: entry.filterset ?? "" };
   }
 
-  /** Enchaîne des appels, puis relit tout ce que la composition influence. */
+  /** Chains calls, then reads again everything the composition influences. */
   async function run(steps: () => Promise<void>) {
     setBusy(true);
     setFailure(null);
@@ -104,7 +104,7 @@ export function FiltersetComposition({
       setFailure(error instanceof Error ? error.message : String(error));
     } finally {
       await queryClient.invalidateQueries({ queryKey: [FILTERSET_KEY] });
-      // Les listes filtrées par ce filterset changent de contenu.
+      // The lists filtered by this filterset change their content.
       await queryClient.invalidateQueries({ queryKey: ["nodes"] });
       await queryClient.invalidateQueries({ queryKey: ["services"] });
       setBusy(false);

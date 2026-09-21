@@ -6,11 +6,11 @@ import { problemText } from "@/lib/api/problem";
 import { SlideOver } from "@/components/ui/SlideOver";
 
 /**
- * Création d'un groupe.
+ * Creating a group.
  *
- * `POST /groups` crée ou met à jour : un nom déjà pris modifierait le groupe existant
- * au lieu d'échouer (`server/handlers/post_groups.go`). Un formulaire de création ne
- * doit pas faire ça en silence, d'où la vérification préalable, comme pour les nodes.
+ * `POST /groups` creates or updates: a name already taken would modify the existing
+ * group instead of failing (`server/handlers/post_groups.go`). A creation form must
+ * not do that silently, hence the check beforehand, as for nodes.
  */
 export function CreateGroupPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
@@ -48,7 +48,7 @@ export function CreateGroupPanel({ open, onClose }: { open: boolean; onClose: ()
 
   return (
     <SlideOver
-      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      // Data-entry drawer: a click beside it must not clear what has been typed.
       closeOnOutsideClick={false}
       open={open}
       title={t("groups.create.title")}

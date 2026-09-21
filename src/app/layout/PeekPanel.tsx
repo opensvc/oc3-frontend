@@ -5,7 +5,7 @@ import { InstanceDetailPanel } from "@/features/instances/InstanceDetailPanel";
 import { AppDetailPanel } from "@/features/apps/AppDetailPanel";
 import { GroupDetailPanel } from "@/features/groups/GroupDetailPanel";
 
-/** Sépare `kind:identifiant`, l'identifiant pouvant contenir « : » (rien n'en a). */
+/** Splits `kind:id`, the id being allowed to contain ":" (none does). */
 function parsePeek(peek: unknown): { kind: string; id: string } | null {
   if (typeof peek !== "string") return null;
   const cut = peek.indexOf(":");
@@ -14,24 +14,23 @@ function parsePeek(peek: unknown): { kind: string; id: string } | null {
 }
 
 /**
- * Fiche d'un objet regardé depuis une autre vue.
+ * Record of an object looked at from another view.
  *
- * Une puce de cellule (`CrossLink`) ouvre ici la fiche du node, du service, de
- * l'instance, du code application ou de l'équipe qu'elle nomme, sans quitter la
- * liste ni perdre son tri, sa page ou sa sélection. Posé dans la coquille de
- * l'application : toutes les vues en profitent, et il n'y a qu'un panneau de ce
- * genre à l'écran.
+ * A badge in a cell (`CrossLink`) opens here the record of the node, the service,
+ * the instance, the application code or the team it names, without leaving the list
+ * nor losing its sort, its page or its selection. Placed in the application shell:
+ * every view benefits from it, and there is only one panel of this kind on screen.
  *
- * L'objet regardé vit dans l'URL (`peek`), comme le panneau de la ligne : un lien
- * partagé rouvre la même fiche, et Échap ou la croix la referme. Les deux ne
- * coexistent pas : `toSearchParams` efface la fiche dès qu'une ligne est
- * sélectionnée, et le panneau de la ligne l'emporte si l'URL porte les deux.
+ * The object looked at lives in the URL (`peek`), like the row panel: a shared link
+ * reopens the same record, and Escape or the cross closes it. The two do not
+ * coexist: `toSearchParams` clears the record as soon as a row is selected, and the
+ * row panel wins if the URL carries both.
  */
 export function PeekPanel() {
   const search = useSearch({ strict: false }) as Record<string, unknown>;
   const navigate = useNavigate();
-  // Le panneau de la ligne l'emporte : une URL écrite à la main peut porter les deux,
-  // et deux tiroirs superposés ne se referment pas l'un l'autre.
+  // The row panel wins: a hand-written URL may carry both, and two stacked drawers do
+  // not close one another.
   const peeked =
     typeof search.sel === "string" && search.sel !== "" ? null : parsePeek(search.peek);
   const tab = typeof search.peektab === "string" ? search.peektab : undefined;

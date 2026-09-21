@@ -1,12 +1,12 @@
 import { useSyncExternalStore } from "react";
 
 /**
- * Identifiants du collector, conservés le temps de l'onglet.
+ * Collector credentials, kept for the lifetime of the tab.
  *
- * Provisoire : oc3 n'implémente aujourd'hui que l'authentification HTTP Basic
- * (mot de passe d'utilisateur web2py, uuid de node). Le mode retenu à terme est
- * OIDC. Tout ce qui touche aux identifiants est donc isolé ici, pour être
- * remplacé d'un bloc sans que les vues en dépendent.
+ * A stopgap: oc3 currently implements HTTP Basic authentication only (web2py user
+ * password, node uuid). The mode intended in the end is OIDC. Everything touching
+ * credentials is therefore isolated here, to be replaced in one piece without the
+ * views depending on it.
  */
 export interface Credentials {
   user: string;
@@ -32,7 +32,7 @@ function read(): Credentials | null {
     }
     return null;
   } catch {
-    // Stockage illisible ou refusé : on repart d'une session vide.
+    // Storage unreadable or refused: we start again from an empty session.
     return null;
   }
 }
@@ -58,7 +58,7 @@ export function setCredentials(next: Credentials | null): void {
     if (next === null) sessionStorage.removeItem(STORAGE_KEY);
     else sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch {
-    // Navigation privée ou stockage refusé : la session ne survit pas au rechargement.
+    // Private browsing or storage refused: the session does not survive a reload.
   }
   for (const listener of listeners) listener();
 }
@@ -67,7 +67,7 @@ export function useCredentials(): Credentials | null {
   return useSyncExternalStore(subscribe, snapshot);
 }
 
-/** En-tête Authorization de la requête courante, ou null si personne n'est connecté. */
+/** Authorization header of the current request, or null when nobody is signed in. */
 export function authorizationHeader(): string | null {
   if (current === null) return null;
   // btoa n'accepte que du latin-1 : on passe par l'encodage UTF-8 des octets.

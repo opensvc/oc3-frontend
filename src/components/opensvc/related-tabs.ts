@@ -1,18 +1,18 @@
 import type { ReactNode } from "react";
 
-/** Part d'un effectif, affichée dans sa propre pastille. */
+/** Share of a count, shown in its own pill. */
 export interface SummaryPart {
   key: string;
   count: number;
   /** Classes de fond et d'encre, par tokens. */
   box: string;
-  /** Libellé complet, pluriel compris : infobulle et lecteurs d'écran. */
+  /** Full label, plural included: tooltip and screen readers. */
   label: string;
 }
 
 /**
- * Résumé d'un onglet : son effectif, et sa répartition quand elle a un sens (les
- * alertes par gravité). Les parts vides ne sont pas affichées.
+ * Summary of a tab: its count, and its breakdown when that means something (alerts
+ * by severity). Empty shares are not shown.
  */
 export interface RelatedSummary {
   count: number | undefined;
@@ -20,17 +20,17 @@ export interface RelatedSummary {
 }
 
 /**
- * Un type de données rattachées à un objet (node, service…), présenté dans un onglet
- * de son panneau de détail. Chaque objet en déclare la liste, dans l'ordre d'affichage.
+ * A kind of data attached to an object (node, service…), presented in a tab of its
+ * detail panel. Each object declares the list of them, in display order.
  */
 export interface RelatedTab {
   key: string;
   labelKey: string;
   icon: ReactNode;
-  /** Hook appelé par le compteur de l'onglet, un composant par onglet. */
+  /** Hook called by the tab counter, one component per tab. */
   useSummary: (id: string | undefined) => RelatedSummary;
   render: (id: string, locale: string) => ReactNode;
 }
 
-/** Clé de l'onglet des propriétés : absente de l'URL, c'est l'onglet par défaut. */
+/** Key of the properties tab: absent from the URL, it is the default tab. */
 export const PROPERTIES_TAB = "properties";

@@ -4,12 +4,12 @@ import { problemText } from "@/lib/api/problem";
 import { CrossLink } from "@/components/opensvc/CrossLink";
 
 /**
- * Identifiants des groupes, par nom de rôle.
+ * Ids of the groups, by role name.
  *
- * Les listes ne portent que le nom d'une équipe, alors que la vue Groupes désigne
- * ses lignes par l'identifiant entier de `auth_group` et que `GET /groups/{id}`
- * refuse un nom — contrairement à `GET /apps/{app_id}`, qui accepte le code. La
- * correspondance est donc faite ici, en une requête partagée et mise en cache.
+ * The lists carry only the name of a team, whereas the Groups view names its rows by
+ * the integer id of `auth_group` and `GET /groups/{id}` refuses a name — unlike
+ * `GET /apps/{app_id}`, which accepts the code. The matching is therefore done here,
+ * in a single shared and cached request.
  */
 function useGroupIds() {
   return useQuery({
@@ -30,7 +30,7 @@ function useGroupIds() {
   });
 }
 
-/** Nom d'équipe d'une liste : une puce qui ouvre la vue Groupes sur ce groupe. */
+/** Team name in a list: a badge that opens the Groups view on that group. */
 export function TeamLink({ name }: { name: unknown }) {
   const ids = useGroupIds();
   if (typeof name !== "string" || name === "") return <>{name}</>;

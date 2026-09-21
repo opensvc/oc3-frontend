@@ -23,8 +23,8 @@ type GroupRow = components["schemas"]["GroupRow"];
 const DEFAULT_SORT = ["role"];
 
 /**
- * Toutes les propriétés de groupe exposées par apicollector, dans l'ordre de son
- * `meta.available_props`. `satisfies` les confronte au schéma généré.
+ * Every group property exposed by apicollector, in the order of its
+ * `meta.available_props`. `satisfies` confronts them with the generated schema.
  */
 const GROUP_PROPS = [
   "id",
@@ -33,10 +33,10 @@ const GROUP_PROPS = [
   "description",
 ] as const satisfies readonly (keyof GroupRow)[];
 
-/** Colonnes par défaut : le nom, la nature et ce que le groupe désigne. */
+/** Default columns: the name, the nature and what the group names. */
 const DEFAULT_COLS: string[] = ["role", "privilege", "description"];
 
-/** `id` vient du helper `col` sur une colonne entière : aligné à droite. */
+/** `id` comes from the `col` helper on an integer column: aligned right. */
 const NUMERIC_PROPS = new Set<string>(["id"]);
 
 /** Famille de chaque colonne : un groupe rassemble des personnes. */
@@ -49,7 +49,7 @@ const FAMILY: Record<string, ColumnFamily> = {
 
 const ALL_PROPS = [...GROUP_PROPS];
 
-/** Ne demander que les colonnes affichées : apicollector fait le pushdown en base. */
+/** Ask only for the columns shown: apicollector pushes the selection down to the database. */
 function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
@@ -58,7 +58,7 @@ function useGroups(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["groups", search.sort, search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/groups", {
         params: {
           query: {
@@ -87,7 +87,7 @@ export function GroupsPage() {
   const { data, isPending, isError, error, isFetching } = useGroups(search);
   const [creating, setCreating] = useState(false);
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/groups", {
       params: { query: { props: "id", limit: 0 } },
@@ -101,7 +101,7 @@ export function GroupsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -110,7 +110,7 @@ export function GroupsPage() {
     });
   }
 
-  // La lettre stockée en base ne dit rien à l'écran : on affiche sa nature.
+  // The letter stored in the database says nothing on screen: its nature is shown.
   const columns: ListColumn<GroupRow>[] = GROUP_PROPS.map((prop) => ({
     prop,
     labelKey: `groups.fields.${prop}`,
@@ -134,7 +134,7 @@ export function GroupsPage() {
         <button
           type="button"
           onClick={() => {
-            // Les deux tiroirs partagent le bord droit : ouvrir la création ferme le détail.
+            // The two drawers share the right edge: opening the creation closes the detail.
             update({ sel: undefined });
             setCreating(true);
           }}

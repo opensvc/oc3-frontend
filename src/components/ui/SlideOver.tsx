@@ -2,17 +2,17 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { CloseIcon } from "./icons";
 
 /**
- * Panneau latéral qui entre par la droite.
+ * Side panel sliding in from the right.
  *
- * Non modal : la table reste lisible et utilisable pendant qu'il est ouvert.
- * Il reste monté en permanence pour que l'entrée et la sortie soient animées ;
- * fermé, `inert` le retire du parcours clavier et des technologies d'assistance.
- * L'animation est neutralisée par la règle globale prefers-reduced-motion.
+ * Not modal: the table stays readable and usable while it is open. It stays mounted
+ * at all times so that entering and leaving are animated; closed, `inert` takes it
+ * out of the keyboard path and away from assistive technologies. The animation is
+ * neutralised by the global prefers-reduced-motion rule.
  */
 /**
- * Ce qui répond au clic et n'a donc pas à refermer le panneau : les commandes et les
- * champs, ce qui porte un rôle ou un raccourci clavier, et les tables, dont les
- * lignes ouvrent leur propre panneau.
+ * What answers a click and therefore must not close the panel: controls and fields,
+ * anything carrying a role or a keyboard shortcut, and tables, whose rows open their
+ * own panel.
  */
 const INTERACTIVE =
   'a, button, input, select, textarea, label, summary, details, table, [role="dialog"], [role="button"], [role="menu"], [role="menuitem"], [role="tab"], [role="listbox"], [role="option"], [role="combobox"], [tabindex]';
@@ -32,15 +32,15 @@ export function SlideOver({
   title: string;
   onClose: () => void;
   closeLabel: string;
-  /** Visuel placé avant le titre, par exemple l'icône du type d'objet. */
+  /** Visual placed before the title, for example the object kind icon. */
   leading?: ReactNode;
-  /** Bande fixée sous le titre, hors défilement : des onglets, par exemple. */
+  /** Strip fixed under the title, outside the scroll: tabs, for instance. */
   subheader?: ReactNode;
-  /** Tiroir plus large, pour un contenu fait de listes plutôt que de propriétés. */
+  /** Wider drawer, for content made of lists rather than properties. */
   wide?: boolean;
   /**
-   * Faux pour un tiroir de saisie : un clic à côté y effacerait un formulaire en
-   * cours, alors qu'il ne fait que reposer une fiche qu'on lisait.
+   * False for a data-entry drawer: a click beside it would clear a form being filled
+   * in, whereas it only puts down a record one was reading.
    */
   closeOnOutsideClick?: boolean;
   children: ReactNode;
@@ -50,7 +50,7 @@ export function SlideOver({
 
   useEffect(() => {
     if (open) {
-      // Mémorise l'élément déclencheur pour lui rendre le focus à la fermeture.
+      // Remembers the triggering element to give it the focus back on closing.
       opener.current = document.activeElement;
       panel.current?.focus();
       return;
@@ -72,9 +72,9 @@ export function SlideOver({
     };
   }, [open, onClose]);
 
-  // Cliquer à côté referme, comme on repose une fiche qu'on vient de lire. Seuls les
-  // fonds inertes comptent : un clic sur une commande ou sur une ligne de liste fait
-  // ce qu'il dit, et refermer par-dessus donnerait l'impression d'avoir raté sa cible.
+  // Clicking beside it closes, as one puts down a record just read. Only inert
+  // backgrounds count: a click on a control or on a list row does what it says, and
+  // closing on top of that would feel like having missed the target.
   useEffect(() => {
     if (!open || !closeOnOutsideClick) return;
     function onPointerDown(event: PointerEvent) {
@@ -82,8 +82,8 @@ export function SlideOver({
       if (!(target instanceof Element)) return;
       if (panel.current?.contains(target) === true) return;
       if (target.closest(INTERACTIVE) !== null) return;
-      // Une saisie en cours dans le panneau — un attribut en cours de modification —
-      // vaut formulaire : on ne l'efface pas d'un clic à côté.
+      // An entry in progress in the panel — an attribute being edited — counts as a
+      // form: it is not cleared by a click beside it.
       const focused = document.activeElement;
       if (
         focused instanceof HTMLElement &&

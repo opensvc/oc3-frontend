@@ -15,7 +15,7 @@ const GROUPS: DetailGroup<GroupRow>[] = [
     family: "team",
     fields: [
       { prop: "role", format: (row) => row.role },
-      // `privilege` vaut T ou F en base : affiché en interrupteur, en lecture seule.
+      // `privilege` is T or F in the database: shown as a switch, read-only.
       { prop: "privilege", format: (row) => row.privilege, input: "boolean" },
       { prop: "description", format: (row) => row.description },
       { prop: "id", format: (row) => (row.id === undefined ? undefined : String(row.id)) },
@@ -52,8 +52,8 @@ export function GroupDetailPanel({
     },
   });
 
-  // Suppression en cascade côté collector : appartenances, responsabilités et
-  // publications du groupe partent avec lui. Le groupe « Everybody » est immuable.
+  // Deletion cascades on the collector side: the group's memberships,
+  // responsibilities and publications go with it. The "Everybody" group is immutable.
   const remove = useMutation({
     mutationFn: async () => {
       const { error: failure } = await api.DELETE("/groups/{group_id}", {

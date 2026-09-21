@@ -24,18 +24,18 @@ type IpRow = components["schemas"]["IpRow"];
 type NetworkRow = components["schemas"]["NetworkRow"];
 
 /**
- * Vide : apicollector refuse tout `orderby` sur cet endpoint. Le mapping `node_ip`
- * décrit ses props par une expression SQL sans référence de colonne, et
- * `buildOrderBy` exige cette référence — « prop "addr" cannot be used in orderby
- * (no column reference) ». Le serveur trie alors par adresse, son ordre par défaut.
+ * Empty: apicollector refuses any `orderby` on this endpoint. The `node_ip` mapping
+ * describes its props by a SQL expression without a column reference, and
+ * `buildOrderBy` requires that reference — "prop "addr" cannot be used in orderby (no
+ * column reference)". The server then sorts by address, its default order.
  */
 const DEFAULT_SORT: string[] = [];
 
 /**
- * Toutes les propriétés exposées par apicollector pour une adresse, dans l'ordre de
- * son `meta.available_props`. Une ligne est une adresse relevée sur un node, jointe
- * à la définition du réseau auquel elle appartient : d'où les préfixes `net_`.
- * `satisfies` les confronte au schéma généré.
+ * Every property exposed by apicollector for an address, in the order of its
+ * `meta.available_props`. A row is an address read on a node, joined to the
+ * definition of the network it belongs to: hence the `net_` prefixes. `satisfies`
+ * confronts them with the generated schema.
  */
 const IP_PROPS = [
   "id",
@@ -63,12 +63,12 @@ const IP_PROPS = [
 ] as const satisfies readonly (keyof IpRow)[];
 
 /**
- * Colonnes par défaut : de quoi situer une adresse. Le nom du node plutôt que son
- * identifiant, contrairement au défaut du serveur.
+ * Default columns: enough to place an address. The name of the node rather than its
+ * id, unlike the server's default.
  */
 const DEFAULT_COLS: string[] = ["nodename", "intf", "addr", "mask", "type", "net_name"];
 
-/** Props entiers du mapping `node_ip` d'oc3 (`Kind: "int64"`), alignés à droite. */
+/** Integer props of the oc3 `node_ip` mapping (`Kind: "int64"`), aligned right. */
 const NUMERIC_PROPS = new Set<string>(["id", "net_id", "net_prio", "flag_deprecated"]);
 
 /** Props que le collector stocke en datetime. */
@@ -124,8 +124,8 @@ const COLUMNS: ListColumn<IpRow>[] = IP_PROPS.map((prop) => ({
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
 /**
- * Colonnes affichées et identifiant, plus celui du node quand son nom est affiché :
- * c'est une puce qui ouvre la vue Nodes sur ce node.
+ * Columns shown and the id, plus the node's when its name is shown: that one is a
+ * badge which opens the Nodes view on this node.
  */
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
@@ -137,7 +137,7 @@ function useIps(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["ips", search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/ips", {
         params: {
           query: {
@@ -164,7 +164,7 @@ export function NetworksPage() {
   const navigate = useNavigate({ from: "/networks" });
   const { data, isPending, isError, error, isFetching } = useIps(search);
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/ips", {
       params: { query: { props: "id", limit: 0 } },
@@ -178,7 +178,7 @@ export function NetworksPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -189,7 +189,7 @@ export function NetworksPage() {
 
   const selected = data?.rows.find((row) => String(row.id) === search.sel);
   const [creating, setCreating] = useState(false);
-  // Le réseau créé n'apparaît que par ses adresses : on confirme sa création ici.
+  // A created network only shows through its addresses: its creation is confirmed here.
   const [created, setCreated] = useState<NetworkRow | null>(null);
 
   return (
@@ -202,7 +202,7 @@ export function NetworksPage() {
         <button
           type="button"
           onClick={() => {
-            // Les deux tiroirs partagent le bord droit : ouvrir la création ferme le détail.
+            // The two drawers share the right edge: opening the creation closes the detail.
             update({ sel: undefined });
             setCreating(true);
           }}

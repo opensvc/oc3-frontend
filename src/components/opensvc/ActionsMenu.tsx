@@ -3,10 +3,10 @@ import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { MenuButton, type MenuItem } from "@/components/ui/MenuButton";
 
-/** Une entrée du menu : l'action posée dans la file, et son groupe. */
+/** An entry of the menu: the action posted to the queue, and its group. */
 export interface ActionEntry {
   action: string;
-  /** Trait de séparation avant cette entrée, pour marquer un groupe. */
+  /** Separator line before this entry, to mark a group. */
   separatorBefore?: boolean;
 }
 
@@ -23,18 +23,18 @@ interface Outcome {
 }
 
 /**
- * Menu des actions d'agent d'un ou plusieurs objets (nodes, services, instances).
- * L'action choisie est confirmée puis posée dans la file d'attente du collector,
- * d'où l'agent la retire : rien ne s'exécute pendant la requête, le menu annonce
- * donc une mise en file et non un résultat.
+ * Agent actions menu for one or several objects (nodes, services, instances).
+ * The chosen action is confirmed then posted to the collector queue, from which the
+ * agent takes it: nothing runs during the request, so the menu announces a queuing
+ * and not a result.
  *
- * Les droits sont vérifiés par l'API pour chaque objet : privilège NodeExec et
- * responsabilité. En sélection multiple, un refus ne vaut que pour son objet et le
- * compte rendu le nomme.
+ * Rights are checked by the API for each object: NodeExec privilege and
+ * responsibility. In a multiple selection, a refusal applies to its object only and
+ * the report names it.
  *
- * Les libellés viennent de `<prefix>.items.<action>`, et les textes du menu de
- * `<prefix>.open`, `.question`, `.confirm`, `.queueing`, `.queued` et `.failure` :
- * chaque type d'objet garde ses propres formulations.
+ * Labels come from `<prefix>.items.<action>`, and the menu texts from
+ * `<prefix>.open`, `.question`, `.confirm`, `.queueing`, `.queued` and `.failure`:
+ * each kind of object keeps its own wording.
  */
 export function ActionsMenu({
   targets,
@@ -44,7 +44,7 @@ export function ActionsMenu({
 }: {
   targets: ActionTarget[];
   actions: readonly ActionEntry[];
-  /** Préfixe des clés de traduction, par exemple `nodes.actions`. */
+  /** Prefix of the translation keys, for example `nodes.actions`. */
   prefix: string;
   /** Pose l'action sur un objet ; le message d'erreur de l'API, ou null. */
   queue: (target: ActionTarget, action: string) => Promise<string | null>;

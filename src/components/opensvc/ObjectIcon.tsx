@@ -13,7 +13,7 @@ import {
   UsersIcon,
 } from "@/components/ui/icons";
 
-/** Types d'objets du collector qui ont une identité visuelle propre. */
+/** Collector object kinds that have a visual identity of their own. */
 export type ObjectKind =
   | "dashboard"
   | "node"
@@ -30,12 +30,11 @@ export type ObjectKind =
   | "filterset";
 
 /**
- * Pictogramme et teinte d'un type d'objet. Même vocabulaire dans le menu, dans les
- * en-têtes de panneaux et partout où il faudra dire de quoi on parle : c'est ce qui
- * relie une ligne de table à l'entrée de menu dont elle vient.
+ * Pictogram and tint of an object kind. The same vocabulary in the menu, in panel
+ * headers and everywhere it will be necessary to say what is being talked about:
+ * this is what ties a table row to the menu entry it comes from.
  *
- * Les classes sont écrites en toutes lettres : Tailwind ne voit pas les noms
- * construits à l'exécution.
+ * The classes are written out in full: Tailwind does not see names built at runtime.
  */
 const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> = {
   dashboard: { Icon: AlertTriangleIcon, className: "text-icon-dashboard" },
@@ -47,8 +46,8 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   disk: { Icon: DatabaseIcon, className: "text-icon-disk" },
   app: { Icon: AsteriskIcon, className: "text-icon-app" },
   group: { Icon: UsersIcon, className: "text-icon-group" },
-  // Même teinte que les groupes : le collector historique peint `guy16` et `guys16`
-  // du même saumon, les deux parlent de personnes.
+  // Same tint as groups: the historical collector paints `guy16` and `guys16` in the
+  // same salmon, both speak of people.
   user: { Icon: UserIcon, className: "text-icon-group" },
   // Bleu bleuet dans le collector historique : la teinte des nodes, qu'elle concerne.
   obsolescence: { Icon: LifeRingIcon, className: "text-icon-node" },
@@ -56,7 +55,7 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   log: { Icon: HistoryIcon, className: "text-icon-dashboard" },
   // `filter16` n'a pas non plus de couleur propre : teinte neutre.
   filter: { Icon: FilterIcon, className: "text-icon-dashboard" },
-  // Même icône que le filtre : le collector historique les marque tous deux `filter16`.
+  // Same icon as the filter: the historical collector marks both of them `filter16`.
   filterset: { Icon: FilterIcon, className: "text-icon-dashboard" },
 };
 

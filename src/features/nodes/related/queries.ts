@@ -11,8 +11,8 @@ type DiskRow = components["schemas"]["DiskRow"];
 type HbaRow = components["schemas"]["HbaRow"];
 
 /**
- * Inventaire matériel du node, tel que remonté par l'agent. Chargé en entier : un
- * node compte quelques dizaines de composants.
+ * Hardware inventory of the node, as pushed by the agent. Loaded whole: a node counts
+ * a few dozen components.
  */
 export function useNodeHardware(nodeId: string | undefined) {
   return useQuery({
@@ -36,7 +36,7 @@ export function useNodeHardware(nodeId: string | undefined) {
   });
 }
 
-/** Alertes du dashboard qui visent le node, les plus graves puis les plus récentes d'abord. */
+/** Dashboard alerts aimed at the node, the most severe then the most recent first. */
 export function useNodeAlerts(nodeId: string | undefined) {
   return useQuery({
     queryKey: ["node", nodeId, "alerts"],
@@ -60,9 +60,9 @@ export function useNodeAlerts(nodeId: string | undefined) {
 }
 
 /**
- * Adresses IP du node, avec le réseau déclaré qui les contient. L'endpoint refuse
- * `orderby` (même mapping que `/ips`) : un node en compte au plus quelques centaines,
- * le tri est fait à l'affichage.
+ * IP addresses of the node, with the declared network that contains them. The
+ * endpoint refuses `orderby` (same mapping as `/ips`): a node counts a few hundred at
+ * most, so sorting is done on display.
  */
 export function useNodeIps(nodeId: string | undefined) {
   return useQuery({
@@ -86,7 +86,7 @@ export function useNodeIps(nodeId: string | undefined) {
   });
 }
 
-/** Disques vus par le node, triés par service puis par identifiant. */
+/** Disks seen by the node, sorted by service then by id. */
 export function useNodeDisks(nodeId: string | undefined) {
   return useQuery({
     queryKey: ["node", nodeId, "disks"],
@@ -110,7 +110,7 @@ export function useNodeDisks(nodeId: string | undefined) {
   });
 }
 
-/** Adaptateurs de bus hôte du node (iSCSI, Fibre Channel…), par type puis identifiant. */
+/** Host bus adapters of the node (iSCSI, Fibre Channel…), by type then id. */
 export function useNodeHbas(nodeId: string | undefined) {
   return useQuery({
     queryKey: ["node", nodeId, "hbas"],
@@ -129,7 +129,7 @@ export function useNodeHbas(nodeId: string | undefined) {
   });
 }
 
-/** Tags attachés au node. `GET /…/tags` renvoie le `ListResponse` générique : lu par `toTagRows`. */
+/** Tags attached to the node. `GET /…/tags` returns the generic `ListResponse`: read by `toTagRows`. */
 export function useNodeTags(nodeId: string | undefined) {
   return useQuery({
     queryKey: ["node", nodeId, "tags"],

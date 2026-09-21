@@ -31,8 +31,8 @@ type InstanceRow = components["schemas"]["InstanceRow"];
 const DEFAULT_SORT = ["services.svcname", "nodes.nodename"];
 
 /**
- * Propriétés d'instance exposées par apicollector : les noms joints d'abord, puis
- * l'ordre de `meta.available_props`. `satisfies` les confronte au schéma généré.
+ * Instance properties exposed by apicollector: the joined names first, then the order
+ * of `meta.available_props`. `satisfies` confronts them with the generated schema.
  */
 const INSTANCE_PROPS = [
   "services.svcname",
@@ -64,7 +64,7 @@ const INSTANCE_PROPS = [
   "mon_changed",
 ] as const satisfies readonly (keyof InstanceRow)[];
 
-/** Colonnes par défaut : quelle instance, dans quel état, vue quand. */
+/** Default columns: which instance, in which state, seen when. */
 const DEFAULT_COLS: string[] = [
   "services.svcname",
   "nodes.nodename",
@@ -127,7 +127,7 @@ const FAMILY: Record<string, ColumnFamily> = {
   mon_changed: "time",
 };
 
-/** Les noms joints sont triables : `orderby` les résout par les jointures du mapping. */
+/** The joined names are sortable: `orderby` resolves them through the mapping joins. */
 const COLUMNS: ListColumn<InstanceRow>[] = INSTANCE_PROPS.map((prop) => ({
   prop,
   labelKey: `instances.fields.${prop}`,
@@ -149,7 +149,7 @@ const COLUMNS: ListColumn<InstanceRow>[] = INSTANCE_PROPS.map((prop) => ({
       );
     if (STATUS_PROPS.has(prop) && typeof value === "string")
       return <StatusBadge {...statusBadge(value)} />;
-    // Dernier rapport de l'agent pour cette instance : son ancienneté se lit mieux en relatif.
+    // Last report of the agent for this instance: its age reads better as a distance.
     if (prop === "mon_updated" && typeof value === "string")
       return <RelativeTime value={value} locale={locale} />;
     if (DATE_PROPS.has(prop) && typeof value === "string")
@@ -161,13 +161,13 @@ const COLUMNS: ListColumn<InstanceRow>[] = INSTANCE_PROPS.map((prop) => ({
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
 /**
- * Colonnes affichées, plus les deux identifiants qui désignent l'instance, et l'OS
- * du node quand son nom est affiché, pour le logo.
+ * Columns shown, plus the two ids that name the instance, and the OS of the node when
+ * its name is shown, for the logo.
  */
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
   const extra: string[] = [];
-  // `mon_frozen` toujours demandé : le gel se signale même colonne masquée.
+  // `mon_frozen` always requested: freezing is marked even with the column hidden.
   return [...new Set(["svc_id", "node_id", "mon_frozen", ...shown, ...extra])].join(",");
 }
 
@@ -175,7 +175,7 @@ function useInstances(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["instances", search.sort, search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/services_instances", {
         params: {
           query: {
@@ -203,7 +203,7 @@ export function InstancesPage() {
   const navigate = useNavigate({ from: "/instances" });
   const { data, isPending, isError, error, isFetching } = useInstances(search);
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/services_instances", {
       params: { query: { props: "svc_id,node_id", limit: 0 } },
@@ -216,7 +216,7 @@ export function InstancesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -228,7 +228,7 @@ export function InstancesPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const selected = data?.rows.find((row) => toInstanceId(row.svc_id, row.node_id) === search.sel);
-  // « service @ node » plutôt que l'identifiant composé, pour nommer les refus.
+  // "service @ node" rather than the compound id, to name the refusals.
   const instanceNames = Object.fromEntries(
     (data?.rows ?? []).map((row) => [
       toInstanceId(row.svc_id, row.node_id) ?? "",
@@ -255,7 +255,7 @@ export function InstancesPage() {
         rowId={(row) => toInstanceId(row.svc_id, row.node_id)}
         search={search}
         onChange={update}
-        // apicollector n'a pas d'endpoint d'instances filtré par filterset.
+        // apicollector has no instances endpoint filtered by filterset.
         filtersets={[]}
         isPending={isPending}
         isFetching={isFetching}

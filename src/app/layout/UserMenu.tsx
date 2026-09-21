@@ -9,12 +9,13 @@ const ITEM =
   "flex w-full items-center gap-2 rounded-(--radius-control) px-2 py-1.5 text-left text-ink hover:bg-surface focus:bg-surface focus:outline-none";
 
 /**
- * Menu du compte, ouvert depuis le nom de l'utilisateur dans la barre du haut.
+ * Account menu, opened from the user name in the top bar.
  *
- * Suit le motif « menu button » de l'ARIA APG : le bouton annonce le menu et son
- * état, l'ouverture au clavier place le focus sur la première entrée, les flèches,
- * Début et Fin parcourent les entrées, Échap referme et rend le focus au bouton.
- * Un clic hors du menu, Tab ou le choix d'une entrée le referment aussi.
+ * It follows the "menu button" pattern of the ARIA APG: the button announces the
+ * menu and its state, opening from the keyboard puts the focus on the first entry,
+ * the arrows, Home and End walk through the entries, Escape closes and gives the
+ * focus back to the button. A click outside the menu, Tab or choosing an entry close
+ * it too.
  */
 export function UserMenu({ user }: { user: string }) {
   const { t } = useTranslation();
@@ -23,7 +24,7 @@ export function UserMenu({ user }: { user: string }) {
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
-  // Entrée à focaliser à l'ouverture : la première au clavier, aucune à la souris.
+  // Entry to focus on opening: the first one from the keyboard, none with the mouse.
   const focusOnOpen = useRef<"first" | "last" | null>(null);
 
   function items(): HTMLElement[] {
@@ -63,7 +64,7 @@ export function UserMenu({ user }: { user: string }) {
     if (target === null) return;
     event.preventDefault();
     if (open) {
-      // Menu déjà ouvert à la souris : le focus est resté sur le bouton.
+      // Menu already opened with the mouse: the focus stayed on the button.
       const list = items();
       (target === "first" ? list[0] : list[list.length - 1])?.focus();
       return;
@@ -93,7 +94,7 @@ export function UserMenu({ user }: { user: string }) {
         move(list.length - 1);
         break;
       case "Escape":
-        // Le panneau latéral écoute Échap au niveau du document : ne fermer que le menu.
+        // The side panel listens for Escape at the document level: close the menu only.
         event.preventDefault();
         event.stopPropagation();
         close(true);

@@ -2,8 +2,8 @@ import { CrossLink, type CrossKind } from "./CrossLink";
 import type { DetailField } from "./DetailPanel";
 
 /**
- * Attribut dont la valeur désigne un objet d'une autre vue : affiché en puce, qui
- * montre sa fiche au double-clic comme dans les listes.
+ * Attribute whose value names an object from another view: shown as a badge, which
+ * displays its record on a double-click as in the lists.
  */
 export function linkedField<T>(
   prop: string,

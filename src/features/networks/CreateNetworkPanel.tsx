@@ -18,10 +18,11 @@ function toInt(value: string): number | undefined {
 }
 
 /**
- * Déclaration d'un réseau. apicollector ne liste pas les réseaux déclarés : un réseau
- * créé se voit ensuite par les adresses de node qu'il contient, dont la colonne Réseau
- * prend son nom. L'aperçu de plage reproduit le calcul des colonnes générées de la
- * table ; le serveur reste seul juge (adresse de réseau, passerelle, unicité).
+ * Declaring a network. apicollector does not list the declared networks: a network
+ * once created shows through the node addresses it contains, whose Network column
+ * takes its name. The range preview reproduces the computation of the table's
+ * generated columns; the server stays the only judge (network address, gateway,
+ * uniqueness).
  */
 export function CreateNetworkPanel({
   open,
@@ -77,7 +78,7 @@ export function CreateNetworkPanel({
       setPrio("0");
       setTeam("");
       setComment("");
-      // Les adresses du nouveau réseau changent de colonne Réseau.
+      // The addresses of the new network change their Network column.
       await queryClient.invalidateQueries({ queryKey: ["ips"] });
       await queryClient.invalidateQueries({ queryKey: ["ip"] });
       await queryClient.invalidateQueries({ queryKey: ["node"] });
@@ -103,7 +104,7 @@ export function CreateNetworkPanel({
 
   return (
     <SlideOver
-      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      // Data-entry drawer: a click beside it must not clear what has been typed.
       closeOnOutsideClick={false}
       open={open}
       title={t("networks.create.title")}

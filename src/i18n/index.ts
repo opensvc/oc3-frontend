@@ -3,7 +3,7 @@ import { initReactI18next } from "react-i18next";
 import en from "./locales/en.json";
 import fr from "./locales/fr.json";
 
-// Toute chaîne visible passe par t(). Aucune chaîne en dur dans les composants.
+// Every visible string goes through t(). No hard-coded string in the components.
 void i18n.use(initReactI18next).init({
   resources: { en: { translation: en }, fr: { translation: fr } },
   lng: navigator.language.startsWith("fr") ? "fr" : "en",

@@ -6,19 +6,19 @@ export interface ComboboxOption {
 }
 
 /**
- * Liste déroulante filtrable au clavier, selon le motif « combobox » de l'ARIA
- * Authoring Practices : un champ de saisie qui filtre une liste d'options.
+ * Dropdown list filtered from the keyboard, following the "combobox" pattern of the
+ * ARIA Authoring Practices: a text field that filters a list of options.
  *
- * Écrit ici plutôt qu'importé : quelques dizaines de lignes suffisent pour un
- * filtre par sous-chaîne, et un `<select>` natif ne se filtre pas au-delà de la
- * première lettre.
+ * Written here rather than imported: a few dozen lines are enough for a substring
+ * filter, and a native `<select>` cannot be filtered beyond the first letter.
  *
- * Tant que rien n'est saisi, le champ affiche l'option choisie et la liste montre
- * tout ; prendre le focus sélectionne ce texte, pour que la première frappe filtre
- * plutôt que d'allonger la valeur. Taper filtre sans tenir compte de la casse et annule le choix courant, qui
- * n'est rétabli qu'en choisissant une option : à la souris, ou avec les flèches et
- * Entrée, qui ne fait que choisir. Échap referme la liste sans remonter au panneau
- * parent ; liste fermée, Entrée soumet le formulaire englobant comme dans tout champ.
+ * As long as nothing is typed, the field shows the chosen option and the list shows
+ * everything; taking the focus selects that text, so that the first keystroke
+ * filters instead of lengthening the value. Typing filters case-insensitively and
+ * clears the current choice, which is restored only by choosing an option: with the
+ * mouse, or with the arrows and Enter, which only chooses. Escape closes the list
+ * without reaching the parent panel; with the list closed, Enter submits the
+ * surrounding form as in any field.
  */
 export function Combobox({
   options,
@@ -37,7 +37,7 @@ export function Combobox({
   /** Nom accessible du champ. */
   label: string;
   placeholder?: string;
-  /** Affiché dans la liste quand le filtre n'y laisse rien. */
+  /** Shown in the list when the filter leaves nothing in it. */
   emptyText: string;
   className?: string;
   inputRef?: Ref<HTMLInputElement>;
@@ -95,16 +95,16 @@ export function Combobox({
           if (value !== "") onChange("");
         }}
         onFocus={(event) => {
-          // Le champ arrive rempli de l'option choisie : la sélectionner d'emblée
-          // permet de filtrer en tapant, au lieu d'allonger la valeur existante.
+          // The field arrives filled with the chosen option: selecting it straight away
+          // allows filtering by typing, instead of lengthening the existing value.
           event.currentTarget.select();
           setOpen(true);
         }}
         onMouseUp={(event) => {
-          // Le clic pose le curseur dans le texte et défait la sélection du focus :
-          // sans cela, taper accolerait le filtre à l'option déjà choisie, et la
-          // liste n'aurait plus rien à montrer. C'est au relâchement, une fois le
-          // curseur posé, qu'il faut resélectionner.
+          // A click puts the caret in the text and undoes the selection made on focus:
+          // without this, typing would stick the filter onto the option already chosen,
+          // and the list would have nothing left to show. Reselecting must happen on
+          // release, once the caret is placed.
           if (query === null) event.currentTarget.select();
         }}
         onClick={() => {
@@ -128,9 +128,9 @@ export function Combobox({
             }
             case "Enter":
               if (activeOption !== undefined) {
-                // Ce premier Entrée choisit, et rien de plus : un formulaire autour
-                // du champ ne doit pas le prendre pour une validation. Le suivant,
-                // liste fermée, lui revient.
+                // This first Enter chooses, and nothing more: a form around the field
+                // must not take it for a submission. The next one, with the list
+                // closed, belongs to the form.
                 event.preventDefault();
                 event.stopPropagation();
                 choose(activeOption);

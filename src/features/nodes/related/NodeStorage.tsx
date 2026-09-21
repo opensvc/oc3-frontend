@@ -8,7 +8,7 @@ export function NodeStorage({ nodeId, locale }: { nodeId: string; locale: string
   const hbas = useNodeHbas(nodeId);
   const rows = disks.data ?? [];
 
-  // Disques regroupés par service : ceux qu'un service utilise, puis ceux du node seul.
+  // Disks grouped by service: those a service uses, then those of the node alone.
   const services = [...new Set(rows.map((row) => row.svcname ?? ""))].sort((a, b) =>
     a === "" ? 1 : b === "" ? -1 : a.localeCompare(b),
   );

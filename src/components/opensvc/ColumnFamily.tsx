@@ -21,11 +21,11 @@ import {
 } from "@/components/ui/icons";
 
 /**
- * Famille d'une colonne : le sujet dont elle parle, pas le type de sa valeur.
+ * Family of a column: the subject it speaks of, not the type of its value.
  *
- * C'est la convention du collector historique, dont les sélecteurs de colonnes
- * marquent chaque entrée d'une icône de famille (classes `node16`, `loc`, `cpu16`,
- * `mem16`, `os16`, `time16`, `pwr`… dans `init/static/css/base.css`).
+ * This is the convention of the historical collector, whose column pickers mark each
+ * entry with a family icon (classes `node16`, `loc`, `cpu16`, `mem16`, `os16`,
+ * `time16`, `pwr`… in `init/static/css/base.css`).
  */
 export type ColumnFamily =
   | "node"
@@ -49,10 +49,10 @@ export type ColumnFamily =
   | "drp";
 
 /**
- * Le collector colore par domaine et non par famille : tout ce qui touche au node est
- * bleuet, le réseau et la zone de sécurité cadet, le service vert, les équipes
- * saumon, l'application magenta, l'horodatage neutre. On reprend ce découpage avec
- * les teintes déjà définies dans les tokens.
+ * The collector colours by domain rather than by family: everything about the node is
+ * cornflower, network and security zone are cadet, service is green, teams are
+ * salmon, application is magenta, timestamps are neutral. We take that split over,
+ * with the tints already defined in the tokens.
  */
 const FAMILIES: Record<ColumnFamily, { Icon: typeof ServerIcon; className: string }> = {
   node: { Icon: ServerIcon, className: "text-icon-node" },
@@ -73,7 +73,7 @@ const FAMILIES: Record<ColumnFamily, { Icon: typeof ServerIcon; className: strin
   time: { Icon: ClockIcon, className: "text-ink-muted" },
   alert: { Icon: BellIcon, className: "text-ink-muted" },
   state: { Icon: StateIcon, className: "text-ink-muted" },
-  // `drp16` du collector n'a pas de couleur propre : neutre également.
+  // The collector's `drp16` has no colour of its own: neutral as well.
   drp: { Icon: DrpIcon, className: "text-ink-muted" },
 };
 

@@ -17,8 +17,8 @@ function NavLink({ entry }: { entry: NavEntry }) {
         className={LINK}
         activeProps={LINK_ACTIVE}
       >
-        {/* L'icône garde sa teinte dans tous les états : elle identifie la vue,
-            c'est le fond et le libellé qui marquent la sélection. */}
+        {/* The icon keeps its tint in every state: it identifies the view, and the
+            background and the label are what mark the selection. */}
         <ObjectIcon kind={entry.icon} />
         {t(entry.labelKey)}
       </Link>
@@ -27,9 +27,9 @@ function NavLink({ entry }: { entry: NavEntry }) {
 }
 
 /**
- * Menu latéral. Repliable : sur un écran étroit, ou quand une table large a besoin
- * de toute la place. Replié, il garde sa place dans la grille mais plus sa largeur,
- * et `inert` le retire du parcours clavier.
+ * Side menu. Foldable: on a narrow screen, or when a wide table needs all the room.
+ * Folded, it keeps its place in the grid but not its width, and `inert` takes it out
+ * of the keyboard path.
  */
 export function Sidebar({ open }: { open: boolean }) {
   const { t } = useTranslation();

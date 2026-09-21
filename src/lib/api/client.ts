@@ -4,8 +4,8 @@ import { authorizationHeader } from "./auth";
 import { signOut } from "@/lib/session";
 
 /**
- * Client HTTP typé depuis la spec OpenAPI d'oc3 apicollector.
- * En dev, /api est proxifié par Vite vers OC3_API_TARGET.
+ * HTTP client typed from the OpenAPI spec of the oc3 apicollector.
+ * In dev, /api is proxied by Vite to OC3_API_TARGET.
  */
 export const api = createClient<paths>({ baseUrl: "/api" });
 
@@ -16,9 +16,9 @@ api.use({
     return request;
   },
   onResponse({ response }) {
-    // Identifiants refusés ou expirés : on repasse par l'écran de connexion
-    // plutôt que de laisser les vues afficher une erreur qu'on sait résoudre.
-    // Via signOut : le cache de la session refusée ne doit pas survivre.
+    // Credentials refused or expired: back to the sign-in screen rather than leaving
+    // the views showing an error we know how to resolve.
+    // Through signOut: the cache of the refused session must not survive.
     if (response.status === 401) signOut();
     return response;
   },

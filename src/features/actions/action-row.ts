@@ -1,12 +1,12 @@
 import { readProp } from "@/lib/row";
 
 /**
- * Ligne de la file d'actions.
+ * Row of the action queue.
  *
- * Écart assumé à la règle « corriger la spec côté oc3 » : `GET /actions` renvoie le
- * `ListResponse` générique, dont les lignes sont typées `Record<string, never>`. Le
- * type est donc décrit ici, en un seul endroit, avec une lecture défensive. À
- * supprimer le jour où la spec typera la réponse, comme pour les tags.
+ * A deliberate departure from the "fix the spec on the oc3 side" rule: `GET /actions`
+ * returns the generic `ListResponse`, whose rows are typed `Record<string, never>`.
+ * The type is therefore described here, in a single place, with a defensive read. To
+ * be removed the day the spec types the response, as for the tags.
  */
 export interface ActionRow {
   id: string;
@@ -43,9 +43,9 @@ export const ACTION_PROPS: (keyof ActionRow)[] = [
 ];
 
 /**
- * Statuts de l'ancien collector (`init/actiond/actiond.py`) : « T » terminée et
- * « C » annulée sont les seuls états finaux, tout le reste attend son tour ou
- * s'exécute.
+ * Statuses of the old collector (`init/actiond/actiond.py`): "T" finished and "C"
+ * cancelled are the only final states, everything else is waiting its turn or
+ * running.
  */
 const DONE = new Set(["T", "C"]);
 
@@ -82,7 +82,7 @@ export function toActionRows(data: unknown): ActionRow[] {
   });
 }
 
-/** Date « zéro » de MySQL : une action jamais dépilée n'a pas de date de fin. */
+/** MySQL "zero" date: an action never taken has no end date. */
 export function realDate(value: string): string | undefined {
   return value === "" || value.startsWith("0000-00-00") ? undefined : value;
 }

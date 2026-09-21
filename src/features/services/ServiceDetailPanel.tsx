@@ -30,12 +30,11 @@ const field = (
 ) => ({ prop, format: format ?? text(prop) });
 
 /**
- * Booléens affichés en interrupteur, en lecture seule : le démon les tient à jour.
+ * Booleans shown as a switch, read-only: the daemon keeps them up to date.
  *
- * `svc_frozen` et `svc_provisioned` n'en font pas partie : ce sont des états à
- * plusieurs valeurs côté om3 — « frozen », « unfrozen », « mixed », « n/a » pour l'un,
- * « true », « false », « mixed », « n/a » pour l'autre — qu'un interrupteur ne sait
- * pas représenter.
+ * `svc_frozen` and `svc_provisioned` are not among them: they are states with
+ * several values on the om3 side — "frozen", "unfrozen", "mixed", "n/a" for one,
+ * "true", "false", "mixed", "n/a" for the other — which a switch cannot represent.
  */
 const flag = (prop: keyof ServiceRow) => ({ ...field(prop), input: "boolean" as const });
 
@@ -105,12 +104,12 @@ const GROUPS: DetailGroup<ServiceRow>[] = [
   },
 ];
 
-// Ne demander au collector que les propriétés effectivement affichées.
+// Ask the collector only for the properties actually shown.
 const PROPS = GROUPS.flatMap((group) => group.fields.map((f) => f.prop)).join(",");
 
 /**
- * Détail d'un service : ses propriétés, puis ses données rattachées, un onglet chacune
- * (`SERVICE_RELATED_TABS`). L'onglet ouvert vit dans l'URL (`tab`), tenue par la vue.
+ * Detail of a service: its properties, then its related data, one tab each
+ * (`SERVICE_RELATED_TABS`). The open tab lives in the URL (`tab`), held by the view.
  */
 export function ServiceDetailPanel({
   svcId,

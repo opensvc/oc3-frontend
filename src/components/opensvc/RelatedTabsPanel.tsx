@@ -9,9 +9,9 @@ import { RelatedCount } from "./RelatedCount";
 import { PROPERTIES_TAB, type RelatedTab } from "./related-tabs";
 
 /**
- * Panneau de détail à onglets : les propriétés de l'objet, puis ses données rattachées,
- * un onglet chacune avec son effectif. L'onglet ouvert est tenu par la vue, dans l'URL
- * (`tab`), pour qu'un lien, un rechargement ou le bouton Précédent le rouvrent.
+ * Detail panel with tabs: the properties of the object, then its related data, one
+ * tab each with its count. The open tab is held by the view, in the URL (`tab`), so
+ * that a link, a reload or the Back button reopen it.
  */
 export function RelatedTabsPanel({
   open,
@@ -30,22 +30,22 @@ export function RelatedTabsPanel({
   title: string;
   kind: ObjectKind;
   onClose: () => void;
-  /** Identifiant passé aux onglets ; absent tant que rien n'est sélectionné. */
+  /** Id passed to the tabs; absent as long as nothing is selected. */
   objectId: string | undefined;
   tabs: RelatedTab[];
   tab: string | undefined;
   onTabChange: (tab: string | undefined) => void;
-  /** Icône de l'onglet des propriétés. */
+  /** Icon of the properties tab. */
   propertiesFamily: ColumnFamily;
   /** Nom accessible de la barre d'onglets. */
   label: string;
-  /** Contenu de l'onglet des propriétés. */
+  /** Content of the properties tab. */
   children: ReactNode;
 }) {
   const { t, i18n } = useTranslation();
   const tabsId = useTabsId();
-  // Un onglet inconnu, venu d'une URL ancienne ou d'un autre type d'objet, retombe sur
-  // les propriétés.
+  // An unknown tab, coming from an old URL or from another kind of object, falls back
+  // to the properties.
   const related = tabs.find((entry) => entry.key === tab);
   const active = related?.key ?? PROPERTIES_TAB;
   const items: TabItem[] = [

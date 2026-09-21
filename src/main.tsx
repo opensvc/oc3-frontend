@@ -9,7 +9,7 @@ import { queryClient } from "@/lib/query";
 import { router } from "@/app/router";
 import { applyTheme, cachedTheme } from "@/lib/theme";
 
-// Avant le premier rendu : le choix mis en cache, sinon le thème du système.
+// Before the first render: the cached choice, otherwise the system theme.
 applyTheme(cachedTheme());
 
 createRoot(document.getElementById("root")!).render(

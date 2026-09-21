@@ -89,8 +89,8 @@ export function NetworkDetailPanel({
     },
   });
 
-  // Supprime le relevé, pas l'adresse : un node qui remonte encore cette adresse la
-  // réinscrira à sa prochaine remontée d'inventaire.
+  // Deletes the reading, not the address: a node still reporting this address will
+  // write it back at its next inventory push.
   const remove = useMutation({
     mutationFn: async () => {
       const { error: failure } = await api.DELETE("/ips/{id}", {

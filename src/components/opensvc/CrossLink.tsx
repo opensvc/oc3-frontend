@@ -3,20 +3,20 @@ import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ObjectIcon } from "./ObjectIcon";
 
-/** Objets dont `PeekPanel` sait montrer la fiche. */
+/** Objects whose record `PeekPanel` knows how to show. */
 export type CrossKind = "node" | "service" | "instance" | "app" | "group";
 
 /**
- * Valeur d'une cellule qui désigne un objet d'une autre vue : le node d'une
- * instance, le service d'un disque…
+ * Value of a cell that names an object from another view: the node of an instance,
+ * the service of a disk…
  *
- * Un double-clic montre sa fiche à la place du panneau de la ligne, sans quitter la
- * liste (`peek` dans l'URL, voir `PeekPanel`) : c'est le geste par lequel l'ancien
- * collector ouvrait la fiche d'un objet. Un simple clic ne fait rien ici, il est
- * réservé à la ligne, dont il ouvre le propre panneau.
+ * A double-click shows its record in place of the row panel, without leaving the
+ * list (`peek` in the URL, see `PeekPanel`): this is the gesture by which the old
+ * collector opened the record of an object. A single click does nothing here, it
+ * belongs to the row, whose own panel it opens.
  *
- * Au clavier, la puce est un bouton comme un autre : Entrée ou Espace montre la
- * fiche, et l'infobulle dit ce que fait le double-clic.
+ * From the keyboard, the badge is a button like any other: Enter or Space shows the
+ * record, and the tooltip says what the double-click does.
  */
 export function CrossLink({
   kind,
@@ -24,7 +24,7 @@ export function CrossLink({
   children,
 }: {
   kind: CrossKind;
-  /** Identifiant attendu par la vue cible ; sans lui, la valeur reste du texte. */
+  /** Id the target view expects; without it, the value stays plain text. */
   id: string | undefined;
   children: ReactNode;
 }) {
@@ -40,7 +40,7 @@ export function CrossLink({
   )
     return <>{children}</>;
 
-  /** Montre la fiche sans quitter la vue, à la place du panneau de la ligne. */
+  /** Shows the record without leaving the view, in place of the row panel. */
   const peek = () => {
     void navigate({
       to: ".",
@@ -60,8 +60,8 @@ export function CrossLink({
       type="button"
       title={t("crossLink.hint", { kind: t(`crossLink.kinds.${kind}`) })}
       onClick={(event) => {
-        // Le clic simple reste à la ligne ; sans quoi ouvrir la puce ouvrirait aussi
-        // le panneau de la ligne survolée.
+        // The single click belongs to the row; without this, opening the badge would
+        // also open the panel of the row under the pointer.
         event.stopPropagation();
       }}
       onDoubleClick={(event) => {

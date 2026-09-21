@@ -33,9 +33,9 @@ export function useServiceDisks(svcId: string | undefined) {
 }
 
 /**
- * Adaptateurs de bus hôte des nodes qui portent une instance du service, comme dans
- * l'onglet Storage du collector historique (`ajax_svc_stor`). apicollector n'a pas
- * d'endpoint dédié : on lit les instances, puis les HBA de chaque node.
+ * Host bus adapters of the nodes carrying an instance of the service, as in the
+ * Storage tab of the historical collector (`ajax_svc_stor`). apicollector has no
+ * dedicated endpoint: the instances are read, then the HBAs of each node.
  */
 export function useServiceHbas(svcId: string | undefined) {
   return useQuery({
@@ -75,7 +75,7 @@ export function useServiceHbas(svcId: string | undefined) {
   });
 }
 
-/** Tags attachés au service. `GET /…/tags` renvoie le `ListResponse` générique : lu par `toTagRows`. */
+/** Tags attached to the service. `GET /…/tags` returns the generic `ListResponse`: read by `toTagRows`. */
 export function useServiceTags(svcId: string | undefined) {
   return useQuery({
     queryKey: ["service", svcId, "tags"],

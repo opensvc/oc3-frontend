@@ -6,7 +6,7 @@ import { useNodeHardware } from "./queries";
 
 type NodeHardwareRow = components["schemas"]["NodeHardwareRow"];
 
-/** Familles dans l'ordre d'affichage : la mémoire, courte, avant la longue liste PCI. */
+/** Families in display order: memory, which is short, before the long PCI list. */
 const TYPE_ORDER = ["mem", "cpu", "pci", "usb", "disk"];
 
 export function NodeHardware({ nodeId, locale }: { nodeId: string; locale: string }) {
@@ -14,7 +14,7 @@ export function NodeHardware({ nodeId, locale }: { nodeId: string; locale: strin
   const hardware = useNodeHardware(nodeId);
   const rows = hardware.data ?? [];
 
-  // Regroupé par famille de composant : c'est ainsi qu'on lit un inventaire.
+  // Grouped by component family: this is how an inventory reads.
   const types = [...new Set(rows.map((row) => row.hw_type ?? ""))].sort(
     (a, b) =>
       (TYPE_ORDER.indexOf(a) + 1 || TYPE_ORDER.length + 1) -
@@ -53,7 +53,7 @@ export function NodeHardware({ nodeId, locale }: { nodeId: string; locale: strin
     },
   ];
 
-  // Tout l'inventaire est daté de la même remontée : on l'indique une fois.
+  // The whole inventory is dated from the same push: it is said once.
   const updated = rows.reduce<string | undefined>(
     (latest, row) =>
       row.updated !== undefined && (latest === undefined || row.updated > latest)

@@ -5,11 +5,11 @@ import { setCredentials } from "@/lib/api/auth";
 import opensvcLogo from "@/assets/opensvc-logo.svg";
 
 /**
- * Écran de connexion provisoire, en attendant OIDC.
+ * Temporary sign-in screen, while waiting for OIDC.
  *
- * apicollector n'expose pas d'endpoint d'identité : pour vérifier des identifiants,
- * on appelle un endpoint protégé et on regarde s'il répond. Quand OIDC arrivera,
- * ce composant et le magasin d'identifiants disparaissent ensemble.
+ * apicollector exposes no identity endpoint: to check credentials, a protected
+ * endpoint is called and its answer looked at. When OIDC arrives, this component and
+ * the credentials store disappear together.
  */
 export function SignIn() {
   const { t } = useTranslation();
@@ -33,7 +33,7 @@ export function SignIn() {
 
   return (
     <div className="mx-auto mt-16 w-full max-w-sm">
-      {/* Même marque que la barre du haut, que l'écran de connexion remplace. */}
+      {/* Same mark as the top bar, which the sign-in screen replaces. */}
       <div className="mb-6 flex flex-col items-center gap-2">
         <img src={opensvcLogo} alt="" width={56} height={56} className="h-14 w-14" />
         <p className="text-title font-semibold tracking-tight">OpenSVC Collector</p>

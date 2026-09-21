@@ -1,9 +1,9 @@
 import type { ObjectState } from "./StatusBadge";
 
 /**
- * Traduit un statut du collector en état d'objet OpenSVC.
- * La base stocke "up", "warn", "down", "n/a", et une chaîne vide pour un service
- * qui n'a jamais remonté de statut : les deux derniers sont un état inconnu.
+ * Translates a collector status into an OpenSVC object state.
+ * The database stores "up", "warn", "down", "n/a", and an empty string for a service
+ * that has never reported a status: the last two are an unknown state.
  */
 export function toObjectState(value: string | undefined): ObjectState {
   switch (value) {
@@ -17,10 +17,10 @@ export function toObjectState(value: string | undefined): ObjectState {
 }
 
 /**
- * Badge d'un statut du collector, valeurs de veille comprises. Comme le collector
- * historique (`cell_decorator_status`), « stdby up » prend la couleur de « up » et
- * « stdby down » celle de « down », et « undef » celle d'un état inconnu ; ces
- * valeurs gardent leur propre libellé, qui en dit plus que l'état seul.
+ * Badge for a collector status, standby values included. As in the historical
+ * collector (`cell_decorator_status`), "stdby up" takes the colour of "up" and
+ * "stdby down" that of "down", and "undef" that of an unknown state; those values
+ * keep their own label, which says more than the state alone.
  */
 export function statusBadge(value: string | undefined): { state: ObjectState; label?: string } {
   switch (value) {

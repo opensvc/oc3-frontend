@@ -5,15 +5,15 @@ const PILL =
   "inline-flex min-w-5 items-center justify-center gap-0.5 rounded-full px-1.5 text-[0.6875rem] leading-4 tabular-nums";
 
 /**
- * Compteur d'un onglet de données rattachées. Composant à part pour que le hook de
- * résumé de chaque onglet soit appelé à sa place. Un compteur nul reste affiché,
- * estompé : les onglets ne changent pas de place d'un objet à l'autre.
+ * Counter of a related-data tab. A separate component so that the summary hook of
+ * each tab is called in its place. A zero count stays on display, dimmed: the tabs do
+ * not move from one object to the next.
  *
- * Quand le résumé est réparti (les alertes par gravité), la pastille se découpe en
- * sections, une par part non vide, teintée selon sa catégorie. Seuls les nombres
- * sont affichés, à la demande : écart assumé à la règle « jamais la couleur seule »,
- * compensé par l'ordre fixe des sections (de la plus grave à la moins grave) et par
- * les libellés complets en infobulle et pour les lecteurs d'écran (voir notes.md).
+ * When the summary is broken down (alerts by severity), the pill is cut into
+ * sections, one per non-empty share, tinted by its category. Only the numbers are
+ * shown, as requested: a deliberate departure from the "never colour alone" rule,
+ * offset by the fixed order of the sections (from the most severe to the least) and
+ * by the full labels in the tooltip and for screen readers (see notes.md).
  */
 export function RelatedCount({ tab, id }: { tab: RelatedTab; id: string | undefined }) {
   const { t } = useTranslation();

@@ -8,7 +8,7 @@ export interface RelatedColumn<T> {
   numeric?: boolean;
   /** Colonne qui absorbe la largeur restante, typiquement une description. */
   grow?: boolean;
-  /** Texte long autorisé à passer à la ligne, sans prendre la largeur restante. */
+  /** Long text allowed to wrap, without taking the remaining width. */
   wrap?: boolean;
 }
 
@@ -19,10 +19,9 @@ export interface RelatedGroup<T> {
 }
 
 /**
- * Liste compacte de données rattachées à un objet, dans un panneau de détail : pas
- * de pagination ni de sélecteur de colonnes, les volumes y restent modestes. Les
- * lignes peuvent être regroupées, chaque groupe sous son intitulé et son effectif,
- * pour qu'une liste longue reste lisible d'un coup d'œil.
+ * Compact list of data attached to an object, in a detail panel: no pagination nor
+ * column picker, the volumes stay modest there. Rows may be grouped, each group under
+ * its heading and its count, so that a long list stays readable at a glance.
  */
 export function RelatedTable<T>({
   columns,
@@ -38,7 +37,7 @@ export function RelatedTable<T>({
   rowKey: (row: T) => string;
   isPending: boolean;
   errorMessage: string | null;
-  /** Texte affiché quand il n'y a aucune ligne. */
+  /** Text shown when there is no row. */
   empty: string;
   /** Nom accessible du tableau. */
   caption: string;

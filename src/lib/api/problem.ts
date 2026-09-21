@@ -1,6 +1,6 @@
 /**
- * Message d'erreur d'apicollector. Les erreurs sont renvoyées en `{"text": "…"}` ;
- * on retombe sur la forme brute si ce n'est pas le cas.
+ * Error message from apicollector. Errors come back as `{"text": "…"}`; we fall back
+ * to the raw shape when they do not.
  */
 export function problemText(error: unknown): string {
   if (typeof error === "object" && error !== null && "text" in error) {

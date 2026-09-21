@@ -5,11 +5,11 @@ import { api } from "@/lib/api/client";
 import { isPending, toActionRows } from "./action-row";
 
 /**
- * Nombre d'actions encore en attente dans la file.
+ * Number of actions still waiting in the queue.
  *
- * L'API ne sait pas filtrer une liste par statut ni en rendre le total : la page est
- * donc lue puis comptée ici, plafonnée, et rafraîchie à intervalle régulier — la
- * file bouge sans que l'utilisateur agisse, c'est l'agent qui la dépile.
+ * The API cannot filter a list by status nor return its total: the page is therefore
+ * read then counted here, capped, and refreshed at a regular interval — the queue
+ * moves without the user acting, it is the agent that drains it.
  */
 const LIMIT = 200;
 
@@ -29,9 +29,8 @@ function usePendingActions() {
 }
 
 /**
- * Entrée « File d'actions » de la barre du haut : toujours un lien vers la file, qui
- * garde aussi les actions passées, avec le nombre de celles qui attendent encore
- * quand il y en a.
+ * "Action queue" entry of the top bar: always a link to the queue, which also keeps
+ * the past actions, with the number of those still waiting when there are any.
  */
 export function ActionQueueLink() {
   const { t } = useTranslation();

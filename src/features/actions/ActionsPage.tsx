@@ -23,7 +23,7 @@ import { ActionDetailPanel } from "./ActionDetailPanel";
 import { ActionQueueMenu } from "./ActionQueueMenu";
 import { ACTION_PROPS, isPending, realDate, toActionRows, type ActionRow } from "./action-row";
 
-/** La file se lit de la plus récente à la plus ancienne, comme le journal. */
+/** The queue reads from the most recent to the oldest, like the log. */
 const DEFAULT_SORT = ["-id"];
 
 const DEFAULT_COLS: string[] = [
@@ -57,9 +57,9 @@ const FAMILY: Record<string, ColumnFamily> = {
 const LONG_PROPS = new Set(["stdout", "stderr"]);
 
 /**
- * État d'une action, du point de vue de qui la regarde : en attente tant que l'agent
- * ne l'a pas dépilée, puis selon son code de retour. Les codes de l'ancien collector
- * sont gardés tels quels, faute de libellés dans l'API.
+ * State of an action, from the point of view of whoever looks at it: waiting as long
+ * as the agent has not taken it, then according to its return code. The codes of the
+ * old collector are kept as they are, for want of labels in the API.
  */
 function statusState(row: ActionRow): "up" | "warn" | "down" | "unknown" {
   if (isPending(row.status)) return "warn";
@@ -102,7 +102,7 @@ const COLUMNS: ListColumn<ActionRow>[] = ACTION_PROPS.map((prop) => ({
 
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
-/** Colonnes affichées, plus ce dont les puces et l'état ont besoin. */
+/** Columns shown, plus what the badges and the state need. */
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
   return [...new Set(["id", "status", "ret", "node_id", "svc_id", ...shown])].join(",");
@@ -112,7 +112,7 @@ function useActions(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["actions", search.sort, search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/actions", {
         params: {
           query: {
@@ -152,7 +152,7 @@ export function ActionsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -178,7 +178,7 @@ export function ActionsPage() {
         rowId={(row) => row.id}
         search={search}
         onChange={update}
-        // apicollector n'a pas d'endpoint d'actions filtré par filterset.
+        // apicollector has no actions endpoint filtered by filterset.
         filtersets={[]}
         isPending={loading}
         isFetching={isFetching}

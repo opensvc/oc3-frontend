@@ -2,12 +2,12 @@ import { useTranslation } from "react-i18next";
 import { SnowflakeIcon } from "@/components/ui/icons";
 
 /**
- * Marque de gel en tête de ligne.
+ * Frozen mark at the head of a row.
  *
- * Le gel se lit quelles que soient les colonnes affichées : il dit que l'objet ne
- * répond plus aux ordres d'orchestration, ce qui explique bien des états. Le flocon
- * est doublé d'un texte pour les lecteurs d'écran et d'une infobulle, la couleur et
- * la forme seules ne suffisant pas.
+ * Freezing reads whatever the columns on display: it says that the object no longer
+ * answers orchestration orders, which explains many a state. The snowflake is
+ * doubled by a text for screen readers and by a tooltip, colour and shape alone not
+ * being enough.
  */
 export function FrozenMark({ frozen }: { frozen: boolean }) {
   const { t } = useTranslation();

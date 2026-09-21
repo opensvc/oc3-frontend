@@ -24,8 +24,8 @@ type AppRow = components["schemas"]["AppRow"];
 const DEFAULT_SORT = ["app"];
 
 /**
- * Toutes les propriétés de code application exposées par apicollector, dans l'ordre
- * de son `meta.available_props`. `satisfies` les confronte au schéma généré.
+ * Every application code property exposed by apicollector, in the order of its
+ * `meta.available_props`. `satisfies` confronts them with the generated schema.
  */
 const APP_PROPS = [
   "id",
@@ -36,10 +36,10 @@ const APP_PROPS = [
   "updated",
 ] as const satisfies readonly (keyof AppRow)[];
 
-/** Colonnes affichées par défaut : le code, ce qu'il désigne, et sa fraîcheur. */
+/** Columns shown by default: the code, what it names, and how fresh it is. */
 const DEFAULT_COLS: string[] = ["app", "description", "updated"];
 
-/** `id` vient du helper `col` sur une colonne entière : aligné à droite. */
+/** `id` comes from the `col` helper on an integer column: aligned right. */
 const NUMERIC_PROPS = new Set<string>(["id"]);
 
 /** Props que le collector stocke en datetime. */
@@ -70,7 +70,7 @@ const COLUMNS: ListColumn<AppRow>[] = APP_PROPS.map((prop) => ({
 
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
-/** Ne demander que les colonnes affichées : apicollector fait le pushdown en base. */
+/** Ask only for the columns shown: apicollector pushes the selection down to the database. */
 function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", "app", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
@@ -79,7 +79,7 @@ function useApps(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["apps", search.sort, search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/apps", {
         params: {
           query: {
@@ -108,7 +108,7 @@ export function AppsPage() {
   const { data, isPending, isError, error, isFetching } = useApps(search);
   const [creating, setCreating] = useState(false);
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/apps", {
       params: { query: { props: "id", limit: 0 } },
@@ -122,7 +122,7 @@ export function AppsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -131,11 +131,11 @@ export function AppsPage() {
     });
   }
 
-  // Le code désigne la ligne : c'est lui que portent les autres vues, et l'API
-  // accepte aussi bien `GET /apps/DEV` que l'identifiant entier. Un lien déjà
-  // partagé en `?sel="<id>"` ouvre donc toujours la bonne fiche, sans surligner sa
-  // ligne. Le routeur lit un `sel` non guillemeté comme un nombre et l'écarte, ce
-  // qui est vrai de toutes les vues à identifiant entier : voir notes.md.
+  // The code names the row: it is what the other views carry, and the API accepts
+  // `GET /apps/DEV` as well as the integer id. A link already shared as `?sel="<id>"`
+  // therefore still opens the right record, without highlighting its row. The router
+  // reads an unquoted `sel` as a number and discards it, which is true of every view
+  // with an integer id: see notes.md.
   const selected = data?.rows.find(
     (row) => row.app === search.sel || String(row.id) === search.sel,
   );
@@ -150,7 +150,7 @@ export function AppsPage() {
         <button
           type="button"
           onClick={() => {
-            // Les deux tiroirs partagent le bord droit : ouvrir la création ferme le détail.
+            // The two drawers share the right edge: opening the creation closes the detail.
             update({ sel: undefined });
             setCreating(true);
           }}

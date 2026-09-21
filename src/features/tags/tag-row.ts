@@ -1,19 +1,19 @@
 import { readProp } from "@/lib/row";
 
 /**
- * Forme d'une ligne de tag.
+ * Shape of a tag row.
  *
- * Écart assumé à la règle « corriger la spec côté oc3 plutôt que contourner côté
- * frontend » : `GET /tags` renvoie le `ListResponse` générique, dont les lignes sont
- * typées `Record<string, never>`, et il a été demandé de ne pas toucher à l'API. Le
- * type est donc décrit ici, en un seul endroit, avec une lecture défensive plutôt
- * qu'une conversion aveugle. À supprimer le jour où la spec typera la réponse.
+ * A deliberate departure from the "fix the spec on the oc3 side rather than work
+ * around it on the frontend" rule: `GET /tags` returns the generic `ListResponse`,
+ * whose rows are typed `Record<string, never>`, and it was asked that the API be left
+ * alone. The type is therefore described here, in a single place, with a defensive
+ * read rather than a blind cast. To be removed the day the spec types the response.
  */
 export interface TagRow {
   tag_id: string;
   tag_name: string;
   tag_exclude: string;
-  /** Données libres attachées au tag ; l'API les renvoie déjà décodées. */
+  /** Free data attached to the tag; the API returns it already decoded. */
   tag_data: string;
   tag_created: string;
 }

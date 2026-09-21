@@ -1,8 +1,8 @@
 /**
- * Sévérité d'une entrée du dashboard. Le collector la stocke en entier de 0 à 5
- * sans libellé : on garde donc le chiffre affiché, et on n'ajoute qu'un palier de
- * lecture. Comme pour les états d'objet, chaque palier a sa forme propre, pour
- * rester lisible sans la couleur.
+ * Severity of a dashboard entry. The collector stores it as an integer from 0 to 5
+ * with no label: the number is therefore kept on display, and only a reading tier is
+ * added. As for object states, each tier has its own shape, to stay readable without
+ * colour.
  */
 export const SEVERITY_LEVELS = [
   { min: 3, box: "bg-state-down-soft text-state-down", glyph: "■", key: "critical" },

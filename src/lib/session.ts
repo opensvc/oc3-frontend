@@ -2,12 +2,11 @@ import { setCredentials } from "@/lib/api/auth";
 import { queryClient } from "@/lib/query";
 
 /**
- * Ferme la session : oublie les identifiants et vide le cache des requêtes.
+ * Ends the session: forgets the credentials and empties the query cache.
  *
- * Sans le second point, la personne qui se connecte ensuite dans le même onglet
- * verrait, le temps du `staleTime`, les données chargées pour la précédente : les
- * clés de requête ne portent pas l'utilisateur, et `["user", "self"]` désigne
- * « l'utilisateur connecté » quel qu'il soit.
+ * Without the second part, whoever signs in next in the same tab would see, for as
+ * long as `staleTime` lasts, the data loaded for the previous user: query keys do not
+ * carry the user, and `["user", "self"]` means "the signed-in user", whoever that is.
  */
 export function signOut(): void {
   queryClient.clear();

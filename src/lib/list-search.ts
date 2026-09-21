@@ -1,42 +1,41 @@
 /**
- * État d'URL commun aux vues « liste du collector » : tri, pagination, filterset,
- * colonnes visibles et ligne sélectionnée. La grille « définition de terminé »
- * demande que ces états soient partageables par simple lien.
+ * URL state shared by the "collector list" views: sort, pagination, filterset,
+ * visible columns and selected row. The "definition of done" grid asks for these
+ * states to be shareable by link alone.
  *
- * Deux formes coexistent volontairement :
+ * Two shapes coexist on purpose:
  *
- * - `ListSearch` est ce qui transite par l'URL. Uniquement des scalaires : le
- *   routeur sérialise toute valeur non primitive en JSON, ce qui donnerait des
- *   liens comme `?sort=%5B%22-mem_bytes%22%5D`. Les listes sont donc écrites en
- *   clair, séparées par des virgules.
- * - `ResolvedListSearch` est ce que manipulent les composants, avec de vraies
- *   listes.
+ * - `ListSearch` is what travels through the URL. Scalars only: the router
+ *   serialises any non-primitive value as JSON, which would give links such as
+ *   `?sort=%5B%22-mem_bytes%22%5D`. Lists are therefore written in plain text,
+ *   separated by commas.
+ * - `ResolvedListSearch` is what the components handle, with real lists.
  *
- * `parseListSearch` et `toSearchParams` font la conversion aux deux frontières.
+ * `parseListSearch` and `toSearchParams` convert at both boundaries.
  */
 export interface ListSearch {
-  /** Clés de tri séparées par des virgules, préfixées de - pour l'ordre descendant. */
+  /** Sort keys separated by commas, prefixed with - for descending order. */
   sort?: string;
   offset?: number;
   limit?: number;
-  /** Nom du filterset appliqué, absent pour la liste complète. */
+  /** Name of the applied filterset, absent for the full list. */
   fset?: string;
-  /** Identifiant de la ligne dont le panneau de détail est ouvert. */
+  /** Id of the row whose detail panel is open. */
   sel?: string;
   /** Props des colonnes visibles ; absent signifie « toutes les colonnes de la vue ». */
   cols?: string;
   /**
-   * Onglet ouvert dans le panneau de détail. Dans l'URL pour qu'un lien, un
-   * rechargement ou le bouton Précédent rouvrent le même onglet.
+   * Tab open in the detail panel. In the URL so that a link, a reload or the Back
+   * button reopen the same tab.
    */
   tab?: string;
   /**
-   * Objet d'une autre vue regardé sans quitter celle-ci, sous la forme
-   * `kind:identifiant` : la puce d'une cellule ouvre ainsi sa fiche à la place du
-   * panneau de la ligne. Dans l'URL comme le reste, pour qu'un lien la rouvre.
+   * Object from another view looked at without leaving this one, as `kind:id`: a
+   * badge in a cell opens its record in place of the row panel. In the URL like the
+   * rest, so that a link reopens it.
    */
   peek?: string;
-  /** Onglet ouvert dans ce panneau-là, quand l'objet regardé en a. */
+  /** Tab open in that panel, when the object looked at has any. */
   peektab?: string;
 }
 
@@ -67,9 +66,9 @@ function toNonEmptyString(value: unknown): string | undefined {
 }
 
 /**
- * Accepte aussi bien "a,b" qu'un vrai tableau : un lien partagé avant que cet
- * état passe en chaînes contient encore un tableau sérialisé en JSON, que le
- * routeur nous rend tel quel.
+ * Accepts "a,b" as well as a real array: a link shared before this state moved to
+ * strings still carries an array serialised as JSON, which the router hands back as
+ * it is.
  */
 function toCommaList(value: unknown): string | undefined {
   if (Array.isArray(value)) {
@@ -109,10 +108,10 @@ export function resolveListSearch(search: ListSearch, defaultSort: string[]): Re
 }
 
 /**
- * Traduit une mise à jour venue d'un composant vers la forme d'URL. Une clé absente
- * laisse la valeur précédente ; une clé à `undefined` l'efface. Les valeurs par
- * défaut sont effacées plutôt qu'écrites, pour que l'URL ne porte que ce qui
- * s'écarte de la vue de base.
+ * Translates an update coming from a component into the URL shape. An absent key
+ * leaves the previous value; a key set to `undefined` clears it. Default values are
+ * cleared rather than written, so that the URL carries only what departs from the
+ * base view.
  */
 export function toSearchParams(next: Partial<ResolvedListSearch>): Partial<ListSearch> {
   const out: Partial<ListSearch> = {};
@@ -123,8 +122,8 @@ export function toSearchParams(next: Partial<ResolvedListSearch>): Partial<ListS
   if ("offset" in next) out.offset = next.offset === 0 ? undefined : next.offset;
   if ("limit" in next) out.limit = next.limit === DEFAULT_LIMIT ? undefined : next.limit;
   if ("fset" in next) out.fset = next.fset === "" ? undefined : next.fset;
-  // Un seul tiroir à la fois : ouvrir le panneau d'une ligne referme la fiche qu'une
-  // puce avait ouverte, comme la puce referme le panneau de la ligne.
+  // One drawer at a time: opening a row panel closes the record a badge had opened,
+  // just as the badge closes the row panel.
   if ("sel" in next) {
     out.sel = next.sel;
     out.peek = undefined;
@@ -137,13 +136,12 @@ export function toSearchParams(next: Partial<ResolvedListSearch>): Partial<ListS
 }
 
 /**
- * Colonnes visibles, dans l'ordre déclaré par la vue.
+ * Visible columns, in the order the view declares them.
  *
- * Sans sélection dans l'URL, ce sont les colonnes par défaut de la vue et non
- * toutes ses colonnes : une vue peut en proposer des dizaines sans les imposer.
- * Les props inconnus d'une URL ancienne ou bricolée sont ignorés, et une sélection
- * vide retombe sur les colonnes par défaut, une table sans colonne n'ayant rien à
- * montrer.
+ * Without a selection in the URL, these are the view's default columns and not all
+ * of them: a view may offer dozens without imposing them. Props unknown to an old or
+ * hand-made URL are ignored, and an empty selection falls back to the default
+ * columns, a table without a column having nothing to show.
  */
 export function visibleProps(
   cols: string[] | undefined,
@@ -156,18 +154,18 @@ export function visibleProps(
 }
 
 /**
- * États qui ne remplacent pas les lignes affichées : panneau de détail ouvert, son
- * onglet, colonnes visibles.
+ * States that do not replace the rows on display: open detail panel, its tab,
+ * visible columns.
  */
 const IN_PLACE_KEYS = new Set<keyof ResolvedListSearch>(["sel", "tab", "cols", "peek", "peektab"]);
 
 /**
- * Faut-il remonter en haut de page après cette mise à jour de l'URL ?
+ * Should the page scroll back to the top after this URL update?
  *
- * Le routeur le fait par défaut à chaque navigation. C'est voulu quand la page, le
- * tri ou le filterset changent les lignes affichées, mais pas quand on ouvre le
- * détail d'une ligne atteinte en faisant défiler : la liste sauterait sous le
- * panneau et on perdrait sa place en le refermant.
+ * The router does it by default on every navigation. That is wanted when the page,
+ * the sort or the filterset change the rows on display, but not when opening the
+ * detail of a row reached by scrolling: the list would jump under the panel and the
+ * place would be lost on closing it.
  */
 export function resetsScroll(next: Partial<ResolvedListSearch>): boolean {
   return Object.keys(next).some((key) => !IN_PLACE_KEYS.has(key as keyof ResolvedListSearch));

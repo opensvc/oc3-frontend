@@ -3,9 +3,9 @@ import { CalendarIcon } from "@/components/ui/icons";
 import { formatDate, formatDateTime, parseCollectorDate } from "@/lib/format";
 
 /**
- * Mise en forme commune des horodatages de liste : une icône de calendrier devant la
- * valeur, qui signale une date au premier regard quel que soit son format, absolu ou
- * relatif. Le tout reste sur une ligne pour que l'icône ne se retrouve pas seule.
+ * Shared layout for list timestamps: a calendar icon before the value, which marks a
+ * date at first glance whatever its format, absolute or relative. The whole stays on
+ * one line so that the icon never ends up alone.
  */
 export function DateStamp({
   date,
@@ -29,8 +29,8 @@ export function DateStamp({
 }
 
 /**
- * Date et heure localisées, précédées de l'icône de calendrier. `dateOnly` omet
- * l'heure, pour une échéance au jour.
+ * Localised date and time, preceded by the calendar icon. `dateOnly` leaves out the
+ * time, for a deadline set by the day.
  */
 export function DateTime({
   value,
@@ -43,7 +43,7 @@ export function DateTime({
 }) {
   const parsed = parseCollectorDate(value);
   const text = dateOnly ? formatDate(value, locale) : formatDateTime(value, locale);
-  // Valeur vide ou illisible : ce n'est pas une date, pas d'icône.
+  // Empty or unreadable value: this is not a date, so no icon.
   if (parsed === null) return text;
   return <DateStamp date={parsed}>{text}</DateStamp>;
 }

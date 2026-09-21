@@ -16,15 +16,15 @@ function readSidebarOpen(): boolean {
   try {
     return localStorage.getItem(SIDEBAR_KEY) !== "closed";
   } catch {
-    // Navigation privée ou stockage refusé : le menu s'ouvre, comme par défaut.
+    // Private browsing or storage refused: the menu opens, as by default.
     return true;
   }
 }
 
 /**
- * Coquille applicative. Reprend les zones fonctionnelles du collector : navigation
- * en menu latéral, filtre de session, file d'actions, recherche globale.
- * Les trois derniers sont des emplacements : ils sont implémentés en phases 3 et 4.
+ * Application shell. It mirrors the functional areas of the collector: navigation in
+ * a side menu, session filter, action queue, global search. The last two are
+ * placeholders: they are implemented in phases 3 and 4.
  */
 export function AppShell() {
   const { t } = useTranslation();
@@ -37,14 +37,14 @@ export function AppShell() {
       try {
         localStorage.setItem(SIDEBAR_KEY, next ? "open" : "closed");
       } catch {
-        // Préférence non mémorisée : sans conséquence pour la session en cours.
+        // Preference not remembered: without consequence for the current session.
       }
       return next;
     });
   }
 
-  // Tant que personne n'est connecté, aucune vue n'a de données à montrer :
-  // on affiche l'écran de connexion à la place, sans les outils de l'interface.
+  // As long as nobody is signed in, no view has data to show: the sign-in screen is
+  // displayed instead, without the tools of the interface.
   if (credentials === null) {
     return (
       <div className="min-h-dvh bg-surface px-4 text-ink">
@@ -68,7 +68,7 @@ export function AppShell() {
         </button>
 
         <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          {/* Décoratif : le titre qui suit nomme déjà le lien. */}
+          {/* Decorative: the title that follows already names the link. */}
           <img src={opensvcLogo} alt="" width={24} height={24} className="h-6 w-6" />
           OpenSVC Collector
         </Link>

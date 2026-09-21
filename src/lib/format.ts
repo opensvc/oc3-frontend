@@ -1,27 +1,28 @@
 /**
- * Formatage des valeurs du collector. Les unités et les formats de date viennent
- * de la base historique : c'est ici qu'on absorbe leurs particularités.
+ * Formatting of collector values. The units and date formats come from the historical
+ * database: this is where their quirks are absorbed.
  */
 
 /**
- * Tailles stockées en mébioctets par le collector, quel que soit le nom de la
- * colonne : `mem_bytes` vaut 4096 sur un node de 4 Gio, et `disk_size` 40960 sur un
- * disque de 40 Gio.
+ * Sizes stored in mebibytes by the collector, whatever the column is called:
+ * `mem_bytes` is 4096 on a node with 4 GiB, and `disk_size` is 40960 on a 40 GiB
+ * disk.
  */
 export function formatSizeMiB(value: number | undefined, locale: string): string {
   if (value === undefined || value <= 0) return "";
-  // Sous le gibioctet, en mébioctets : 16 Mio affichés « 0 GiB » ne diraient rien.
+  // Below the gibibyte, in mebibytes: 16 MiB shown as "0 GiB" would say nothing.
   if (value < 1024) return `${value.toLocaleString(locale, { maximumFractionDigits: 0 })} MiB`;
   const gib = value / 1024;
   return `${gib.toLocaleString(locale, { maximumFractionDigits: gib < 10 ? 1 : 0 })} GiB`;
 }
 
 /**
- * Le collector renvoie « 2026-09-15 15:06:23.000 », qui n'est pas de l'ISO 8601 :
- * sans le T, Safari refuse de la parser.
+ * The collector returns "2026-09-15 15:06:23.000", which is not ISO 8601: without the
+ * T, Safari refuses to parse it.
  *
- * L'horodatage ne porte aucun fuseau : il est interprété dans celui du navigateur,
- * donc juste tant que le navigateur est à l'heure du collector. Voir notes.md.
+ * The timestamp carries no time zone: it is read in the browser's one, and is
+ * therefore right only as long as the browser keeps the collector's time. See
+ * notes.md.
  */
 export function parseCollectorDate(value: string | undefined): Date | null {
   if (value === undefined || value === "") return null;
@@ -29,7 +30,7 @@ export function parseCollectorDate(value: string | undefined): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-/** Date et heure localisées, ou la valeur telle quelle si elle n'en est pas une. */
+/** Localised date and time, or the value as it is when it is not one. */
 export function formatDateTime(value: string | undefined, locale: string): string {
   if (value === undefined || value === "") return "";
   const parsed = parseCollectorDate(value);
@@ -38,8 +39,8 @@ export function formatDateTime(value: string | undefined, locale: string): strin
 }
 
 /**
- * Date seule, localisée, pour les échéances dont l'heure ne dit rien : les dates
- * d'obsolescence sont saisies au jour et stockées à minuit.
+ * Date alone, localised, for deadlines whose time says nothing: obsolescence dates
+ * are entered by the day and stored at midnight.
  */
 export function formatDate(value: string | undefined, locale: string): string {
   if (value === undefined || value === "") return "";
@@ -60,11 +61,11 @@ const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
 ];
 
 /**
- * Écart à maintenant, en toutes lettres : « il y a 5 minutes », « hier ».
+ * Distance from now, in words: "5 minutes ago", "yesterday".
  *
- * L'unité retenue est la plus grande qui tienne, et l'écart est tronqué plutôt
- * qu'arrondi : à 90 secondes on lit « il y a 1 minute » et non « il y a 2 minutes »,
- * pour ne jamais annoncer un contact plus ancien qu'il ne l'est.
+ * The unit kept is the largest that fits, and the distance is truncated rather than
+ * rounded: at 90 seconds one reads "1 minute ago" and not "2 minutes ago", so that a
+ * contact is never announced as older than it is.
  */
 export function formatRelativeTime(
   value: string | undefined,

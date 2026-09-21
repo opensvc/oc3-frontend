@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import type { ObjectState } from "@/components/opensvc/StatusBadge";
 
-/** Un emplacement `%(clé)s` ou `%(clé)d` du format Python des journaux du collector. */
+/** A `%(key)s` or `%(key)d` placeholder of the Python format of the collector logs. */
 const PLACEHOLDER = /%\(([^)]+)\)[sd]/g;
 
 /**
- * `log_dict` est un objet JSON sérialisé en chaîne. `null` signale un contenu
- * illisible, à distinguer d'un journal sans valeurs.
+ * `log_dict` is a JSON object serialised as a string. `null` signals unreadable
+ * content, to be told apart from a log entry without values.
  */
 function parseDict(dict: string | null | undefined): Record<string, unknown> | null {
   if (dict === null || dict === undefined || dict === "") return {};
@@ -27,10 +27,10 @@ function valueText(value: unknown): string {
 }
 
 /**
- * Message d'un journal : `log_fmt` dont chaque emplacement reçoit la valeur de
- * `log_dict`, en gras comme dans le collector historique (`cell_decorator_log_event`).
- * Un emplacement sans valeur reste tel quel ; un `log_dict` illisible laisse le
- * format brut, signalé par `corrupted`.
+ * Message of a log entry: `log_fmt` with each placeholder receiving the value from
+ * `log_dict`, in bold as in the historical collector
+ * (`cell_decorator_log_event`). A placeholder without a value stays as it is; an
+ * unreadable `log_dict` leaves the raw format, signalled by `corrupted`.
  */
 export function formatLogMessage(
   fmt: string | undefined,
@@ -64,9 +64,9 @@ export function formatLogMessage(
 }
 
 /**
- * Niveau d'un journal vers la forme et la couleur d'un badge d'état, comme les
- * couleurs du collector historique (`cell_decorator_log_level`) : info vert,
- * warning orange, error rouge. Le libellé reste le niveau lui-même.
+ * Level of a log entry to the shape and colour of a state badge, like the colours of
+ * the historical collector (`cell_decorator_log_level`): info green, warning orange,
+ * error red. The label stays the level itself.
  */
 export function logLevelState(level: string | undefined): ObjectState {
   switch (level) {

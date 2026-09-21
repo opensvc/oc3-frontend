@@ -14,10 +14,10 @@ const OUTPUT =
   "max-h-64 overflow-auto rounded-(--radius-control) bg-surface-sunken p-2 text-data whitespace-pre-wrap";
 
 /**
- * Détail d'une action de la file : ce que l'agent a reçu, et ce qu'il en a renvoyé.
+ * Detail of an action in the queue: what the agent received, and what it returned.
  *
- * Panneau écrit à la main plutôt que monté sur `DetailPanel` : la sortie standard et
- * la sortie d'erreur se lisent en bloc préformaté, pas en liste de propriétés.
+ * A panel written by hand rather than built on `DetailPanel`: the standard output and
+ * the error output read as preformatted blocks, not as a list of properties.
  */
 export function ActionDetailPanel({
   actionId,

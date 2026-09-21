@@ -16,7 +16,7 @@ const EMPTY: Record<Field, string> = {
   loc_city: "",
 };
 
-/** Codes application, pour proposer un choix plutôt qu'une saisie libre. */
+/** Application codes, to offer a choice rather than free input. */
 function useAppCodes() {
   return useQuery({
     queryKey: ["apps", "codes"],
@@ -32,13 +32,13 @@ function useAppCodes() {
 }
 
 /**
- * Création d'un node à la main, comme l'entrée « add node » de la gestion de données
- * du collector historique. En marche normale un node se crée tout seul, en
- * s'enregistrant depuis l'agent.
+ * Creating a node by hand, like the "add node" entry of the historical collector's
+ * data management. In normal operation a node creates itself, by registering from
+ * the agent.
  *
- * `POST /nodes` crée ou met à jour : un nodename déjà pris modifierait le node
- * existant au lieu d'échouer. Un formulaire de création ne doit pas faire ça en
- * silence, d'où la vérification préalable.
+ * `POST /nodes` creates or updates: a nodename already taken would modify the
+ * existing node instead of failing. A creation form must not do that silently, hence
+ * the check beforehand.
  */
 export function CreateNodePanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
@@ -84,7 +84,7 @@ export function CreateNodePanel({ open, onClose }: { open: boolean; onClose: () 
 
   return (
     <SlideOver
-      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      // Data-entry drawer: a click beside it must not clear what has been typed.
       closeOnOutsideClick={false}
       open={open}
       title={t("nodes.create.title")}
@@ -121,7 +121,7 @@ export function CreateNodePanel({ open, onClose }: { open: boolean; onClose: () 
             }}
             className="h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2"
           >
-            {/* Vide : le serveur retient alors le code application par défaut de l'utilisateur. */}
+            {/* Empty: the server then keeps the user's default application code. */}
             <option value="">{t("nodes.create.defaultApp")}</option>
             {(appCodes.data ?? []).map((code) => (
               <option key={code} value={code}>

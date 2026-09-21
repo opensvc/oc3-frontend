@@ -24,15 +24,15 @@ import { formatLogMessage, logLevelState } from "./log-message";
 type LogRow = components["schemas"]["LogRow"];
 
 /**
- * Par date, du plus récent au plus ancien. Beaucoup de journaux partagent la même
- * seconde : l'identifiant, croissant avec l'écriture, les départage dans le même
- * ordre, sans quoi la pagination pourrait répéter ou sauter des lignes à égalité.
+ * By date, from the most recent to the oldest. Many log entries share the same
+ * second: the id, which grows with writing, breaks the tie in the same order, without
+ * which pagination could repeat or skip rows on equal dates.
  */
 const DEFAULT_SORT = ["-log_date", "-id"];
 
 /**
- * Propriétés exposées par apicollector, noms joints compris. `log_fmt` porte la
- * colonne « Message » : elle affiche le format complété par `log_dict`.
+ * Properties exposed by apicollector, joined names included. `log_fmt` carries the
+ * "Message" column: it shows the format filled in from `log_dict`.
  */
 const LOG_PROPS = [
   "log_date",
@@ -51,7 +51,7 @@ const LOG_PROPS = [
   "log_email_sent",
 ] as const satisfies readonly (keyof LogRow)[];
 
-/** Colonnes par défaut : celles de la table historique (`default_columns`). */
+/** Default columns: those of the historical table (`default_columns`). */
 const DEFAULT_COLS: string[] = [
   "log_date",
   "log_level",
@@ -82,14 +82,14 @@ const FAMILY: Record<string, ColumnFamily> = {
 };
 
 /**
- * Colonnes affichées et identifiant ; le message a besoin des valeurs de `log_dict`,
- * et le nom du node de son OS pour le logo.
+ * Columns shown and the id; the message needs the values from `log_dict`, and the
+ * name of the node needs its OS for the logo.
  */
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, [...LOG_PROPS]);
   const extra = [
     ...(shown.includes("log_fmt") ? ["log_dict"] : []),
-    // Les noms joints sont des puces vers leur vue : il leur faut leur identifiant.
+    // The joined names are badges towards their view: they need their id.
     ...(shown.includes("nodes.nodename") ? ["node_id"] : []),
     ...(shown.includes("services.svcname") ? ["svc_id"] : []),
   ];
@@ -100,7 +100,7 @@ function useLogs(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["logs", search.sort, search.offset, search.limit, search.fset, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/logs", {
         params: {
           query: {
@@ -130,7 +130,7 @@ export function LogsPage() {
   const { data, isPending, isError, error, isFetching } = useLogs(search);
   const filtersets = useFiltersets();
 
-  /** Identifiants de toute la sélection, filterset compris, sans pagination. */
+  /** Ids of the whole selection, filterset included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/logs", {
       params: {
@@ -150,7 +150,7 @@ export function LogsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({

@@ -10,13 +10,13 @@ const text = (prop: keyof UserRow) => (row: UserRow) => {
 
 const field = (prop: keyof UserRow) => ({ prop, format: text(prop) });
 
-/** Booléens du collector (« T » / « F »), en interrupteur et en lecture seule. */
+/** Collector booleans ("T" / "F"), as a switch and read-only. */
 const flag = (prop: keyof UserRow) => ({ ...field(prop), input: "boolean" as const });
 
 /**
- * Propriétés d'un utilisateur, communes au panneau de détail et à la page de profil,
- * en lecture seule. `registration_id` et `reset_password_key` n'y figurent pas : la
- * clé de réinitialisation suffit à changer un mot de passe, voir notes.md.
+ * Properties of a user, shared by the detail panel and the profile page, read-only.
+ * `registration_id` and `reset_password_key` are not among them: the reset key is
+ * enough to change a password, see notes.md.
  */
 export const USER_GROUPS: DetailGroup<UserRow>[] = [
   {

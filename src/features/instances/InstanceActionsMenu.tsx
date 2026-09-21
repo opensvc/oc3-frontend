@@ -5,9 +5,9 @@ import { SERVICE_ACTIONS } from "@/features/services/ServiceActionsMenu";
 import { fromInstanceId } from "./instance-id";
 
 /**
- * Actions d'agent d'une instance : les mêmes que pour un service, mais posées sur
- * son node et limitées à cette instance (l'API ajoute `--local`). La cible est
- * désignée par l'identifiant d'instance `svc_id@node_id`.
+ * Agent actions of an instance: the same as for a service, but posted on its node and
+ * limited to that instance (the API adds `--local`). The target is named by the
+ * instance id `svc_id@node_id`.
  */
 export function InstanceActionsMenu({ instances }: { instances: ActionTarget[] }) {
   return (

@@ -11,9 +11,9 @@ type Field = (typeof FIELDS)[number];
 const EMPTY: Record<Field, string> = { app: "", description: "", app_domain: "", app_team_ops: "" };
 
 /**
- * Création d'un code application. Le serveur refuse un code déjà pris (409) et
- * demande le privilège AppManager (403) : on affiche son message tel quel plutôt
- * que de deviner la règle côté client.
+ * Creating an application code. The server refuses a code already taken (409) and
+ * requires the AppManager privilege (403): its message is shown as it is rather than
+ * guessing the rule on the client side.
  */
 export function CreateAppPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
@@ -47,7 +47,7 @@ export function CreateAppPanel({ open, onClose }: { open: boolean; onClose: () =
 
   return (
     <SlideOver
-      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      // Data-entry drawer: a click beside it must not clear what has been typed.
       closeOnOutsideClick={false}
       open={open}
       title={t("apps.create.title")}

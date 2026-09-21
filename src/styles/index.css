@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Expose les tokens comme utilitaires Tailwind : bg-surface, text-ink, border-line, text-state-down... */
+/* Exposes the tokens as Tailwind utilities: bg-surface, text-ink, border-line, text-state-down... */
 @theme inline {
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
@@ -60,7 +60,7 @@
     outline: 2px solid var(--focus-ring);
     outline-offset: 1px;
   }
-  /* Les chiffres s'alignent en colonne dans toutes les données tabulaires */
+  /* Digits line up in a column across all tabular data */
   table,
   [data-numeric] {
     font-variant-numeric: tabular-nums;

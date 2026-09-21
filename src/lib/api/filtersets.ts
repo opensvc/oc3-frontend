@@ -2,9 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "./client";
 
 /**
- * Noms des filtersets du collector. C'est le seul filtrage qu'apicollector expose :
- * les listes n'acceptent aucun paramètre de filtre ad hoc, seulement ces ensembles
- * enregistrés côté serveur.
+ * Names of the collector filtersets. This is the only filtering apicollector exposes:
+ * the lists accept no ad hoc filter parameter, only these sets saved server side.
  */
 export function useFiltersets() {
   return useQuery({

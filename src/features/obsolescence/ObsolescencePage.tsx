@@ -22,9 +22,9 @@ import { ObsolescenceDetailPanel } from "./ObsolescenceDetailPanel";
 type ObsolescenceSettingRow = components["schemas"]["ObsolescenceSettingRow"];
 
 /**
- * Vide : apicollector refuse tout `orderby` sur cet endpoint. Le mapping
- * `obsolescence` ne décrit ses props que par des expressions SQL sur la vue
- * `v_obsolescence`, sans la référence de colonne que `buildOrderBy` exige.
+ * Empty: apicollector refuses any `orderby` on this endpoint. The `obsolescence`
+ * mapping describes its props only by SQL expressions over the `v_obsolescence` view,
+ * without the column reference `buildOrderBy` requires.
  */
 const DEFAULT_SORT: string[] = [];
 
@@ -41,7 +41,7 @@ const OBSOLESCENCE_PROPS = [
   "obs_alert_date_updated",
 ] as const satisfies readonly (keyof ObsolescenceSettingRow)[];
 
-/** Colonnes par défaut : ce que vise le réglage, combien de nodes, et ses deux échéances. */
+/** Default columns: what the setting aims at, how many nodes, and its two deadlines. */
 const DEFAULT_COLS: string[] = [
   "obs_type",
   "obs_name",
@@ -52,7 +52,7 @@ const DEFAULT_COLS: string[] = [
 
 const NUMERIC_PROPS = new Set<string>(["id", "obs_count"]);
 
-/** Échéances saisies au jour : l'heure n'y porte rien. */
+/** Deadlines entered by the day: the time carries nothing there. */
 const DEADLINE_PROPS = new Set<string>(["obs_warn_date", "obs_alert_date"]);
 const TIMESTAMP_PROPS = new Set<string>(["obs_warn_date_updated", "obs_alert_date_updated"]);
 
@@ -71,7 +71,7 @@ const FAMILY: Record<string, ColumnFamily> = {
 
 const ALL_PROPS = [...OBSOLESCENCE_PROPS];
 
-/** Colonnes affichées, plus l'identifiant qui sert au détail. */
+/** Columns shown, plus the id used by the detail. */
 function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
@@ -80,7 +80,7 @@ function useSettings(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["obsolescence", search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/obsolescence/settings", {
         params: {
           query: {
@@ -109,10 +109,10 @@ export function ObsolescencePage() {
   const { data, isPending, isError, error, isFetching } = useSettings(search);
 
   /**
-   * Création des réglages manquants. Le collector ne crée pas de réglage à la main :
-   * il en ajoute un pour chaque modèle matériel et chaque version d'OS remontés par
-   * les nodes qui n'en ont pas encore, comme l'action « refresh obsolescence » du
-   * collector historique. Les réglages existants et leurs dates ne sont pas touchés.
+   * Creating the missing settings. The collector does not create a setting by hand:
+   * it adds one for each hardware model and each OS version reported by the nodes
+   * that do not have one yet, like the "refresh obsolescence" action of the
+   * historical collector. Existing settings and their dates are left untouched.
    */
   const refresh = useMutation({
     mutationFn: async () => {
@@ -124,7 +124,7 @@ export function ObsolescencePage() {
     },
   });
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/obsolescence/settings", {
       params: { query: { props: "id", limit: 0 } },
@@ -138,7 +138,7 @@ export function ObsolescencePage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -205,7 +205,7 @@ export function ObsolescencePage() {
         rowId={(row) => (row.id === undefined ? undefined : String(row.id))}
         search={search}
         onChange={update}
-        // Les filtersets du collector ne portent pas sur ces réglages.
+        // The collector filtersets do not bear on these settings.
         filtersets={[]}
         isPending={isPending}
         isFetching={isFetching}

@@ -11,14 +11,14 @@ const styles: Record<ObjectState, { ink: string; glyph: string }> = {
 };
 
 /**
- * État d'un objet OpenSVC : une forme, une teinte et un libellé, sans fond coloré.
- * La forme distingue les états sans la couleur, pour rester lisible en cas de
- * daltonisme ou d'impression en niveaux de gris.
+ * State of an OpenSVC object: a shape, a tint and a label, without a coloured
+ * background. The shape tells the states apart without colour, to stay readable for
+ * colour blindness or greyscale printing.
  *
- * Largeur fixe, taillée pour le libellé le plus long (« stdby down ») : dans une
- * colonne, les badges s'alignent en un bloc régulier, glyphes compris, quel que soit
- * l'état. `label` remplace le libellé de l'état quand la valeur de l'agent est plus
- * précise, comme « stdby up » affiché avec la forme de « up ».
+ * Fixed width, cut for the longest label ("stdby down"): in a column, the badges
+ * line up as a regular block, glyphs included, whatever the state. `label` replaces
+ * the label of the state when the agent's value is more precise, such as "stdby up"
+ * shown with the shape of "up".
  */
 export function StatusBadge({
   state,

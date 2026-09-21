@@ -18,13 +18,13 @@ import { TagsPage } from "@/features/tags/TagsPage";
 import { UsersPage } from "@/features/users/UsersPage";
 import { parseListSearch } from "@/lib/list-search";
 
-// Routage déclaré en code pour le bootstrap. Passage au routage par fichiers
-// (plugin @tanstack/router-plugin) à décider quand le nombre de vues grossira.
+// Routing declared in code for the bootstrap. Moving to file-based routing (the
+// @tanstack/router-plugin) to be decided when the number of views grows.
 const rootRoute = createRootRoute({ component: AppShell });
 
-// Le dashboard est la page d'accueil : c'est la vue d'entrée du collector,
-// celle qui dit ce qui va mal avant qu'on aille chercher un objet précis.
-// Tri, pagination, filterset, colonnes et ligne sélectionnée vivent dans l'URL.
+// The dashboard is the home page: it is the collector's entry view, the one that
+// says what is going wrong before looking for a particular object.
+// Sort, pagination, filterset, columns and selected row live in the URL.
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
@@ -32,8 +32,7 @@ const dashboardRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
-// Les liens vers l'ancienne adresse du dashboard continuent de fonctionner,
-// avec leur état d'URL.
+// Links to the old dashboard address keep working, with their URL state.
 const dashboardRedirectRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/dashboard",
@@ -142,7 +141,7 @@ const actionsRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
-// Profil de l'utilisateur connecté : pas d'état de liste, donc pas de recherche.
+// Profile of the signed-in user: no list state, hence no search.
 const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/profile",

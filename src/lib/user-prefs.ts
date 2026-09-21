@@ -6,34 +6,34 @@ import type { ListSearch } from "./list-search";
 import { applyTheme, cachedTheme, isTheme, watchSystemTheme, type Theme } from "./theme";
 
 /**
- * Préférences de l'utilisateur, telles que l'ancien collector les range dans la
- * colonne `prefs` de `user_prefs` : un objet JSON libre, enregistré tel quel par
- * `POST /users/self/prefs`. Les colonnes visibles d'une vue y vivent sous
- * `tables.<vue>.visible_columns`, comme dans `init/static/js/osvc/tables/table.js`,
- * pour qu'un compte retrouve ses colonnes d'une interface à l'autre. Le tri est
- * rangé à côté, sous `tables.<vue>.sort` : l'ancienne interface ne le gardait pas,
- * cette clé lui est donc inconnue et sans effet pour elle.
+ * User preferences, as the historical collector keeps them in the `prefs` column of
+ * `user_prefs`: a free JSON object, stored as it is by `POST /users/self/prefs`. The
+ * visible columns of a view live under `tables.<view>.visible_columns`, as in
+ * `init/static/js/osvc/tables/table.js`, so that an account finds its columns again
+ * from one interface to the other. The sort sits next to them, under
+ * `tables.<view>.sort`: the old interface did not keep it, so that key is unknown to
+ * it and without effect there.
  *
- * Le reste de l'objet — filtres de colonne, mode direct, entrées de menu masquées —
- * appartient à l'ancienne interface : il est relu et réenregistré sans y toucher.
+ * The rest of the object — column filters, live mode, hidden menu entries — belongs
+ * to the old interface: it is read back and stored again untouched.
  */
-/** Préférences d'une vue : ce qui suit le compte plutôt que l'URL. */
+/** Preferences of a view: what follows the account rather than the URL. */
 export interface ViewPrefs {
   visible_columns?: string[];
-  /** Clés de tri, préfixées de `-` pour l'ordre descendant, comme dans l'URL. */
+  /** Sort keys, prefixed with `-` for descending order, as in the URL. */
   sort?: string[];
 }
 
 export interface UserPrefs {
   tables?: Record<string, ViewPrefs | undefined>;
-  /** Thème choisi ; absent vaut « système ». */
+  /** Chosen theme; absent means "system". */
   theme?: string;
   [key: string]: unknown;
 }
 
 const PREFS_KEY = ["user", "self", "prefs"];
 
-/** Délai d'écriture, comme l'ancien collector : cocher trois colonnes n'écrit qu'une fois. */
+/** Write delay, as in the old collector: ticking three columns writes only once. */
 const SAVE_DELAY = 1500;
 
 function asPrefs(value: unknown): UserPrefs {
@@ -48,17 +48,17 @@ async function fetchPrefs(): Promise<UserPrefs> {
   return asPrefs(data.data);
 }
 
-/** Préférences courantes, chargées une fois et partagées par toutes les vues. */
+/** Current preferences, loaded once and shared by every view. */
 export function useUserPrefs() {
   return useQuery({ queryKey: PREFS_KEY, queryFn: fetchPrefs, staleTime: 5 * 60 * 1000 });
 }
 
 /**
- * Colonnes et tri enregistrés pour une vue, et de quoi les mettre à jour.
+ * Columns and sort saved for a view, and what it takes to update them.
  *
- * L'URL reste prioritaire : un lien partagé montre ses colonnes et son tri, pas ceux
- * de qui l'ouvre. Les préférences ne servent donc que lorsque l'URL n'en porte pas,
- * et revenir aux colonnes par défaut efface l'entrée enregistrée.
+ * The URL keeps priority: a shared link shows its columns and its sort, not those of
+ * whoever opens it. Preferences therefore only serve when the URL carries none, and
+ * going back to the default columns clears the saved entry.
  */
 export function useViewPrefs(view: string) {
   const queryClient = useQueryClient();
@@ -83,7 +83,7 @@ export function useViewPrefs(view: string) {
       }),
   });
 
-  /** Enregistre après un court délai ; un nouvel appel annule le précédent. */
+  /** Saves after a short delay; a new call cancels the previous one. */
   function later(key: keyof ViewPrefs, value: string[] | undefined) {
     const timer = `${view}:${key}`;
     clearTimeout(timers.get(timer));
@@ -108,7 +108,7 @@ export function useViewPrefs(view: string) {
   };
 }
 
-/** Un compte à rebours par vue et par clé : deux écritures ne s'annulent pas l'une l'autre. */
+/** One timer per view and per key: two writes do not cancel each other. */
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 async function ensurePrefs(queryClient: QueryClient): Promise<UserPrefs> {
@@ -116,10 +116,10 @@ async function ensurePrefs(queryClient: QueryClient): Promise<UserPrefs> {
 }
 
 /**
- * Applique une modification à l'objet de préférences et l'enregistre.
+ * Applies a change to the preferences object and saves it.
  *
- * L'objet est relu avant d'être réécrit : le serveur remplace le tout, et une autre
- * vue a pu enregistrer ses colonnes entre-temps.
+ * The object is read back before being written again: the server replaces the whole
+ * of it, and another view may have saved its columns in the meantime.
  */
 export async function savePrefs(
   queryClient: QueryClient,
@@ -135,8 +135,8 @@ export async function savePrefs(
 }
 
 /**
- * Complète l'état d'URL d'une vue avec ses préférences, avant sa résolution :
- * l'URL l'emporte, les préférences ne comblent que son absence.
+ * Completes the URL state of a view with its preferences, before resolving it: the
+ * URL wins, preferences only fill in what it does not carry.
  */
 export function withSavedSearch(
   search: ListSearch,
@@ -150,11 +150,11 @@ export function withSavedSearch(
 }
 
 /**
- * Thème choisi, appliqué et enregistré.
+ * Chosen theme, applied and saved.
  *
- * Le thème mis en cache localement s'applique dès le démarrage (`src/main.tsx`) ;
- * dès que les préférences du compte arrivent, c'est leur valeur qui fait foi, pour
- * qu'un même compte retrouve son thème sur une autre machine.
+ * The locally cached theme applies from startup (`src/main.tsx`); as soon as the
+ * account preferences arrive, their value is the one that counts, so that the same
+ * account finds its theme again on another machine.
  */
 export function useThemePref() {
   const queryClient = useQueryClient();
@@ -166,7 +166,7 @@ export function useThemePref() {
     applyTheme(theme);
   }, [theme]);
 
-  // Le thème du système peut changer pendant la session, écran veille ou horaire.
+  // The system theme may change during the session, from a sleeping screen or an hour.
   const current = useRef(theme);
   current.current = theme;
   useEffect(() => watchSystemTheme(() => current.current), []);
@@ -189,11 +189,11 @@ export function useThemePref() {
 }
 
 /**
- * Oublie les colonnes et le tri enregistrés pour toutes les vues.
+ * Forgets the columns and the sort saved for every view.
  *
- * Seules ces deux clés sont retirées : l'ancienne interface range dans le même objet
- * la taille de page, ses filtres de colonne et l'état plié de ses sections, qui ne
- * sont pas les nôtres à effacer. Une vue dont il ne reste rien disparaît de `tables`.
+ * Only those two keys are removed: the old interface keeps the page size, its column
+ * filters and the folded state of its sections in the same object, and those are not
+ * ours to clear. A view left with nothing disappears from `tables`.
  */
 export function useResetViewPrefs() {
   const queryClient = useQueryClient();
@@ -220,7 +220,7 @@ export function useResetViewPrefs() {
   };
 }
 
-/** Vrai si au moins une vue a des colonnes ou un tri enregistrés. */
+/** True when at least one view has saved columns or a saved sort. */
 export function hasSavedViewPrefs(prefs: UserPrefs | undefined): boolean {
   return Object.values(prefs?.tables ?? {}).some(
     (entry) => entry?.visible_columns !== undefined || entry?.sort !== undefined,

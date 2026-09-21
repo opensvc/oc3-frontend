@@ -10,31 +10,31 @@ import { readPropAsString } from "@/lib/row";
 import { problemText } from "@/lib/api/problem";
 
 export interface DetailField<T> {
-  /** Nom du prop apicollector : sert de clé de libellé et de clé React. */
+  /** Name of the apicollector prop: serves as label key and React key. */
   prop: string;
   format: (row: T, locale: string) => string | undefined;
   /**
-   * Affichage de la valeur quand elle vaut mieux qu'un texte : la puce d'un objet
-   * d'une autre vue, par exemple. `format` reste la valeur brute, qui décide de
-   * l'affichage de la ligne et sert à la saisie.
+   * Display of the value when it deserves better than text: the badge of an object
+   * from another view, for instance. `format` stays the raw value, which decides
+   * whether the row is shown and serves for editing.
    */
   render?: (row: T, locale: string) => ReactNode;
   /**
-   * Vrai pour un attribut que l'utilisateur peut fixer. N'y figurent que ceux que la
-   * remontée d'inventaire de l'agent n'écrase pas : modifier les autres ne tiendrait
-   * que jusqu'à la remontée suivante.
+   * True for an attribute the user may set. Only those the agent's inventory push
+   * does not overwrite are listed: changing the others would hold only until the
+   * next push.
    */
   editable?: boolean;
   /**
-   * Nature de la saisie ; « text » par défaut. Elle détermine aussi le type envoyé :
-   * le corps de l'API attend un entier pour `power_supply_nb` et un booléen pour
-   * `notifications`, et refuse la chaîne équivalente.
+   * Nature of the input; "text" by default. It also decides the type sent: the API
+   * body expects an integer for `power_supply_nb` and a boolean for `notifications`,
+   * and refuses the equivalent string.
    */
   input?: "text" | "date" | "number" | "boolean";
   /**
-   * Valeurs proposées à la saisie, quand l'attribut en a une liste connue : la
-   * modification se fait alors dans une liste déroulante plutôt qu'en texte libre.
-   * La liste vient de l'appelant, qui seul sait l'interroger.
+   * Values offered for the input, when the attribute has a known list of them:
+   * editing then happens in a dropdown rather than in free text. The list comes from
+   * the caller, who alone knows how to query it.
    */
   optionsKey?: string;
 }
@@ -47,9 +47,9 @@ export interface DetailGroup<T> {
 }
 
 /**
- * Graphies booléennes du collector : « T » / « F » le plus souvent, 0 / 1 pour les
- * `tinyint` et certains `varchar(1)`. Une autre valeur s'affiche en texte : mieux vaut
- * la montrer telle quelle que la ranger d'office du côté « non ».
+ * Boolean spellings of the collector: "T" / "F" most of the time, 0 / 1 for the
+ * `tinyint` and some `varchar(1)`. Any other value is shown as text: better to show
+ * it as it is than to file it away on the "no" side.
  */
 const TRUE_SPELLINGS = new Set(["T", "1"]);
 const FALSE_SPELLINGS = new Set(["F", "0"]);
@@ -60,7 +60,7 @@ function readBoolean(raw: string): boolean | undefined {
   return undefined;
 }
 
-/** Valeur envoyée à l'API, dans le type que son corps attend. */
+/** Value sent to the API, in the type its body expects. */
 function toPayload(input: DetailField<unknown>["input"], value: string): string | number | boolean {
   if (input === "boolean") return value === "true";
   if (input === "number") return value === "" ? 0 : Number(value);
@@ -78,38 +78,37 @@ function toDateInput(value: string): string {
 interface DetailContentProps<T> {
   groups: DetailGroup<T>[];
   row: T | null | undefined;
-  /** Espace de noms i18n des libellés de propriétés, ex. "services.fields". */
+  /** i18n namespace of the property labels, e.g. "services.fields". */
   labelPrefix: string;
   /** Espace de noms i18n des titres de groupes, ex. "services.detail.groups". */
   groupPrefix: string;
   isPending: boolean;
   errorMessage: string | null;
-  /** Actions portant sur l'objet affiché, par exemple sa suppression. */
+  /** Actions on the object on display, for example deleting it. */
   actions?: ReactNode;
-  /** Enregistre une propriété. Rejette pour signaler un refus du serveur. */
+  /** Saves a property. Rejects to signal a refusal from the server. */
   onSave?: (changes: Record<string, string | number | boolean>) => Promise<void>;
   /**
-   * Note affichée sous les propriétés quand la modification est possible. Par défaut,
-   * celle des nodes, dont une partie des attributs vient de l'agent ; chaque objet
-   * dont la règle diffère fournit la sienne.
+   * Note shown under the properties when editing is possible. By default the one for
+   * nodes, part of whose attributes come from the agent; every object whose rule
+   * differs provides its own.
    */
   editHint?: string;
   /**
-   * Valeurs proposées pour les attributs qui en déclarent une liste (`optionsKey`).
-   * L'appelant les fournit : lui seul sait où les chercher, les équipes par exemple.
-   * Une liste vide laisse la saisie libre.
+   * Values offered for the attributes that declare a list of them (`optionsKey`).
+   * The caller provides them: it alone knows where to look, teams for instance. An
+   * empty list leaves the input free.
    */
   options?: Record<string, string[]>;
 }
 
 /**
- * Propriétés d'un objet du collector, en groupes de listes de définitions, sans
- * cadre : le tiroir de `DetailPanel` et les pages pleines comme le profil les
- * posent chacun dans leur mise en page. Le chargement est fait par l'appelant, qui
- * seul connaît son endpoint.
+ * Properties of a collector object, in groups of definition lists, without a frame:
+ * the `DetailPanel` drawer and the full pages such as the profile each place them in
+ * their own layout. Loading is done by the caller, which alone knows its endpoint.
  *
- * Quand `onSave` est fourni, les attributs marqués modifiables portent un crayon au
- * survol, qui bascule cette seule propriété en saisie.
+ * When `onSave` is provided, the attributes marked as editable carry a pencil on
+ * hover, which switches that one property to an input.
  */
 export function DetailContent<T>({
   groups,
@@ -144,7 +143,7 @@ export function DetailContent<T>({
     setSaveError(null);
   }
 
-  /** Bascule immédiate d'un booléen : l'interrupteur est déjà la commande. */
+  /** Immediate toggle of a boolean: the switch is already the control. */
   async function toggleBoolean(field: DetailField<T>, next: boolean) {
     if (onSave === undefined) return;
     setSaving(true);
@@ -188,8 +187,8 @@ export function DetailContent<T>({
       event.preventDefault();
       void commit(field);
     } else if (event.key === "Escape") {
-      // Le panneau écoute Échap au niveau du document : sans cela, annuler une
-      // saisie refermerait aussi le panneau.
+      // The panel listens for Escape at the document level: without this, cancelling
+      // an input would close the panel as well.
       event.stopPropagation();
       cancel();
     }
@@ -210,9 +209,9 @@ export function DetailContent<T>({
       {row !== null && row !== undefined && (
         <div className="flex flex-col gap-4">
           {groups.map((group) => {
-            // Les colonnes vides du collector sont légion : on ne montre que ce qui est
-            // renseigné. Un attribut modifiable reste visible même vide, sans quoi il
-            // n'y aurait rien à survoler pour le remplir.
+            // Empty columns are legion in the collector: only what is filled in is
+            // shown. An editable attribute stays visible even when empty, without which
+            // there would be nothing to hover over to fill it in.
             const entries = group.fields
               .map((field) => ({ field, value: field.format(row, locale) }))
               .filter(
@@ -231,9 +230,9 @@ export function DetailContent<T>({
                   {entries.map(({ field, value: shown }) => {
                     const label = t(`${labelPrefix}.${field.prop}`);
                     const isEditing = editing === field.prop;
-                    // Liste déroulante seulement si l'on a de quoi la remplir : sans
-                    // équipe déclarée, la saisie libre vaut mieux qu'un choix vide. La
-                    // valeur courante y figure toujours, fût-elle hors liste.
+                    // A dropdown only if there is something to fill it with: with no
+                    // team declared, free input is better than an empty choice. The
+                    // current value is always listed, even when outside the list.
                     const known =
                       field.optionsKey === undefined ? undefined : options?.[field.optionsKey];
                     const current = readPropAsString(row, field.prop);
@@ -247,8 +246,8 @@ export function DetailContent<T>({
                       field.input !== "boolean"
                         ? undefined
                         : readBoolean(readPropAsString(row, field.prop));
-                    // Un booléen modifiable garde son interrupteur même vide : l'absence
-                    // de valeur vaut « non », et c'est l'interrupteur qui permet de la fixer.
+                    // An editable boolean keeps its switch even when empty: the absence
+                    // of a value means "no", and the switch is what allows setting it.
                     const isBoolean =
                       field.input === "boolean" && (state !== undefined || field.editable === true);
                     const checked = state === true;
@@ -286,9 +285,9 @@ export function DetailContent<T>({
                                   <option value="false">{t("detail.no")}</option>
                                 </select>
                               ) : choices !== undefined ? (
-                                // La liste se filtre à la saisie : un collector peut
-                                // compter des dizaines d'équipes. Effacer le champ
-                                // vide l'attribut, ce que le collector accepte.
+                                // The list filters as one types: a collector may count
+                                // dozens of teams. Clearing the field clears the
+                                // attribute, which the collector accepts.
                                 <div
                                   className="min-w-0 flex-1"
                                   onKeyDown={(event) => {
@@ -366,8 +365,8 @@ export function DetailContent<T>({
                                 )}
                               </span>
                               {canEdit && field.editable === true && (
-                                // Invisible au repos mais présent et focusable : le
-                                // crayon reste atteignable au clavier.
+                                // Invisible at rest but present and focusable: the
+                                // pencil stays reachable from the keyboard.
                                 <button
                                   type="button"
                                   title={t("detail.editField", { field: label })}
@@ -411,7 +410,7 @@ export function DetailContent<T>({
 }
 
 /**
- * Panneau de détail d'un objet du collector : ses propriétés dans un tiroir latéral.
+ * Detail panel of a collector object: its properties in a side drawer.
  */
 export function DetailPanel<T>({
   open,
@@ -425,9 +424,9 @@ export function DetailPanel<T>({
   open: boolean;
   title: string;
   onClose: () => void;
-  /** Type d'objet, pour rappeler en tête de panneau d'où vient la ligne. */
+  /** Object kind, to recall at the head of the panel where the row comes from. */
   kind: ObjectKind;
-  /** Contenu placé avant les propriétés, comme les tags de l'objet. */
+  /** Content placed before the properties, such as the object's tags. */
   before?: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -440,7 +439,7 @@ export function DetailPanel<T>({
       leading={<ObjectIcon kind={kind} />}
     >
       {before}
-      {/* Une requête désactivée reste « en attente » : panneau fermé, rien à charger. */}
+      {/* A disabled query stays "pending": panel closed, nothing to load. */}
       <DetailContent {...content} isPending={open && isPending} />
     </SlideOver>
   );

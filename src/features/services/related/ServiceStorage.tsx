@@ -1,7 +1,7 @@
 import { StorageSections } from "@/components/opensvc/StorageSections";
 import { useServiceDisks, useServiceHbas } from "./queries";
 
-/** Stockage d'un service : HBA et disques regroupés par node, un groupe par node. */
+/** Storage of a service: HBAs and disks grouped by node, one group per node. */
 export function ServiceStorage({ svcId, locale }: { svcId: string; locale: string }) {
   const disks = useServiceDisks(svcId);
   const hbas = useServiceHbas(svcId);

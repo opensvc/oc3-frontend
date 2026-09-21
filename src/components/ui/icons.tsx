@@ -1,16 +1,14 @@
 import type { SVGProps } from "react";
 
 /**
- * Icônes du menu, dessinées ici plutôt qu'importées d'une bibliothèque.
+ * Menu icons, drawn here rather than imported from a library.
  *
- * Le collector historique utilise des glyphes Font Awesome 5 pleins ; on reste dans
- * ce registre — silhouettes pleines sur une grille de 24, pas de contour fin — sans
- * ajouter de dépendance npm ni embarquer une police entière pour sept pictogrammes.
- * Les tracés sont écrits à la main : reprendre ceux de Font Awesome imposerait son
- * attribution CC BY.
+ * The historical collector uses solid Font Awesome 5 glyphs; we stay in that register
+ * — solid silhouettes on a 24 grid, no thin outline — without adding an npm
+ * dependency nor shipping a whole font for seven pictograms. The paths are written by
+ * hand: reusing those of Font Awesome would require its CC BY attribution.
  *
- * Chaque icône hérite de `currentColor`, la couleur étant portée par la classe de
- * l'appelant.
+ * Every icon inherits `currentColor`, the colour being carried by the caller's class.
  */
 type IconProps = SVGProps<SVGSVGElement>;
 
@@ -49,9 +47,9 @@ export function ServerIcon(props: IconProps) {
 }
 
 /**
- * Services : une pile d'objets. Le collector historique utilise un disque plein
- * (fa-circle), mais ce glyphe sert déjà à l'état « up » dans StatusBadge : le
- * reprendre dans le menu rendrait les deux confondables.
+ * Services: a stack of objects. The historical collector uses a filled circle
+ * (fa-circle), but that glyph already stands for the "up" state in StatusBadge:
+ * reusing it in the menu would make the two easy to confuse.
  */
 export function StackIcon(props: IconProps) {
   return (
@@ -61,7 +59,7 @@ export function StackIcon(props: IconProps) {
   );
 }
 
-/** Réseaux : les nœuds câblés (fa-network-wired). */
+/** Networks: the wired nodes (fa-network-wired). */
 export function NetworkIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -70,7 +68,7 @@ export function NetworkIcon(props: IconProps) {
   );
 }
 
-/** Disques : le cylindre de base de données (fa-database). */
+/** Disks: the database cylinder (fa-database). */
 export function DatabaseIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -79,7 +77,7 @@ export function DatabaseIcon(props: IconProps) {
   );
 }
 
-/** Codes application : l'astérisque du collector (fa-asterisk). */
+/** Application codes: the collector's asterisk (fa-asterisk). */
 export function AsteriskIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -88,8 +86,8 @@ export function AsteriskIcon(props: IconProps) {
   );
 }
 
-/** Groupes : les silhouettes du collector (fa-users). */
-/** Instance de service : le disque à moitié plein du collector (fa-adjust, `svcinstance`). */
+/** Groups: the collector's silhouettes (fa-users). */
+/** Service instance: the collector's half-filled disc (fa-adjust, `svcinstance`). */
 export function InstanceIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -98,7 +96,7 @@ export function InstanceIcon(props: IconProps) {
   );
 }
 
-/** Obsolescence : la bouée du collector (fa-life-ring, `obs16`). */
+/** Obsolescence: the collector's life ring (fa-life-ring, `obs16`). */
 export function LifeRingIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -110,7 +108,7 @@ export function LifeRingIcon(props: IconProps) {
   );
 }
 
-/** Rafraîchissement : les deux flèches en cercle (fa-sync). */
+/** Refresh: the two arrows in a circle (fa-sync). */
 export function RefreshIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -154,9 +152,9 @@ export function UsersIcon(props: IconProps) {
   );
 }
 
-/* --- Icônes utilitaires. Neutres : ce sont des commandes, pas des objets. --- */
+/* --- Utility icons. Neutral: these are commands, not objects. --- */
 
-/** Ouverture d'un menu déroulant. */
+/** Opening a dropdown menu. */
 export function ChevronDownIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -165,7 +163,7 @@ export function ChevronDownIcon(props: IconProps) {
   );
 }
 
-/** Déconnexion (fa-sign-out-alt). */
+/** Sign out (fa-sign-out-alt). */
 export function SignOutIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -174,7 +172,7 @@ export function SignOutIcon(props: IconProps) {
   );
 }
 
-/** Sélecteur de colonnes. */
+/** Column picker. */
 export function ColumnsIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -192,7 +190,7 @@ export function SearchIcon(props: IconProps) {
   );
 }
 
-/** Retour aux valeurs par défaut. */
+/** Back to the default values. */
 export function ResetIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -239,7 +237,7 @@ export function EnvIcon(props: IconProps) {
   );
 }
 
-/** Zone de sécurité (fa-fire). */
+/** Security zone (fa-fire). */
 export function FirewallIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -266,7 +264,7 @@ export function CloudIcon(props: IconProps) {
   );
 }
 
-/** Système d'exploitation. */
+/** Operating system. */
 export function OsIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -284,7 +282,7 @@ export function CpuIcon(props: IconProps) {
   );
 }
 
-/** Mémoire (fa-memory). */
+/** Memory (fa-memory). */
 export function MemoryIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -341,7 +339,7 @@ export function DrpIcon(props: IconProps) {
   );
 }
 
-/** État d'un objet, rendu en badge. */
+/** State of an object, rendered as a badge. */
 export function StateIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -350,7 +348,7 @@ export function StateIcon(props: IconProps) {
   );
 }
 
-/** Édition. */
+/** Editing. */
 export function PencilIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -368,7 +366,7 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
-/** Ajout d'un élément à une liste. */
+/** Adding an item to a list. */
 export function PlusIcon(props: IconProps) {
   return (
     <Svg {...props}>

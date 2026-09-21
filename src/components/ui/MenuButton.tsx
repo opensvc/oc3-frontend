@@ -6,7 +6,7 @@ export interface MenuItem {
   label: string;
   icon?: ReactNode;
   disabled?: boolean;
-  /** Trait de séparation avant cette entrée, pour marquer un groupe. */
+  /** Separator line before this entry, to mark a group. */
   separatorBefore?: boolean;
   onSelect: () => void;
 }
@@ -15,11 +15,12 @@ const ITEM =
   "flex w-full items-center gap-2 rounded-(--radius-control) px-2 py-1.5 text-left text-ink hover:bg-surface focus:bg-surface focus:outline-none disabled:text-ink-muted/60 disabled:hover:bg-transparent";
 
 /**
- * Bouton ouvrant un menu d'actions, selon le motif « menu button » de l'ARIA APG,
- * comme le menu du compte dont il reprend le comportement : le bouton annonce le
- * menu et son état, l'ouverture au clavier place le focus sur la première entrée,
- * les flèches, Début et Fin parcourent les entrées, Échap referme et rend le focus
- * au bouton. Un clic hors du menu, Tab ou le choix d'une entrée le referment aussi.
+ * Button opening an action menu, following the "menu button" pattern of the ARIA
+ * APG, like the account menu whose behaviour it reuses: the button announces the
+ * menu and its state, opening from the keyboard puts the focus on the first entry,
+ * the arrows, Home and End walk through the entries, Escape closes and gives the
+ * focus back to the button. A click outside the menu, Tab or choosing an entry close
+ * it too.
  */
 export function MenuButton({
   label,
@@ -37,7 +38,7 @@ export function MenuButton({
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
-  // Entrée à focaliser à l'ouverture : la première au clavier, aucune à la souris.
+  // Entry to focus on opening: the first one from the keyboard, none with the mouse.
   const focusOnOpen = useRef<"first" | "last" | null>(null);
 
   function entries(): HTMLElement[] {
@@ -106,7 +107,7 @@ export function MenuButton({
         move(list.length - 1);
         break;
       case "Escape":
-        // Le panneau latéral écoute Échap au niveau du document : ne fermer que le menu.
+        // The side panel listens for Escape at the document level: close the menu only.
         event.preventDefault();
         event.stopPropagation();
         close(true);

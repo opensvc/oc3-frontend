@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
- * Bouton d'action irréversible : le premier clic arme, le second confirme.
- * Deux étapes plutôt qu'une fenêtre modale, pour rester au clavier et sans
- * piège de focus. Le bouton de confirmation prend le focus dès l'armement,
- * ce qui énonce la question aux lecteurs d'écran.
+ * Button for an irreversible action: the first click arms it, the second confirms.
+ * Two steps rather than a modal window, to stay on the keyboard and without a focus
+ * trap. The confirm button takes the focus as soon as it is armed, which reads the
+ * question out to screen readers.
  */
 export function ConfirmButton({
   label,
@@ -22,7 +22,7 @@ export function ConfirmButton({
   cancelLabel: string;
   pendingLabel: string;
   pending?: boolean;
-  /** Visuel placé avant le libellé du bouton d'armement. */
+  /** Visual placed before the label of the arming button. */
   icon?: ReactNode;
   onConfirm: () => void;
 }) {

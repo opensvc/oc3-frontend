@@ -8,11 +8,11 @@ import { SlideOver } from "@/components/ui/SlideOver";
 import { Switch } from "@/components/ui/Switch";
 
 /**
- * Création d'un filterset.
+ * Creating a filterset.
  *
- * `POST /filtersets` crée ou met à jour : un nom déjà pris modifierait le filterset
- * existant au lieu d'échouer (`server/handlers/post_filtersets.go`). D'où la
- * vérification préalable, comme pour les groupes.
+ * `POST /filtersets` creates or updates: a name already taken would modify the
+ * existing filterset instead of failing
+ * (`server/handlers/post_filtersets.go`). Hence the check beforehand, as for groups.
  */
 export function CreateFiltersetPanel({
   open,
@@ -56,7 +56,7 @@ export function CreateFiltersetPanel({
 
   return (
     <SlideOver
-      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      // Data-entry drawer: a click beside it must not clear what has been typed.
       closeOnOutsideClick={false}
       open={open}
       title={t("filtersets.create.title")}

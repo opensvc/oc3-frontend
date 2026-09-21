@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-/** Attributs du panneau associé à l'onglet actif. */
+/** Attributes of the panel bound to the active tab. */
 export function tabPanelProps(idPrefix: string, key: string) {
   return {
     id: `${idPrefix}-panel-${key}`,

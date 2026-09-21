@@ -1,4 +1,4 @@
-/** Calcul d'une plage IPv4, pour l'aperçu du formulaire de réseau. */
+/** Computing an IPv4 range, for the preview of the network form. */
 
 function toInt(address: string): number | null {
   const parts = address.trim().split(".");
@@ -18,20 +18,20 @@ function toAddress(value: number): string {
 }
 
 export interface Ipv4Range {
-  /** Adresse de réseau correspondant au préfixe. */
+  /** Network address matching the prefix. */
   network: string;
-  /** Vrai quand l'adresse saisie a des bits d'hôte : ce n'est pas l'adresse de réseau. */
+  /** True when the address entered has host bits: it is not the network address. */
   hostBitsSet: boolean;
   first: string;
   last: string;
   broadcast: string;
-  /** Adresses utilisables, hors réseau et diffusion. */
+  /** Usable addresses, network and broadcast excluded. */
   usable: number;
 }
 
 /**
- * Plage d'un réseau IPv4, calculée comme les colonnes générées de la table `networks`
- * (`begin`, `end`, `broadcast`). `null` pour une saisie incomplète ou invalide.
+ * Range of an IPv4 network, computed as the generated columns of the `networks`
+ * table are (`begin`, `end`, `broadcast`). `null` for an incomplete or invalid entry.
  */
 export function ipv4Range(address: string, prefix: number): Ipv4Range | null {
   const value = toInt(address);
@@ -48,7 +48,7 @@ export function ipv4Range(address: string, prefix: number): Ipv4Range | null {
   };
 }
 
-/** Vrai si l'adresse appartient à la plage. */
+/** True when the address belongs to the range. */
 export function ipv4Contains(range: Ipv4Range, prefix: number, address: string): boolean {
   const value = toInt(address);
   const network = toInt(range.network);

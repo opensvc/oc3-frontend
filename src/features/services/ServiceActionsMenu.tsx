@@ -3,12 +3,12 @@ import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 
 /**
- * Actions d'agent d'un service. L'API les pose sur un node du service vu vivant
- * depuis moins de quinze minutes, et sans `--local` : elles valent pour le service
- * entier, pas pour cette instance-là. Comme pour les nodes, seules les actions qui
- * n'interrompent pas le service sont proposées ; démarrage, arrêt, bascule,
- * synchronisations et provisionnement sont écartés pour l'instant, ici comme dans
- * la liste blanche de l'API (`serviceActions`, `post_service_action.go`).
+ * Agent actions of a service. The API posts them on a node of the service seen alive
+ * in the last fifteen minutes, and without `--local`: they apply to the whole
+ * service, not to that one instance. As for nodes, only the actions that do not
+ * interrupt the service are offered; start, stop, switch, synchronisations and
+ * provisioning are left out for now, here as in the API allowlist (`serviceActions`,
+ * `post_service_action.go`).
  */
 export const SERVICE_ACTIONS = [
   { action: "push resinfo" },

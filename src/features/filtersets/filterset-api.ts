@@ -7,8 +7,8 @@ type FiltersetRow = components["schemas"]["FiltersetRow"];
 type FiltersetExportEntry = components["schemas"]["FiltersetExportEntry"];
 
 /**
- * Opérateurs logiques qui joignent une entrée à la précédente, comme dans le collector
- * historique (`gen_filtersets_filters.f_log_op`) et l'enum du schéma OpenAPI.
+ * Logical operators joining an entry to the previous one, as in the historical
+ * collector (`gen_filtersets_filters.f_log_op`) and the enum of the OpenAPI schema.
  */
 export const LOG_OPS = ["AND", "AND NOT", "OR", "OR NOT"] as const;
 export type LogOp = (typeof LOG_OPS)[number];
@@ -17,7 +17,7 @@ export function isLogOp(value: string | undefined): value is LogOp {
   return LOG_OPS.some((op) => op === value);
 }
 
-/** Toutes les requêtes d'un filterset partagent cette racine, pour être invalidées ensemble. */
+/** Every query of a filterset shares this root, to be invalidated together. */
 export const FILTERSET_KEY = "filterset";
 
 export function useFilterset(id: string | undefined) {
@@ -36,9 +36,9 @@ export function useFilterset(id: string | undefined) {
 }
 
 /**
- * Entrées d'un filterset, dans l'ordre. L'export est la seule lecture qui donne à la
- * fois les filtres et les filtersets encapsulés avec leur position et leur opérateur :
- * `GET /filtersets/{id}/filtersets` ne renvoie que les filtersets eux-mêmes.
+ * Entries of a filterset, in order. The export is the only read that gives both the
+ * filters and the nested filtersets with their position and their operator:
+ * `GET /filtersets/{id}/filtersets` returns only the filtersets themselves.
  */
 export function useFiltersetEntries(id: string | undefined) {
   return useQuery({
@@ -49,8 +49,8 @@ export function useFiltersetEntries(id: string | undefined) {
         params: { path: { filterset_id: id ?? "" } },
       });
       if (error !== undefined) throw new Error(problemText(error));
-      // L'export contient aussi, à plat, les filtersets encapsulés : on ne garde que la
-      // racine, désignée par son identifiant ou par son nom, comme dans l'API.
+      // The export also contains, flattened, the nested filtersets: only the root is
+      // kept, named by its id or by its name, as in the API.
       const root = data.filtersets.find((item) => String(item.id) === id || item.fset_name === id);
       const entries: FiltersetExportEntry[] = [...(root?.filters ?? [])];
       return entries.sort((a, b) => a.f_order - b.f_order);
@@ -72,7 +72,7 @@ export function useFiltersetUsage(id: string | undefined) {
   });
 }
 
-/** Nombre de nodes et de services sélectionnés, pour situer l'effet du filterset. */
+/** Number of nodes and services selected, to place the effect of the filterset. */
 export function useFiltersetMatches(id: string | undefined) {
   return useQuery({
     queryKey: [FILTERSET_KEY, id, "matches"],

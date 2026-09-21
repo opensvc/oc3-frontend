@@ -5,7 +5,7 @@ import { problemText } from "@/lib/api/problem";
 
 type FilterRow = components["schemas"]["FilterRow"];
 
-/** Charge un filtre ; partagé avec le formulaire de modification, qui part de lui. */
+/** Loads a filter; shared with the edit form, which starts from it. */
 export function useFilter(filterId: string | undefined) {
   return useQuery({
     queryKey: ["filter", filterId],

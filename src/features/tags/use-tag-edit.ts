@@ -8,27 +8,26 @@ import { toTagRows } from "./tag-row";
 export type TagTargetKind = "node" | "service";
 
 /**
- * Rattachement et détachement des tags d'un node ou d'un service depuis son panneau
- * de détail.
+ * Attaching and detaching the tags of a node or a service from its detail panel.
  *
- * Les tags proposés viennent de `GET /…/candidate_tags`, qui écarte ceux déjà
- * attachés et ceux qu'exclut un tag déjà en place ; la liste n'est demandée qu'à
- * l'ouverture du sélecteur. Le rattachement passe par `POST /tags/nodes` et
- * `/tags/services`, qui acceptent le `tag_id` char(36) que renvoient les listes,
- * contrairement à `/tags/{tag_id}/…` qui attend l'identifiant entier (voir notes.md) ;
- * le détachement, par `DELETE` sur les mêmes routes. Comme dans l'ancien collector,
- * ces actions ne sont proposées qu'au responsable de
- * l'objet (`am_i_responsible`) ; la compatibilité des exclusions reste vérifiée par
- * l'API, dont le refus s'affiche tel quel.
+ * The tags offered come from `GET /…/candidate_tags`, which leaves out those already
+ * attached and those excluded by a tag already in place; the list is only requested
+ * when the picker opens. Attaching goes through `POST /tags/nodes` and
+ * `/tags/services`, which accept the char(36) `tag_id` the lists return, unlike
+ * `/tags/{tag_id}/…` which expects the integer id (see notes.md); detaching, through
+ * `DELETE` on the same routes. As in the old collector, these actions are only
+ * offered to whoever is responsible for the object (`am_i_responsible`); the
+ * compatibility of exclusions stays checked by the API, whose refusal is shown as it
+ * is.
  */
 export function useTagEdit(kind: TagTargetKind, objectId: string | undefined): TagEditControl {
   const queryClient = useQueryClient();
-  // Rattaché à l'objet plutôt qu'un simple booléen : passer à un autre node referme
-  // le sélecteur sans effet de bord.
+  // Tied to the object rather than a plain boolean: moving to another node closes the
+  // picker without a side effect.
   const [pickingFor, setPickingFor] = useState<string | undefined>(undefined);
   const picking = objectId !== undefined && pickingFor === objectId;
-  // Même précaution pour la confirmation : une question laissée ouverte ne doit pas
-  // détacher le tag d'un autre objet.
+  // Same precaution for the confirmation: a question left open must not detach the
+  // tag of another object.
   const [confirming, setConfirming] = useState<{ objectId: string; tagId: string } | null>(null);
 
   // 200 si l'utilisateur est responsable, 403 sinon : seul le statut compte.

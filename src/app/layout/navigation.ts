@@ -1,11 +1,11 @@
 /**
- * Structure du menu, en données plutôt qu'en JSX : ajouter une vue ou une section
- * se fait ici, et le repli par section pourra s'appuyer sur la clé de catégorie
- * sans toucher au rendu.
+ * Menu structure, as data rather than JSX: adding a view or a section is done here,
+ * and folding by section will be able to rely on the category key without touching
+ * the rendering.
  *
- * Les sections reprennent celles du menu du collector historique, recensées dans
- * MIGRATION.md §4.4. Seules les sections ayant au moins une vue portée sont
- * déclarées : une section vide promettrait des vues qui n'existent pas encore.
+ * The sections mirror those of the historical collector menu, listed in MIGRATION.md
+ * §4.4. Only sections with at least one ported view are declared: an empty section
+ * would promise views that do not exist yet.
  */
 import type { ObjectKind } from "@/components/opensvc/ObjectIcon";
 
@@ -27,7 +27,7 @@ export interface NavEntry {
     | "/filtersets";
   labelKey: string;
   icon: ObjectKind;
-  /** Vrai pour la racine : sans cela la correspondance par préfixe l'activerait partout. */
+  /** True for the root: without it, prefix matching would activate it everywhere. */
   exact?: boolean;
 }
 
@@ -37,7 +37,7 @@ export interface NavCategory {
   entries: NavEntry[];
 }
 
-/** Entrées hors catégorie, en tête du menu. */
+/** Entries outside any category, at the top of the menu. */
 export const NAV_TOP: NavEntry[] = [
   { to: "/", labelKey: "nav.dashboard", icon: "dashboard", exact: true },
 ];
@@ -55,9 +55,9 @@ export const NAV_CATEGORIES: NavCategory[] = [
     ],
   },
   {
-    // Les codes application vont ici, et non sous Infrastructure : le menu
-    // historique rangeait leur création dans `dm-add-app`, et la vue porte
-    // justement la liste et la création ensemble.
+    // Application codes go here rather than under Infrastructure: the historical menu
+    // kept their creation in `dm-add-app`, and the view carries the list and the
+    // creation together.
     key: "dataManagement",
     labelKey: "nav.categories.dataManagement",
     entries: [
@@ -71,8 +71,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
     labelKey: "nav.categories.administration",
     entries: [
       { to: "/users", labelKey: "nav.users", icon: "user" },
-      // Les groupes suivent les utilisateurs qu'ils rassemblent. Le menu historique les
-      // rangeait sous Data Management (`dm-add-group`) ; déplacés ici à la demande.
+      // Groups follow the users they gather. The historical menu kept them under Data
+      // Management (`dm-add-group`); moved here on request.
       { to: "/groups", labelKey: "nav.groups", icon: "group" },
       // `adm-obs` dans le menu historique.
       { to: "/obsolescence", labelKey: "nav.obsolescence", icon: "obsolescence" },

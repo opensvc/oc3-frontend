@@ -10,7 +10,7 @@ type AlertRow = components["schemas"]["AlertRow"];
 
 const text = (prop: keyof AlertRow) => (row: AlertRow) => {
   const value = row[prop];
-  // Un prop joint vaut null quand l'entrée vise l'autre type d'objet.
+  // A joined prop is null when the entry aims at the other kind of object.
   return value === undefined || value === null ? undefined : String(value);
 };
 

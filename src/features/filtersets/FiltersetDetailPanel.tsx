@@ -41,10 +41,10 @@ const GROUPS: DetailGroup<FiltersetRow>[] = [
 ];
 
 /**
- * Détail d'un filterset : propriétés, composition, effet et usages.
+ * Detail of a filterset: properties, composition, effect and uses.
  *
- * Posé directement dans un tiroir plutôt que par `DetailPanel` : la composition et les
- * usages ne sont pas des listes de propriétés.
+ * Placed directly in a drawer rather than through `DetailPanel`: the composition and
+ * the uses are not lists of properties.
  */
 export function FiltersetDetailPanel({
   filtersetId,
@@ -72,7 +72,7 @@ export function FiltersetDetailPanel({
     mutationFn: async (changes: Record<string, string | number | boolean>) => {
       const body: { fset_name?: string; fset_stats?: "T" | "F" } = {};
       if (typeof changes.fset_name === "string") body.fset_name = changes.fset_name;
-      // Le collector stocke le type statistique en « T » / « F », l'interrupteur en booléen.
+      // The collector stores the statistical type as "T" / "F", the switch as a boolean.
       if (typeof changes.fset_stats === "boolean") body.fset_stats = changes.fset_stats ? "T" : "F";
       const { error } = await api.POST("/filtersets/{filterset_id}", {
         params: { path: { filterset_id: filtersetId ?? "" } },

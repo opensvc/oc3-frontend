@@ -23,11 +23,11 @@ type UserRow = components["schemas"]["UserRow"];
 const DEFAULT_SORT = ["email"];
 
 /**
- * Propriétés d'utilisateur exposées par apicollector, dans l'ordre de son
- * `meta.available_props`, à deux exceptions près : `registration_id` et
- * `reset_password_key` ne sont pas proposés. La clé de réinitialisation suffit à
- * changer le mot de passe d'un compte ; elle n'a rien à faire dans une liste, et
- * qu'apicollector la renvoie est signalé dans notes.md.
+ * User properties exposed by apicollector, in the order of its
+ * `meta.available_props`, with two exceptions: `registration_id` and
+ * `reset_password_key` are not offered. The reset key is enough to change the
+ * password of an account; it has no place in a list, and the fact that apicollector
+ * returns it is reported in notes.md.
  */
 const USER_PROPS = [
   "id",
@@ -50,12 +50,12 @@ const USER_PROPS = [
   "quota_docker_registries",
 ] as const satisfies readonly (keyof UserRow)[];
 
-/** Colonnes par défaut : de quoi reconnaître quelqu'un et le joindre. */
+/** Default columns: enough to recognise someone and to reach them. */
 const DEFAULT_COLS: string[] = ["email", "first_name", "last_name", "phone_work"];
 
 /**
- * Colonnes chiffrées, alignées à droite. apicollector renvoie délais et quotas en
- * chaînes (helper `colStr`), mais ce sont des nombres à l'écran.
+ * Numeric columns, aligned right. apicollector returns delays and quotas as strings
+ * (the `colStr` helper), but they are numbers on screen.
  */
 const NUMERIC_PROPS = new Set<string>([
   "id",
@@ -97,21 +97,21 @@ const COLUMNS: ListColumn<UserRow>[] = USER_PROPS.map((prop) => ({
 
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
-/** Ne demander que les colonnes affichées, plus l'identifiant qui sert au détail. */
+/** Ask only for the columns shown, plus the id used by the detail. */
 function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
 
 /**
- * La liste est filtrée côté serveur selon l'appelant : un Manager ou un UserManager
- * voit tout le monde, les autres ne voient qu'eux-mêmes et les membres de leurs
- * groupes d'organisation.
+ * The list is filtered server side according to the caller: a Manager or a
+ * UserManager sees everyone, the others see only themselves and the members of their
+ * organisation groups.
  */
 function useUsers(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["users", search.sort, search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/users", {
         params: {
           query: {
@@ -139,7 +139,7 @@ export function UsersPage() {
   const navigate = useNavigate({ from: "/users" });
   const { data, isPending, isError, error, isFetching } = useUsers(search);
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/users", {
       params: { query: { props: "id", limit: 0 } },
@@ -153,7 +153,7 @@ export function UsersPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -175,7 +175,7 @@ export function UsersPage() {
         <button
           type="button"
           onClick={() => {
-            // Les deux tiroirs partagent le bord droit : ouvrir la création ferme le détail.
+            // The two drawers share the right edge: opening the creation closes the detail.
             update({ sel: undefined });
             setCreating(true);
           }}
@@ -207,7 +207,7 @@ export function UsersPage() {
           setCreating(false);
         }}
         onCreated={(id) => {
-          // Le nouvel utilisateur s'ouvre dans le détail.
+          // The new user opens in the detail.
           if (id !== undefined) update({ sel: String(id) });
         }}
       />

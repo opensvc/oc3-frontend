@@ -12,13 +12,13 @@ type LogRow = components["schemas"]["LogRow"];
 
 const text = (prop: keyof LogRow) => (row: LogRow) => {
   const value = row[prop];
-  // Les noms joints valent null quand le journal ne désigne ni node ni service.
+  // The joined names are null when the log entry names neither node nor service.
   return value === undefined || value === null ? undefined : String(value);
 };
 
 const field = (prop: keyof LogRow) => ({ prop, format: text(prop) });
 
-/** Détail d'un journal, en lecture seule : le journal du collector ne se modifie pas. */
+/** Detail of a log entry, read-only: the collector log cannot be edited. */
 const GROUPS: DetailGroup<LogRow>[] = [
   {
     key: "event",

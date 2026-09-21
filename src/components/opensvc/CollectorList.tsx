@@ -17,11 +17,11 @@ import { PAGE_SIZES, visibleProps, type ResolvedListSearch } from "@/lib/list-se
 import { readProp } from "@/lib/row";
 
 export interface ListColumn<T> {
-  /** Nom du prop apicollector : sert au tri et à la sélection des colonnes demandées. */
+  /** Name of the apicollector prop: used for sorting and for picking the requested columns. */
   prop: string;
   labelKey: string;
   numeric?: boolean;
-  /** Sujet de la colonne, pour la situer d'un coup d'œil dans le sélecteur. */
+  /** Subject of the column, to place it at a glance in the picker. */
   family: ColumnFamily;
   /**
    * Faux pour une colonne qu'apicollector ne sait pas trier, par exemple un prop
@@ -31,12 +31,12 @@ export interface ListColumn<T> {
   render: (row: T, locale: string) => ReactNode;
 }
 
-/** Métadonnées portées par chaque colonne TanStack, au-delà de ce qu'elle connaît. */
+/** Metadata carried by each TanStack column, beyond what it knows itself. */
 interface ColumnMeta<T> {
   column: ListColumn<T>;
 }
 
-/** `sort` de l'URL (« -mem_bytes,nodename ») vers l'état de tri de TanStack. */
+/** The URL `sort` ("-mem_bytes,nodename") to the TanStack sorting state. */
 function toSortingState(sort: string[]): SortingState {
   return sort.map((key) =>
     key.startsWith("-") ? { id: key.slice(1), desc: true } : { id: key, desc: false },
@@ -48,22 +48,22 @@ function fromSortingState(sorting: SortingState): string[] {
   return sorting.map((entry) => (entry.desc ? `-${entry.id}` : entry.id));
 }
 
-/** TanStack passe soit une valeur, soit une fonction de mise à jour. */
+/** TanStack passes either a value or an updater function. */
 function resolveUpdater<S>(updater: S | ((old: S) => S), current: S): S {
   return typeof updater === "function" ? (updater as (old: S) => S)(current) : updater;
 }
 
 /**
- * Table d'une liste du collector, bâtie sur TanStack Table.
+ * Table of a collector list, built on TanStack Table.
  *
- * Tri, pagination et visibilité des colonnes sont en mode « manuel » : c'est
- * apicollector qui trie et pagine, la table ne fait que porter l'état. Cet état vit
- * dans l'URL, donc chaque changement repasse par `onChange` plutôt que par un état
- * interne à la table.
+ * Sorting, pagination and column visibility are in "manual" mode: apicollector sorts
+ * and paginates, the table only carries the state. That state lives in the URL, so
+ * every change goes through `onChange` rather than through a state internal to the
+ * table.
  *
- * Deux limites viennent de l'API et non de la table : elle ne renvoie pas le total
- * d'une sélection, d'où un `pageCount` inconnu et une pagination sans numéro de page ;
- * et elle n'accepte aucun filtre ad hoc, donc le filtrage de TanStack reste inutilisé.
+ * Two limits come from the API rather than from the table: it does not return the
+ * total of a selection, hence an unknown `pageCount` and a pagination without a page
+ * number; and it accepts no ad hoc filter, so TanStack's filtering stays unused.
  */
 export function CollectorList<T>({
   columns,
@@ -82,7 +82,7 @@ export function CollectorList<T>({
   selectAllMatching,
 }: {
   columns: ListColumn<T>[];
-  /** Props affichés tant que l'utilisateur n'a pas choisi ses colonnes. */
+  /** Props shown as long as the user has not chosen their columns. */
   defaultCols: string[];
   rows: T[];
   rowId: (row: T) => string | undefined;
@@ -94,21 +94,20 @@ export function CollectorList<T>({
   errorMessage: string | null;
   hasMore: boolean;
   /**
-   * Lignes cochées, à chaque changement. La sélection est tenue ici et survit au
-   * changement de page : `getRowId` la garde indexée par identifiant de ligne, pas
-   * par position.
+   * Ticked rows, on every change. The selection is kept here and survives a page
+   * change: `getRowId` keeps it indexed by row id, not by position.
    */
   onSelectionChange?: (ids: string[]) => void;
   /**
-   * Marque placée en tête de ligne, quelles que soient les colonnes affichées : le
-   * gel d'un objet, par exemple, que masquer sa colonne ne doit pas cacher.
+   * Mark placed at the head of a row, whatever the columns on display: the freezing
+   * of an object, for instance, which hiding its column must not hide.
    */
   rowLead?: (row: T) => ReactNode;
   /**
-   * Identifiants de toutes les lignes de la sélection courante, pages suivantes
-   * comprises. Seule la vue sait interroger son endpoint ; elle renvoie ici la même
-   * sélection sans pagination. Sans cette fonction, la case d'en-tête ne coche que
-   * la page affichée.
+   * Ids of every row of the current selection, following pages included. Only the
+   * view knows how to query its endpoint; it returns here the same selection without
+   * pagination. Without this function, the header checkbox only ticks the page on
+   * display.
    */
   selectAllMatching?: () => Promise<string[]>;
 }) {
@@ -116,19 +115,19 @@ export function CollectorList<T>({
   const locale = i18n.language;
   const [columnFilter, setColumnFilter] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  // Vrai quand la sélection couvre toutes les pages et non la seule page affichée.
+  // True when the selection covers every page and not just the page on display.
   const [allMatching, setAllMatching] = useState(false);
   const [selectingAll, setSelectingAll] = useState(false);
   const [selectionError, setSelectionError] = useState<string | null>(null);
   const picker = useRef<HTMLDetailsElement>(null);
 
   /**
-   * Échap referme le sélecteur de colonnes et rend le focus à son bouton.
+   * Escape closes the column picker and gives the focus back to its button.
    *
-   * `<details>` ne le fait pas de lui-même. L'écoute est posée sur le `<details>`
-   * plutôt que sur le document : la touche n'agit que si le focus est dans le menu,
-   * et la propagation est arrêtée pour que le panneau latéral, qui écoute Échap au
-   * niveau du document, ne se referme pas en même temps.
+   * `<details>` does not do it by itself. The listener sits on the `<details>` rather
+   * than on the document: the key only acts when the focus is in the menu, and
+   * propagation is stopped so that the side panel, which listens for Escape at the
+   * document level, does not close at the same time.
    */
   function onPickerKeyDown(event: KeyboardEvent<HTMLDetailsElement>) {
     const element = picker.current;
@@ -145,10 +144,10 @@ export function CollectorList<T>({
     () =>
       columns.map((column) => ({
         id: column.prop,
-        // Sans accesseur, TanStack classe la colonne en « display » et
-        // `getCanSort()` répond faux : l'en-tête ne trierait plus rien. La valeur
-        // n'est pas utilisée pour trier — le serveur s'en charge — mais elle fait
-        // de la colonne une colonne de données.
+        // Without an accessor, TanStack files the column as "display" and
+        // `getCanSort()` answers false: the header would no longer sort anything. The
+        // value is not used for sorting — the server takes care of that — but it makes
+        // the column a data column.
         accessorFn: (row) => readProp(row, column.prop),
         header: () => t(column.labelKey),
         cell: (context) => column.render(context.row.original, locale),
@@ -181,12 +180,12 @@ export function CollectorList<T>({
     const next = resolveUpdater(updater, rowSelection);
     setRowSelection(next);
     setAllMatching(false);
-    // Prévenir sans passer par un effet : la vue reçoit la sélection à l'instant
-    // où elle change, sans risque de boucle sur l'identité du rappel.
+    // Telling without going through an effect: the view receives the selection the
+    // moment it changes, with no risk of looping on the identity of the callback.
     onSelectionChange?.(Object.keys(next).filter((id) => next[id]));
   };
 
-  /** Coche toutes les lignes de la sélection, pages suivantes comprises. */
+  /** Ticks every row of the selection, following pages included. */
   async function selectEverything() {
     if (selectAllMatching === undefined) return;
     setSelectingAll(true);
@@ -207,9 +206,9 @@ export function CollectorList<T>({
   const onColumnVisibilityChange: OnChangeFn<VisibilityState> = (updater) => {
     const next = resolveUpdater(updater, columnVisibility);
     const kept = allProps.filter((prop) => next[prop] !== false);
-    if (kept.length === 0) return; // la dernière colonne visible ne se décoche pas
-    // Masquer une colonne retire aussi sa clé de tri : l'en-tête est la seule
-    // indication du tri, une clé invisible n'aurait plus de moyen d'être annulée.
+    if (kept.length === 0) return; // the last visible column cannot be unticked
+    // Hiding a column also removes its sort key: the header is the only indication of
+    // the sort, and an invisible key would have no way left of being cancelled.
     const sortable = columns
       .filter((column) => column.sortable !== false && kept.includes(column.prop))
       .map((column) => column.prop);
@@ -227,14 +226,14 @@ export function CollectorList<T>({
     state: { sorting, columnVisibility, pagination, rowSelection },
     getRowId: (row, index) => rowId(row) ?? String(index),
     getCoreRowModel: getCoreRowModel(),
-    // Le serveur trie et pagine ; la table ne fait que refléter l'état.
+    // The server sorts and paginates; the table only reflects the state.
     manualSorting: true,
     manualPagination: true,
-    // Par défaut TanStack part en descendant sur les colonnes dont la première
-    // valeur est un nombre : le premier clic n'aurait pas le même sens selon la
-    // colonne. On garde l'ordre d'avant la migration, ascendant puis descendant.
+    // By default TanStack starts descending on columns whose first value is a number:
+    // the first click would not have the same meaning from one column to the next. We
+    // keep the order from before the migration, ascending then descending.
     sortDescFirst: false,
-    // apicollector ne renvoie pas le total d'une sélection : le nombre de pages est inconnu.
+    // apicollector does not return the total of a selection: the number of pages is unknown.
     pageCount: -1,
     enableRowSelection: true,
     onSortingChange,
@@ -256,13 +255,13 @@ export function CollectorList<T>({
   const sortableSomewhere = columns.some((column) => column.sortable !== false);
   const selectedCount = Object.values(rowSelection).filter(Boolean).length;
   const pageFullySelected = rows.length > 0 && table.getIsAllPageRowsSelected();
-  // Proposer d'étendre la sélection n'a de sens que s'il reste des pages à couvrir.
+  // Offering to extend the selection only makes sense while pages remain to cover.
   const canSelectEverything =
     selectAllMatching !== undefined && pageFullySelected && !allMatching && hasMore;
 
   /**
-   * La case d'en-tête parcourt trois états : la page, puis toute la sélection quand
-   * il reste des pages, puis plus rien.
+   * The header checkbox walks through three states: the page, then the whole
+   * selection while pages remain, then nothing.
    */
   function onToggleAll() {
     if (!pageFullySelected) {
@@ -283,8 +282,9 @@ export function CollectorList<T>({
             id="list-filterset"
             value={search.fset}
             onChange={(event) => {
-              // Le filtre change la population : ce qui était coché n'en fait plus
-              // forcément partie, et « toutes pages » ne parlerait plus du même tout.
+              // The filter changes the population: what was ticked is not necessarily
+              // part of it any more, and "every page" would no longer speak of the same
+              // whole.
               table.resetRowSelection();
               onChange({ fset: event.target.value, offset: 0, sel: undefined });
             }}
@@ -348,7 +348,7 @@ export function CollectorList<T>({
                       <input
                         type="checkbox"
                         checked={checked}
-                        // La dernière colonne visible ne peut pas être décochée.
+                        // The last visible column cannot be unticked.
                         disabled={checked && shown.length === 1}
                         onChange={column.getToggleVisibilityHandler()}
                       />
@@ -378,8 +378,8 @@ export function CollectorList<T>({
               ? t("list.selectedEverywhere", { count: selectedCount })
               : t("list.selected", { count: selectedCount })}
             {canSelectEverything && (
-              // Un second clic sur la case d'en-tête fait la même chose, mais rien ne
-              // l'annonce : ce bouton rend l'extension visible.
+              // A second click on the header checkbox does the same, but nothing
+              // announces it: this button makes the extension visible.
               <button
                 type="button"
                 disabled={selectingAll}
@@ -419,8 +419,8 @@ export function CollectorList<T>({
           </button>
           <button
             type="button"
-            // `pageCount` étant inconnu, c'est la ligne d'avance demandée au serveur
-            // qui dit s'il reste une page, pas la table.
+            // `pageCount` being unknown, it is the extra row asked of the server that
+            // says whether a page remains, not the table.
             disabled={!hasMore}
             onClick={() => {
               table.nextPage();
@@ -545,7 +545,7 @@ export function CollectorList<T>({
                   >
                     <td
                       className="w-8 px-2"
-                      // Cocher ne doit pas ouvrir le panneau de détail.
+                      // Ticking must not open the detail panel.
                       onClick={(event) => {
                         event.stopPropagation();
                       }}
@@ -588,7 +588,7 @@ export function CollectorList<T>({
   );
 }
 
-/** Récupère les métadonnées d'une colonne, que TanStack type en `unknown`. */
+/** Reads the metadata of a column, which TanStack types as `unknown`. */
 function getMeta<T>(columnDef: ColumnDef<T>): ColumnMeta<T> {
   return columnDef.meta as ColumnMeta<T>;
 }

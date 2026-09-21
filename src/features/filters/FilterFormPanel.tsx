@@ -30,12 +30,12 @@ function fromRow(row: FilterRow | null | undefined): FilterDefinition {
 const INPUT = "h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2";
 
 /**
- * Création ou modification d'un filtre, en un seul formulaire.
+ * Creating or editing a filter, in a single form.
  *
- * Le filtre se modifie en entier plutôt que champ par champ : changer la table seule
- * laisserait souvent une colonne qui n'y existe pas, qu'apicollector refuse. Le
- * serveur valide la définition complète — table, opérateur, colonne, unicité — et
- * ses refus sont affichés tels quels.
+ * The filter is edited as a whole rather than field by field: changing the table
+ * alone would often leave a column that does not exist in it, which apicollector
+ * refuses. The server validates the complete definition — table, operator, column,
+ * uniqueness — and its refusals are shown as they are.
  */
 export function FilterFormPanel({
   open,
@@ -44,7 +44,7 @@ export function FilterFormPanel({
   onSaved,
 }: {
   open: boolean;
-  /** Filtre à modifier ; absent, le formulaire en crée un. */
+  /** Filter to edit; absent, the form creates one. */
   filter?: FilterRow | null;
   onClose: () => void;
   onSaved?: (id: number | undefined) => void;
@@ -54,7 +54,7 @@ export function FilterFormPanel({
   const editing = filter !== undefined && filter !== null;
   const [definition, setDefinition] = useState<FilterDefinition>(fromRow(filter));
 
-  // Chaque ouverture repart du filtre à modifier, ou d'un formulaire vide.
+  // Every opening starts again from the filter to edit, or from an empty form.
   useEffect(() => {
     if (open) setDefinition(fromRow(filter));
   }, [open, filter]);
@@ -76,7 +76,7 @@ export function FilterFormPanel({
     onSuccess: async (id) => {
       await queryClient.invalidateQueries({ queryKey: ["filters"] });
       await queryClient.invalidateQueries({ queryKey: ["filter"] });
-      // Les filtersets qui l'utilisent voient leur sélection changer.
+      // The filtersets using it see their selection change.
       await queryClient.invalidateQueries({ queryKey: ["filtersets"] });
       onSaved?.(id);
       onClose();
@@ -96,7 +96,7 @@ export function FilterFormPanel({
 
   return (
     <SlideOver
-      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      // Data-entry drawer: a click beside it must not clear what has been typed.
       closeOnOutsideClick={false}
       open={open}
       title={editing ? t("filters.form.editTitle") : t("filters.form.createTitle")}

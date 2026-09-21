@@ -30,9 +30,10 @@ type ServiceRow = components["schemas"]["ServiceRow"];
 const DEFAULT_SORT = ["svcname"];
 
 /**
- * Toutes les propriétés de service exposées par apicollector, dans l'ordre de son
- * `meta.available_props`. `satisfies` les confronte au schéma généré : un prop
- * renommé côté oc3 casse le typecheck au lieu de disparaître en silence.
+ * Every service property exposed by apicollector, in the order of its
+ * `meta.available_props`. `satisfies` confronts them with the generated schema: a
+ * prop renamed on the oc3 side breaks the typecheck instead of disappearing
+ * silently.
  */
 const SERVICE_PROPS = [
   "id",
@@ -72,7 +73,7 @@ const SERVICE_PROPS = [
   "updated",
 ] as const satisfies readonly (keyof ServiceRow)[];
 
-/** Colonnes affichées par défaut : l'identité du service et son état. */
+/** Columns shown by default: the identity of the service and its state. */
 const DEFAULT_COLS: string[] = [
   "svcname",
   "svc_availstatus",
@@ -81,7 +82,7 @@ const DEFAULT_COLS: string[] = [
   "svc_status_updated",
 ];
 
-/** Props entiers du mapping `service` d'oc3 (helpers `colInt` et `col`), alignés à droite. */
+/** Integer props of the oc3 `service` mapping (the `colInt` and `col` helpers), aligned right. */
 const NUMERIC_PROPS = new Set<string>([
   "id",
   "svc_ha",
@@ -102,7 +103,7 @@ const DATE_PROPS = new Set<string>([
   "updated",
 ]);
 
-/** Props d'état, rendus avec la forme et le libellé du badge plutôt qu'en texte brut. */
+/** State props, rendered with the shape and label of the badge rather than as raw text. */
 const STATUS_PROPS = new Set<string>(["svc_status", "svc_availstatus"]);
 
 /** Famille de chaque colonne, dans le vocabulaire du collector historique. */
@@ -160,7 +161,7 @@ const COLUMNS: ListColumn<ServiceRow>[] = SERVICE_PROPS.map((prop) => ({
     if (STATUS_PROPS.has(prop) && typeof value === "string") {
       return <StatusBadge {...statusBadge(value)} />;
     }
-    // Comme le dernier contact d'un node : c'est l'ancienneté du statut qui compte.
+    // Like the last contact of a node: what counts is the age of the status.
     if (prop === "svc_status_updated" && typeof value === "string")
       return <RelativeTime value={value} locale={locale} />;
     if (DATE_PROPS.has(prop) && typeof value === "string")
@@ -171,8 +172,8 @@ const COLUMNS: ListColumn<ServiceRow>[] = SERVICE_PROPS.map((prop) => ({
 
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
-/** Ne demander que les colonnes affichées : apicollector fait le pushdown en base. */
-/** `svc_frozen` est toujours demandé : le gel se signale même colonne masquée. */
+/** Ask only for the columns shown: apicollector pushes the selection down to the database. */
+/** `svc_frozen` is always requested: freezing is marked even with the column hidden. */
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
   return [...new Set(["svc_id", "svc_frozen", ...shown])].join(",");
@@ -182,7 +183,7 @@ function useServices(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["services", search.sort, search.offset, search.limit, search.fset, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const query = {
         props: queryProps(search.cols),
         orderby: search.sort.join(","),
@@ -214,7 +215,7 @@ export function ServicesPage() {
   const filtersets = useFiltersets();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  /** Identifiants de toute la sélection, filterset compris, sans pagination. */
+  /** Ids of the whole selection, filterset included, without pagination. */
   async function allIds(): Promise<string[]> {
     const query = { props: "svc_id", limit: 0 };
     const response =
@@ -229,7 +230,7 @@ export function ServicesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -239,8 +240,8 @@ export function ServicesPage() {
   }
 
   const selected = data?.rows.find((row) => row.svc_id === search.sel);
-  // Noms de la page affichée : une sélection étendue aux pages suivantes ne les a
-  // pas tous, l'identifiant sert alors de repli dans les messages.
+  // Names from the page on display: a selection extended to the following pages does
+  // not have them all, so the id then serves as a fallback in the messages.
   const svcNames = Object.fromEntries(
     (data?.rows ?? []).map((row) => [row.svc_id ?? "", row.svcname ?? ""]),
   );

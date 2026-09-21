@@ -18,36 +18,35 @@ import { TrashIcon } from "@/components/ui/icons";
 import { problemText } from "@/lib/api/problem";
 
 /**
- * Attributs qu'un utilisateur peut fixer, parce que la remontée d'inventaire de
- * l'agent ne les écrit pas.
+ * Attributes a user may set, because the agent's inventory push does not write them.
  *
- * La liste vient de `worker/job_feed_system.go` côté oc3, qui énumère les 42 colonnes
- * écrites par la remontée : tout ce qui y figure serait écrasé à la remontée suivante.
- * Sont également écartés les champs tenus par d'autres chemins automatiques — le
- * dernier contact et le gel viennent du flux du démon, les dates d'obsolescence du
- * planificateur, la localisation et le châssis de la propagation depuis le node
- * parent d'un conteneur.
+ * The list comes from `worker/job_feed_system.go` on the oc3 side, which enumerates
+ * the 42 columns written by the push: anything appearing there would be overwritten
+ * at the next one. Also left out are the fields held by other automatic paths — the
+ * last contact and the freezing come from the daemon feed, the obsolescence dates
+ * from the scheduler, the location and the chassis from propagation out of the parent
+ * node of a container.
  */
 const EDITABLE_DATES = new Set(["warranty_end", "maintenance_end", "snooze_till"]);
 
-/** Le corps de l'API type ces deux-là ; une chaîne y serait refusée. */
+/** The API body types these two; a string would be refused there. */
 const EDITABLE_NUMBERS = new Set(["power_supply_nb"]);
 const EDITABLE_BOOLEANS = new Set(["notifications"]);
 
 /**
- * Colonnes qui portent un booléen du collector (« T » / « F ») et s'affichent donc en
- * interrupteur. `node_frozen` en fait partie sans être modifiable : c'est le flux du
- * démon qui le pilote, l'interrupteur y est en lecture seule.
+ * Columns carrying a collector boolean ("T" / "F") and therefore shown as a switch.
+ * `node_frozen` is one of them without being editable: the daemon feed drives it, so
+ * the switch is read-only there.
  */
 const BOOLEANS = new Set([...EDITABLE_BOOLEANS, "node_frozen"]);
 
 const EDITABLE = new Set<string>([
   "app",
   "team_responsible",
-  // L'équipe d'intégration est modifiable à la demande, mais l'agent l'écrit quand
-  // son inventaire la porte (`team_integ` dans `worker/job_feed_system.go`, en
-  // `Optional`) : une valeur fixée ici tient jusqu'à la prochaine remontée qui la
-  // mentionne. L'équipe de support est dans le même cas, laissée en lecture seule.
+  // The integration team is editable on request, but the agent writes it when its
+  // inventory carries it (`team_integ` in `worker/job_feed_system.go`, as `Optional`):
+  // a value set here holds until the next push that mentions it. The support team is
+  // in the same situation, left read-only.
   "team_integ",
   "status",
   "role",
@@ -80,8 +79,8 @@ const date = (prop: keyof NodeRow) => (row: NodeRow, locale: string) => {
 };
 
 /**
- * Équipe : une puce, dont l'identifiant de groupe est résolu par `TeamLink`, et une
- * liste déroulante des équipes connues quand on la modifie.
+ * Team: a badge, whose group id is resolved by `TeamLink`, and a dropdown of the
+ * known teams when editing it.
  */
 const team = (prop: keyof NodeRow) => ({
   prop,
@@ -97,7 +96,7 @@ const field = (
 ) => ({
   prop,
   format: format ?? text(prop),
-  // La modification n'est offerte que sur les attributs listés plus haut.
+  // Editing is offered only on the attributes listed above.
   editable: EDITABLE.has(prop),
   input: EDITABLE_DATES.has(prop)
     ? ("date" as const)
@@ -163,7 +162,7 @@ const GROUPS: DetailGroup<NodeRow>[] = [
       {
         prop: "os_name",
         format: text("os_name"),
-        // Même logo que dans la liste, à côté du nom du système.
+        // Same logo as in the list, next to the name of the system.
         render: (row: NodeRow) => (
           <span className="inline-flex items-center gap-1.5">
             <OsLogo osName={row.os_name} />
@@ -214,12 +213,12 @@ const GROUPS: DetailGroup<NodeRow>[] = [
   },
 ];
 
-// Ne demander au collector que les propriétés effectivement affichées.
+// Ask the collector only for the properties actually shown.
 const PROPS = GROUPS.flatMap((group) => group.fields.map((f) => f.prop)).join(",");
 
 /**
- * Détail d'un node : ses propriétés, puis ses données rattachées, un onglet chacune
- * (`NODE_RELATED_TABS`). L'onglet ouvert vit dans l'URL (`tab`), tenue par la vue.
+ * Detail of a node: its properties, then its related data, one tab each
+ * (`NODE_RELATED_TABS`). The open tab lives in the URL (`tab`), held by the view.
  */
 export function NodeDetailPanel({
   nodeId,
@@ -254,8 +253,8 @@ export function NodeDetailPanel({
     },
   });
 
-  // La suppression est en cascade côté collector : instances, alertes et relevés
-  // du node partent avec lui.
+  // Deletion cascades on the collector side: the node's instances, alerts and
+  // readings go with it.
   const remove = useMutation({
     mutationFn: async () => {
       const { error: failure } = await api.DELETE("/nodes/{node_id}", {

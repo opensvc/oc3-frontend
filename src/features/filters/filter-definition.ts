@@ -1,8 +1,8 @@
 /**
- * Tables sur lesquelles un filtre peut porter, dans l'ordre de `filterTables`
- * (`server/handlers/post_filters.go` côté oc3). La liste y est validée à la création
- * comme à la modification ; la reprendre ici permet de la proposer en liste plutôt
- * qu'en saisie libre. Un écart avec oc3 se traduirait par un refus explicite du serveur.
+ * Tables a filter may bear on, in the order of `filterTables`
+ * (`server/handlers/post_filters.go` on the oc3 side). The list is validated there on
+ * creation as on update; repeating it here allows offering it as a list rather than
+ * as free input. A drift from oc3 would show as an explicit refusal from the server.
  */
 export const FILTER_TABLES = [
   "nodes",
@@ -19,7 +19,7 @@ export const FILTER_TABLES = [
   "packages",
 ] as const;
 
-/** Opérateurs acceptés, tels que l'enum `f_op` du schéma OpenAPI. */
+/** Accepted operators, as in the `f_op` enum of the OpenAPI schema. */
 export const FILTER_OPERATORS = ["=", "LIKE", ">", ">=", "<", "<=", "IN"] as const;
 
 export type FilterOperator = (typeof FILTER_OPERATORS)[number];

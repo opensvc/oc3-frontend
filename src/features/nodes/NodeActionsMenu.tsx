@@ -3,11 +3,11 @@ import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 
 /**
- * Actions d'agent d'un node, dans l'ordre du menu : les remontées d'inventaire, puis
- * le matériel, puis l'état du node. Ce sont les entrées « node agent » de l'ancien
- * collector qui n'interrompent pas le service ; redémarrage, arrêt, drain et mise à
- * jour de l'agent sont écartés pour l'instant, ici comme dans la liste blanche de
- * l'API (`nodeActions`, `post_node_action.go`).
+ * Agent actions of a node, in menu order: the inventory pushes, then the hardware,
+ * then the state of the node. These are the "node agent" entries of the old collector
+ * that do not interrupt the service; reboot, shutdown, drain and agent update are
+ * left out for now, here as in the API allowlist (`nodeActions`,
+ * `post_node_action.go`).
  */
 const ACTIONS = [
   { action: "pushasset" },

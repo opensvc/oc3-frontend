@@ -21,10 +21,10 @@ import { AlertDetailPanel } from "./AlertDetailPanel";
 
 type AlertRow = components["schemas"]["AlertRow"];
 
-/** Le dashboard historique trie par sévérité décroissante, puis par type. */
+/** The historical dashboard sorts by decreasing severity, then by type. */
 const DEFAULT_SORT = ["-dash_severity", "dash_type"];
 
-/** Nom de l'objet visé : une entrée porte soit un service, soit un node. */
+/** Name of the object aimed at: an entry carries either a service or a node. */
 function objectName(row: AlertRow): string {
   return row["services.svcname"] ?? row["nodes.nodename"] ?? "";
 }
@@ -48,7 +48,7 @@ const COLUMNS: ListColumn<AlertRow>[] = [
     family: "service",
     // orderby n'accepte pas les props joints : cette colonne n'est pas triable.
     sortable: false,
-    // L'alerte porte un service ou un node : la puce mène à celui qui la porte.
+    // The alert carries a service or a node: the badge leads to whichever carries it.
     render: (r) =>
       r.svc_id !== undefined && r.svc_id !== "" ? (
         <CrossLink kind="service" id={r.svc_id}>
@@ -89,12 +89,12 @@ const COLUMNS: ListColumn<AlertRow>[] = [
 
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
-/** Cette vue déclare peu de colonnes : toutes sont affichées par défaut. */
+/** This view declares few columns: all of them are shown by default. */
 const DEFAULT_COLS = ALL_PROPS;
 
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
-  // La colonne « objet » lit les deux noms joints, et l'identifiant sert au détail.
+  // The "object" column reads both joined names, and the id serves for the detail.
   const extra = shown.includes("services.svcname") ? ["nodes.nodename", "svc_id", "node_id"] : [];
   return ["id", ...shown, ...extra].join(",");
 }
@@ -117,13 +117,13 @@ function useAlerts(search: ResolvedListSearch) {
   });
 }
 
-/** Répartition par sévérité, sur l'ensemble des entrées et non sur la page courante. */
+/** Breakdown by severity, over every entry and not over the current page. */
 function useSeverityCounts() {
   return useQuery({
     queryKey: ["alerts", "severity-counts"],
     queryFn: async () => {
       const { data, error } = await api.GET("/alerts", {
-        // `stats` est déclaré en chaîne dans la spec, pas en booléen.
+        // `stats` is declared as a string in the spec, not as a boolean.
         params: { query: { props: "dash_severity", stats: "true", limit: 0 } },
       });
       if (error !== undefined) throw new Error(JSON.stringify(error));
@@ -145,7 +145,7 @@ export function DashboardPage() {
   const severities = useSeverityCounts();
   const filtersets = useFiltersets();
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/alerts", {
       params: { query: { props: "id", limit: 0 } },
@@ -159,7 +159,7 @@ export function DashboardPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({

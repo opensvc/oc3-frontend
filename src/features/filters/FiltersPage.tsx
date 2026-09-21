@@ -22,7 +22,7 @@ import { useFilter } from "./use-filter";
 
 type FilterRow = components["schemas"]["FilterRow"];
 
-/** Regroupés par table puis par colonne : les filtres d'une même colonne se suivent. */
+/** Grouped by table then by column: the filters of one column follow each other. */
 const DEFAULT_SORT = ["f_table", "f_field", "f_value"];
 
 const FILTER_PROPS = [
@@ -37,7 +37,7 @@ const FILTER_PROPS = [
   "f_cksum",
 ] as const satisfies readonly (keyof FilterRow)[];
 
-/** Colonnes par défaut : la définition, et qui l'a touchée en dernier. */
+/** Default columns: the definition, and who touched it last. */
 const DEFAULT_COLS: string[] = ["f_table", "f_field", "f_op", "f_value", "f_author", "f_updated"];
 
 const NUMERIC_PROPS = new Set<string>(["id"]);
@@ -61,8 +61,8 @@ const COLUMNS: ListColumn<FilterRow>[] = FILTER_PROPS.map((prop) => ({
   family: FAMILY[prop] ?? "state",
   render: (row: FilterRow, locale: string) => {
     if (prop === "f_updated") return <DateTime value={row.f_updated} locale={locale} />;
-    // L'opérateur et la valeur se lisent en police à chasse fixe : un espace ou un
-    // « % » de LIKE ne doit pas passer inaperçu.
+    // The operator and the value read in a monospace font: a space or a LIKE "%" must
+    // not go unnoticed.
     if (prop === "f_op" || prop === "f_value")
       return <code className="whitespace-pre">{row[prop]}</code>;
     return row[prop];
@@ -79,7 +79,7 @@ function useFilters(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["filters", search.sort, search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/filters", {
         params: {
           query: {
@@ -106,11 +106,11 @@ export function FiltersPage() {
   );
   const navigate = useNavigate({ from: "/filters" });
   const { data, isPending, isError, error, isFetching } = useFilters(search);
-  // Un seul formulaire : création quand rien n'est sélectionné, modification sinon.
+  // A single form: creation when nothing is selected, editing otherwise.
   const [form, setForm] = useState<"create" | "edit" | null>(null);
   const selectedFilter = useFilter(form === "edit" ? search.sel : undefined);
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/filters", {
       params: { query: { props: "id", limit: 0 } },
@@ -124,7 +124,7 @@ export function FiltersPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
@@ -145,7 +145,7 @@ export function FiltersPage() {
         <button
           type="button"
           onClick={() => {
-            // Les tiroirs partagent le bord droit : ouvrir la création ferme le détail.
+            // The drawers share the right edge: opening the creation closes the detail.
             update({ sel: undefined });
             setForm("create");
           }}
@@ -190,7 +190,7 @@ export function FiltersPage() {
           setForm(null);
         }}
         onSaved={(id) => {
-          // Après une création, le nouveau filtre s'ouvre dans le détail.
+          // After a creation, the new filter opens in the detail.
           if (form === "create" && id !== undefined) update({ sel: String(id) });
         }}
       />

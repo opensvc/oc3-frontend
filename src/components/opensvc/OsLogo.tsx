@@ -10,9 +10,9 @@ import vmware from "@/assets/os/vmware.png";
 import windows from "@/assets/os/windows.png";
 
 /**
- * `os_name` d'un node vers son logo. Table reprise de `os_class_h` dans
- * `init/static/js/osvc/tables/decorators.js` du collector historique, avec les mêmes
- * images : `sunos` et `solaris` partagent le logo Solaris, `osf1` est Tru64.
+ * A node's `os_name` to its logo. Table taken from `os_class_h` in
+ * `init/static/js/osvc/tables/decorators.js` of the historical collector, with the
+ * same images: `sunos` and `solaris` share the Solaris logo, `osf1` is Tru64.
  */
 const LOGOS: Record<string, string> = {
   aix,
@@ -29,11 +29,11 @@ const LOGOS: Record<string, string> = {
 };
 
 /**
- * Logo du système d'exploitation, à 16 px.
+ * Operating system logo, at 16 px.
  *
- * Un système inconnu ou absent laisse un emplacement vide de même taille : les noms
- * restent alignés dans la colonne. Le nom du système est donné en texte alternatif
- * et en infobulle, le logo seul ne suffisant pas à tout le monde.
+ * An unknown or absent system leaves an empty slot of the same size: the names stay
+ * aligned in the column. The name of the system is given as alternative text and as a
+ * tooltip, the logo alone not being enough for everyone.
  */
 export function OsLogo({ osName }: { osName: string | undefined }) {
   const src = osName === undefined ? undefined : LOGOS[osName.toLowerCase()];

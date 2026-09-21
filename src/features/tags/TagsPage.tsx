@@ -19,9 +19,9 @@ import { toTagRows, type TagRow } from "./tag-row";
 const DEFAULT_SORT = ["tag_name"];
 
 /**
- * Props exposés par apicollector pour un tag. `id`, l'identifiant entier, est refusé
- * par l'API (« prop "id" is not allowed »), alors que c'est lui qu'attendent la
- * modification et la suppression : cette vue ne fait donc que lister. Voir notes.md.
+ * Props exposed by apicollector for a tag. `id`, the integer id, is refused by the
+ * API ("prop "id" is not allowed"), although it is what editing and deletion expect:
+ * this view therefore only lists. See notes.md.
  */
 const TAG_PROPS = ["tag_name", "tag_exclude", "tag_data", "tag_created", "tag_id"] as const;
 
@@ -53,7 +53,7 @@ function useTags(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["tags", search.sort, search.offset, search.limit, search.cols],
     queryFn: async () => {
-      // Une ligne de plus que la page : apicollector ne renvoie pas le total d'une sélection.
+      // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/tags", {
         params: {
           query: {
@@ -81,7 +81,7 @@ export function TagsPage() {
   const navigate = useNavigate({ from: "/tags" });
   const { data, isPending, isError, error, isFetching } = useTags(search);
 
-  /** Identifiants de toute la sélection, sans pagination. */
+  /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/tags", {
       params: { query: { props: "tag_id", limit: 0 } },
@@ -91,7 +91,7 @@ export function TagsPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    // Columns and sort follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({

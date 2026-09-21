@@ -15,12 +15,12 @@ import { THEMES } from "@/lib/theme";
 type UserRow = components["schemas"]["UserRow"];
 
 /**
- * Profil de l'utilisateur connecté, ouvert depuis son nom dans la barre du haut.
+ * Profile of the signed-in user, opened from their name in the top bar.
  *
- * `GET /users/self` désigne l'appelant côté serveur : pas besoin de connaître son
- * identifiant, et la page reste juste si l'e-mail de connexion change de casse.
- * Le collector historique montrait aussi les groupes, les codes application et le
- * filterset par défaut ; l'API ne les expose pas encore par utilisateur, voir notes.md.
+ * `GET /users/self` names the caller server side: no need to know their id, and the
+ * page stays right if the sign-in email changes case. The historical collector also
+ * showed the groups, the application codes and the default filterset; the API does
+ * not expose them per user yet, see notes.md.
  */
 export function ProfilePage() {
   const { t } = useTranslation();

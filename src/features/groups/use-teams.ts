@@ -6,9 +6,9 @@ import { problemText } from "@/lib/api/problem";
 type GroupRow = components["schemas"]["GroupRow"];
 
 /**
- * Équipes assignables : les groupes d'organisation, ni les groupes de privilège ni
- * les groupes privés d'un utilisateur (`user_<id>`), que le collector crée pour
- * porter les droits d'une personne.
+ * Assignable teams: the organisation groups, neither the privilege groups nor the
+ * private groups of a user (`user_<id>`), which the collector creates to carry the
+ * rights of a person.
  */
 export function useTeams() {
   return useQuery({

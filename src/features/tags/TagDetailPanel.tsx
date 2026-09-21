@@ -4,12 +4,12 @@ import { formatDateTime } from "@/lib/format";
 import type { TagRow } from "./tag-row";
 
 /**
- * Détail d'un tag, en lecture seule.
+ * Detail of a tag, read-only.
  *
- * Ni modification ni suppression : les endpoints correspondants s'adressent par
- * l'identifiant entier du tag, que la liste ne renvoie pas. Voir notes.md.
- * Le panneau lit la ligne déjà chargée par la liste, faute de pouvoir la relire
- * par `GET /tags/{tag_id}`, qui attend le même identifiant entier.
+ * Neither editing nor deletion: the matching endpoints are addressed by the integer
+ * id of the tag, which the list does not return. See notes.md. The panel reads the
+ * row already loaded by the list, for want of being able to read it again through
+ * `GET /tags/{tag_id}`, which expects that same integer id.
  */
 const GROUPS: DetailGroup<TagRow>[] = [
   {

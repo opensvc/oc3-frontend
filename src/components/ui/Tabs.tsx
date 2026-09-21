@@ -4,16 +4,16 @@ export interface TabItem {
   key: string;
   label: string;
   icon?: ReactNode;
-  /** Petit compteur après le libellé, par exemple le nombre de lignes de l'onglet. */
+  /** Small count after the label, for example the number of rows in the tab. */
   badge?: ReactNode;
 }
 
 /**
- * Barre d'onglets au motif ARIA « tabs » : un seul onglet dans le parcours Tab,
- * les flèches, Début et Fin passent d'un onglet à l'autre et l'activent.
+ * Tab bar following the ARIA "tabs" pattern: a single tab in the Tab order, and the
+ * arrows, Home and End move from one tab to the next and activate it.
  *
- * Elle défile horizontalement quand les onglets ne tiennent plus : leur nombre peut
- * croître sans casser la mise en page.
+ * It scrolls horizontally when the tabs no longer fit: their number can grow without
+ * breaking the layout.
  */
 export function TabList({
   tabs,
@@ -27,7 +27,7 @@ export function TabList({
   onChange: (key: string) => void;
   /** Nom accessible de la barre d'onglets. */
   label: string;
-  /** Préfixe des identifiants, partagé avec `tabPanelProps`. */
+  /** Prefix of the ids, shared with `tabPanelProps`. */
   idPrefix: string;
 }) {
   const list = useRef<HTMLDivElement>(null);
@@ -59,9 +59,9 @@ export function TabList({
       role="tablist"
       aria-label={label}
       onKeyDown={onKeyDown}
-      // Le trait du bas est une ombre intérieure et non une bordure : le soulignement de
-      // l'onglet actif le recouvre sans déborder d'un pixel, ce qui faisait apparaître une
-      // barre de défilement verticale. Seul le défilement horizontal reste permis.
+      // The bottom line is an inner shadow rather than a border: the underline of the
+      // active tab covers it without overflowing by a pixel, which used to bring up a
+      // vertical scrollbar. Only horizontal scrolling stays allowed.
       className="flex shrink-0 gap-1 overflow-x-auto overflow-y-hidden px-3 shadow-[inset_0_-1px_0_var(--color-line)]"
     >
       {tabs.map((tab) => {

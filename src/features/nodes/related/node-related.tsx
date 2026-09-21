@@ -9,11 +9,11 @@ import { NodeStorage } from "./NodeStorage";
 import { useNodeAlerts, useNodeDisks, useNodeHardware, useNodeIps } from "./queries";
 
 /**
- * Données rattachées à un node, un onglet chacune, dans l'ordre d'affichage.
+ * Data attached to a node, one tab each, in display order.
  *
- * Ajouter un type de données — disques, adresses, services, tags, checks… — revient à
- * écrire son composant et à l'ajouter ici. Le résumé réutilise la requête du
- * composant : ouvrir l'onglet ne recharge rien.
+ * Adding a kind of data — disks, addresses, services, tags, checks… — amounts to
+ * writing its component and adding it here. The summary reuses the component's
+ * query: opening the tab reloads nothing.
  */
 export const NODE_RELATED_TABS: RelatedTab[] = [
   {
