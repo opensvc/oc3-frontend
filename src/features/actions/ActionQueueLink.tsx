@@ -29,33 +29,28 @@ function usePendingActions() {
 }
 
 /**
- * Entrée « File d'actions » de la barre du haut : un lien vers la file tant qu'elle
- * contient quelque chose, du texte éteint sinon, comme l'ancien collector qui
- * n'ouvrait sa file que lorsqu'elle avait des actions.
+ * Entrée « File d'actions » de la barre du haut : toujours un lien vers la file, qui
+ * garde aussi les actions passées, avec le nombre de celles qui attendent encore
+ * quand il y en a.
  */
 export function ActionQueueLink() {
   const { t } = useTranslation();
   const pending = usePendingActions();
   const count = pending.data ?? 0;
 
-  if (count === 0)
-    return (
-      <span className="text-ink-muted/60" title={t("header.actionQueueEmpty")}>
-        {t("header.actionQueue")}
-      </span>
-    );
-
   return (
     <Link
       to="/actions"
-      title={t("header.actionQueuePending", { count })}
+      title={count === 0 ? t("header.actionQueueEmpty") : t("header.actionQueuePending", { count })}
       className="flex items-center gap-1.5 text-ink-muted hover:text-ink"
     >
       {t("header.actionQueue")}
-      <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-state-warn-soft px-1.5 text-[0.6875rem] leading-4 font-medium text-state-warn tabular-nums">
-        {count}
-        {count === LIMIT && "+"}
-      </span>
+      {count > 0 && (
+        <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-state-warn-soft px-1.5 text-[0.6875rem] leading-4 font-medium text-state-warn tabular-nums">
+          {count}
+          {count === LIMIT && "+"}
+        </span>
+      )}
     </Link>
   );
 }

@@ -29,9 +29,10 @@
     "noFilter": "Aucun",
     "actionQueue": "File d'actions",
     "accountMenu": "Menu du compte",
-    "actionQueueEmpty": "Aucune action dans la file",
+    "actionQueueEmpty": "Aucune action en attente : ouvrir l'historique des actions",
     "actionQueuePending_one": "1 action en attente dans la file",
-    "actionQueuePending_other": "{{count}} actions en attente dans la file"
+    "actionQueuePending_other": "{{count}} actions en attente dans la file",
+    "actionQueueOpen": "Ouvrir la file d'actions"
   },
   "state": {
     "up": "up",

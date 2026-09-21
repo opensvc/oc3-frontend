@@ -29,9 +29,10 @@
     "noFilter": "None",
     "actionQueue": "Action queue",
     "accountMenu": "Account menu",
-    "actionQueueEmpty": "No action in the queue",
+    "actionQueueEmpty": "No action waiting: open the action history",
     "actionQueuePending_one": "1 action waiting in the queue",
-    "actionQueuePending_other": "{{count}} actions waiting in the queue"
+    "actionQueuePending_other": "{{count}} actions waiting in the queue",
+    "actionQueueOpen": "Open the action queue"
   },
   "state": {
     "up": "up",
