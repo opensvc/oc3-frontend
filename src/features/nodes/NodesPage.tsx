@@ -7,6 +7,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { NodeActionsMenu } from "./NodeActionsMenu";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { OsLogo } from "@/components/opensvc/OsLogo";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -295,6 +296,9 @@ export function NodesPage() {
   const { data, isPending, isError, error, isFetching } = useNodes(search);
   const filtersets = useFiltersets();
   const [creating, setCreating] = useState(false);
+  // Sélection tenue par la liste ; la page n'en garde que les identifiants, pour le
+  // menu d'actions. Les noms viennent de la page affichée, d'où le repli sur l'id.
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   /** Identifiants de toute la sélection, filterset compris, sans pagination. */
   async function allIds(): Promise<string[]> {
@@ -318,6 +322,11 @@ export function NodesPage() {
   }
 
   const selected = data?.rows.find((row) => row.node_id === search.sel);
+  // Noms de la page affichée : une sélection étendue aux pages suivantes ne les a
+  // pas tous, l'identifiant sert alors de repli dans les messages.
+  const nodeNames = Object.fromEntries(
+    (data?.rows ?? []).map((row) => [row.node_id ?? "", row.nodename ?? ""]),
+  );
 
   return (
     <section>
@@ -337,6 +346,7 @@ export function NodesPage() {
         >
           {t("nodes.create.open")}
         </button>
+        <NodeActionsMenu nodes={selectedIds.map((id) => ({ id, name: nodeNames[id] ?? id }))} />
       </div>
 
       <CollectorList
@@ -351,6 +361,7 @@ export function NodesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
       />
 

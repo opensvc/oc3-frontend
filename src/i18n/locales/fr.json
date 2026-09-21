@@ -146,6 +146,28 @@
       "networks": "Réseaux",
       "storage": "Stockage"
     },
+    "actions": {
+      "open": "Actions",
+      "question_one": "Mettre {{action}} en file sur ce node ?",
+      "question_other": "Mettre {{action}} en file sur {{count}} nodes ?",
+      "confirm": "Mettre en file",
+      "queueing": "Mise en file…",
+      "queued_one": "{{action}} en file sur 1 node.",
+      "queued_other": "{{action}} en file sur {{count}} nodes.",
+      "failure": "{{name}} : {{message}}",
+      "items": {
+        "pushasset": "Remonter l'inventaire du node",
+        "pushdisks": "Remonter les disques",
+        "pushpkg": "Remonter les paquets",
+        "pushpatch": "Remonter les correctifs",
+        "pushstats": "Remonter les statistiques",
+        "checks": "Remonter les relevés",
+        "sysreport": "Remonter le sysreport",
+        "scanscsi": "Réexaminer les hôtes SCSI",
+        "freeze": "Geler",
+        "thaw": "Dégeler"
+      }
+    },
     "hardware": {
       "reported": "Remonté par l'agent",
       "empty": "Aucun inventaire matériel : l'agent n'en a pas remonté pour ce node.",
@@ -283,6 +305,22 @@
     "related": {
       "label": "Données du service",
       "storage": "Stockage"
+    },
+    "actions": {
+      "open": "Actions",
+      "question_one": "Mettre {{action}} en file sur ce service ?",
+      "question_other": "Mettre {{action}} en file sur {{count}} services ?",
+      "confirm": "Mettre en file",
+      "queueing": "Mise en file…",
+      "queued_one": "{{action}} en file sur 1 service.",
+      "queued_other": "{{action}} en file sur {{count}} services.",
+      "failure": "{{name}} : {{message}}",
+      "items": {
+        "push resinfo": "Remonter les informations applicatives",
+        "push config": "Remonter la configuration",
+        "freeze": "Geler",
+        "thaw": "Dégeler"
+      }
     }
   },
   "alerts": {
@@ -584,6 +622,22 @@
         "state": "État",
         "resources": "État des ressources",
         "virtualization": "Virtualisation"
+      }
+    },
+    "actions": {
+      "open": "Actions",
+      "question_one": "Mettre {{action}} en file sur cette instance ?",
+      "question_other": "Mettre {{action}} en file sur {{count}} instances ?",
+      "confirm": "Mettre en file",
+      "queueing": "Mise en file…",
+      "queued_one": "{{action}} en file sur 1 instance.",
+      "queued_other": "{{action}} en file sur {{count}} instances.",
+      "failure": "{{name}} : {{message}}",
+      "items": {
+        "push resinfo": "Remonter les informations applicatives",
+        "push config": "Remonter la configuration",
+        "freeze": "Geler",
+        "thaw": "Dégeler"
       }
     }
   },

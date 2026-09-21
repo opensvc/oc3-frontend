@@ -1079,6 +1079,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/nodes/{node_id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Queue an agent action on a node, as the historical collector action menu
+         *     did. The command is built from the node action_type: queued bare for a
+         *     pull or feed node, wrapped in a ssh call to nodemgr for a push node.
+         *     Requires the NodeExec privilege and responsibility for the node.
+         */
+        post: operations["PostNodeAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/nodes/{node_id}/alerts": {
         parameters: {
             query?: never;
@@ -1572,6 +1594,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/services/{svc_id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Queue an agent action on a service, as the historical collector action menu
+         *     did: the action is posted for a node of the service seen alive in the last
+         *     15 minutes, and asks the agent to act on the whole service rather than on
+         *     that one instance. Requires the NodeExec privilege and responsibility for
+         *     the service.
+         */
+        post: operations["PostServiceAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/services/{svc_id}/alerts": {
         parameters: {
             query?: never;
@@ -1808,6 +1853,27 @@ export interface paths {
         post?: never;
         /** @description Delete a service instance and cascade to dashboard, resmon, resinfo and checks_live */
         delete: operations["DeleteServiceInstance"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/services/{svc_id}/instances/{node_id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Queue an agent action on one service instance, acting on that node only.
+         *     Requires the NodeExec privilege and responsibility for both the service and
+         *     the node.
+         */
+        post: operations["PostServiceInstanceAction"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -6600,6 +6666,53 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
+    PostNodeAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the node */
+                node_id: components["parameters"]["inPathNodeId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description Action to queue
+                     * @enum {string}
+                     */
+                    action: "pushasset" | "pushdisks" | "pushpkg" | "pushpatch" | "pushstats" | "checks" | "sysreport" | "scanscsi" | "freeze" | "thaw";
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Command queued for the agent */
+                        command?: string;
+                        /**
+                         * Format: int64
+                         * @description Action queue entry id
+                         */
+                        id?: number;
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
     GetNodeAlerts: {
         parameters: {
             query?: {
@@ -8076,6 +8189,62 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
+    PostServiceAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service identifier (svc_id UUID or svcname) */
+                svc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description Action to queue
+                     * @enum {string}
+                     */
+                    action: "push resinfo" | "push config" | "freeze" | "thaw";
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Command queued for the agent */
+                        command?: string;
+                        /**
+                         * Format: int64
+                         * @description Action queue entry id
+                         */
+                        id?: number;
+                        info?: string;
+                        /** @description Node the action was queued on */
+                        node_id?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            /** @description No node of the service has been seen alive recently */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: components["responses"]["500"];
+        };
+    };
     GetServiceAlerts: {
         parameters: {
             query?: {
@@ -8702,6 +8871,55 @@ export interface operations {
                     "application/json": Record<string, never>;
                 };
             };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostServiceInstanceAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service identifier (svc_id UUID or svcname) */
+                svc_id: string;
+                /** @description ID of the node */
+                node_id: components["parameters"]["inPathNodeId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description Action to queue
+                     * @enum {string}
+                     */
+                    action: "push resinfo" | "push config" | "freeze" | "thaw";
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Command queued for the agent */
+                        command?: string;
+                        /**
+                         * Format: int64
+                         * @description Action queue entry id
+                         */
+                        id?: number;
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
             401: components["responses"]["401"];
             403: components["responses"]["403"];
             404: components["responses"]["404"];

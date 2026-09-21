@@ -146,6 +146,28 @@
       "networks": "Networks",
       "storage": "Storage"
     },
+    "actions": {
+      "open": "Actions",
+      "question_one": "Queue {{action}} on this node?",
+      "question_other": "Queue {{action}} on {{count}} nodes?",
+      "confirm": "Queue",
+      "queueing": "Queuing…",
+      "queued_one": "{{action}} queued on 1 node.",
+      "queued_other": "{{action}} queued on {{count}} nodes.",
+      "failure": "{{name}}: {{message}}",
+      "items": {
+        "pushasset": "Push asset information",
+        "pushdisks": "Push disks information",
+        "pushpkg": "Push packages information",
+        "pushpatch": "Push patches information",
+        "pushstats": "Push stats",
+        "checks": "Push check values",
+        "sysreport": "Push sysreport",
+        "scanscsi": "Rescan SCSI hosts",
+        "freeze": "Freeze",
+        "thaw": "Thaw"
+      }
+    },
     "hardware": {
       "reported": "Reported by the agent",
       "empty": "No hardware inventory: the agent has not reported any for this node.",
@@ -283,6 +305,22 @@
     "related": {
       "label": "Service data",
       "storage": "Storage"
+    },
+    "actions": {
+      "open": "Actions",
+      "question_one": "Queue {{action}} on this service?",
+      "question_other": "Queue {{action}} on {{count}} services?",
+      "confirm": "Queue",
+      "queueing": "Queuing…",
+      "queued_one": "{{action}} queued on 1 service.",
+      "queued_other": "{{action}} queued on {{count}} services.",
+      "failure": "{{name}}: {{message}}",
+      "items": {
+        "push resinfo": "Push app information",
+        "push config": "Push service configuration",
+        "freeze": "Freeze",
+        "thaw": "Thaw"
+      }
     }
   },
   "alerts": {
@@ -584,6 +622,22 @@
         "state": "State",
         "resources": "Resource status",
         "virtualization": "Virtualization"
+      }
+    },
+    "actions": {
+      "open": "Actions",
+      "question_one": "Queue {{action}} on this instance?",
+      "question_other": "Queue {{action}} on {{count}} instances?",
+      "confirm": "Queue",
+      "queueing": "Queuing…",
+      "queued_one": "{{action}} queued on 1 instance.",
+      "queued_other": "{{action}} queued on {{count}} instances.",
+      "failure": "{{name}}: {{message}}",
+      "items": {
+        "push resinfo": "Push app information",
+        "push config": "Push service configuration",
+        "freeze": "Freeze",
+        "thaw": "Thaw"
       }
     }
   },

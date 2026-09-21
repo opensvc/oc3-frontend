@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -19,6 +20,7 @@ import {
   type ResolvedListSearch,
 } from "@/lib/list-search";
 import { InstanceDetailPanel } from "./InstanceDetailPanel";
+import { InstanceActionsMenu } from "./InstanceActionsMenu";
 import { toInstanceId } from "./instance-id";
 
 type InstanceRow = components["schemas"]["InstanceRow"];
@@ -209,7 +211,16 @@ export function InstancesPage() {
     });
   }
 
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
   const selected = data?.rows.find((row) => toInstanceId(row.svc_id, row.node_id) === search.sel);
+  // « service @ node » plutôt que l'identifiant composé, pour nommer les refus.
+  const instanceNames = Object.fromEntries(
+    (data?.rows ?? []).map((row) => [
+      toInstanceId(row.svc_id, row.node_id) ?? "",
+      `${row["services.svcname"] ?? row.svc_id ?? ""} @ ${row["nodes.nodename"] ?? row.node_id ?? ""}`,
+    ]),
+  );
 
   return (
     <section>
@@ -218,6 +229,9 @@ export function InstancesPage() {
           <ObjectIcon kind="instance" className="h-5 w-5" />
           {t("instances.title")}
         </h1>
+        <InstanceActionsMenu
+          instances={selectedIds.map((id) => ({ id, name: instanceNames[id] ?? id }))}
+        />
       </div>
 
       <CollectorList
@@ -233,6 +247,7 @@ export function InstancesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
       />
 

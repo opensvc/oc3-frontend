@@ -6,6 +6,7 @@ import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPane
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
+import { ServiceActionsMenu } from "./ServiceActionsMenu";
 import { useServiceTags } from "./related/queries";
 import { SERVICE_RELATED_TABS } from "./related/service-related";
 import { formatDateTime } from "@/lib/format";
@@ -159,6 +160,13 @@ export function ServiceDetailPanel({
       propertiesFamily="service"
       label={t("services.related.label")}
     >
+      {tagEdit.allowed && (
+        <div className="mb-4">
+          <ServiceActionsMenu
+            services={svcId === undefined ? [] : [{ id: svcId, name: service?.svcname ?? svcId }]}
+          />
+        </div>
+      )}
       <ObjectTags
         tags={tags.data}
         isPending={open && tags.isPending}

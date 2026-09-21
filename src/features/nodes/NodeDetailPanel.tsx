@@ -4,6 +4,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { NODE_RELATED_TABS } from "./related/node-related";
+import { NodeActionsMenu } from "./NodeActionsMenu";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
@@ -268,6 +269,13 @@ export function NodeDetailPanel({
       propertiesFamily="node"
       label={t("nodes.related.label")}
     >
+      {tagEdit.allowed && (
+        <div className="mb-4">
+          <NodeActionsMenu
+            nodes={nodeId === undefined ? [] : [{ id: nodeId, name: node?.nodename ?? nodeId }]}
+          />
+        </div>
+      )}
       <ObjectTags
         tags={tags.data}
         isPending={open && tags.isPending}

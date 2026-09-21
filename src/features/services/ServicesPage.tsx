@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DateTime } from "@/components/ui/DateTime";
 import { RelativeTime } from "@/components/ui/RelativeTime";
@@ -7,6 +8,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { ServiceActionsMenu } from "./ServiceActionsMenu";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { StatusBadge } from "@/components/opensvc/StatusBadge";
@@ -195,6 +197,7 @@ export function ServicesPage() {
   const navigate = useNavigate({ from: "/services" });
   const { data, isPending, isError, error, isFetching } = useServices(search);
   const filtersets = useFiltersets();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   /** Identifiants de toute la sélection, filterset compris, sans pagination. */
   async function allIds(): Promise<string[]> {
@@ -218,13 +221,23 @@ export function ServicesPage() {
   }
 
   const selected = data?.rows.find((row) => row.svc_id === search.sel);
+  // Noms de la page affichée : une sélection étendue aux pages suivantes ne les a
+  // pas tous, l'identifiant sert alors de repli dans les messages.
+  const svcNames = Object.fromEntries(
+    (data?.rows ?? []).map((row) => [row.svc_id ?? "", row.svcname ?? ""]),
+  );
 
   return (
     <section>
-      <h1 className="mb-3 flex items-center gap-2 text-title font-semibold">
-        <ObjectIcon kind="service" className="h-5 w-5" />
-        {t("services.title")}
-      </h1>
+      <div className="mb-3 flex items-center gap-3">
+        <h1 className="flex items-center gap-2 text-title font-semibold">
+          <ObjectIcon kind="service" className="h-5 w-5" />
+          {t("services.title")}
+        </h1>
+        <ServiceActionsMenu
+          services={selectedIds.map((id) => ({ id, name: svcNames[id] ?? id }))}
+        />
+      </div>
 
       <CollectorList
         columns={COLUMNS}
@@ -238,6 +251,7 @@ export function ServicesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
       />
 

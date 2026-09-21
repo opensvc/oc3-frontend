@@ -4,6 +4,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
+import { InstanceActionsMenu } from "./InstanceActionsMenu";
 import { useServiceTags } from "@/features/services/related/queries";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { problemText } from "@/lib/api/problem";
@@ -143,12 +144,21 @@ export function InstanceDetailPanel({
       labelPrefix="instances.fields"
       groupPrefix="instances.detail.groups"
       before={
-        <ObjectTags
-          tags={tags.data}
-          isPending={svcId !== undefined && tags.isPending}
-          errorMessage={tags.isError ? tags.error.message : null}
-          edit={tagEdit}
-        />
+        <>
+          {tagEdit.allowed && (
+            <div className="mb-4">
+              <InstanceActionsMenu
+                instances={instanceId === undefined ? [] : [{ id: instanceId, name: title }]}
+              />
+            </div>
+          )}
+          <ObjectTags
+            tags={tags.data}
+            isPending={svcId !== undefined && tags.isPending}
+            errorMessage={tags.isError ? tags.error.message : null}
+            edit={tagEdit}
+          />
+        </>
       }
       isPending={key !== null && isPending}
       errorMessage={isError ? error.message : null}
