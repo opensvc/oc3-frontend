@@ -360,6 +360,7 @@ export function DetailPanel<T>({
   onClose,
   kind,
   isPending,
+  before,
   ...content
 }: DetailContentProps<T> & {
   open: boolean;
@@ -367,6 +368,8 @@ export function DetailPanel<T>({
   onClose: () => void;
   /** Type d'objet, pour rappeler en tête de panneau d'où vient la ligne. */
   kind: ObjectKind;
+  /** Contenu placé avant les propriétés, comme les tags de l'objet. */
+  before?: ReactNode;
 }) {
   const { t } = useTranslation();
   return (
@@ -377,6 +380,7 @@ export function DetailPanel<T>({
       closeLabel={t("detail.close")}
       leading={<ObjectIcon kind={kind} />}
     >
+      {before}
       {/* Une requête désactivée reste « en attente » : panneau fermé, rien à charger. */}
       <DetailContent {...content} isPending={open && isPending} />
     </SlideOver>

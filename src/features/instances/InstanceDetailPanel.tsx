@@ -3,6 +3,9 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { ObjectTags } from "@/components/opensvc/ObjectTags";
+import { useServiceTags } from "@/features/services/related/queries";
+import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { problemText } from "@/lib/api/problem";
 import { formatDateTime } from "@/lib/format";
 import { fromInstanceId } from "./instance-id";
@@ -115,6 +118,12 @@ export function InstanceDetailPanel({
     },
   });
 
+  // Les tags sont ceux du service de l'instance : une instance n'en porte pas. Même
+  // clé de cache que le panneau de service, qui voit donc les mêmes changements.
+  const svcId = key?.svcId;
+  const tags = useServiceTags(svcId);
+  const tagEdit = useTagEdit("service", svcId);
+
   const title =
     instance === undefined || instance === null
       ? label === ""
@@ -133,6 +142,14 @@ export function InstanceDetailPanel({
       row={key === null && instanceId !== undefined ? null : instance}
       labelPrefix="instances.fields"
       groupPrefix="instances.detail.groups"
+      before={
+        <ObjectTags
+          tags={tags.data}
+          isPending={svcId !== undefined && tags.isPending}
+          errorMessage={tags.isError ? tags.error.message : null}
+          edit={tagEdit}
+        />
+      }
       isPending={key !== null && isPending}
       errorMessage={isError ? error.message : null}
     />
