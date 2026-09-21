@@ -7,6 +7,8 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { CrossLink } from "@/components/opensvc/CrossLink";
+import { TeamLink } from "@/features/groups/TeamLink";
 import { NodeActionsMenu } from "./NodeActionsMenu";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { OsLogo } from "@/components/opensvc/OsLogo";
@@ -237,6 +239,14 @@ const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
     // La colonne mémoire est en mébioctets malgré son nom, voir lib/format.
     if (prop === "mem_bytes") return formatSizeMiB(row.mem_bytes, locale);
     // Comme dans le collector historique, le logo du système précède le nom.
+    if (prop === "team_responsible" || prop === "team_integ" || prop === "team_support")
+      return <TeamLink name={value} />;
+    if (prop === "app")
+      return (
+        <CrossLink kind="app" to="/apps" id={typeof value === "string" ? value : undefined}>
+          {value}
+        </CrossLink>
+      );
     if (prop === "nodename")
       return (
         <span className="inline-flex items-center gap-1.5 whitespace-nowrap">

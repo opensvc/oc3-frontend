@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { formatSizeMiB } from "@/lib/format";
@@ -99,6 +100,24 @@ const COLUMNS: ListColumn<DiskRow>[] = DISK_PROPS.map((prop) => ({
   family: FAMILY[prop] ?? "node",
   render: (row: DiskRow, locale: string) => {
     const value = row[prop];
+    if (prop === "app")
+      return (
+        <CrossLink kind="app" to="/apps" id={typeof value === "string" ? value : undefined}>
+          {value}
+        </CrossLink>
+      );
+    if (prop === "nodename")
+      return (
+        <CrossLink kind="node" to="/nodes" id={row.node_id}>
+          {value}
+        </CrossLink>
+      );
+    if (prop === "svcname")
+      return (
+        <CrossLink kind="service" to="/services" id={row.svc_id}>
+          {value}
+        </CrossLink>
+      );
     if (SIZE_PROPS.has(prop) && typeof value === "number") return formatSizeMiB(value, locale);
     if (DATE_PROPS.has(prop) && typeof value === "string")
       return <DateTime value={value} locale={locale} />;
@@ -108,9 +127,17 @@ const COLUMNS: ListColumn<DiskRow>[] = DISK_PROPS.map((prop) => ({
 
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
-/** Ne demander que les colonnes affichées : apicollector fait le pushdown en base. */
+/**
+ * Colonnes affichées et identifiant, plus les identifiants du node et du service :
+ * leurs noms sont des puces qui ouvrent leur vue, et il leur faut leur cible.
+ */
 function queryProps(cols: string[] | undefined): string {
-  return [...new Set(["disk_id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
+  const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
+  const extra = [
+    ...(shown.includes("nodename") ? ["node_id"] : []),
+    ...(shown.includes("svcname") ? ["svc_id"] : []),
+  ];
+  return [...new Set(["disk_id", ...shown, ...extra])].join(",");
 }
 
 function useDisks(search: ResolvedListSearch) {

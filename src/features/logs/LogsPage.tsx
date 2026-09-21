@@ -5,6 +5,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { OsLogo } from "@/components/opensvc/OsLogo";
 import { StatusBadge } from "@/components/opensvc/StatusBadge";
@@ -89,7 +90,9 @@ function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, [...LOG_PROPS]);
   const extra = [
     ...(shown.includes("log_fmt") ? ["log_dict"] : []),
-    ...(shown.includes("nodes.nodename") ? ["nodes.os_name"] : []),
+    // Les noms joints sont des puces vers leur vue : il leur faut leur identifiant.
+    ...(shown.includes("nodes.nodename") ? ["nodes.os_name", "node_id"] : []),
+    ...(shown.includes("services.svcname") ? ["svc_id"] : []),
   ];
   return [...new Set(["id", ...shown, ...extra])].join(",");
 }
@@ -169,11 +172,19 @@ export function LogsPage() {
         return row.log_level === undefined ? undefined : (
           <StatusBadge state={logLevelState(row.log_level)} label={row.log_level} />
         );
+      if (prop === "services.svcname")
+        return value === null || value === undefined ? undefined : (
+          <CrossLink kind="service" to="/services" id={row.svc_id}>
+            {value}
+          </CrossLink>
+        );
       if (prop === "nodes.nodename")
         return value === null || value === undefined ? undefined : (
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
             <OsLogo osName={row["nodes.os_name"] ?? undefined} />
-            {value}
+            <CrossLink kind="node" to="/nodes" id={row.node_id}>
+              {value}
+            </CrossLink>
           </span>
         );
       if (prop === "log_fmt") {

@@ -876,5 +876,15 @@
       "question": "Detach tag {{name}}?",
       "confirm": "Detach"
     }
+  },
+  "crossLink": {
+    "hint": "Double-click to open this {{kind}}",
+    "kinds": {
+      "node": "node",
+      "service": "service",
+      "instance": "instance",
+      "app": "app",
+      "group": "team"
+    }
   }
 }

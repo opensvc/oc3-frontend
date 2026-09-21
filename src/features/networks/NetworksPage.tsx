@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import {
@@ -108,6 +109,12 @@ const COLUMNS: ListColumn<IpRow>[] = IP_PROPS.map((prop) => ({
   sortable: false,
   render: (row: IpRow, locale: string) => {
     const value = row[prop];
+    if (prop === "nodename")
+      return (
+        <CrossLink kind="node" to="/nodes" id={row.node_id}>
+          {value}
+        </CrossLink>
+      );
     if (DATE_PROPS.has(prop) && typeof value === "string")
       return <DateTime value={value} locale={locale} />;
     return value;
@@ -116,9 +123,14 @@ const COLUMNS: ListColumn<IpRow>[] = IP_PROPS.map((prop) => ({
 
 const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
-/** Ne demander que les colonnes affichées : apicollector fait le pushdown en base. */
+/**
+ * Colonnes affichées et identifiant, plus celui du node quand son nom est affiché :
+ * c'est une puce qui ouvre la vue Nodes sur ce node.
+ */
 function queryProps(cols: string[] | undefined): string {
-  return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
+  const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
+  const extra = shown.includes("nodename") ? ["node_id"] : [];
+  return [...new Set(["id", ...shown, ...extra])].join(",");
 }
 
 function useIps(search: ResolvedListSearch) {

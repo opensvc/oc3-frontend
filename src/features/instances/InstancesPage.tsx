@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { OsLogo } from "@/components/opensvc/OsLogo";
 import { StatusBadge } from "@/components/opensvc/StatusBadge";
@@ -139,8 +140,16 @@ const COLUMNS: ListColumn<InstanceRow>[] = INSTANCE_PROPS.map((prop) => ({
       return (
         <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
           <OsLogo osName={row["nodes.os_name"] ?? undefined} />
-          {value}
+          <CrossLink kind="node" to="/nodes" id={row.node_id}>
+            {value}
+          </CrossLink>
         </span>
+      );
+    if (prop === "services.svcname")
+      return (
+        <CrossLink kind="service" to="/services" id={row.svc_id}>
+          {value}
+        </CrossLink>
       );
     if (STATUS_PROPS.has(prop) && typeof value === "string")
       return <StatusBadge {...statusBadge(value)} />;

@@ -518,11 +518,22 @@ export function CollectorList<T>({
                 return (
                   <tr
                     key={row.id}
+                    // La ligne porte l'ouverture du panneau, au clic comme au clavier :
+                    // une cellule peut contenir ses propres boutons, et un bouton dans
+                    // un bouton ne serait ni valide ni utilisable au clavier.
+                    tabIndex={0}
+                    aria-haspopup="dialog"
                     onClick={() => {
                       onChange({ sel: id });
                     }}
+                    onKeyDown={(event) => {
+                      if (event.target !== event.currentTarget) return;
+                      if (event.key !== "Enter" && event.key !== " ") return;
+                      event.preventDefault();
+                      onChange({ sel: id });
+                    }}
                     aria-current={selected ? "true" : undefined}
-                    className={`h-(--row-height) cursor-pointer border-b border-line last:border-b-0 hover:bg-surface-sunken ${
+                    className={`h-(--row-height) cursor-pointer border-b border-line last:border-b-0 hover:bg-surface-sunken focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--focus-ring) ${
                       selected ? "bg-accent-soft" : ""
                     }`}
                   >
@@ -545,16 +556,8 @@ export function CollectorList<T>({
                       const meta = getMeta(cell.column.columnDef).column;
                       const content = flexRender(cell.column.columnDef.cell, cell.getContext());
                       return index === 0 ? (
-                        <th key={cell.id} scope="row" className="text-left font-medium">
-                          {/* Le bouton porte l'ouverture pour le clavier et les lecteurs
-                              d'écran ; le clic sur la ligne n'est qu'un raccourci souris. */}
-                          <button
-                            type="button"
-                            aria-haspopup="dialog"
-                            className="w-full px-2 text-left"
-                          >
-                            {content}
-                          </button>
+                        <th key={cell.id} scope="row" className="px-2 text-left font-medium">
+                          {content}
                         </th>
                       ) : (
                         <td

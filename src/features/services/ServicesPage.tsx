@@ -8,6 +8,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ServiceActionsMenu } from "./ServiceActionsMenu";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -149,6 +150,12 @@ const COLUMNS: ListColumn<ServiceRow>[] = SERVICE_PROPS.map((prop) => ({
   family: FAMILY[prop] ?? "node",
   render: (row: ServiceRow, locale: string) => {
     const value = row[prop];
+    if (prop === "svc_app")
+      return (
+        <CrossLink kind="app" to="/apps" id={typeof value === "string" ? value : undefined}>
+          {value}
+        </CrossLink>
+      );
     if (STATUS_PROPS.has(prop) && typeof value === "string") {
       return <StatusBadge {...statusBadge(value)} />;
     }

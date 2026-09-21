@@ -72,7 +72,7 @@ const ALL_PROPS = COLUMNS.map((column) => column.prop);
 
 /** Ne demander que les colonnes affichées : apicollector fait le pushdown en base. */
 function queryProps(cols: string[] | undefined): string {
-  return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
+  return [...new Set(["id", "app", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
 
 function useApps(search: ResolvedListSearch) {
@@ -131,7 +131,14 @@ export function AppsPage() {
     });
   }
 
-  const selected = data?.rows.find((row) => String(row.id) === search.sel);
+  // Le code désigne la ligne : c'est lui que portent les autres vues, et l'API
+  // accepte aussi bien `GET /apps/DEV` que l'identifiant entier. Un lien déjà
+  // partagé en `?sel="<id>"` ouvre donc toujours la bonne fiche, sans surligner sa
+  // ligne. Le routeur lit un `sel` non guillemeté comme un nombre et l'écarte, ce
+  // qui est vrai de toutes les vues à identifiant entier : voir notes.md.
+  const selected = data?.rows.find(
+    (row) => row.app === search.sel || String(row.id) === search.sel,
+  );
 
   return (
     <section>
@@ -157,7 +164,7 @@ export function AppsPage() {
         columns={COLUMNS}
         defaultCols={DEFAULT_COLS}
         rows={data?.rows ?? []}
-        rowId={(row) => (row.id === undefined ? undefined : String(row.id))}
+        rowId={(row) => row.app}
         search={search}
         onChange={update}
         // Les filtersets du collector ne portent pas sur les codes application.

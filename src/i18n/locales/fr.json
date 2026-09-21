@@ -876,5 +876,15 @@
       "question": "Détacher le tag {{name}} ?",
       "confirm": "Détacher"
     }
+  },
+  "crossLink": {
+    "hint": "Double-cliquer pour ouvrir ce {{kind}}",
+    "kinds": {
+      "node": "node",
+      "service": "service",
+      "instance": "instance",
+      "app": "application",
+      "group": "équipe"
+    }
   }
 }

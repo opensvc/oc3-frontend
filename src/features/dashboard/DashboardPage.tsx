@@ -6,6 +6,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { SeverityBadge } from "@/components/opensvc/SeverityBadge";
 import {
@@ -47,7 +48,17 @@ const COLUMNS: ListColumn<AlertRow>[] = [
     family: "service",
     // orderby n'accepte pas les props joints : cette colonne n'est pas triable.
     sortable: false,
-    render: (r) => objectName(r),
+    // L'alerte porte un service ou un node : la puce mène à celui qui la porte.
+    render: (r) =>
+      r.svc_id !== undefined && r.svc_id !== "" ? (
+        <CrossLink kind="service" to="/services" id={r.svc_id}>
+          {objectName(r)}
+        </CrossLink>
+      ) : (
+        <CrossLink kind="node" to="/nodes" id={r.node_id}>
+          {objectName(r)}
+        </CrossLink>
+      ),
   },
   {
     prop: "dash_env",
@@ -84,7 +95,7 @@ const DEFAULT_COLS = ALL_PROPS;
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
   // La colonne « objet » lit les deux noms joints, et l'identifiant sert au détail.
-  const extra = shown.includes("services.svcname") ? ["nodes.nodename"] : [];
+  const extra = shown.includes("services.svcname") ? ["nodes.nodename", "svc_id", "node_id"] : [];
   return ["id", ...shown, ...extra].join(",");
 }
 
