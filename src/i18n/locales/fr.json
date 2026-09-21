@@ -28,7 +28,10 @@
     "sessionFilter": "Filtre de session",
     "noFilter": "Aucun",
     "actionQueue": "File d'actions",
-    "accountMenu": "Menu du compte"
+    "accountMenu": "Menu du compte",
+    "actionQueueEmpty": "Aucune action dans la file",
+    "actionQueuePending_one": "1 action en attente dans la file",
+    "actionQueuePending_other": "{{count}} actions en attente dans la file"
   },
   "state": {
     "up": "up",
@@ -885,6 +888,32 @@
       "instance": "instance",
       "app": "application",
       "group": "équipe"
+    }
+  },
+  "actions": {
+    "title": "File d'actions",
+    "pending": "en attente de l'agent",
+    "done": "terminée",
+    "noOutput": "L'agent n'a rien renvoyé.",
+    "detail": {
+      "title": "Action de la file",
+      "missing": "Cette action n'est plus dans la file."
+    },
+    "fields": {
+      "id": "Identifiant",
+      "status": "Statut",
+      "command": "Commande",
+      "action_type": "Type",
+      "connect_to": "Connexion à",
+      "date_queued": "Mise en file",
+      "date_dequeued": "Dépilée",
+      "ret": "Code de retour",
+      "stdout": "Sortie standard",
+      "stderr": "Sortie d'erreur",
+      "node_id": "Identifiant du node",
+      "svc_id": "Identifiant du service",
+      "nodes.nodename": "Node",
+      "services.svcname": "Service"
     }
   }
 }

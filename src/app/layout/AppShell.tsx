@@ -5,6 +5,7 @@ import { useCredentials } from "@/lib/api/auth";
 import { SignIn } from "@/features/auth/SignIn";
 import opensvcLogo from "@/assets/opensvc-logo.svg";
 import { Sidebar } from "./Sidebar";
+import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
 
 const SIDEBAR_KEY = "oc3.sidebar";
@@ -79,9 +80,7 @@ export function AppShell() {
           >
             {t("header.sessionFilter")}: {t("header.noFilter")}
           </button>
-          <span className="text-ink-muted" title={t("header.actionQueue")}>
-            {t("header.actionQueue")}
-          </span>
+          <ActionQueueLink />
           <input
             type="search"
             placeholder={t("header.search")}

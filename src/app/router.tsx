@@ -11,6 +11,7 @@ import { LogsPage } from "@/features/logs/LogsPage";
 import { NetworksPage } from "@/features/networks/NetworksPage";
 import { NodesPage } from "@/features/nodes/NodesPage";
 import { ObsolescencePage } from "@/features/obsolescence/ObsolescencePage";
+import { ActionsPage } from "@/features/actions/ActionsPage";
 import { ProfilePage } from "@/features/profile/ProfilePage";
 import { ServicesPage } from "@/features/services/ServicesPage";
 import { TagsPage } from "@/features/tags/TagsPage";
@@ -133,6 +134,14 @@ const usersRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
+// File d'actions du collector : atteinte depuis la barre du haut, pas depuis le menu.
+const actionsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/actions",
+  component: ActionsPage,
+  validateSearch: parseListSearch,
+});
+
 // Profil de l'utilisateur connecté : pas d'état de liste, donc pas de recherche.
 const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -156,6 +165,7 @@ const routeTree = rootRoute.addChildren([
   logsRoute,
   filtersRoute,
   filtersetsRoute,
+  actionsRoute,
   profileRoute,
 ]);
 

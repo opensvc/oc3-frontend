@@ -28,7 +28,10 @@
     "sessionFilter": "Session filter",
     "noFilter": "None",
     "actionQueue": "Action queue",
-    "accountMenu": "Account menu"
+    "accountMenu": "Account menu",
+    "actionQueueEmpty": "No action in the queue",
+    "actionQueuePending_one": "1 action waiting in the queue",
+    "actionQueuePending_other": "{{count}} actions waiting in the queue"
   },
   "state": {
     "up": "up",
@@ -885,6 +888,32 @@
       "instance": "instance",
       "app": "app",
       "group": "team"
+    }
+  },
+  "actions": {
+    "title": "Action queue",
+    "pending": "waiting for the agent",
+    "done": "done",
+    "noOutput": "The agent returned no output.",
+    "detail": {
+      "title": "Queued action",
+      "missing": "This action is no longer in the queue."
+    },
+    "fields": {
+      "id": "Record id",
+      "status": "Status",
+      "command": "Command",
+      "action_type": "Type",
+      "connect_to": "Connects to",
+      "date_queued": "Queued",
+      "date_dequeued": "Taken",
+      "ret": "Return code",
+      "stdout": "Standard output",
+      "stderr": "Error output",
+      "node_id": "Node id",
+      "svc_id": "Service id",
+      "nodes.nodename": "Node",
+      "services.svcname": "Service"
     }
   }
 }
