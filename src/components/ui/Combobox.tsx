@@ -100,6 +100,13 @@ export function Combobox({
           event.currentTarget.select();
           setOpen(true);
         }}
+        onMouseUp={(event) => {
+          // Le clic pose le curseur dans le texte et défait la sélection du focus :
+          // sans cela, taper accolerait le filtre à l'option déjà choisie, et la
+          // liste n'aurait plus rien à montrer. C'est au relâchement, une fois le
+          // curseur posé, qu'il faut resélectionner.
+          if (query === null) event.currentTarget.select();
+        }}
         onClick={() => {
           setOpen(true);
         }}

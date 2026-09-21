@@ -44,6 +44,11 @@ const BOOLEANS = new Set([...EDITABLE_BOOLEANS, "node_frozen"]);
 const EDITABLE = new Set<string>([
   "app",
   "team_responsible",
+  // L'équipe d'intégration est modifiable à la demande, mais l'agent l'écrit quand
+  // son inventaire la porte (`team_integ` dans `worker/job_feed_system.go`, en
+  // `Optional`) : une valeur fixée ici tient jusqu'à la prochaine remontée qui la
+  // mentionne. L'équipe de support est dans le même cas, laissée en lecture seule.
+  "team_integ",
   "status",
   "role",
   "type",
