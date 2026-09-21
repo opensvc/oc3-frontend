@@ -15,7 +15,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
-import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
+import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateNetworkPanel } from "./CreateNetworkPanel";
 import { NetworkDetailPanel } from "./NetworkDetailPanel";
 
@@ -144,10 +144,10 @@ function useIps(search: ResolvedListSearch) {
 
 export function NetworksPage() {
   const { t } = useTranslation();
-  const prefs = useViewColumns("networks");
-  const search = withSavedCols(
-    resolveListSearch(useSearch({ from: "/networks" }), DEFAULT_SORT),
-    prefs.cols,
+  const prefs = useViewPrefs("networks");
+  const search = resolveListSearch(
+    withSavedSearch(useSearch({ from: "/networks" }), prefs),
+    DEFAULT_SORT,
   );
   const navigate = useNavigate({ from: "/networks" });
   const { data, isPending, isError, error, isFetching } = useIps(search);
@@ -166,8 +166,9 @@ export function NetworksPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
-    if ("cols" in next) prefs.save(next.cols);
+    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.saveCols(next.cols);
+    if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),

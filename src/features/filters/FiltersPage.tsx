@@ -15,7 +15,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
-import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
+import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { FilterDetailPanel } from "./FilterDetailPanel";
 import { FilterFormPanel } from "./FilterFormPanel";
 import { useFilter } from "./use-filter";
@@ -99,10 +99,10 @@ function useFilters(search: ResolvedListSearch) {
 
 export function FiltersPage() {
   const { t } = useTranslation();
-  const prefs = useViewColumns("filters");
-  const search = withSavedCols(
-    resolveListSearch(useSearch({ from: "/filters" }), DEFAULT_SORT),
-    prefs.cols,
+  const prefs = useViewPrefs("filters");
+  const search = resolveListSearch(
+    withSavedSearch(useSearch({ from: "/filters" }), prefs),
+    DEFAULT_SORT,
   );
   const navigate = useNavigate({ from: "/filters" });
   const { data, isPending, isError, error, isFetching } = useFilters(search);
@@ -124,8 +124,9 @@ export function FiltersPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
-    if ("cols" in next) prefs.save(next.cols);
+    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.saveCols(next.cols);
+    if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { api } from "./api/client";
 import { problemText } from "./api/problem";
-import type { ResolvedListSearch } from "./list-search";
+import type { ListSearch } from "./list-search";
 import { applyTheme, cachedTheme, isTheme, watchSystemTheme, type Theme } from "./theme";
 
 /**
@@ -10,13 +10,22 @@ import { applyTheme, cachedTheme, isTheme, watchSystemTheme, type Theme } from "
  * colonne `prefs` de `user_prefs` : un objet JSON libre, enregistré tel quel par
  * `POST /users/self/prefs`. Les colonnes visibles d'une vue y vivent sous
  * `tables.<vue>.visible_columns`, comme dans `init/static/js/osvc/tables/table.js`,
- * pour qu'un compte retrouve ses colonnes d'une interface à l'autre.
+ * pour qu'un compte retrouve ses colonnes d'une interface à l'autre. Le tri est
+ * rangé à côté, sous `tables.<vue>.sort` : l'ancienne interface ne le gardait pas,
+ * cette clé lui est donc inconnue et sans effet pour elle.
  *
  * Le reste de l'objet — filtres de colonne, mode direct, entrées de menu masquées —
  * appartient à l'ancienne interface : il est relu et réenregistré sans y toucher.
  */
+/** Préférences d'une vue : ce qui suit le compte plutôt que l'URL. */
+export interface ViewPrefs {
+  visible_columns?: string[];
+  /** Clés de tri, préfixées de `-` pour l'ordre descendant, comme dans l'URL. */
+  sort?: string[];
+}
+
 export interface UserPrefs {
-  tables?: Record<string, { visible_columns?: string[] } | undefined>;
+  tables?: Record<string, ViewPrefs | undefined>;
   /** Thème choisi ; absent vaut « système ». */
   theme?: string;
   [key: string]: unknown;
@@ -45,45 +54,61 @@ export function useUserPrefs() {
 }
 
 /**
- * Colonnes enregistrées pour une vue, et de quoi les mettre à jour.
+ * Colonnes et tri enregistrés pour une vue, et de quoi les mettre à jour.
  *
- * L'URL reste prioritaire : un lien partagé montre ses colonnes, pas celles de qui
- * l'ouvre. Les préférences ne servent donc que lorsque l'URL n'en porte pas, et
- * c'est le retour aux colonnes par défaut qui efface l'entrée enregistrée.
+ * L'URL reste prioritaire : un lien partagé montre ses colonnes et son tri, pas ceux
+ * de qui l'ouvre. Les préférences ne servent donc que lorsque l'URL n'en porte pas,
+ * et revenir aux colonnes par défaut efface l'entrée enregistrée.
  */
-export function useViewColumns(view: string) {
+export function useViewPrefs(view: string) {
   const queryClient = useQueryClient();
   const prefs = useUserPrefs();
 
   const save = useMutation({
-    mutationFn: async (cols: string[] | undefined) =>
+    mutationFn: async ({ key, value }: { key: keyof ViewPrefs; value: string[] | undefined }) =>
       savePrefs(queryClient, (current) => {
         const tables = { ...current.tables };
-        if (cols === undefined || cols.length === 0) {
+        const entry: ViewPrefs = { ...tables[view] };
+        if (value === undefined || value.length === 0) {
+          delete entry[key];
+        } else {
+          entry[key] = value;
+        }
+        if (Object.keys(entry).length === 0) {
           delete tables[view];
         } else {
-          tables[view] = { ...tables[view], visible_columns: cols };
+          tables[view] = entry;
         }
         return { ...current, tables };
       }),
   });
 
+  /** Enregistre après un court délai ; un nouvel appel annule le précédent. */
+  function later(key: keyof ViewPrefs, value: string[] | undefined) {
+    const timer = `${view}:${key}`;
+    clearTimeout(timers.get(timer));
+    timers.set(
+      timer,
+      setTimeout(() => {
+        save.mutate({ key, value });
+      }, SAVE_DELAY),
+    );
+  }
+
+  const entry = prefs.data?.tables?.[view];
   return {
-    cols: prefs.data?.tables?.[view]?.visible_columns,
-    /** Enregistre après un court délai ; un nouvel appel annule le précédent. */
-    save: (cols: string[] | undefined) => {
-      clearTimeout(timers.get(view));
-      timers.set(
-        view,
-        setTimeout(() => {
-          save.mutate(cols);
-        }, SAVE_DELAY),
-      );
+    cols: entry?.visible_columns,
+    sort: entry?.sort,
+    saveCols: (cols: string[] | undefined) => {
+      later("visible_columns", cols);
+    },
+    saveSort: (sort: string[] | undefined) => {
+      later("sort", sort);
     },
   };
 }
 
-/** Un compte à rebours par vue : deux vues ouvertes n'annulent pas l'écriture l'une de l'autre. */
+/** Un compte à rebours par vue et par clé : deux écritures ne s'annulent pas l'une l'autre. */
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 async function ensurePrefs(queryClient: QueryClient): Promise<UserPrefs> {
@@ -110,14 +135,18 @@ export async function savePrefs(
 }
 
 /**
- * Applique les colonnes enregistrées à l'état d'URL d'une vue : l'URL l'emporte,
- * les préférences ne comblent que son absence.
+ * Complète l'état d'URL d'une vue avec ses préférences, avant sa résolution :
+ * l'URL l'emporte, les préférences ne comblent que son absence.
  */
-export function withSavedCols(
-  search: ResolvedListSearch,
-  saved: string[] | undefined,
-): ResolvedListSearch {
-  return search.cols === undefined && saved !== undefined ? { ...search, cols: saved } : search;
+export function withSavedSearch(
+  search: ListSearch,
+  saved: { cols?: string[]; sort?: string[] },
+): ListSearch {
+  return {
+    ...search,
+    cols: search.cols ?? saved.cols?.join(","),
+    sort: search.sort ?? saved.sort?.join(","),
+  };
 }
 
 /**

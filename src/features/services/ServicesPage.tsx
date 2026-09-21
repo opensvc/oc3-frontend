@@ -20,7 +20,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
-import { useViewColumns, withSavedCols } from "@/lib/user-prefs";
+import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ServiceDetailPanel } from "./ServiceDetailPanel";
 
 type ServiceRow = components["schemas"]["ServiceRow"];
@@ -194,10 +194,10 @@ function useServices(search: ResolvedListSearch) {
 
 export function ServicesPage() {
   const { t } = useTranslation();
-  const prefs = useViewColumns("services");
-  const search = withSavedCols(
-    resolveListSearch(useSearch({ from: "/services" }), DEFAULT_SORT),
-    prefs.cols,
+  const prefs = useViewPrefs("services");
+  const search = resolveListSearch(
+    withSavedSearch(useSearch({ from: "/services" }), prefs),
+    DEFAULT_SORT,
   );
   const navigate = useNavigate({ from: "/services" });
   const { data, isPending, isError, error, isFetching } = useServices(search);
@@ -219,8 +219,9 @@ export function ServicesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Les colonnes choisies suivent le compte, les autres états restent dans l'URL.
-    if ("cols" in next) prefs.save(next.cols);
+    // Colonnes et tri suivent le compte, les autres états restent dans l'URL.
+    if ("cols" in next) prefs.saveCols(next.cols);
+    if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
       search: (previous) => ({ ...previous, ...toSearchParams(next) }),
       resetScroll: resetsScroll(next),
