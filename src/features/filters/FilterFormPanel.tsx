@@ -96,6 +96,8 @@ export function FilterFormPanel({
 
   return (
     <SlideOver
+      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      closeOnOutsideClick={false}
       open={open}
       title={editing ? t("filters.form.editTitle") : t("filters.form.createTitle")}
       onClose={onClose}

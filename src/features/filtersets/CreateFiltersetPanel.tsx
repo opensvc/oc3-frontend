@@ -56,6 +56,8 @@ export function CreateFiltersetPanel({
 
   return (
     <SlideOver
+      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      closeOnOutsideClick={false}
       open={open}
       title={t("filtersets.create.title")}
       onClose={onClose}

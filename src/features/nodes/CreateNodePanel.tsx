@@ -84,6 +84,8 @@ export function CreateNodePanel({ open, onClose }: { open: boolean; onClose: () 
 
   return (
     <SlideOver
+      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      closeOnOutsideClick={false}
       open={open}
       title={t("nodes.create.title")}
       onClose={onClose}

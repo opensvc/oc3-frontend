@@ -120,6 +120,8 @@ export function CreateNetworkPanel({
 
   return (
     <SlideOver
+      // Tiroir de saisie : un clic à côté ne doit pas effacer ce qui est tapé.
+      closeOnOutsideClick={false}
       open={open}
       title={t("networks.create.title")}
       onClose={onClose}
