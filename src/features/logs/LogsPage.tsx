@@ -174,7 +174,7 @@ export function LogsPage() {
         );
       if (prop === "services.svcname")
         return value === null || value === undefined ? undefined : (
-          <CrossLink kind="service" to="/services" id={row.svc_id}>
+          <CrossLink kind="service" id={row.svc_id}>
             {value}
           </CrossLink>
         );
@@ -182,7 +182,7 @@ export function LogsPage() {
         return value === null || value === undefined ? undefined : (
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
             <OsLogo osName={row["nodes.os_name"] ?? undefined} />
-            <CrossLink kind="node" to="/nodes" id={row.node_id}>
+            <CrossLink kind="node" id={row.node_id}>
               {value}
             </CrossLink>
           </span>

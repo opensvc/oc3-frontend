@@ -30,6 +30,14 @@ export interface ListSearch {
    * rechargement ou le bouton Précédent rouvrent le même onglet.
    */
   tab?: string;
+  /**
+   * Objet d'une autre vue regardé sans quitter celle-ci, sous la forme
+   * `kind:identifiant` : la puce d'une cellule ouvre ainsi sa fiche à la place du
+   * panneau de la ligne. Dans l'URL comme le reste, pour qu'un lien la rouvre.
+   */
+  peek?: string;
+  /** Onglet ouvert dans ce panneau-là, quand l'objet regardé en a. */
+  peektab?: string;
 }
 
 export interface ResolvedListSearch {
@@ -40,6 +48,8 @@ export interface ResolvedListSearch {
   sel?: string;
   cols?: string[];
   tab?: string;
+  peek?: string;
+  peektab?: string;
 }
 
 export const PAGE_SIZES = [25, 50, 100] as const;
@@ -79,6 +89,8 @@ export function parseListSearch(raw: Record<string, unknown>): ListSearch {
     sel: toNonEmptyString(raw.sel),
     cols: toCommaList(raw.cols),
     tab: toNonEmptyString(raw.tab),
+    peek: toNonEmptyString(raw.peek),
+    peektab: toNonEmptyString(raw.peektab),
   };
 }
 
@@ -91,6 +103,8 @@ export function resolveListSearch(search: ListSearch, defaultSort: string[]): Re
     sel: search.sel,
     cols: search.cols?.split(","),
     tab: search.tab,
+    peek: search.peek,
+    peektab: search.peektab,
   };
 }
 
@@ -109,8 +123,16 @@ export function toSearchParams(next: Partial<ResolvedListSearch>): Partial<ListS
   if ("offset" in next) out.offset = next.offset === 0 ? undefined : next.offset;
   if ("limit" in next) out.limit = next.limit === DEFAULT_LIMIT ? undefined : next.limit;
   if ("fset" in next) out.fset = next.fset === "" ? undefined : next.fset;
-  if ("sel" in next) out.sel = next.sel;
+  // Un seul tiroir à la fois : ouvrir le panneau d'une ligne referme la fiche qu'une
+  // puce avait ouverte, comme la puce referme le panneau de la ligne.
+  if ("sel" in next) {
+    out.sel = next.sel;
+    out.peek = undefined;
+    out.peektab = undefined;
+  }
   if ("tab" in next) out.tab = next.tab;
+  if ("peek" in next) out.peek = next.peek;
+  if ("peektab" in next) out.peektab = next.peektab;
   return out;
 }
 
@@ -137,7 +159,7 @@ export function visibleProps(
  * États qui ne remplacent pas les lignes affichées : panneau de détail ouvert, son
  * onglet, colonnes visibles.
  */
-const IN_PLACE_KEYS = new Set<keyof ResolvedListSearch>(["sel", "tab", "cols"]);
+const IN_PLACE_KEYS = new Set<keyof ResolvedListSearch>(["sel", "tab", "cols", "peek", "peektab"]);
 
 /**
  * Faut-il remonter en haut de page après cette mise à jour de l'URL ?

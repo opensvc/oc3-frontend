@@ -1,29 +1,29 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ObjectIcon, type ObjectKind } from "./ObjectIcon";
+import { ObjectIcon } from "./ObjectIcon";
 
-/** Vues ouvrables depuis une puce : celles dont le panneau se désigne par `sel`. */
-export type CrossView = "/nodes" | "/services" | "/instances" | "/apps" | "/groups";
+/** Objets dont `PeekPanel` sait montrer la fiche. */
+export type CrossKind = "node" | "service" | "instance" | "app" | "group";
 
 /**
  * Valeur d'une cellule qui désigne un objet d'une autre vue : le node d'une
- * instance, le service d'un disque… Un double-clic ouvre la vue correspondante sur
- * le panneau de cet objet, comme l'ancien collector ouvrait la fiche d'un objet au
- * double-clic. Un simple clic ne fait rien ici : il est réservé à la ligne, dont il
- * ouvre le propre panneau.
+ * instance, le service d'un disque…
  *
- * Au clavier, la puce est un bouton comme un autre : Entrée ou Espace ouvre la vue,
- * et l'infobulle dit ce que fera le double-clic.
+ * Un double-clic montre sa fiche à la place du panneau de la ligne, sans quitter la
+ * liste (`peek` dans l'URL, voir `PeekPanel`) : c'est le geste par lequel l'ancien
+ * collector ouvrait la fiche d'un objet. Un simple clic ne fait rien ici, il est
+ * réservé à la ligne, dont il ouvre le propre panneau.
+ *
+ * Au clavier, la puce est un bouton comme un autre : Entrée ou Espace montre la
+ * fiche, et l'infobulle dit ce que fait le double-clic.
  */
 export function CrossLink({
   kind,
-  to,
   id,
   children,
 }: {
-  kind: ObjectKind;
-  to: CrossView;
+  kind: CrossKind;
   /** Identifiant attendu par la vue cible ; sans lui, la valeur reste du texte. */
   id: string | undefined;
   children: ReactNode;
@@ -40,8 +40,19 @@ export function CrossLink({
   )
     return <>{children}</>;
 
-  const open = () => {
-    void navigate({ to, search: { sel: id } });
+  /** Montre la fiche sans quitter la vue, à la place du panneau de la ligne. */
+  const peek = () => {
+    void navigate({
+      to: ".",
+      search: (previous) => ({
+        ...(previous as Record<string, unknown>),
+        sel: undefined,
+        tab: undefined,
+        peek: `${kind}:${id}`,
+        peektab: undefined,
+      }),
+      resetScroll: false,
+    });
   };
 
   return (
@@ -55,13 +66,13 @@ export function CrossLink({
       }}
       onDoubleClick={(event) => {
         event.stopPropagation();
-        open();
+        peek();
       }}
       onKeyDown={(event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         event.stopPropagation();
-        open();
+        peek();
       }}
       className="inline-flex max-w-full items-center gap-1 rounded-full border border-line bg-surface px-1.5 text-data hover:border-line-strong hover:bg-surface-sunken"
     >

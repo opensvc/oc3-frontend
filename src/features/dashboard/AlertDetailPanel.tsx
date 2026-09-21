@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { linkedField } from "@/components/opensvc/linked-field";
 import { formatDateTime } from "@/lib/format";
 
 type AlertRow = components["schemas"]["AlertRow"];
@@ -40,7 +41,17 @@ const GROUPS: DetailGroup<AlertRow>[] = [
   {
     key: "object",
     family: "service",
-    fields: [field("services.svcname"), field("nodes.nodename"), field("svc_id"), field("node_id")],
+    fields: [
+      linkedField<AlertRow>(
+        "services.svcname",
+        "service",
+        (row) => row.svc_id,
+        text("services.svcname"),
+      ),
+      linkedField<AlertRow>("nodes.nodename", "node", (row) => row.node_id, text("nodes.nodename")),
+      field("svc_id"),
+      field("node_id"),
+    ],
   },
   {
     key: "raw",

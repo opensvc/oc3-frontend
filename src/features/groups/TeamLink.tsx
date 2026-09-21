@@ -35,7 +35,7 @@ export function TeamLink({ name }: { name: unknown }) {
   const ids = useGroupIds();
   if (typeof name !== "string" || name === "") return <>{name}</>;
   return (
-    <CrossLink kind="group" to="/groups" id={ids.data?.get(name)}>
+    <CrossLink kind="group" id={ids.data?.get(name)}>
       {name}
     </CrossLink>
   );

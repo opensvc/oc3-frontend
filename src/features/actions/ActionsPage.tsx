@@ -80,13 +80,13 @@ const COLUMNS: ListColumn<ActionRow>[] = ACTION_PROPS.map((prop) => ({
     if (prop === "command") return <code className="text-data">{value}</code>;
     if (prop === "nodes.nodename")
       return (
-        <CrossLink kind="node" to="/nodes" id={row.node_id}>
+        <CrossLink kind="node" id={row.node_id}>
           {value}
         </CrossLink>
       );
     if (prop === "services.svcname")
       return (
-        <CrossLink kind="service" to="/services" id={row.svc_id}>
+        <CrossLink kind="service" id={row.svc_id}>
           {value}
         </CrossLink>
       );

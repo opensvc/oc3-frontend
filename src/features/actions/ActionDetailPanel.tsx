@@ -97,7 +97,7 @@ export function ActionDetailPanel({
             {field(
               "actions.fields.nodes.nodename",
               row["nodes.nodename"] === "" ? undefined : (
-                <CrossLink kind="node" to="/nodes" id={row.node_id}>
+                <CrossLink kind="node" id={row.node_id}>
                   {row["nodes.nodename"]}
                 </CrossLink>
               ),
@@ -105,7 +105,7 @@ export function ActionDetailPanel({
             {field(
               "actions.fields.services.svcname",
               row["services.svcname"] === "" ? undefined : (
-                <CrossLink kind="service" to="/services" id={row.svc_id}>
+                <CrossLink kind="service" id={row.svc_id}>
                   {row["services.svcname"]}
                 </CrossLink>
               ),

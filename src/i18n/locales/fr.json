@@ -881,7 +881,7 @@
     }
   },
   "crossLink": {
-    "hint": "Double-cliquer pour ouvrir ce {{kind}}",
+    "hint": "Double-cliquer pour voir ce {{kind}}",
     "kinds": {
       "node": "node",
       "service": "service",

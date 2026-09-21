@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { linkedField } from "@/components/opensvc/linked-field";
+import { TeamLink } from "@/features/groups/TeamLink";
 import { NODE_RELATED_TABS } from "./related/node-related";
 import { NodeActionsMenu } from "./NodeActionsMenu";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
@@ -70,6 +72,13 @@ const date = (prop: keyof NodeRow) => (row: NodeRow, locale: string) => {
   return typeof value === "string" ? formatDateTime(value, locale) : undefined;
 };
 
+/** Équipe : une puce, dont l'identifiant de groupe est résolu par `TeamLink`. */
+const team = (prop: keyof NodeRow) => ({
+  prop,
+  format: text(prop),
+  render: (row: NodeRow) => <TeamLink name={row[prop]} />,
+});
+
 const field = (
   prop: keyof NodeRow,
   format?: (row: NodeRow, locale: string) => string | undefined,
@@ -95,15 +104,15 @@ const GROUPS: DetailGroup<NodeRow>[] = [
       field("nodename"),
       field("fqdn"),
       field("node_id"),
-      field("app"),
+      linkedField<NodeRow>("app", "app", (row) => row.app, text("app")),
       field("node_env"),
       field("status"),
       field("role"),
       field("assetname"),
       field("type"),
-      field("team_responsible"),
-      field("team_integ"),
-      field("team_support"),
+      team("team_responsible"),
+      team("team_integ"),
+      team("team_support"),
     ],
   },
   {

@@ -111,7 +111,7 @@ const COLUMNS: ListColumn<IpRow>[] = IP_PROPS.map((prop) => ({
     const value = row[prop];
     if (prop === "nodename")
       return (
-        <CrossLink kind="node" to="/nodes" id={row.node_id}>
+        <CrossLink kind="node" id={row.node_id}>
           {value}
         </CrossLink>
       );

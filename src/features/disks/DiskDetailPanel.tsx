@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { linkedField } from "@/components/opensvc/linked-field";
 import { formatDateTime, formatSizeMiB } from "@/lib/format";
 
 type DiskRow = components["schemas"]["DiskRow"];
@@ -46,11 +47,11 @@ const GROUPS: DetailGroup<DiskRow>[] = [
     key: "attachment",
     family: "node",
     fields: [
-      field("nodename"),
+      linkedField<DiskRow>("nodename", "node", (row) => row.node_id, text("nodename")),
       field("node_id"),
-      field("svcname"),
+      linkedField<DiskRow>("svcname", "service", (row) => row.svc_id, text("svcname")),
       field("svc_id"),
-      field("app"),
+      linkedField<DiskRow>("app", "app", (row) => row.app, text("app")),
       field("disk_arrayid"),
       field("disk_dg"),
       field("disk_region"),

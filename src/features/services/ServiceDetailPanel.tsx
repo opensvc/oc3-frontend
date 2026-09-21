@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { linkedField } from "@/components/opensvc/linked-field";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
@@ -45,7 +46,7 @@ const GROUPS: DetailGroup<ServiceRow>[] = [
     fields: [
       field("svcname"),
       field("svc_id"),
-      field("svc_app"),
+      linkedField<ServiceRow>("svc_app", "app", (row) => row.svc_app, text("svc_app")),
       field("svc_env"),
       field("cluster_id"),
       field("svc_comment"),

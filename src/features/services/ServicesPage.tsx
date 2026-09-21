@@ -152,7 +152,7 @@ const COLUMNS: ListColumn<ServiceRow>[] = SERVICE_PROPS.map((prop) => ({
     const value = row[prop];
     if (prop === "svc_app")
       return (
-        <CrossLink kind="app" to="/apps" id={typeof value === "string" ? value : undefined}>
+        <CrossLink kind="app" id={typeof value === "string" ? value : undefined}>
           {value}
         </CrossLink>
       );

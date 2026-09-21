@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { linkedField } from "@/components/opensvc/linked-field";
 import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { TrashIcon } from "@/components/ui/icons";
 import { problemText } from "@/lib/api/problem";
@@ -30,7 +31,7 @@ const GROUPS: DetailGroup<IpRow>[] = [
       field("type"),
       field("intf"),
       field("mac"),
-      field("nodename"),
+      linkedField<IpRow>("nodename", "node", (row) => row.node_id, text("nodename")),
       field("node_id"),
       { ...field("flag_deprecated"), input: "boolean" as const },
       field("updated", (row, locale) => formatDateTime(row.updated, locale)),

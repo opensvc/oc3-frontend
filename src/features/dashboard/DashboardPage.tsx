@@ -51,11 +51,11 @@ const COLUMNS: ListColumn<AlertRow>[] = [
     // L'alerte porte un service ou un node : la puce mène à celui qui la porte.
     render: (r) =>
       r.svc_id !== undefined && r.svc_id !== "" ? (
-        <CrossLink kind="service" to="/services" id={r.svc_id}>
+        <CrossLink kind="service" id={r.svc_id}>
           {objectName(r)}
         </CrossLink>
       ) : (
-        <CrossLink kind="node" to="/nodes" id={r.node_id}>
+        <CrossLink kind="node" id={r.node_id}>
           {objectName(r)}
         </CrossLink>
       ),

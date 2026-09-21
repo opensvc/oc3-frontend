@@ -243,7 +243,7 @@ const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
       return <TeamLink name={value} />;
     if (prop === "app")
       return (
-        <CrossLink kind="app" to="/apps" id={typeof value === "string" ? value : undefined}>
+        <CrossLink kind="app" id={typeof value === "string" ? value : undefined}>
           {value}
         </CrossLink>
       );

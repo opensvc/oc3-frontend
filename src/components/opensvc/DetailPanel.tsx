@@ -13,6 +13,12 @@ export interface DetailField<T> {
   prop: string;
   format: (row: T, locale: string) => string | undefined;
   /**
+   * Affichage de la valeur quand elle vaut mieux qu'un texte : la puce d'un objet
+   * d'une autre vue, par exemple. `format` reste la valeur brute, qui décide de
+   * l'affichage de la ligne et sert à la saisie.
+   */
+  render?: (row: T, locale: string) => ReactNode;
+  /**
    * Vrai pour un attribut que l'utilisateur peut fixer. N'y figurent que ceux que la
    * remontée d'inventaire de l'agent n'écrase pas : modifier les autres ne tiendrait
    * que jusqu'à la remontée suivante.
@@ -302,6 +308,8 @@ export function DetailContent<T>({
                               <span className="min-w-0 flex-1">
                                 {shown === undefined || shown === "" ? (
                                   <span className="text-ink-muted">—</span>
+                                ) : field.render !== undefined ? (
+                                  field.render(row, locale)
                                 ) : (
                                   shown
                                 )}

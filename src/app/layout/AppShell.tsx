@@ -5,6 +5,7 @@ import { useCredentials } from "@/lib/api/auth";
 import { SignIn } from "@/features/auth/SignIn";
 import opensvcLogo from "@/assets/opensvc-logo.svg";
 import { Sidebar } from "./Sidebar";
+import { PeekPanel } from "./PeekPanel";
 import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
 
@@ -95,6 +96,8 @@ export function AppShell() {
         <Sidebar open={sidebarOpen} />
         <main className="min-w-0 p-4">
           <Outlet />
+          {/* Fiche d'un objet ouverte depuis une puce, quelle que soit la vue. */}
+          <PeekPanel />
         </main>
       </div>
     </div>

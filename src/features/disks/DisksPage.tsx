@@ -102,19 +102,19 @@ const COLUMNS: ListColumn<DiskRow>[] = DISK_PROPS.map((prop) => ({
     const value = row[prop];
     if (prop === "app")
       return (
-        <CrossLink kind="app" to="/apps" id={typeof value === "string" ? value : undefined}>
+        <CrossLink kind="app" id={typeof value === "string" ? value : undefined}>
           {value}
         </CrossLink>
       );
     if (prop === "nodename")
       return (
-        <CrossLink kind="node" to="/nodes" id={row.node_id}>
+        <CrossLink kind="node" id={row.node_id}>
           {value}
         </CrossLink>
       );
     if (prop === "svcname")
       return (
-        <CrossLink kind="service" to="/services" id={row.svc_id}>
+        <CrossLink kind="service" id={row.svc_id}>
           {value}
         </CrossLink>
       );
