@@ -255,7 +255,10 @@
     "editHint": "Seuls les attributs que l'agent ne remonte pas sont modifiables. Les autres seraient écrasés à la prochaine remontée d'inventaire.",
     "editField": "Modifier {{field}}",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "none": "Aucune",
+    "searchValue": "Saisir pour chercher…",
+    "noMatch": "Aucune valeur ne correspond."
   },
   "services": {
     "title": "Services",

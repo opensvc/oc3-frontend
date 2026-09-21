@@ -255,7 +255,10 @@
     "editHint": "Only attributes the agent does not report are editable. The others are overwritten on the next asset push.",
     "editField": "Edit {{field}}",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "none": "None",
+    "searchValue": "Type to search…",
+    "noMatch": "No matching value."
   },
   "services": {
     "title": "Services",

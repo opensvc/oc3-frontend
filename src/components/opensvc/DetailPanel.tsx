@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { CheckIcon, CloseIcon, PencilIcon } from "@/components/ui/icons";
 import { Switch } from "@/components/ui/Switch";
+import { Combobox } from "@/components/ui/Combobox";
 import { ObjectIcon, type ObjectKind } from "./ObjectIcon";
 import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
 import { readPropAsString } from "@/lib/row";
@@ -30,6 +31,12 @@ export interface DetailField<T> {
    * `notifications`, et refuse la chaîne équivalente.
    */
   input?: "text" | "date" | "number" | "boolean";
+  /**
+   * Valeurs proposées à la saisie, quand l'attribut en a une liste connue : la
+   * modification se fait alors dans une liste déroulante plutôt qu'en texte libre.
+   * La liste vient de l'appelant, qui seul sait l'interroger.
+   */
+  optionsKey?: string;
 }
 
 export interface DetailGroup<T> {
@@ -87,6 +94,12 @@ interface DetailContentProps<T> {
    * dont la règle diffère fournit la sienne.
    */
   editHint?: string;
+  /**
+   * Valeurs proposées pour les attributs qui en déclarent une liste (`optionsKey`).
+   * L'appelant les fournit : lui seul sait où les chercher, les équipes par exemple.
+   * Une liste vide laisse la saisie libre.
+   */
+  options?: Record<string, string[]>;
 }
 
 /**
@@ -108,6 +121,7 @@ export function DetailContent<T>({
   actions,
   onSave,
   editHint,
+  options,
 }: DetailContentProps<T>) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
@@ -167,7 +181,7 @@ export function DetailContent<T>({
   }
 
   function onFieldKeyDown(
-    event: KeyboardEvent<HTMLInputElement | HTMLSelectElement>,
+    event: KeyboardEvent<HTMLInputElement | HTMLSelectElement | HTMLDivElement>,
     field: DetailField<T>,
   ) {
     if (event.key === "Enter") {
@@ -217,6 +231,18 @@ export function DetailContent<T>({
                   {entries.map(({ field, value: shown }) => {
                     const label = t(`${labelPrefix}.${field.prop}`);
                     const isEditing = editing === field.prop;
+                    // Liste déroulante seulement si l'on a de quoi la remplir : sans
+                    // équipe déclarée, la saisie libre vaut mieux qu'un choix vide. La
+                    // valeur courante y figure toujours, fût-elle hors liste.
+                    const known =
+                      field.optionsKey === undefined ? undefined : options?.[field.optionsKey];
+                    const current = readPropAsString(row, field.prop);
+                    const choices =
+                      known === undefined || known.length === 0
+                        ? undefined
+                        : known.includes(current) || current === ""
+                          ? known
+                          : [current, ...known];
                     const state =
                       field.input !== "boolean"
                         ? undefined
@@ -259,6 +285,31 @@ export function DetailContent<T>({
                                   <option value="true">{t("detail.yes")}</option>
                                   <option value="false">{t("detail.no")}</option>
                                 </select>
+                              ) : choices !== undefined ? (
+                                // La liste se filtre à la saisie : un collector peut
+                                // compter des dizaines d'équipes. Effacer le champ
+                                // vide l'attribut, ce que le collector accepte.
+                                <div
+                                  className="min-w-0 flex-1"
+                                  onKeyDown={(event) => {
+                                    onFieldKeyDown(event, field);
+                                  }}
+                                >
+                                  <Combobox
+                                    options={choices.map((choice) => ({
+                                      value: choice,
+                                      label: choice,
+                                    }))}
+                                    value={value}
+                                    onChange={setValue}
+                                    label={label}
+                                    placeholder={t("detail.searchValue")}
+                                    emptyText={t("detail.noMatch")}
+                                    inputRef={(node) => {
+                                      node?.focus();
+                                    }}
+                                  />
+                                </div>
                               ) : (
                                 <input
                                   autoFocus

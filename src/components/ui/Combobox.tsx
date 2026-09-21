@@ -14,10 +14,11 @@ export interface ComboboxOption {
  * première lettre.
  *
  * Tant que rien n'est saisi, le champ affiche l'option choisie et la liste montre
- * tout. Taper filtre sans tenir compte de la casse et annule le choix courant, qui
+ * tout ; prendre le focus sélectionne ce texte, pour que la première frappe filtre
+ * plutôt que d'allonger la valeur. Taper filtre sans tenir compte de la casse et annule le choix courant, qui
  * n'est rétabli qu'en choisissant une option : à la souris, ou avec les flèches et
- * Entrée. Échap referme la liste sans remonter au panneau parent ; liste fermée,
- * Entrée soumet le formulaire englobant comme dans tout champ.
+ * Entrée, qui ne fait que choisir. Échap referme la liste sans remonter au panneau
+ * parent ; liste fermée, Entrée soumet le formulaire englobant comme dans tout champ.
  */
 export function Combobox({
   options,
@@ -93,6 +94,12 @@ export function Combobox({
           setOpen(true);
           if (value !== "") onChange("");
         }}
+        onFocus={(event) => {
+          // Le champ arrive rempli de l'option choisie : la sélectionner d'emblée
+          // permet de filtrer en tapant, au lieu d'allonger la valeur existante.
+          event.currentTarget.select();
+          setOpen(true);
+        }}
         onClick={() => {
           setOpen(true);
         }}
@@ -114,7 +121,11 @@ export function Combobox({
             }
             case "Enter":
               if (activeOption !== undefined) {
+                // Ce premier Entrée choisit, et rien de plus : un formulaire autour
+                // du champ ne doit pas le prendre pour une validation. Le suivant,
+                // liste fermée, lui revient.
                 event.preventDefault();
+                event.stopPropagation();
                 choose(activeOption);
               }
               return;

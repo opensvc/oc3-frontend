@@ -9,6 +9,7 @@ import { NODE_RELATED_TABS } from "./related/node-related";
 import { NodeActionsMenu } from "./NodeActionsMenu";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { OsLogo } from "@/components/opensvc/OsLogo";
+import { useTeams } from "@/features/groups/use-teams";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
 import { useNodeTags } from "./related/queries";
@@ -73,10 +74,15 @@ const date = (prop: keyof NodeRow) => (row: NodeRow, locale: string) => {
   return typeof value === "string" ? formatDateTime(value, locale) : undefined;
 };
 
-/** Équipe : une puce, dont l'identifiant de groupe est résolu par `TeamLink`. */
+/**
+ * Équipe : une puce, dont l'identifiant de groupe est résolu par `TeamLink`, et une
+ * liste déroulante des équipes connues quand on la modifie.
+ */
 const team = (prop: keyof NodeRow) => ({
   prop,
   format: text(prop),
+  editable: EDITABLE.has(prop),
+  optionsKey: "teams",
   render: (row: NodeRow) => <TeamLink name={row[prop]} />,
 });
 
@@ -274,6 +280,7 @@ export function NodeDetailPanel({
 
   const open = nodeId !== undefined;
   const tags = useNodeTags(nodeId);
+  const teams = useTeams();
   const tagEdit = useTagEdit("node", nodeId);
 
   return (
@@ -304,6 +311,7 @@ export function NodeDetailPanel({
       />
       <DetailContent
         groups={GROUPS}
+        options={{ teams: teams.data ?? [] }}
         row={node}
         onSave={(changes) => save.mutateAsync(changes)}
         labelPrefix="nodes.fields"

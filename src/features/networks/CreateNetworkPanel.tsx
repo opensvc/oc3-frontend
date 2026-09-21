@@ -1,34 +1,17 @@
 import { useState, type FormEvent } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import { useTeams } from "@/features/groups/use-teams";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { ipv4Contains, ipv4Range } from "./ipv4";
 
-type GroupRow = components["schemas"]["GroupRow"];
 type NetworkRow = components["schemas"]["NetworkRow"];
 
 const INPUT = "h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2";
-
-/** Équipes assignables : groupes d'organisation, ni privilège ni groupe privé d'utilisateur. */
-function useTeams() {
-  return useQuery({
-    queryKey: ["groups", "teams"],
-    queryFn: async () => {
-      const { data, error } = await api.GET("/groups", {
-        params: { query: { props: "role,privilege", orderby: "role", limit: 0 } },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      const rows: GroupRow[] = Array.isArray(data.data) ? data.data : [];
-      return rows
-        .filter((row) => row.privilege === "F" && !(row.role ?? "").startsWith("user_"))
-        .map((row) => row.role ?? "");
-    },
-  });
-}
 
 function toInt(value: string): number | undefined {
   return value.trim() === "" ? undefined : Number(value);
