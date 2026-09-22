@@ -935,5 +935,12 @@
       "queued_other": "{{action}} applied to {{count}} actions.",
       "failure": "{{name}}: {{message}}"
     }
+  },
+  "trail": {
+    "label": "Path followed",
+    "back": "Back to {{name}}",
+    "showAll_one": "Show 1 earlier step",
+    "showAll_other": "Show {{count}} earlier steps",
+    "forward": "Forward to {{name}}"
   }
 }

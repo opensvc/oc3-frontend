@@ -37,6 +37,8 @@ export interface ListSearch {
   peek?: string;
   /** Tab open in that panel, when the object looked at has any. */
   peektab?: string;
+  /** Position in `peek` of the record on display; the last one when absent. */
+  peekat?: number;
 }
 
 export interface ResolvedListSearch {
@@ -49,6 +51,7 @@ export interface ResolvedListSearch {
   tab?: string;
   peek?: string;
   peektab?: string;
+  peekat?: number;
 }
 
 export const PAGE_SIZES = [25, 50, 100] as const;
@@ -90,6 +93,7 @@ export function parseListSearch(raw: Record<string, unknown>): ListSearch {
     tab: toNonEmptyString(raw.tab),
     peek: toNonEmptyString(raw.peek),
     peektab: toNonEmptyString(raw.peektab),
+    peekat: toPositiveInt(raw.peekat),
   };
 }
 
@@ -104,6 +108,7 @@ export function resolveListSearch(search: ListSearch, defaultSort: string[]): Re
     tab: search.tab,
     peek: search.peek,
     peektab: search.peektab,
+    peekat: search.peekat,
   };
 }
 
@@ -128,10 +133,12 @@ export function toSearchParams(next: Partial<ResolvedListSearch>): Partial<ListS
     out.sel = next.sel;
     out.peek = undefined;
     out.peektab = undefined;
+    out.peekat = undefined;
   }
   if ("tab" in next) out.tab = next.tab;
   if ("peek" in next) out.peek = next.peek;
   if ("peektab" in next) out.peektab = next.peektab;
+  if ("peekat" in next) out.peekat = next.peekat;
   return out;
 }
 

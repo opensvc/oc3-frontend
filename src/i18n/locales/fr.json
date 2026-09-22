@@ -935,5 +935,12 @@
       "queued_other": "{{action}} appliqué à {{count}} actions.",
       "failure": "{{name}} : {{message}}"
     }
+  },
+  "trail": {
+    "label": "Chemin suivi",
+    "back": "Retour à {{name}}",
+    "showAll_one": "Afficher l'étape précédente",
+    "showAll_other": "Afficher les {{count}} étapes précédentes",
+    "forward": "Avancer vers {{name}}"
   }
 }

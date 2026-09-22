@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { CloseIcon } from "./icons";
+import { TrailBar } from "./TrailBar";
 
 /**
  * Side panel sliding in from the right.
@@ -124,6 +125,8 @@ export function SlideOver({
           <span className="sr-only">{closeLabel}</span>
         </button>
       </div>
+      {/* Path followed to this record, when a badge led here. */}
+      <TrailBar />
       {subheader}
       <div className="min-h-0 flex-1 overflow-y-auto p-3">{children}</div>
     </div>
