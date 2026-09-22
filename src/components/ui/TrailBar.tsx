@@ -19,6 +19,9 @@ const SHOWN = 3;
  * one click away.
  *
  * Nothing is shown when a single object has been visited: there is nowhere to go.
+ *
+ * At the foot of the panel and outside its scroll: a long record does not push it out
+ * of sight, and coming back costs one click wherever one has read to.
  */
 export function TrailBar() {
   const { t } = useTranslation();
@@ -36,7 +39,7 @@ export function TrailBar() {
   return (
     <nav
       aria-label={t("trail.label")}
-      className="flex items-center gap-1 border-b border-line px-3 py-1.5"
+      className="flex shrink-0 items-center gap-1 border-t border-line bg-surface-raised px-3 py-1.5"
     >
       <button
         type="button"

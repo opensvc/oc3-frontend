@@ -125,10 +125,11 @@ export function SlideOver({
           <span className="sr-only">{closeLabel}</span>
         </button>
       </div>
-      {/* Path followed to this record, when a badge led here. */}
-      <TrailBar />
       {subheader}
       <div className="min-h-0 flex-1 overflow-y-auto p-3">{children}</div>
+      {/* The records visited, at the foot of the panel: outside the scrolling area, so
+          they stay in reach wherever one is in a long record. */}
+      <TrailBar />
     </div>
   );
 }
