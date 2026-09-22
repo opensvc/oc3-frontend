@@ -70,7 +70,9 @@ type NodeRow = components["schemas"]["NodeRow"];
 
 const text = (prop: keyof NodeRow) => (row: NodeRow) => {
   const value = row[prop];
-  return value === undefined ? undefined : String(value);
+  // A joined prop is null when the row it points at is missing: a node may name a
+  // cluster the collector does not know. Nothing to show then, rather than "null".
+  return value === undefined || value === null ? undefined : String(value);
 };
 
 const date = (prop: keyof NodeRow) => (row: NodeRow, locale: string) => {
@@ -115,6 +117,10 @@ const GROUPS: DetailGroup<NodeRow>[] = [
       field("nodename"),
       field("fqdn"),
       field("node_id"),
+      // The cluster the node belongs to, named before its id: the name is what one
+      // reads, the id is what the API joins on.
+      field("clusters.cluster_name"),
+      field("cluster_id"),
       linkedField<NodeRow>("app", "app", (row) => row.app, text("app")),
       field("node_env"),
       field("status"),
@@ -199,7 +205,6 @@ const GROUPS: DetailGroup<NodeRow>[] = [
     family: "service",
     fields: [
       field("version"),
-      field("cluster_id"),
       field("listener_port"),
       field("connect_to"),
       field("last_comm", date("last_comm")),

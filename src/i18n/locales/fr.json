@@ -88,6 +88,7 @@
       "sec_zone": "Zone de sécurité",
       "version": "Version de l'agent",
       "cluster_id": "Identifiant de cluster",
+      "clusters.cluster_name": "Nom du cluster",
       "listener_port": "Port d'écoute",
       "connect_to": "Adresse de connexion",
       "last_comm": "Dernier contact",

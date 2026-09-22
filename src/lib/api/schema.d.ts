@@ -2775,6 +2775,8 @@ export interface components {
             bios_version?: string;
             blade_cabinet?: string;
             cluster_id?: string;
+            /** @description Name of the node's cluster, from the joined clusters table. */
+            "clusters.cluster_name"?: string | null;
             collector?: string;
             connect_to?: string;
             cpu_cores?: number;
