@@ -366,6 +366,15 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
+/** Form: the collector's puzzle piece (fa-puzzle-piece, `wf16`). */
+export function PuzzleIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M10 3.5a2.5 2.5 0 0 1 5 0V5h3.5c.8 0 1.5.7 1.5 1.5V10h-1.5a2.5 2.5 0 0 0 0 5H20v3.5c0 .8-.7 1.5-1.5 1.5H15v-1.5a2.5 2.5 0 0 0-5 0V20H6.5c-.8 0-1.5-.7-1.5-1.5V15H3.5a2.5 2.5 0 0 1 0-5H5V6.5C5 5.7 5.7 5 6.5 5H10V3.5Z" />
+    </Svg>
+  );
+}
+
 /** Adding an item to a list. */
 export function PlusIcon(props: IconProps) {
   return (

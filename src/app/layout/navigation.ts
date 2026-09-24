@@ -24,7 +24,8 @@ export interface NavEntry {
     | "/obsolescence"
     | "/logs"
     | "/filters"
-    | "/filtersets";
+    | "/filtersets"
+    | "/forms";
   labelKey: string;
   icon: ObjectKind;
   /** True for the root: without it, prefix matching would activate it everywhere. */
@@ -82,6 +83,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
       { to: "/filters", labelKey: "nav.filters", icon: "filter" },
       // `adm-filtersets`.
       { to: "/filtersets", labelKey: "nav.filtersets", icon: "filterset" },
+      // `adm-forms`.
+      { to: "/forms", labelKey: "nav.forms", icon: "form" },
     ],
   },
 ];

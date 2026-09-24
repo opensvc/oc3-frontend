@@ -5,6 +5,7 @@ import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { DisksPage } from "@/features/disks/DisksPage";
 import { FiltersPage } from "@/features/filters/FiltersPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
+import { FormsPage } from "@/features/forms/FormsPage";
 import { GroupsPage } from "@/features/groups/GroupsPage";
 import { InstancesPage } from "@/features/instances/InstancesPage";
 import { LogsPage } from "@/features/logs/LogsPage";
@@ -126,6 +127,13 @@ const filtersetsRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
+const formsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/forms",
+  component: FormsPage,
+  validateSearch: parseListSearch,
+});
+
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users",
@@ -164,6 +172,7 @@ const routeTree = rootRoute.addChildren([
   logsRoute,
   filtersRoute,
   filtersetsRoute,
+  formsRoute,
   actionsRoute,
   profileRoute,
 ]);

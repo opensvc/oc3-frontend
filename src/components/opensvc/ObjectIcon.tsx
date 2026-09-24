@@ -7,6 +7,7 @@ import {
   InstanceIcon,
   LifeRingIcon,
   NetworkIcon,
+  PuzzleIcon,
   ServerIcon,
   StackIcon,
   UserIcon,
@@ -28,7 +29,8 @@ export type ObjectKind =
   | "obsolescence"
   | "log"
   | "filter"
-  | "filterset";
+  | "filterset"
+  | "form";
 
 /**
  * Pictogram and tint of an object kind. The same vocabulary in the menu, in panel
@@ -60,6 +62,7 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   filter: { Icon: FilterIcon, className: "text-icon-dashboard" },
   // Same icon as the filter: the historical collector marks both of them `filter16`.
   filterset: { Icon: FilterIcon, className: "text-icon-dashboard" },
+  form: { Icon: PuzzleIcon, className: "text-icon-form" },
 };
 
 export function ObjectIcon({ kind, className }: { kind: ObjectKind; className?: string }) {

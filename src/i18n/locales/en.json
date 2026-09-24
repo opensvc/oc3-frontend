@@ -21,7 +21,8 @@
     "obsolescence": "Obsolescence",
     "logs": "Logs",
     "filters": "Filters",
-    "filtersets": "Filtersets"
+    "filtersets": "Filtersets",
+    "forms": "Forms"
   },
   "header": {
     "search": "Search the collector",
@@ -982,5 +983,47 @@
     "showAll_one": "Show 1 earlier step",
     "showAll_other": "Show {{count}} earlier steps",
     "forward": "Forward to {{name}}"
+  },
+  "forms": {
+    "title": "Forms",
+    "intro": "A form describes, in YAML, the inputs a submission expects and the outputs it runs: database insert, API call, script, mail or workflow step. The list shows the forms published to one of your groups; creating and changing them requires the FormsManager privilege.",
+    "fields": {
+      "id": "Id",
+      "form_name": "Name",
+      "form_type": "Type",
+      "form_folder": "Folder",
+      "form_author": "Author",
+      "form_created": "Created",
+      "form_yaml": "Definition"
+    },
+    "types": {
+      "custo": "Custom",
+      "obj": "Compliance object",
+      "folder": "Folder",
+      "generic": "Generic"
+    },
+    "detail": {
+      "title": "Form",
+      "groups": {
+        "identity": "Identity",
+        "record": "Record"
+      },
+      "noDefinition": "No definition yet."
+    },
+    "form": {
+      "open": "New form",
+      "edit": "Edit",
+      "createTitle": "New form",
+      "editTitle": "Edit form",
+      "createIntro": "The form is published to your default group, which is also made responsible for it.",
+      "editIntro": "Each new definition is recorded in the form's revision history.",
+      "yamlHint": "YAML, indented with spaces. The collector refuses a definition that does not parse.",
+      "saving": "Saving…",
+      "saveCreate": "Create form",
+      "saveEdit": "Save changes"
+    },
+    "delete": {
+      "question": "Delete the form {{name}}, with its publications and responsibles?"
+    }
   }
 }

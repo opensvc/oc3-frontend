@@ -699,6 +699,416 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/form_output_results/{results_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Show the results structure of a form submission. */
+        get: operations["GetFormOutputResults"];
+        /** @description Add a result or log lines to an output of a form submission results. */
+        put: operations["PutFormOutputResults"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the forms. A manager sees every form, others the forms published to
+         *     one of their groups. form_definition is form_yaml parsed.
+         */
+        get: operations["GetForms"];
+        put?: never;
+        /**
+         * @description Create forms, as the historical collector's POST /forms: one entry or a list.
+         *     form_name is mandatory, the other keys are forms columns (form_yaml,
+         *     form_type, form_folder...). The author and the creation date are set, and
+         *     the form is published to and made the responsibility of the creator's
+         *     default group. Requires the FormsManager privilege.
+         */
+        post: operations["PostForms"];
+        /**
+         * @description Delete forms: an entry with the 'id' key, or a list of them. Same
+         *     requirements as DELETE /forms/{form_id}.
+         */
+        delete: operations["DeleteForms"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Show a form, as GET /forms restricted to one id: empty when the form does
+         *     not exist or is not published to the caller.
+         */
+        get: operations["GetForm"];
+        /**
+         * @description Submit a form: validate the data against the form inputs and run its
+         *     outputs (db, rest, script, mail, workflow). The body may also be
+         *     form-encoded, data given as its JSON string, as in the historical examples. The answer is the results
+         *     structure, also stored and readable with GET /form_output_results/{id}. A
+         *     negative id designates an internal form. The form must be published to the
+         *     caller, unless a manager.
+         */
+        put: operations["PutForm"];
+        /**
+         * @description Modify a form. The keys are forms columns; form_definition, a JSON document
+         *     or its string form, is stored as form_yaml. A new form_yaml is recorded in
+         *     the form's revision history. Requires the FormsManager privilege.
+         */
+        post: operations["PostForm"];
+        /**
+         * @description Delete a form, with its publications and responsibles. Requires the
+         *     FormsManager privilege and responsibility for the form.
+         */
+        delete: operations["DeleteForm"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}/am_i_responsible": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Tell whether the caller is responsible for the form, as {"data": true} or
+         *     {"data": false}.
+         */
+        get: operations["GetFormAmIResponsible"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}/diff/{cid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Show the change made by a revision, or the differences between cid and
+         *     other when set, as git prints them.
+         */
+        get: operations["GetFormDiff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}/publications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the groups the form is published to. Requires the form to be
+         *     published to the caller, unless a manager.
+         */
+        get: operations["GetFormPublications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}/publications/{group_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Publish the form to a group. Requires the FormsManager privilege and
+         *     responsibility for the form. An existing link answers with an info message.
+         */
+        post: operations["PostFormPublication"];
+        /**
+         * @description Unpublish the form from a group. Requires the FormsManager privilege
+         *     and responsibility for the form. A missing link answers with an info message.
+         */
+        delete: operations["DeleteFormPublication"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}/responsibles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the groups the form is the responsibility of. Requires the form to be
+         *     published to the caller, unless a manager.
+         */
+        get: operations["GetFormResponsibles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}/responsibles/{group_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Make a group responsible for the form. Requires the FormsManager privilege and
+         *     responsibility for the form. An existing link answers with an info message.
+         */
+        post: operations["PostFormResponsible"];
+        /**
+         * @description Remove a responsible group from the form. Requires the FormsManager privilege
+         *     and responsibility for the form. A missing link answers with an info message.
+         */
+        delete: operations["DeleteFormResponsible"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the revisions of the form definition, from its git history: an empty
+         *     list when the form is not published to the caller.
+         */
+        get: operations["GetFormRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}/revisions/{cid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Show the form definition at a revision, as {"data": {"oid", "content"}}. */
+        get: operations["GetFormRevision"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms/{form_id}/rollback/{cid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Restore the form definition of a revision, recorded as a new revision.
+         *     Requires the FormsManager privilege and responsibility for the form.
+         */
+        post: operations["PostFormRollback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms_publications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Same as POST /forms/{form_id}/publications/{group_id}, the form_id and
+         *     group_id keys given in the body: one entry or a list.
+         */
+        post: operations["PostFormsPublications"];
+        /**
+         * @description Same as DELETE /forms/{form_id}/publications/{group_id}, the form_id and
+         *     group_id keys given in the body: one entry or a list.
+         */
+        delete: operations["DeleteFormsPublications"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms_responsibles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Same as POST /forms/{form_id}/responsibles/{group_id}, the form_id and
+         *     group_id keys given in the body: one entry or a list.
+         */
+        post: operations["PostFormsResponsibles"];
+        /**
+         * @description Same as DELETE /forms/{form_id}/responsibles/{group_id}, the form_id and
+         *     group_id keys given in the body: one entry or a list.
+         */
+        delete: operations["DeleteFormsResponsibles"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms_revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List the form revisions stored for workflows. */
+        get: operations["GetFormsRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms_revisions/{revision_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Show a form revision, by id or by md5. */
+        get: operations["GetFormsRevision"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms_store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the forms stored by workflows, with the revision they were submitted
+         *     with.
+         */
+        get: operations["GetFormsStore"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms_store/{store_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Show a form stored by a workflow. */
+        get: operations["GetFormStore"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/forms_store/{store_id}/dump": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Show a form stored by a workflow, with its workflow, the workflow head and
+         *     tail stored forms.
+         */
+        get: operations["GetFormStoreDump"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/frontend/hidden_menu_entries": {
         parameters: {
             query?: never;
@@ -2500,6 +2910,34 @@ export interface components {
                 thresholds: string[];
             };
         };
+        FormListResponse: {
+            data: components["schemas"]["FormRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** @description The change made, on a modification */
+            info?: string;
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A form: its definition, form_yaml, drives the inputs a submission expects
+         *     and the outputs it runs. form_definition is form_yaml parsed. Every
+         *     property is optional: the `props` query parameter selects which columns
+         *     the server returns.
+         */
+        FormRow: {
+            form_author?: string;
+            form_created?: string;
+            /** @description form_yaml parsed, absent when it does not parse */
+            form_definition?: unknown;
+            form_folder?: string;
+            form_name?: string;
+            /** @description obj, custo, folder or generic */
+            form_type?: string;
+            form_yaml?: string;
+            id?: number;
+        };
         GroupListResponse: {
             data: components["schemas"]["GroupRow"][] | {
                 [key: string]: {
@@ -2634,6 +3072,11 @@ export interface components {
             included_props?: string[];
             limit?: number;
             offset?: number;
+            /**
+             * @description Number of rows of the list without pagination, the filters applied; for
+             *     a grouped list, the number of groups. With stats, the number of rows the
+             *     statistics are computed from.
+             */
             total?: number;
         };
         ListResponse: {
@@ -3038,7 +3481,12 @@ export interface components {
         inQueryGroupby: string;
         /** @description The maximum number of entries to return. 0 means no limit. */
         inQueryLimit: number;
-        /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+        /**
+         * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+         *     the meta field. The metadata of a list carries its total number of rows
+         *     without pagination (total), as well as the rows returned (count), the offset
+         *     and the limit.
+         */
         inQueryMeta: string;
         /** @description Skip the first entries of the data cursor. */
         inQueryOffset: number;
@@ -3064,7 +3512,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -3181,7 +3634,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -3249,7 +3707,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -3285,7 +3748,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -3395,7 +3863,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -3505,7 +3978,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -3732,7 +4210,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -3772,7 +4255,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -3877,7 +4365,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -3917,7 +4410,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -4022,7 +4520,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -4208,7 +4711,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -4277,7 +4785,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -4388,7 +4901,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -4455,7 +4973,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -4566,7 +5089,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -4676,7 +5204,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -4786,7 +5319,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -4915,7 +5453,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5026,7 +5569,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5138,7 +5686,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5192,7 +5745,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5421,6 +5979,1131 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
+    GetFormOutputResults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Results id */
+                results_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PutFormOutputResults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Results id */
+                results_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The log lines to append to output_id logs, [[lvl, fmt, data], ...], lvl 0 for info, 1 for error */
+                    log?: unknown;
+                    /** @description The id of the form output for which to store the result */
+                    output_id?: string;
+                    /** @description The result to add for output_id, a JSON document or its string form */
+                    result?: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetForms: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FormListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostForms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                } | {
+                    [key: string]: unknown;
+                }[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteForms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                } | {
+                    [key: string]: unknown;
+                }[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetForm: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+            };
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FormListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PutForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The information the form expects, as an object, a list of objects or their JSON string form. */
+                    data?: unknown;
+                    /** @description The previous step id in an existing workflow. */
+                    prev_wfid?: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FormListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormAmIResponsible: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormDiff: {
+        parameters: {
+            query?: {
+                /** @description Another revision to compare cid with */
+                other?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+                /** @description Git commit id of a form revision */
+                cid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormPublications: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+            };
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostFormPublication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteFormPublication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormResponsibles: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+            };
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostFormResponsible: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteFormResponsible: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormRevisions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormRevision: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+                /** @description Git commit id of a form revision */
+                cid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostFormRollback: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                form_id: number;
+                /** @description Git commit id of a form revision */
+                cid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostFormsPublications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                } | {
+                    [key: string]: unknown;
+                }[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteFormsPublications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                } | {
+                    [key: string]: unknown;
+                }[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostFormsResponsibles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                } | {
+                    [key: string]: unknown;
+                }[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteFormsResponsibles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                } | {
+                    [key: string]: unknown;
+                }[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormsRevisions: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormsRevision: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+            };
+            header?: never;
+            path: {
+                /** @description Revision id or md5 */
+                revision_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormsStore: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormStore: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+            };
+            header?: never;
+            path: {
+                /** @description Stored form id */
+                store_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetFormStoreDump: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stored form id */
+                store_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
     GetFrontendHiddenMenuEntries: {
         parameters: {
             query?: {
@@ -5430,7 +7113,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5467,7 +7155,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5572,7 +7265,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5675,7 +7373,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5714,7 +7417,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5826,7 +7534,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5865,7 +7578,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5904,7 +7622,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5943,7 +7666,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -5982,7 +7710,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6021,7 +7754,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6091,7 +7829,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6162,7 +7905,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6232,7 +7980,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6316,7 +8069,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6504,7 +8262,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6540,7 +8303,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6576,7 +8344,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6750,7 +8523,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6817,7 +8595,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6857,7 +8640,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6897,7 +8685,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -6949,7 +8742,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7001,7 +8799,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7041,7 +8844,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7161,7 +8969,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7281,7 +9094,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7333,7 +9151,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7373,7 +9196,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7413,7 +9241,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7453,7 +9286,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7493,7 +9331,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7533,7 +9376,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7573,7 +9421,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7652,7 +9505,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7744,7 +9602,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7850,7 +9713,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -7979,7 +9847,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8117,7 +9990,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8240,7 +10118,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8307,7 +10190,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8347,7 +10235,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8387,7 +10280,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8429,7 +10327,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8469,7 +10372,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8511,7 +10419,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8617,7 +10530,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8721,7 +10639,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8761,7 +10684,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8801,7 +10729,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8872,7 +10805,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8912,7 +10850,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8954,7 +10897,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -8996,7 +10944,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9038,7 +10991,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9078,7 +11036,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9118,7 +11081,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9158,7 +11126,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9198,7 +11171,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9286,7 +11264,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9326,7 +11309,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9362,7 +11350,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9398,7 +11391,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9503,7 +11501,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9614,7 +11617,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -9924,7 +11932,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -10034,7 +12047,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];
@@ -10107,7 +12125,12 @@ export interface operations {
                 limit?: components["parameters"]["inQueryLimit"];
                 /** @description Skip the first entries of the data cursor. */
                 offset?: components["parameters"]["inQueryOffset"];
-                /** @description Include metadata in the response. Enabled by default. Use false or 0 to omit the meta field. */
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
                 meta?: components["parameters"]["inQueryMeta"];
                 /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
                 stats?: components["parameters"]["inQueryStats"];

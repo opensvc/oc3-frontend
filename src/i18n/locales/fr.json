@@ -21,7 +21,8 @@
     "obsolescence": "Obsolescence",
     "logs": "Journaux",
     "filters": "Filtres",
-    "filtersets": "Filtersets"
+    "filtersets": "Filtersets",
+    "forms": "Formulaires"
   },
   "header": {
     "search": "Rechercher dans le collector",
@@ -982,5 +983,47 @@
     "showAll_one": "Afficher l'étape précédente",
     "showAll_other": "Afficher les {{count}} étapes précédentes",
     "forward": "Avancer vers {{name}}"
+  },
+  "forms": {
+    "title": "Formulaires",
+    "intro": "Un formulaire décrit en YAML les entrées qu'une soumission attend et les sorties qu'elle exécute : insertion en base, appel d'API, script, courriel ou étape de workflow. La liste montre les formulaires publiés à l'un de vos groupes ; les créer et les modifier demande le privilège FormsManager.",
+    "fields": {
+      "id": "Id",
+      "form_name": "Nom",
+      "form_type": "Type",
+      "form_folder": "Dossier",
+      "form_author": "Auteur",
+      "form_created": "Créé",
+      "form_yaml": "Définition"
+    },
+    "types": {
+      "custo": "Personnalisé",
+      "obj": "Objet de conformité",
+      "folder": "Dossier",
+      "generic": "Générique"
+    },
+    "detail": {
+      "title": "Formulaire",
+      "groups": {
+        "identity": "Identité",
+        "record": "Enregistrement"
+      },
+      "noDefinition": "Pas encore de définition."
+    },
+    "form": {
+      "open": "Nouveau formulaire",
+      "edit": "Modifier",
+      "createTitle": "Nouveau formulaire",
+      "editTitle": "Modifier le formulaire",
+      "createIntro": "Le formulaire est publié à votre groupe par défaut, qui en devient aussi responsable.",
+      "editIntro": "Chaque nouvelle définition est enregistrée dans l'historique des révisions du formulaire.",
+      "yamlHint": "YAML, indenté par des espaces. Le collector refuse une définition qui ne s'analyse pas.",
+      "saving": "Enregistrement…",
+      "saveCreate": "Créer le formulaire",
+      "saveEdit": "Enregistrer"
+    },
+    "delete": {
+      "question": "Supprimer le formulaire {{name}}, avec ses publications et ses responsables ?"
+    }
   }
 }
