@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -55,6 +55,8 @@ export interface ColumnFilterOption {
   render?: ReactNode;
 }
 
+const PAGE_BUTTON = "h-7 rounded-(--radius-control) border border-line px-2 disabled:opacity-40";
+
 /** Metadata carried by each TanStack column, beyond what it knows itself. */
 interface ColumnMeta<T> {
   column: ListColumn<T>;
@@ -92,8 +94,10 @@ function resolveUpdater<S>(updater: S | ((old: S) => S), current: S): S {
  * bar above the table lists every active filter, hidden columns included, with a
  * way to clear each.
  *
- * The API does not return the total of a selection, hence an unknown `pageCount` and
- * a pagination without a page number.
+ * The page count comes from the total the API returns with each page (`total`): it
+ * gives the first and last page buttons and the page number. Without it, from an
+ * older API, the count stays unknown and the extra row asked of the server says
+ * whether a next page exists (`hasMore`).
  */
 export function CollectorList<T>({
   columns,
@@ -107,6 +111,7 @@ export function CollectorList<T>({
   isFetching,
   errorMessage,
   hasMore,
+  total,
   onSelectionChange,
   rowLead,
   selectAllMatching,
@@ -124,6 +129,8 @@ export function CollectorList<T>({
   isFetching: boolean;
   errorMessage: string | null;
   hasMore: boolean;
+  /** Rows of the list without pagination, when the API tells it. */
+  total?: number;
   /**
    * Ticked rows, on every change. The selection is kept here and survives a page
    * change: `getRowId` keeps it indexed by row id, not by position.
@@ -174,6 +181,8 @@ export function CollectorList<T>({
   }
 
   const allProps = useMemo(() => columns.map((column) => column.prop), [columns]);
+  // At least one page, even for an empty list.
+  const pageCount = total === undefined ? undefined : Math.max(1, Math.ceil(total / search.limit));
   const shown = visibleProps(search.cols, defaultCols, allProps);
 
   const columnDefs = useMemo<ColumnDef<T>[]>(
@@ -284,8 +293,8 @@ export function CollectorList<T>({
     // the first click would not have the same meaning from one column to the next. We
     // keep the order from before the migration, ascending then descending.
     sortDescFirst: false,
-    // apicollector does not return the total of a selection: the number of pages is unknown.
-    pageCount: -1,
+    // Unknown (-1) when the API gives no total.
+    pageCount: pageCount ?? -1,
     enableRowSelection: true,
     onSortingChange,
     onPaginationChange,
@@ -295,6 +304,17 @@ export function CollectorList<T>({
 
   const from = rows.length === 0 ? 0 : search.offset + 1;
   const to = search.offset + rows.length;
+  const pageIndex = Math.floor(search.offset / search.limit);
+  const lastOffset = pageCount === undefined ? undefined : (pageCount - 1) * search.limit;
+  const onLastPage = pageCount === undefined ? !hasMore : pageIndex >= pageCount - 1;
+  const format = (n: number) => n.toLocaleString(locale);
+
+  // A link, or rows deleted meanwhile, may point past the end of the list: go to
+  // its last page rather than show an empty one.
+  useEffect(() => {
+    if (isFetching || total === undefined || total === 0 || lastOffset === undefined) return;
+    if (search.offset > lastOffset) onChange({ offset: lastOffset });
+  }, [isFetching, total, lastOffset, search.offset, onChange]);
   const needle = columnFilter.trim().toLowerCase();
   const pickerColumns = table
     .getAllLeafColumns()
@@ -461,32 +481,62 @@ export function CollectorList<T>({
         )}
 
         <span aria-live="polite" className="ml-auto text-ink-muted">
-          {isFetching ? t("list.loading") : t("list.range", { from, to })}
+          {isFetching
+            ? t("list.loading")
+            : total === undefined
+              ? t("list.range", { from: format(from), to: format(to) })
+              : t("list.rangeOf", { from: format(from), to: format(to), total: format(total) })}
         </span>
-        <div className="flex gap-1">
+        <nav aria-label={t("list.pagination")} className="flex items-center gap-1">
+          <button
+            type="button"
+            disabled={search.offset === 0}
+            onClick={() => {
+              onChange({ offset: 0 });
+            }}
+            className={PAGE_BUTTON}
+          >
+            {t("list.first")}
+          </button>
           <button
             type="button"
             disabled={!table.getCanPreviousPage()}
             onClick={() => {
               table.previousPage();
             }}
-            className="h-7 rounded-(--radius-control) border border-line px-2 disabled:opacity-40"
+            className={PAGE_BUTTON}
           >
             {t("list.previous")}
           </button>
+          <span className="px-1 text-ink-muted" aria-current="page">
+            {pageCount === undefined
+              ? t("list.pageUnknown", { page: format(pageIndex + 1) })
+              : t("list.page", { page: format(pageIndex + 1), pages: format(pageCount) })}
+          </span>
           <button
             type="button"
-            // `pageCount` being unknown, it is the extra row asked of the server that
-            // says whether a page remains, not the table.
-            disabled={!hasMore}
+            // Without a total, it is the extra row asked of the server that says
+            // whether a page remains, not the table.
+            disabled={onLastPage}
             onClick={() => {
               table.nextPage();
             }}
-            className="h-7 rounded-(--radius-control) border border-line px-2 disabled:opacity-40"
+            className={PAGE_BUTTON}
           >
             {t("list.next")}
           </button>
-        </div>
+          <button
+            type="button"
+            disabled={lastOffset === undefined || onLastPage}
+            title={lastOffset === undefined ? t("list.lastUnknown") : undefined}
+            onClick={() => {
+              if (lastOffset !== undefined) onChange({ offset: lastOffset });
+            }}
+            className={PAGE_BUTTON}
+          >
+            {t("list.last")}
+          </button>
+        </nav>
       </div>
 
       {activeFilters.length > 0 && (

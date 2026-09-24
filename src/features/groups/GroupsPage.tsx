@@ -4,6 +4,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
+import { toPage } from "@/lib/api/page";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -71,7 +72,7 @@ function useGroups(search: ResolvedListSearch) {
       });
       if (error !== undefined) throw new Error(JSON.stringify(error));
       const all: GroupRow[] = Array.isArray(data.data) ? data.data : [];
-      return { rows: all.slice(0, search.limit), hasMore: all.length > search.limit };
+      return toPage(all, data.meta, search.limit);
     },
   });
 }
@@ -157,6 +158,7 @@ export function GroupsPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        total={data?.total}
         selectAllMatching={allIds}
       />
 

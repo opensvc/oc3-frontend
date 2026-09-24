@@ -258,7 +258,14 @@
       "clearAll_one": "Retirer le filtre",
       "clearAll_other": "Retirer les filtres ({{count}})",
       "noMatch": "Aucune ligne ne correspond aux filtres."
-    }
+    },
+    "first": "Première",
+    "last": "Dernière",
+    "lastUnknown": "Le serveur ne donne pas le nombre de pages",
+    "page": "Page {{page}} sur {{pages}}",
+    "pageUnknown": "Page {{page}}",
+    "rangeOf": "{{from}}–{{to}} sur {{total}}",
+    "pagination": "Pagination"
   },
   "detail": {
     "close": "Fermer",

@@ -258,7 +258,14 @@
       "clearAll_one": "Clear filter",
       "clearAll_other": "Clear filters ({{count}})",
       "noMatch": "No row matches the filters."
-    }
+    },
+    "first": "First",
+    "last": "Last",
+    "lastUnknown": "The server does not give the number of pages",
+    "page": "Page {{page}} of {{pages}}",
+    "pageUnknown": "Page {{page}}",
+    "rangeOf": "{{from}}–{{to}} of {{total}}",
+    "pagination": "Pagination"
   },
   "detail": {
     "close": "Close",

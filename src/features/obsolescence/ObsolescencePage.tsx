@@ -3,6 +3,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
+import { toPage } from "@/lib/api/page";
 import { problemText } from "@/lib/api/problem";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
@@ -92,7 +93,7 @@ function useSettings(search: ResolvedListSearch) {
       });
       if (error !== undefined) throw new Error(JSON.stringify(error));
       const all: ObsolescenceSettingRow[] = Array.isArray(data.data) ? data.data : [];
-      return { rows: all.slice(0, search.limit), hasMore: all.length > search.limit };
+      return toPage(all, data.meta, search.limit);
     },
   });
 }
@@ -211,6 +212,7 @@ export function ObsolescencePage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        total={data?.total}
         selectAllMatching={allIds}
       />
 

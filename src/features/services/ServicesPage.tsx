@@ -6,6 +6,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
+import { toPage } from "@/lib/api/page";
 import { problemText } from "@/lib/api/problem";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
@@ -218,7 +219,7 @@ function useServices(search: ResolvedListSearch) {
             });
       if (response.error !== undefined) throw new Error(problemText(response.error));
       const all: ServiceRow[] = Array.isArray(response.data.data) ? response.data.data : [];
-      return { rows: all.slice(0, search.limit), hasMore: all.length > search.limit };
+      return toPage(all, response.data.meta, search.limit);
     },
   });
 }
@@ -291,6 +292,7 @@ export function ServicesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        total={data?.total}
         rowLead={(row) => <FrozenMark frozen={row.svc_frozen === "frozen"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
