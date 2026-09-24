@@ -7,10 +7,12 @@ import "@/styles/index.css";
 import "@/i18n";
 import { queryClient } from "@/lib/query";
 import { router } from "@/app/router";
-import { applyTheme, cachedTheme } from "@/lib/theme";
+import { applyPalette, applyTheme, cachedPalette, cachedTheme } from "@/lib/theme";
 
-// Before the first render: the cached choice, otherwise the system theme.
+// Before the first render: the cached choices, otherwise the system theme and the
+// standard palette.
 applyTheme(cachedTheme());
+applyPalette(cachedPalette());
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

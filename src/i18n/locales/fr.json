@@ -609,8 +609,16 @@
   },
   "profile": {
     "title": "Mon profil",
+    "palette": {
+      "title": "Thème",
+      "hint": "Le contraste élevé emploie un texte noir ou blanc, des bordures marquées et des couleurs saturées, en mode clair comme en mode sombre. Enregistré avec votre compte.",
+      "options": {
+        "standard": "Standard",
+        "contrast": "Contraste élevé"
+      }
+    },
     "theme": {
-      "title": "Thème de couleur",
+      "title": "Clair ou sombre",
       "hint": "Enregistré avec votre compte, et appliqué partout où vous vous connectez.",
       "options": {
         "system": "Système",

@@ -609,8 +609,16 @@
   },
   "profile": {
     "title": "My profile",
+    "palette": {
+      "title": "Theme",
+      "hint": "High contrast uses black or white text, visible borders and saturated colours, in light as in dark mode. Saved with your account.",
+      "options": {
+        "standard": "Standard",
+        "contrast": "High contrast"
+      }
+    },
     "theme": {
-      "title": "Color theme",
+      "title": "Light or dark",
       "hint": "Saved with your account, and applied wherever you sign in.",
       "options": {
         "system": "System",

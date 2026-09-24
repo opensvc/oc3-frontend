@@ -4,7 +4,17 @@ import { api } from "./api/client";
 import { problemText } from "./api/problem";
 import { FILTER_KEY_PREFIX, filterKey, type ColumnFilters } from "./column-filters";
 import type { ListSearch } from "./list-search";
-import { applyTheme, cachedTheme, isTheme, watchSystemTheme, type Theme } from "./theme";
+import {
+  applyPalette,
+  applyTheme,
+  cachedPalette,
+  cachedTheme,
+  isPalette,
+  isTheme,
+  watchSystemTheme,
+  type Palette,
+  type Theme,
+} from "./theme";
 
 /**
  * User preferences, as the historical collector keeps them in the `prefs` column of
@@ -31,8 +41,10 @@ export interface ViewPrefs {
 
 export interface UserPrefs {
   tables?: Record<string, ViewPrefs | undefined>;
-  /** Chosen theme; absent means "system". */
+  /** Chosen light or dark mode; absent means "system". */
   theme?: string;
+  /** Chosen colour palette; absent means "standard". */
+  palette?: string;
   [key: string]: unknown;
 }
 
@@ -187,43 +199,89 @@ export function withSavedSearch(
   };
 }
 
+/** Mode and palette in effect: the account's once known, the local cache until then. */
+function currentAppearance(prefs: ReturnType<typeof useUserPrefs>): {
+  theme: Theme;
+  palette: Palette;
+} {
+  const storedTheme = prefs.data?.theme;
+  const storedPalette = prefs.data?.palette;
+  return {
+    theme: isTheme(storedTheme) ? storedTheme : prefs.isSuccess ? "system" : cachedTheme(),
+    palette: isPalette(storedPalette)
+      ? storedPalette
+      : prefs.isSuccess
+        ? "standard"
+        : cachedPalette(),
+  };
+}
+
 /**
- * Chosen theme, applied and saved.
+ * Applies the account's mode and palette, for as long as someone is signed in.
  *
- * The locally cached theme applies from startup (`src/main.tsx`); as soon as the
- * account preferences arrive, their value is the one that counts, so that the same
- * account finds its theme again on another machine.
+ * Called once by the application shell, not by the profile page: the choice made on
+ * another machine must apply as soon as the preferences arrive, whatever the first
+ * page opened. Until then, the local cache applied at startup (`src/main.tsx`) holds.
  */
-export function useThemePref() {
-  const queryClient = useQueryClient();
-  const prefs = useUserPrefs();
-  const stored = prefs.data?.theme;
-  const theme: Theme = isTheme(stored) ? stored : prefs.isSuccess ? "system" : cachedTheme();
+export function useAppearance(): void {
+  const { theme, palette } = currentAppearance(useUserPrefs());
 
   useEffect(() => {
     applyTheme(theme);
   }, [theme]);
+  useEffect(() => {
+    applyPalette(palette);
+  }, [palette]);
 
   // The system theme may change during the session, from a sleeping screen or an hour.
   const current = useRef(theme);
-  current.current = theme;
+  useEffect(() => {
+    current.current = theme;
+  }, [theme]);
   useEffect(() => watchSystemTheme(() => current.current), []);
+}
 
+/**
+ * One appearance choice, as the profile page edits it: its value, and a setter that
+ * applies it at once and saves it. If the save fails, the stored value is applied
+ * again, so that the screen does not show a choice the account does not hold.
+ */
+function useAppearanceChoice<K extends "theme" | "palette", V extends Theme | Palette>(
+  key: K,
+  value: V,
+  apply: (value: V) => void,
+) {
+  const queryClient = useQueryClient();
   const save = useMutation({
-    mutationFn: async (next: Theme) => {
-      applyTheme(next);
-      await savePrefs(queryClient, (currentPrefs) => ({ ...currentPrefs, theme: next }));
+    mutationFn: async (next: V) => {
+      apply(next);
+      await savePrefs(queryClient, (currentPrefs) => ({ ...currentPrefs, [key]: next }));
+    },
+    onError: () => {
+      apply(value);
     },
   });
-
   return {
-    theme,
-    setTheme: (next: Theme) => {
+    // The choice being saved shows at once, rather than when the server confirms it.
+    value: save.isPending ? save.variables : value,
+    set: (next: V) => {
       save.mutate(next);
     },
     isSaving: save.isPending,
     errorMessage: save.isError ? save.error.message : null,
   };
+}
+
+/** Light or dark mode chosen by the account. */
+export function useThemePref() {
+  const { theme } = currentAppearance(useUserPrefs());
+  return useAppearanceChoice("theme", theme, applyTheme);
+}
+
+/** Colour palette chosen by the account: standard or high contrast. */
+export function usePalettePref() {
+  const { palette } = currentAppearance(useUserPrefs());
+  return useAppearanceChoice("palette", palette, applyPalette);
 }
 
 /**

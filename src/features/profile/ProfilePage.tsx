@@ -7,10 +7,16 @@ import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { problemText } from "@/lib/api/problem";
 import { USER_GROUPS, USER_PROPS_QUERY } from "@/features/users/user-fields";
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
-import { hasSavedViewPrefs, useResetViewPrefs, useThemePref, useUserPrefs } from "@/lib/user-prefs";
+import {
+  hasSavedViewPrefs,
+  usePalettePref,
+  useResetViewPrefs,
+  useThemePref,
+  useUserPrefs,
+} from "@/lib/user-prefs";
 import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { ResetIcon } from "@/components/ui/icons";
-import { THEMES } from "@/lib/theme";
+import { PALETTES, THEMES } from "@/lib/theme";
 
 type UserRow = components["schemas"]["UserRow"];
 
@@ -25,6 +31,7 @@ type UserRow = components["schemas"]["UserRow"];
 export function ProfilePage() {
   const { t } = useTranslation();
   const theme = useThemePref();
+  const palette = usePalettePref();
   const prefs = useUserPrefs();
   const resetViews = useResetViewPrefs();
   const { data, isPending, isError, error } = useQuery({
@@ -69,34 +76,31 @@ export function ProfilePage() {
       <section className="mt-6">
         <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
           <ColumnFamilyIcon family="env" />
+          {t("profile.palette.title")}
+        </h2>
+        <p className="mb-2 text-ink-muted">{t("profile.palette.hint")}</p>
+        <ChoiceGroup
+          name="palette"
+          label={t("profile.palette.title")}
+          options={PALETTES}
+          optionLabel={(value) => t(`profile.palette.options.${value}`)}
+          choice={palette}
+        />
+      </section>
+
+      <section className="mt-6">
+        <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
+          <ColumnFamilyIcon family="env" />
           {t("profile.theme.title")}
         </h2>
         <p className="mb-2 text-ink-muted">{t("profile.theme.hint")}</p>
-        <div role="radiogroup" aria-label={t("profile.theme.title")} className="flex gap-2">
-          {THEMES.map((value) => (
-            <label
-              key={value}
-              className="flex h-7 cursor-pointer items-center gap-1.5 rounded-(--radius-control) border border-line px-3 has-checked:border-accent has-checked:bg-accent-soft has-checked:text-ink"
-            >
-              <input
-                type="radio"
-                name="theme"
-                value={value}
-                checked={theme.theme === value}
-                disabled={theme.isSaving}
-                onChange={() => {
-                  theme.setTheme(value);
-                }}
-              />
-              {t(`profile.theme.options.${value}`)}
-            </label>
-          ))}
-        </div>
-        {theme.errorMessage !== null && (
-          <p role="alert" className="mt-2 text-state-down">
-            ■ {theme.errorMessage}
-          </p>
-        )}
+        <ChoiceGroup
+          name="theme"
+          label={t("profile.theme.title")}
+          options={THEMES}
+          optionLabel={(value) => t(`profile.theme.options.${value}`)}
+          choice={theme}
+        />
       </section>
 
       <section className="mt-6">
@@ -128,5 +132,50 @@ export function ProfilePage() {
         )}
       </section>
     </section>
+  );
+}
+
+/** Radio group of an appearance choice, saved as soon as it changes. */
+function ChoiceGroup<V extends string>({
+  name,
+  label,
+  options,
+  optionLabel,
+  choice,
+}: {
+  name: string;
+  label: string;
+  options: readonly V[];
+  optionLabel: (value: V) => string;
+  choice: { value: V; set: (value: V) => void; isSaving: boolean; errorMessage: string | null };
+}) {
+  return (
+    <>
+      <div role="radiogroup" aria-label={label} className="flex gap-2">
+        {options.map((value) => (
+          <label
+            key={value}
+            className="flex h-7 cursor-pointer items-center gap-1.5 rounded-(--radius-control) border border-line px-3 has-checked:border-accent has-checked:bg-accent-soft has-checked:text-ink"
+          >
+            <input
+              type="radio"
+              name={name}
+              value={value}
+              checked={choice.value === value}
+              disabled={choice.isSaving}
+              onChange={() => {
+                choice.set(value);
+              }}
+            />
+            {optionLabel(value)}
+          </label>
+        ))}
+      </div>
+      {choice.errorMessage !== null && (
+        <p role="alert" className="mt-2 text-state-down">
+          ■ {choice.errorMessage}
+        </p>
+      )}
+    </>
   );
 }

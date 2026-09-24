@@ -1,7 +1,7 @@
 /*
- * Tokens de design du collector oc3.
+ * Design tokens of the oc3 collector.
  * This file is the visual identity contract: the webapp will be able to take it as it is.
- * Les composants ne consomment jamais une couleur en dur, uniquement ces variables.
+ * Components never use a hard-coded colour, only these variables.
  */
 
 :root {
@@ -51,9 +51,9 @@
   --tag-hover: #006b7a;
   --tag-ink: #ffffff;
 
-  /* Typographie */
+  /* Typography */
   --font-sans: "IBM Plex Sans Variable", system-ui, sans-serif;
-  --text-data: 0.8125rem; /* 13px : cellules de tables */
+  --text-data: 0.8125rem; /* 13px: table cells */
   --text-ui: 0.875rem; /* 14px: controls and running text */
   --text-title: 1.125rem;
 
@@ -99,4 +99,84 @@
   --tag: #3a9aa8;
   --tag-hover: #4fb0be;
   --tag-ink: #0c1417;
+}
+
+/*
+ * High-contrast theme, chosen in the profile (`palette` preference) and set by the
+ * `contrast` class on <html>, on top of the light or dark mode. Same tokens, pushed
+ * further: black or white ink, darker secondary text, borders visible at a glance,
+ * saturated state and icon colours instead of the desaturated ones. Every text
+ * colour reaches at least 6.7:1 on the main surfaces (5.3:1 on the soft state
+ * backgrounds), and the plain border 3.7:1, against 4.5:1 and 3:1 required.
+ */
+.contrast {
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #e6e9eb;
+  --ink: #000000;
+  --ink-muted: #3b454c;
+  --line: #7d878d;
+  --line-strong: #40494f;
+
+  --accent: #004a55;
+  --accent-ink: #ffffff;
+  --accent-soft: #c4e4e8;
+  --focus-ring: #004a55;
+
+  --state-up: #00692f;
+  --state-up-soft: #c3ecd1;
+  --state-warn: #8c4a00;
+  --state-warn-soft: #ffdfae;
+  --state-down: #b00d00;
+  --state-down-soft: #ffd3cd;
+  --state-unknown: #454e55;
+  --state-unknown-soft: #dde2e5;
+
+  --icon-dashboard: #000000;
+  --icon-node: #0047ad;
+  --icon-service: #00664f;
+  --icon-network: #005f70;
+  --icon-disk: #595700;
+  --icon-app: #9c005d;
+  --icon-group: #9a2c16;
+
+  --tag: #006272;
+  --tag-hover: #004c59;
+  --tag-ink: #ffffff;
+}
+
+.dark.contrast {
+  --surface: #000000;
+  --surface-raised: #0e1215;
+  --surface-sunken: #000000;
+  --ink: #ffffff;
+  --ink-muted: #c9d1d6;
+  --line: #5f6c74;
+  --line-strong: #9aa6ad;
+
+  --accent: #5ce1f0;
+  --accent-ink: #000000;
+  --accent-soft: #003d45;
+  --focus-ring: #5ce1f0;
+
+  --state-up: #4cec8a;
+  --state-up-soft: #063a1c;
+  --state-warn: #ffbf3d;
+  --state-warn-soft: #4a3000;
+  --state-down: #ff6b61;
+  --state-down-soft: #520d08;
+  --state-unknown: #c0cad0;
+  --state-unknown-soft: #252c31;
+
+  --icon-dashboard: #ffffff;
+  --icon-node: #8cbcff;
+  --icon-service: #4fe0bc;
+  --icon-network: #5cd9eb;
+  --icon-disk: #e6e070;
+  --icon-app: #ff8fcf;
+  --icon-group: #ffab94;
+
+  --tag: #3fd0e3;
+  --tag-hover: #72dfee;
+  --tag-ink: #000000;
 }

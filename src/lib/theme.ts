@@ -1,10 +1,13 @@
 /**
- * Interface theme: the system one, or an explicit choice.
+ * Appearance of the interface, on two independent axes: the light or dark mode
+ * (`Theme`: the system one, or an explicit choice), and the colour palette
+ * (`Palette`: standard, or high contrast).
  *
- * The dark tokens live under the `dark` class (`src/styles/tokens.css`), set here on
- * `<html>`. The choice follows the account, in the user preferences (`theme`), but it
- * is also kept in local storage: preferences arrive after the first render, and
- * without that cache the page would briefly show the other theme on every load.
+ * The dark tokens live under the `dark` class, the high-contrast ones under the
+ * `contrast` class (`src/styles/tokens.css`), both set here on `<html>`. Both choices
+ * follow the account, in the user preferences (`theme` and `palette`), but they are
+ * also kept in local storage: preferences arrive after the first render, and without
+ * that cache the page would briefly show the other appearance on every load.
  */
 export const THEMES = ["system", "light", "dark"] as const;
 
@@ -52,4 +55,33 @@ export function watchSystemTheme(current: () => Theme): () => void {
   return () => {
     query.removeEventListener("change", onChange);
   };
+}
+
+export const PALETTES = ["standard", "contrast"] as const;
+
+export type Palette = (typeof PALETTES)[number];
+
+const PALETTE_STORAGE_KEY = "oc3.palette";
+
+export function isPalette(value: unknown): value is Palette {
+  return typeof value === "string" && PALETTES.includes(value as Palette);
+}
+
+/** Palette cached locally, "standard" as long as nothing has been chosen. */
+export function cachedPalette(): Palette {
+  try {
+    const stored = localStorage.getItem(PALETTE_STORAGE_KEY);
+    return isPalette(stored) ? stored : "standard";
+  } catch {
+    return "standard";
+  }
+}
+
+export function applyPalette(palette: Palette): void {
+  document.documentElement.classList.toggle("contrast", palette === "contrast");
+  try {
+    localStorage.setItem(PALETTE_STORAGE_KEY, palette);
+  } catch {
+    // Without the cache the palette stays correct: it is applied again on the next load.
+  }
 }

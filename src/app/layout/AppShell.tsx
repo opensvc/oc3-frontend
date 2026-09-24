@@ -8,10 +8,11 @@ import { Sidebar } from "./Sidebar";
 import { PeekPanel } from "./PeekPanel";
 import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
+import { useAppearance } from "@/lib/user-prefs";
 
 const SIDEBAR_KEY = "oc3.sidebar";
 
-/** Le repli du menu est un confort d'affichage, propre au navigateur : il ne va pas dans l'URL. */
+/** Folding the menu is a display comfort, specific to the browser: it does not go in the URL. */
 function readSidebarOpen(): boolean {
   try {
     return localStorage.getItem(SIDEBAR_KEY) !== "closed";
@@ -55,6 +56,7 @@ export function AppShell() {
 
   return (
     <div className="grid min-h-dvh grid-rows-[auto_1fr] bg-surface text-ink">
+      <AccountAppearance />
       <header className="flex h-11 items-center gap-4 border-b border-line bg-surface-raised px-3">
         <button
           type="button"
@@ -96,10 +98,20 @@ export function AppShell() {
         <Sidebar open={sidebarOpen} />
         <main className="min-w-0 p-4">
           <Outlet />
-          {/* Fiche d'un objet ouverte depuis une puce, quelle que soit la vue. */}
+          {/* Record of an object opened from a badge, whatever the view. */}
           <PeekPanel />
         </main>
       </div>
     </div>
   );
+}
+
+/**
+ * Applies the signed-in account's mode and palette. A component of its own, rendered
+ * only once someone is signed in: before that, reading the preferences would be
+ * refused.
+ */
+function AccountAppearance() {
+  useAppearance();
+  return null;
 }
