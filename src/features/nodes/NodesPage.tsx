@@ -136,7 +136,7 @@ const NUMERIC_PROPS = new Set<string>([
   "listener_port",
 ]);
 
-/** Props que le collector stocke en datetime. */
+/** Props the collector stores as datetime. */
 const DATE_PROPS = new Set<string>([
   "warranty_end",
   "maintenance_end",

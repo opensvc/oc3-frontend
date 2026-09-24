@@ -10,7 +10,7 @@ export function tabPanelProps(idPrefix: string, key: string) {
   };
 }
 
-/** Identifiant stable pour relier une barre d'onglets et ses panneaux. */
+/** Stable id linking a tab bar and its panels. */
 export function useTabsId(): string {
   return useId().replace(/:/g, "");
 }

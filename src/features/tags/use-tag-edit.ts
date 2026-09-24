@@ -30,7 +30,7 @@ export function useTagEdit(kind: TagTargetKind, objectId: string | undefined): T
   // tag of another object.
   const [confirming, setConfirming] = useState<{ objectId: string; tagId: string } | null>(null);
 
-  // 200 si l'utilisateur est responsable, 403 sinon : seul le statut compte.
+  // 200 when the user is responsible, 403 otherwise: only the status matters.
   const responsible = useQuery({
     queryKey: [kind, objectId, "am_i_responsible"],
     enabled: objectId !== undefined,

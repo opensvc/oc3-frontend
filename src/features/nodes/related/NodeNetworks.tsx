@@ -6,10 +6,10 @@ import { useNodeIps } from "./queries";
 
 type IpRow = components["schemas"]["IpRow"];
 
-/** Tri naturel des noms d'interface : eth2 avant eth10. */
+/** Natural sort of interface names: eth2 before eth10. */
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 
-/** IPv4 avant IPv6, puis adresses dans l'ordre naturel. */
+/** IPv4 before IPv6, then addresses in natural order. */
 function compareIps(a: IpRow, b: IpRow): number {
   const family = (row: IpRow) => (row.type === "ipv4" ? 0 : 1);
   return family(a) - family(b) || collator.compare(a.addr ?? "", b.addr ?? "");

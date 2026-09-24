@@ -21,7 +21,7 @@ export interface TagEditControl {
   attachError: string | null;
   /** `tag_id` of the tag whose detachment awaits confirmation. */
   confirmingDetach: string | null;
-  /** Demande confirmation pour ce tag, ou l'abandonne avec `null`. */
+  /** Asks confirmation for this tag, or drops the question with `null`. */
   askDetach: (tagId: string | null) => void;
   detach: (tagId: string) => void;
   /** `tag_id` of the tag being detached. */
@@ -145,7 +145,7 @@ export function ObjectTags({
           }}
           onCancel={() => {
             edit.askDetach(null);
-            // Le focus revient sur la croix qui a ouvert la question.
+            // The focus goes back to the cross that opened the question.
             section.current
               ?.querySelector<HTMLButtonElement>(`[data-detach="${CSS.escape(confirming.tag_id)}"]`)
               ?.focus();

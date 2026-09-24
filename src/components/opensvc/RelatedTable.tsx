@@ -6,7 +6,7 @@ export interface RelatedColumn<T> {
   label: string;
   render: (row: T) => ReactNode;
   numeric?: boolean;
-  /** Colonne qui absorbe la largeur restante, typiquement une description. */
+  /** Column that takes the remaining width, typically a description. */
   grow?: boolean;
   /** Long text allowed to wrap, without taking the remaining width. */
   wrap?: boolean;
@@ -39,7 +39,7 @@ export function RelatedTable<T>({
   errorMessage: string | null;
   /** Text shown when there is no row. */
   empty: string;
-  /** Nom accessible du tableau. */
+  /** Accessible name of the table. */
   caption: string;
 }) {
   const { t } = useTranslation();

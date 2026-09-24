@@ -133,7 +133,7 @@ const usersRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
-// File d'actions du collector : atteinte depuis la barre du haut, pas depuis le menu.
+// Action queue of the collector: reached from the top bar, not from the menu.
 const actionsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/actions",

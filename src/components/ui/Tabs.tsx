@@ -25,7 +25,7 @@ export function TabList({
   tabs: TabItem[];
   active: string;
   onChange: (key: string) => void;
-  /** Nom accessible de la barre d'onglets. */
+  /** Accessible name of the tab bar. */
   label: string;
   /** Prefix of the ids, shared with `tabPanelProps`. */
   idPrefix: string;

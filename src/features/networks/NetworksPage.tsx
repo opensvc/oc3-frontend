@@ -71,10 +71,10 @@ const DEFAULT_COLS: string[] = ["nodename", "intf", "addr", "mask", "type", "net
 /** Integer props of the oc3 `node_ip` mapping (`Kind: "int64"`), aligned right. */
 const NUMERIC_PROPS = new Set<string>(["id", "net_id", "net_prio", "flag_deprecated"]);
 
-/** Props que le collector stocke en datetime. */
+/** Props the collector stores as datetime. */
 const DATE_PROPS = new Set<string>(["updated"]);
 
-/** Famille de chaque colonne, dans le vocabulaire du collector historique. */
+/** Family of each column, in the vocabulary of the historical collector. */
 const FAMILY: Record<string, ColumnFamily> = {
   id: "network",
   node_id: "node",
@@ -105,7 +105,7 @@ const COLUMNS: ListColumn<IpRow>[] = IP_PROPS.map((prop) => ({
   labelKey: `networks.fields.${prop}`,
   numeric: NUMERIC_PROPS.has(prop),
   family: FAMILY[prop] ?? "node",
-  // Aucune colonne n'est triable tant que l'endpoint refuse `orderby`.
+  // No column can be sorted as long as the endpoint refuses `orderby`.
   sortable: false,
   render: (row: IpRow, locale: string) => {
     const value = row[prop];
@@ -231,7 +231,7 @@ export function NetworksPage() {
         rowId={(row) => (row.id === undefined ? undefined : String(row.id))}
         search={search}
         onChange={update}
-        // Les filtersets du collector ne portent pas sur les adresses.
+        // The collector's filtersets do not apply to addresses.
         filtersets={[]}
         isPending={isPending}
         isFetching={isFetching}

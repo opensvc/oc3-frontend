@@ -49,7 +49,7 @@ export function formatDate(value: string | undefined, locale: string): string {
   return parsed.toLocaleDateString(locale, { dateStyle: "medium" });
 }
 
-/** Paliers du plus grand au plus petit, en secondes. */
+/** Steps from the largest to the smallest, in seconds. */
 const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ["year", 365 * 24 * 3600],
   ["month", 30 * 24 * 3600],

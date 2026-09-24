@@ -42,10 +42,10 @@ const DEFAULT_COLS: string[] = ["app", "description", "updated"];
 /** `id` comes from the `col` helper on an integer column: aligned right. */
 const NUMERIC_PROPS = new Set<string>(["id"]);
 
-/** Props que le collector stocke en datetime. */
+/** Props the collector stores as datetime. */
 const DATE_PROPS = new Set<string>(["updated"]);
 
-/** Famille de chaque colonne, dans le vocabulaire du collector historique. */
+/** Family of each column, in the vocabulary of the historical collector. */
 const FAMILY: Record<string, ColumnFamily> = {
   id: "app",
   app: "app",
@@ -167,7 +167,7 @@ export function AppsPage() {
         rowId={(row) => row.app}
         search={search}
         onChange={update}
-        // Les filtersets du collector ne portent pas sur les codes application.
+        // The collector's filtersets do not apply to application codes.
         filtersets={[]}
         isPending={isPending}
         isFetching={isFetching}

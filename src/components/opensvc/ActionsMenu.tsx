@@ -10,7 +10,7 @@ export interface ActionEntry {
   separatorBefore?: boolean;
 }
 
-/** Objet sur lequel poser l'action : son identifiant, et son nom pour les refus. */
+/** Object to queue the action on: its id, and its name for refusal messages. */
 export interface ActionTarget {
   id: string;
   name: string;
@@ -46,7 +46,7 @@ export function ActionsMenu({
   actions: readonly ActionEntry[];
   /** Prefix of the translation keys, for example `nodes.actions`. */
   prefix: string;
-  /** Pose l'action sur un objet ; le message d'erreur de l'API, ou null. */
+  /** Queues the action on one object; returns the API error message, or null. */
   queue: (target: ActionTarget, action: string) => Promise<string | null>;
 }) {
   const { t } = useTranslation();

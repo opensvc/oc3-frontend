@@ -25,7 +25,7 @@ const text = (prop: keyof FiltersetRow) => (row: FiltersetRow) => {
   return value === undefined ? undefined : String(value);
 };
 
-/** Le nom et le type statistique se modifient ; le reste est tenu par le collector. */
+/** The name and the statistics type can be edited; the rest is kept by the collector. */
 const GROUPS: DetailGroup<FiltersetRow>[] = [
   {
     key: "properties",

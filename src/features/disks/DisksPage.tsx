@@ -66,10 +66,10 @@ const NUMERIC_PROPS = new Set<string>(["disk_size", "disk_used", "disk_alloc", "
 /** Sizes in mebibytes, like node memory. */
 const SIZE_PROPS = new Set<string>(["disk_size", "disk_used", "disk_alloc"]);
 
-/** Props que le collector stocke en datetime. */
+/** Props the collector stores as datetime. */
 const DATE_PROPS = new Set<string>(["updated"]);
 
-/** Famille de chaque colonne, dans le vocabulaire du collector historique. */
+/** Family of each column, in the vocabulary of the historical collector. */
 const FAMILY: Record<string, ColumnFamily> = {
   disk_id: "disk",
   disk_name: "disk",
@@ -208,7 +208,7 @@ export function DisksPage() {
         rowId={(row) => row.disk_id}
         search={search}
         onChange={update}
-        // Les filtersets du collector ne portent pas sur les disques.
+        // The collector's filtersets do not apply to disks.
         filtersets={[]}
         isPending={isPending}
         isFetching={isFetching}

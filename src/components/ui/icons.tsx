@@ -28,7 +28,7 @@ function Svg({ children, ...props }: IconProps) {
   );
 }
 
-/** Dashboard : le triangle d'alerte du collector (fa-exclamation-triangle). */
+/** Dashboard: the collector's warning triangle (fa-exclamation-triangle). */
 export function AlertTriangleIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -37,7 +37,7 @@ export function AlertTriangleIcon(props: IconProps) {
   );
 }
 
-/** Nodes : le serveur en rack (fa-server). */
+/** Nodes: the rack server (fa-server). */
 export function ServerIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -117,7 +117,7 @@ export function RefreshIcon(props: IconProps) {
   );
 }
 
-/** Journal : l'horloge qui remonte le temps du collector (fa-history, `log16`). */
+/** Log: the collector's clock turning back time (fa-history, `log16`). */
 export function HistoryIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -126,7 +126,7 @@ export function HistoryIcon(props: IconProps) {
   );
 }
 
-/** Filtre : l'entonnoir du collector (fa-filter, `filter16`). */
+/** Filter: the collector's funnel (fa-filter, `filter16`). */
 export function FilterIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -135,7 +135,7 @@ export function FilterIcon(props: IconProps) {
   );
 }
 
-/** Utilisateur : la silhouette seule du collector (fa-user, `guy16`). */
+/** User: the collector's single silhouette (fa-user, `guy16`). */
 export function UserIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -181,7 +181,7 @@ export function ColumnsIcon(props: IconProps) {
   );
 }
 
-/** Champ de filtre. */
+/** Filter field. */
 export function SearchIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -199,7 +199,7 @@ export function ResetIcon(props: IconProps) {
   );
 }
 
-/** Fermeture d'un panneau. */
+/** Closing a panel. */
 export function CloseIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -208,7 +208,7 @@ export function CloseIcon(props: IconProps) {
   );
 }
 
-/** Suppression. */
+/** Deletion. */
 export function TrashIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -217,7 +217,7 @@ export function TrashIcon(props: IconProps) {
   );
 }
 
-/* --- Familles de colonnes, reprises des classes du collector historique. --- */
+/* --- Column families, taken from the classes of the historical collector. --- */
 
 /** Cluster (fa-circle-notch). */
 export function ClusterIcon(props: IconProps) {
@@ -228,7 +228,7 @@ export function ClusterIcon(props: IconProps) {
   );
 }
 
-/** Environnement (fa-clone). */
+/** Environment (fa-clone). */
 export function EnvIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -246,7 +246,7 @@ export function FirewallIcon(props: IconProps) {
   );
 }
 
-/** Localisation (fa-map-marker). */
+/** Location (fa-map-marker). */
 export function LocationIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -255,7 +255,7 @@ export function LocationIcon(props: IconProps) {
   );
 }
 
-/** Hyperviseur (fa-cloud). */
+/** Hypervisor (fa-cloud). */
 export function CloudIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -273,7 +273,7 @@ export function OsIcon(props: IconProps) {
   );
 }
 
-/** Processeur (fa-microchip). */
+/** Processor (fa-microchip). */
 export function CpuIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -291,7 +291,7 @@ export function MemoryIcon(props: IconProps) {
   );
 }
 
-/** Horodatage (fa-clock). */
+/** Timestamp (fa-clock). */
 export function ClockIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -300,7 +300,7 @@ export function ClockIcon(props: IconProps) {
   );
 }
 
-/** Date, devant un horodatage dans les listes (fa-calendar-alt). */
+/** Date, in front of a timestamp in the lists (fa-calendar-alt). */
 export function CalendarIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -312,7 +312,7 @@ export function CalendarIcon(props: IconProps) {
   );
 }
 
-/** Alimentation (fa-bolt). */
+/** Power supply (fa-bolt). */
 export function PowerIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -330,7 +330,7 @@ export function BellIcon(props: IconProps) {
   );
 }
 
-/** Plan de secours (fa-bomb, classe `drp16` du collector). */
+/** Disaster recovery plan (fa-bomb, the collector's `drp16` class). */
 export function DrpIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -357,7 +357,7 @@ export function PencilIcon(props: IconProps) {
   );
 }
 
-/** Validation d'une saisie. */
+/** Confirming an entry. */
 export function CheckIcon(props: IconProps) {
   return (
     <Svg {...props}>
@@ -375,7 +375,7 @@ export function PlusIcon(props: IconProps) {
   );
 }
 
-/** Gel d'un objet : le flocon du collector historique (fa-snowflake). */
+/** Freezing of an object: the historical collector's snowflake (fa-snowflake). */
 export function SnowflakeIcon(props: IconProps) {
   return (
     <Svg {...props}>

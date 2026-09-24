@@ -66,7 +66,7 @@ export const NAV_CATEGORIES: NavCategory[] = [
     ],
   },
   {
-    // Le menu historique place les utilisateurs sous Administration (`adm-usr`).
+    // The historical menu places users under Administration (`adm-usr`).
     key: "administration",
     labelKey: "nav.categories.administration",
     entries: [
@@ -74,7 +74,7 @@ export const NAV_CATEGORIES: NavCategory[] = [
       // Groups follow the users they gather. The historical menu kept them under Data
       // Management (`dm-add-group`); moved here on request.
       { to: "/groups", labelKey: "nav.groups", icon: "group" },
-      // `adm-obs` dans le menu historique.
+      // `adm-obs` in the historical menu.
       { to: "/obsolescence", labelKey: "nav.obsolescence", icon: "obsolescence" },
       // `adm-log`.
       { to: "/logs", labelKey: "nav.logs", icon: "log" },

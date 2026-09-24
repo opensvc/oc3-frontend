@@ -37,7 +37,7 @@ export function RelatedTabsPanel({
   onTabChange: (tab: string | undefined) => void;
   /** Icon of the properties tab. */
   propertiesFamily: ColumnFamily;
-  /** Nom accessible de la barre d'onglets. */
+  /** Accessible name of the tab bar. */
   label: string;
   /** Content of the properties tab. */
   children: ReactNode;

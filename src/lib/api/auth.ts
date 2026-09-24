@@ -70,7 +70,7 @@ export function useCredentials(): Credentials | null {
 /** Authorization header of the current request, or null when nobody is signed in. */
 export function authorizationHeader(): string | null {
   if (current === null) return null;
-  // btoa n'accepte que du latin-1 : on passe par l'encodage UTF-8 des octets.
+  // btoa only accepts latin-1: go through the UTF-8 encoding of the bytes.
   const bytes = new TextEncoder().encode(`${current.user}:${current.password}`);
   return `Basic ${btoa(String.fromCharCode(...bytes))}`;
 }

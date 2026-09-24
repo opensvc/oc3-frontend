@@ -16,7 +16,7 @@ type InstanceRow = components["schemas"]["InstanceRow"];
 
 const text = (prop: keyof InstanceRow) => (row: InstanceRow) => {
   const value = row[prop];
-  // Un nom joint vaut null quand la ligne jointe manque.
+  // A joined name is null when the joined row is missing.
   return value === undefined || value === null ? undefined : String(value);
 };
 

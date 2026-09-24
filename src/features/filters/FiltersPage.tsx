@@ -163,7 +163,7 @@ export function FiltersPage() {
         rowId={(row) => (row.id === undefined ? undefined : String(row.id))}
         search={search}
         onChange={update}
-        // Un filtre ne se filtre pas par filterset : c'est lui qui les compose.
+        // A filter is not filtered by a filterset: filtersets are made of filters.
         filtersets={[]}
         isPending={isPending}
         isFetching={isFetching}

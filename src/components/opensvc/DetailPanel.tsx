@@ -41,7 +41,7 @@ export interface DetailField<T> {
 
 export interface DetailGroup<T> {
   key: string;
-  /** Sujet du groupe, dans le vocabulaire des familles de colonnes. */
+  /** Subject of the group, in the vocabulary of the column families. */
   family: ColumnFamily;
   fields: DetailField<T>[];
 }
@@ -68,8 +68,8 @@ function toPayload(input: DetailField<unknown>["input"], value: string): string 
 }
 
 /**
- * Le collector stocke ses dates en « AAAA-MM-JJ hh:mm:ss » ; un champ de type date
- * n'accepte que la partie calendaire.
+ * The collector stores its dates as "YYYY-MM-DD hh:mm:ss"; a date input only
+ * accepts the calendar part.
  */
 function toDateInput(value: string): string {
   return /^\d{4}-\d{2}-\d{2}/.test(value) ? value.slice(0, 10) : "";
@@ -80,7 +80,7 @@ interface DetailContentProps<T> {
   row: T | null | undefined;
   /** i18n namespace of the property labels, e.g. "services.fields". */
   labelPrefix: string;
-  /** Espace de noms i18n des titres de groupes, ex. "services.detail.groups". */
+  /** i18n namespace of the group titles, e.g. "services.detail.groups". */
   groupPrefix: string;
   isPending: boolean;
   errorMessage: string | null;

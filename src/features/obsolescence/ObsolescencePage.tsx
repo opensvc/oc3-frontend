@@ -152,7 +152,7 @@ export function ObsolescencePage() {
     labelKey: `obsolescence.fields.${prop}`,
     numeric: NUMERIC_PROPS.has(prop),
     family: FAMILY[prop] ?? "node",
-    // Aucune colonne n'est triable tant que l'endpoint refuse `orderby`.
+    // No column can be sorted as long as the endpoint refuses `orderby`.
     sortable: false,
     render: (row: ObsolescenceSettingRow, locale: string) => {
       const value = row[prop];

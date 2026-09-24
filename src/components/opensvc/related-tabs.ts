@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export interface SummaryPart {
   key: string;
   count: number;
-  /** Classes de fond et d'encre, par tokens. */
+  /** Background and ink classes, through tokens. */
   box: string;
   /** Full label, plural included: tooltip and screen readers. */
   label: string;

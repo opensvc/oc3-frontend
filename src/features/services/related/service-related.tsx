@@ -13,7 +13,7 @@ export const SERVICE_RELATED_TABS: RelatedTab[] = [
     key: "storage",
     labelKey: "services.related.storage",
     icon: <ColumnFamilyIcon family="disk" />,
-    // Comme pour le node, l'effectif est celui des disques, l'essentiel de l'onglet.
+    // As for the node, the count is that of the disks, the bulk of the tab.
     useSummary: (svcId) => ({ count: useServiceDisks(svcId).data?.length }),
     render: (svcId, locale) => <ServiceStorage svcId={svcId} locale={locale} />,
   },

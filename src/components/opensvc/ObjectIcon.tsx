@@ -41,7 +41,7 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   dashboard: { Icon: AlertTriangleIcon, className: "text-icon-dashboard" },
   node: { Icon: ServerIcon, className: "text-icon-node" },
   service: { Icon: StackIcon, className: "text-icon-service" },
-  // Teinte du service : une instance est un service vu depuis un node.
+  // Service tint: an instance is a service seen from a node.
   instance: { Icon: InstanceIcon, className: "text-icon-service" },
   network: { Icon: NetworkIcon, className: "text-icon-network" },
   disk: { Icon: DatabaseIcon, className: "text-icon-disk" },
@@ -52,11 +52,11 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   // Same tint as groups: the historical collector paints `guy16` and `guys16` in the
   // same salmon, both speak of people.
   user: { Icon: UserIcon, className: "text-icon-group" },
-  // Bleu bleuet dans le collector historique : la teinte des nodes, qu'elle concerne.
+  // Cornflower blue in the historical collector: the tint of nodes, which it is about.
   obsolescence: { Icon: LifeRingIcon, className: "text-icon-node" },
-  // `log16` n'a pas de couleur propre dans le collector historique : teinte neutre.
+  // `log16` has no colour of its own in the historical collector: neutral tint.
   log: { Icon: HistoryIcon, className: "text-icon-dashboard" },
-  // `filter16` n'a pas non plus de couleur propre : teinte neutre.
+  // `filter16` has no colour of its own either: neutral tint.
   filter: { Icon: FilterIcon, className: "text-icon-dashboard" },
   // Same icon as the filter: the historical collector marks both of them `filter16`.
   filterset: { Icon: FilterIcon, className: "text-icon-dashboard" },

@@ -8,7 +8,7 @@ type DiskRow = components["schemas"]["DiskRow"];
 type HbaRow = components["schemas"]["HbaRow"];
 type InstanceRow = components["schemas"]["InstanceRow"];
 
-/** Disques du service, vus par chacun de ses nodes. */
+/** Disks of the service, as seen by each of its nodes. */
 export function useServiceDisks(svcId: string | undefined) {
   return useQuery({
     queryKey: ["service", svcId, "disks"],

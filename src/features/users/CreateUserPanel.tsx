@@ -138,7 +138,7 @@ export function CreateUserPanel({
           })}
         </div>
 
-        {/* new-password : le navigateur ne propose pas le mot de passe de la session en cours. */}
+        {/* new-password: the browser does not offer the password of the current session. */}
         {text("create-user-password", t("users.create.password"), password, setPassword, {
           type: "password",
           autoComplete: "new-password",

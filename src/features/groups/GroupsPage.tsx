@@ -39,7 +39,7 @@ const DEFAULT_COLS: string[] = ["role", "privilege", "description"];
 /** `id` comes from the `col` helper on an integer column: aligned right. */
 const NUMERIC_PROPS = new Set<string>(["id"]);
 
-/** Famille de chaque colonne : un groupe rassemble des personnes. */
+/** Family of each column: a group gathers people. */
 const FAMILY: Record<string, ColumnFamily> = {
   id: "team",
   role: "team",
@@ -151,7 +151,7 @@ export function GroupsPage() {
         rowId={(row) => (row.id === undefined ? undefined : String(row.id))}
         search={search}
         onChange={update}
-        // Les filtersets du collector ne portent pas sur les groupes.
+        // The collector's filtersets do not apply to groups.
         filtersets={[]}
         isPending={isPending}
         isFetching={isFetching}

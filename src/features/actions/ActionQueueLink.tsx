@@ -21,7 +21,7 @@ function usePendingActions() {
       const { data, error } = await api.GET("/actions", {
         params: { query: { props: "id,status", limit: LIMIT, orderby: "-id" } },
       });
-      // Une file illisible ne doit pas encombrer la barre du haut : on n'en dit rien.
+      // An unreadable queue must not clutter the top bar: nothing is said about it.
       if (error !== undefined) return 0;
       return toActionRows(data.data).filter((row) => isPending(row.status)).length;
     },

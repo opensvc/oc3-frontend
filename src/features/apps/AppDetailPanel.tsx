@@ -53,7 +53,7 @@ export function AppDetailPanel({
     queryKey: ["app", appId],
     enabled: appId !== undefined,
     queryFn: async () => {
-      // Contrairement aux nodes et aux services, cet endpoint renvoie la ligne seule.
+      // Unlike nodes and services, this endpoint returns the bare row.
       const { data, error: failure } = await api.GET("/apps/{app_id}", {
         params: { path: { app_id: appId ?? "" } },
       });
@@ -62,7 +62,7 @@ export function AppDetailPanel({
     },
   });
 
-  // Partent aussi les rattachements du code application : responsables et publications.
+  // The links of the application code go too: responsibles and publications.
   const remove = useMutation({
     mutationFn: async () => {
       const { error: failure } = await api.DELETE("/apps/{app_id}", {

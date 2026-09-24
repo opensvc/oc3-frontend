@@ -31,10 +31,10 @@ export function Combobox({
   inputRef,
 }: {
   options: ComboboxOption[];
-  /** Valeur de l'option choisie, "" si aucune. */
+  /** Value of the chosen option, "" when none. */
   value: string;
   onChange: (value: string) => void;
-  /** Nom accessible du champ. */
+  /** Accessible name of the field. */
   label: string;
   placeholder?: string;
   /** Shown in the list when the filter leaves nothing in it. */
@@ -44,7 +44,7 @@ export function Combobox({
 }) {
   const listId = useId();
   const [open, setOpen] = useState(false);
-  // null : rien de saisi depuis le dernier choix, le champ montre l'option choisie.
+  // null: nothing typed since the last choice, the field shows the chosen option.
   const [query, setQuery] = useState<string | null>(null);
   const [active, setActive] = useState(0);
   const list = useRef<HTMLUListElement>(null);
@@ -163,7 +163,7 @@ export function Combobox({
               id={optionId(index)}
               role="option"
               aria-selected={option.value === value}
-              // Avant le blur du champ, qui refermerait la liste sous le clic.
+              // Before the blur of the field, which would close the list under the click.
               onMouseDown={(event) => {
                 event.preventDefault();
               }}

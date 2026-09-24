@@ -22,7 +22,7 @@ export function NodeAlerts({ nodeId, locale }: { nodeId: string; locale: string 
       key: "dash_type",
       label: t("alerts.fields.dash_type"),
       grow: true,
-      // Le type fait le message quand l'alerte n'en a pas d'autre.
+      // The type serves as the message when the alert has no other.
       render: (row) => (
         <Link
           to="/"

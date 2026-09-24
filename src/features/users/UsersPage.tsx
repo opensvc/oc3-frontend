@@ -192,7 +192,7 @@ export function UsersPage() {
         rowId={(row) => (row.id === undefined ? undefined : String(row.id))}
         search={search}
         onChange={update}
-        // Les filtersets du collector ne portent pas sur les utilisateurs.
+        // The collector's filtersets do not apply to users.
         filtersets={[]}
         isPending={isPending}
         isFetching={isFetching}

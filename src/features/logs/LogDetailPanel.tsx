@@ -28,7 +28,7 @@ const GROUPS: DetailGroup<LogRow>[] = [
       field("log_level"),
       field("log_action"),
       field("log_user"),
-      // Texte seul dans le panneau : le gras de la table n'y apporte rien.
+      // Plain text in the panel: the bold of the table adds nothing there.
       { prop: "log_fmt", format: (row) => formatLogMessage(row.log_fmt, row.log_dict).text },
     ],
   },

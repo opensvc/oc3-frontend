@@ -30,7 +30,7 @@ import { toInstanceId } from "./instance-id";
 
 type InstanceRow = components["schemas"]["InstanceRow"];
 
-/** Une instance se lit d'abord par son service, puis par le node qui la porte. */
+/** An instance reads first by its service, then by the node that hosts it. */
 const DEFAULT_SORT = ["services.svcname", "nodes.nodename"];
 
 /**

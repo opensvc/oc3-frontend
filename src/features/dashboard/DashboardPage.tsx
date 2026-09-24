@@ -46,7 +46,7 @@ const COLUMNS: ListColumn<AlertRow>[] = [
     prop: "services.svcname",
     labelKey: "alerts.fields.object",
     family: "service",
-    // orderby n'accepte pas les props joints : cette colonne n'est pas triable.
+    // orderby does not accept joined props: this column cannot be sorted.
     sortable: false,
     // The alert carries a service or a node: the badge leads to whichever carries it.
     render: (r) =>
