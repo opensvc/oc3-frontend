@@ -6,6 +6,8 @@ import { DisksPage } from "@/features/disks/DisksPage";
 import { FiltersPage } from "@/features/filters/FiltersPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
 import { FormsPage } from "@/features/forms/FormsPage";
+import { NewRequestPage } from "@/features/requests/NewRequestPage";
+import { parseRequestSearch } from "@/features/requests/catalog";
 import { GroupsPage } from "@/features/groups/GroupsPage";
 import { InstancesPage } from "@/features/instances/InstancesPage";
 import { LogsPage } from "@/features/logs/LogsPage";
@@ -134,6 +136,14 @@ const formsRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
+// The request catalog: the folder browsed and the form chosen live in the URL.
+const requestsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/requests",
+  component: NewRequestPage,
+  validateSearch: parseRequestSearch,
+});
+
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users",
@@ -173,6 +183,7 @@ const routeTree = rootRoute.addChildren([
   filtersRoute,
   filtersetsRoute,
   formsRoute,
+  requestsRoute,
   actionsRoute,
   profileRoute,
 ]);

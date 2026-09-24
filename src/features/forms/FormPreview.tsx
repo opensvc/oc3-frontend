@@ -1,39 +1,9 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import type { components } from "@/lib/api/schema";
-import { api } from "@/lib/api/client";
-import { problemText } from "@/lib/api/problem";
-import { parseDefinition, type FormUser } from "./form-engine";
+import { parseDefinition } from "./form-engine";
 import { FormRender } from "./FormRender";
 import { useForm } from "./use-form";
-
-type UserRow = components["schemas"]["UserRow"];
-
-/** The signed-in user, for the __user_*__ defaults of the forms. */
-function useFormUser() {
-  return useQuery({
-    queryKey: ["user", "self", "form-defaults"],
-    staleTime: 5 * 60 * 1000,
-    queryFn: async (): Promise<FormUser> => {
-      const { data, error } = await api.GET("/users/{user_id}", {
-        params: {
-          path: { user_id: "self" },
-          query: { props: "id,first_name,last_name,email,phone_work" },
-        },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      const rows: UserRow[] = Array.isArray(data.data) ? data.data : [];
-      const row = rows[0];
-      return {
-        id: row?.id === undefined ? "" : String(row.id),
-        name: `${row?.first_name ?? ""} ${row?.last_name ?? ""}`,
-        email: row?.email ?? "",
-        phoneWork: row?.phone_work ?? "",
-      };
-    },
-  });
-}
+import { useFormUser } from "./use-form-user";
 
 /**
  * The form as its users will see it: rendered from its stored definition, filled

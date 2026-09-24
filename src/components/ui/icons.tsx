@@ -366,6 +366,15 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
+/** Folder of forms, in the request catalog (fa-folder-open). */
+export function FolderIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3.5 5h5.2c.5 0 .9.2 1.2.6L11 7h7.5c.8 0 1.5.7 1.5 1.5V10H7.2c-.7 0-1.3.4-1.5 1.1L3 18.2V6.5C3 5.7 3.7 5 4.5 5h-1Zm3.7 6.5h14.3c.7 0 1.2.7.9 1.4l-2.3 6c-.2.6-.8 1.1-1.5 1.1H4.1c-.7 0-1.2-.7-.9-1.4l2.5-6c.3-.7.8-1.1 1.5-1.1Z" />
+    </Svg>
+  );
+}
+
 /** Form: the collector's puzzle piece (fa-puzzle-piece, `wf16`). */
 export function PuzzleIcon(props: IconProps) {
   return (

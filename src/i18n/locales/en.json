@@ -22,7 +22,8 @@
     "logs": "Logs",
     "filters": "Filters",
     "filtersets": "Filtersets",
-    "forms": "Forms"
+    "forms": "Forms",
+    "newRequest": "New request"
   },
   "header": {
     "search": "Search the collector",
@@ -1053,5 +1054,24 @@
       "subFormMissing": "The sub-form is not named.",
       "subFormNotFound": "Sub-form {{name}} not found."
     }
+  },
+  "requests": {
+    "title": "New request",
+    "intro": "Choose the form of your request. The search narrows the list as you type, on the forms' names, labels and descriptions.",
+    "search": "Search the forms",
+    "noMatch": "No form matches the search.",
+    "back": "Back to the catalog",
+    "notFound": "This form does not exist, or is not published to you.",
+    "unusable": "This form has no usable definition.",
+    "submit": "Submit the request",
+    "submitting": "Submitting…",
+    "results": {
+      "title": "Request {{id}}",
+      "succeeded": "completed",
+      "failed": "completed with errors (code {{code}})",
+      "running": "in progress ({{status}})",
+      "noLog": "Nothing logged."
+    },
+    "empty": "No form is available to you."
   }
 }

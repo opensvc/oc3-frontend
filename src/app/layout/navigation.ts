@@ -25,7 +25,8 @@ export interface NavEntry {
     | "/logs"
     | "/filters"
     | "/filtersets"
-    | "/forms";
+    | "/forms"
+    | "/requests";
   labelKey: string;
   icon: ObjectKind;
   /** True for the root: without it, prefix matching would activate it everywhere. */
@@ -64,6 +65,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
     entries: [
       { to: "/apps", labelKey: "nav.apps", icon: "app" },
       { to: "/tags", labelKey: "nav.tags", icon: "app" },
+      // `req-new` of the historical Requests menu: the catalog of the forms to submit.
+      { to: "/requests", labelKey: "nav.newRequest", icon: "form" },
     ],
   },
   {
