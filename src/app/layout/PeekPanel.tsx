@@ -5,6 +5,8 @@ import { ServiceDetailPanel } from "@/features/services/ServiceDetailPanel";
 import { InstanceDetailPanel } from "@/features/instances/InstanceDetailPanel";
 import { AppDetailPanel } from "@/features/apps/AppDetailPanel";
 import { GroupDetailPanel } from "@/features/groups/GroupDetailPanel";
+import { TagDetailPanel } from "@/features/tags/TagDetailPanel";
+import { useTag } from "@/features/tags/use-tag";
 import { ObjectIcon, type ObjectKind } from "@/components/opensvc/ObjectIcon";
 import { useObjectLabels } from "@/components/opensvc/object-label";
 import { TrailContext, type TrailStep } from "@/components/ui/trail";
@@ -14,7 +16,7 @@ import { currentIndex, parseTrail } from "@/lib/peek-trail";
  * Record of an object looked at from another view.
  *
  * A badge in a cell (`CrossLink`) opens here the record of the node, the service,
- * the instance, the application code or the team it names, without leaving the list
+ * the instance, the application code, the team or the tag it names, without leaving the list
  * nor losing its sort, its page or its selection. Placed in the application shell:
  * every view benefits from it, and there is only one panel of this kind on screen.
  *
@@ -102,6 +104,8 @@ export function PeekPanel() {
         return <AppDetailPanel appId={id} label="" onClose={close} />;
       case "group":
         return <GroupDetailPanel groupId={id} label="" onClose={close} />;
+      case "tag":
+        return <TagPeek tagId={id} onClose={close} />;
       default:
         return null;
     }
@@ -113,5 +117,19 @@ export function PeekPanel() {
       {panel}
       <span className="sr-only">{t("trail.label")}</span>
     </TrailContext.Provider>
+  );
+}
+
+/** A tag opened from a badge: read by its id, then shown like a row of the Tags list. */
+function TagPeek({ tagId, onClose }: { tagId: string | undefined; onClose: () => void }) {
+  const { tag, isPending, errorMessage } = useTag(tagId);
+  return (
+    <TagDetailPanel
+      tag={tag}
+      open={tagId !== undefined}
+      isPending={isPending}
+      errorMessage={errorMessage}
+      onClose={onClose}
+    />
   );
 }

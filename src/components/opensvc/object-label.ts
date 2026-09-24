@@ -51,6 +51,16 @@ async function fetchLabel(step: PeekStep): Promise<string> {
       const rows = Array.isArray(data?.data) ? data.data : [];
       return text(readProp(rows[0] ?? {}, "role")) || step.id;
     }
+    case "tag": {
+      // No tag can be read by its char(36) id alone: the list is read and searched,
+      // as `useTag` does.
+      const { data } = await api.GET("/tags", {
+        params: { query: { props: "tag_id,tag_name", limit: 0 } },
+      });
+      const rows = Array.isArray(data?.data) ? data.data : [];
+      const row = rows.find((r) => readProp(r, "tag_id") === step.id);
+      return text(readProp(row ?? {}, "tag_name")) || step.id;
+    }
     // An application code names itself: the id is the code.
     case "app":
     default:

@@ -28,20 +28,36 @@ const GROUPS: DetailGroup<TagRow>[] = [
   },
 ];
 
-export function TagDetailPanel({ tag, onClose }: { tag: TagRow | undefined; onClose: () => void }) {
+/**
+ * `open`, `isPending` and `errorMessage` serve the panel history, which opens a tag by
+ * its id before its row is known; the Tags list passes the row it already holds.
+ */
+export function TagDetailPanel({
+  tag,
+  onClose,
+  open = tag !== undefined && tag !== null,
+  isPending = false,
+  errorMessage = null,
+}: {
+  tag: TagRow | null | undefined;
+  onClose: () => void;
+  open?: boolean;
+  isPending?: boolean;
+  errorMessage?: string | null;
+}) {
   const { t } = useTranslation();
   return (
     <DetailPanel
-      kind="app"
-      open={tag !== undefined}
+      kind="tag"
+      open={open}
       title={tag?.tag_name ?? t("tags.detail.title")}
       onClose={onClose}
       groups={GROUPS}
       row={tag ?? null}
       labelPrefix="tags.fields"
       groupPrefix="tags.detail.groups"
-      isPending={false}
-      errorMessage={null}
+      isPending={isPending}
+      errorMessage={errorMessage}
     />
   );
 }

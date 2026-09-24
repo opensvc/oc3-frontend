@@ -22,6 +22,7 @@ export type ObjectKind =
   | "network"
   | "disk"
   | "app"
+  | "tag"
   | "group"
   | "user"
   | "obsolescence"
@@ -45,6 +46,8 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   network: { Icon: NetworkIcon, className: "text-icon-network" },
   disk: { Icon: DatabaseIcon, className: "text-icon-disk" },
   app: { Icon: AsteriskIcon, className: "text-icon-app" },
+  // Same mark as in the menu, where the Tags entry shares the application asterisk.
+  tag: { Icon: AsteriskIcon, className: "text-icon-app" },
   group: { Icon: UsersIcon, className: "text-icon-group" },
   // Same tint as groups: the historical collector paints `guy16` and `guys16` in the
   // same salmon, both speak of people.

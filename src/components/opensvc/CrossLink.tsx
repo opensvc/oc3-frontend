@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-import { useLocation, useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ObjectIcon } from "./ObjectIcon";
-import { parseTrail, pushStep, rowStep, serialiseTrail } from "@/lib/peek-trail";
+import { usePeek } from "./use-peek";
 
 /** Objects whose record `PeekPanel` knows how to show. */
-export type CrossKind = "node" | "service" | "instance" | "app" | "group";
+export type CrossKind = "node" | "service" | "instance" | "app" | "group" | "tag";
 
 /**
  * Value of a cell that names an object from another view: the node of an instance,
@@ -29,9 +28,7 @@ export function CrossLink({
   id: string | undefined;
   children: ReactNode;
 }) {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const search = useSearch({ strict: false }) as Record<string, unknown>;
+  const openRecord = usePeek();
   const { t } = useTranslation();
 
   if (
@@ -43,28 +40,9 @@ export function CrossLink({
   )
     return <>{children}</>;
 
-  /**
-   * Shows the record without leaving the view, in place of the row panel, and adds it
-   * to the history: the record one was reading becomes the previous entry, so that
-   * the breadcrumb leads back to it. Nothing already visited is dropped.
-   */
+  /** Shows the record without leaving the view, in place of the row panel. */
   const peek = () => {
-    const started = parseTrail(search.peek);
-    const root = rowStep(pathname, search.sel);
-    const from = started.length > 0 ? started : root === null ? [] : [root];
-    const { trail, index } = pushStep(from, { kind, id });
-    void navigate({
-      to: ".",
-      search: (previous) => ({
-        ...(previous as Record<string, unknown>),
-        sel: undefined,
-        tab: undefined,
-        peek: serialiseTrail(trail),
-        peekat: index,
-        peektab: undefined,
-      }),
-      resetScroll: false,
-    });
+    openRecord(kind, id);
   };
 
   return (

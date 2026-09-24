@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { TagRow } from "@/features/tags/tag-row";
 import { Combobox } from "@/components/ui/Combobox";
 import { CloseIcon, PlusIcon } from "@/components/ui/icons";
 import { ColumnFamilyIcon } from "./ColumnFamily";
+import { usePeek } from "./use-peek";
 
 /** Attaching and detaching, held by the caller (see `useTagEdit`). */
 export interface TagEditControl {
@@ -31,8 +31,9 @@ export interface TagEditControl {
 
 /**
  * Tags of an object (node, service), at the head of its properties: a few words that
- * say what the object is for or what is promised about it. Each tag leads to its
- * record in the Tags view; its data and its exclusion pattern are in the tooltip.
+ * say what the object is for or what is promised about it. A double-click on a tag
+ * shows its record in this panel, like any badge naming an object, and adds it to
+ * the panel history; its data and its exclusion pattern are in the tooltip.
  *
  * With `edit`, and for whoever has the right, each badge carries a cross that
  * detaches the tag after confirmation, and a button opens a picker of the tags still
@@ -51,6 +52,7 @@ export function ObjectTags({
   edit?: TagEditControl;
 }) {
   const { t } = useTranslation();
+  const openRecord = usePeek();
   const editable = edit?.allowed === true;
   const section = useRef<HTMLElement>(null);
   const confirming =
@@ -97,14 +99,23 @@ export function ObjectTags({
                 key={tag.tag_id || tag.tag_name}
                 className={`inline-flex items-stretch overflow-hidden rounded-full bg-tag text-data font-medium text-tag-ink ${detaching ? "opacity-60" : ""}`}
               >
-                <Link
-                  to="/tags"
-                  search={{ sel: tag.tag_id }}
-                  title={details.length === 0 ? t("objectTags.open") : details.join("\n")}
+                {/* Like any badge naming an object: a double-click, or Enter, shows
+                    the tag in this panel and adds it to the history. */}
+                <button
+                  type="button"
+                  title={[t("objectTags.open"), ...details].join("\n")}
+                  onDoubleClick={() => {
+                    openRecord("tag", tag.tag_id);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    event.preventDefault();
+                    openRecord("tag", tag.tag_id);
+                  }}
                   className={`inline-flex items-center py-0.5 hover:bg-tag-hover ${editable ? "pr-1.5 pl-2" : "px-2"}`}
                 >
                   {tag.tag_name}
-                </Link>
+                </button>
                 {editable && (
                   <button
                     type="button"

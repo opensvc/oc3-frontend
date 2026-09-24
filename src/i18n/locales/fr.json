@@ -867,7 +867,7 @@
   "objectTags": {
     "title": "Tags",
     "none": "Aucun tag.",
-    "open": "Ouvrir dans la vue Tags",
+    "open": "Double-cliquer pour voir ce tag",
     "data": "Données : {{data}}",
     "exclude": "Exclut les tags correspondant à {{pattern}}",
     "attach": {
@@ -893,7 +893,8 @@
       "service": "service",
       "instance": "instance",
       "app": "application",
-      "group": "équipe"
+      "group": "équipe",
+      "tag": "tag"
     }
   },
   "actions": {
