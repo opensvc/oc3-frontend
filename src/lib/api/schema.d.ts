@@ -17,7 +17,30 @@ export interface paths {
          *     responsible for.
          */
         get: operations["GetActions"];
-        put?: never;
+        /**
+         * @description Enqueue agent actions, as the historical collector's PUT /actions does. The
+         *     body is one entry, or a list of entries; the fields present select the
+         *     target:
+         *
+         *     - node_id and svc_id: an action on that instance of the service, acting on
+         *       that node only (--local), or on the resources given by rid (--rid).
+         *       Requires the NodeExec privilege and responsibility for the service.
+         *     - svc_id alone: an action on the whole service, posted for a node of the
+         *       service seen alive in the last 15 minutes. Same requirements.
+         *     - node_id alone: a node action. Requires the NodeExec privilege and
+         *       responsibility for the node.
+         *
+         *     Accepted actions: push resinfo, push config, freeze and thaw on a service
+         *     or an instance; pushasset, pushdisks, pushpkg, pushpatch, pushstats,
+         *     checks, sysreport, scanscsi, freeze and thaw on a node. Compliance actions
+         *     (module, moduleset, ruleset) and agent options are not supported.
+         *
+         *     One entry answers with the queued action, as GET /actions/{id} does, or
+         *     with a problem. A list always answers 200, with the queued actions in
+         *     data and one message per refused entry in error; entries differing only
+         *     by rid are merged into one action on those resources.
+         */
+        put: operations["PutActions"];
         /**
          * @description Modify an action_queue entry. The 'id' key is mandatory and selects the
          *     target action; only the 'status' property is updatable. Requires the
@@ -1079,28 +1102,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/nodes/{node_id}/actions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * @description Queue an agent action on a node, as the historical collector action menu
-         *     did. The command is built from the node action_type: queued bare for a
-         *     pull or feed node, wrapped in a ssh call to nodemgr for a push node.
-         *     Requires the NodeExec privilege and responsibility for the node.
-         */
-        post: operations["PostNodeAction"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/nodes/{node_id}/alerts": {
         parameters: {
             query?: never;
@@ -1594,29 +1595,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/services/{svc_id}/actions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * @description Queue an agent action on a service, as the historical collector action menu
-         *     did: the action is posted for a node of the service seen alive in the last
-         *     15 minutes, and asks the agent to act on the whole service rather than on
-         *     that one instance. Requires the NodeExec privilege and responsibility for
-         *     the service.
-         */
-        post: operations["PostServiceAction"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/services/{svc_id}/alerts": {
         parameters: {
             query?: never;
@@ -1853,27 +1831,6 @@ export interface paths {
         post?: never;
         /** @description Delete a service instance and cascade to dashboard, resmon, resinfo and checks_live */
         delete: operations["DeleteServiceInstance"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/services/{svc_id}/instances/{node_id}/actions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * @description Queue an agent action on one service instance, acting on that node only.
-         *     Requires the NodeExec privilege and responsibility for both the service and
-         *     the node.
-         */
-        post: operations["PostServiceInstanceAction"];
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -2325,6 +2282,19 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description One action to enqueue with PUT /actions. */
+        ActionEnqueue: {
+            /** @description Agent action to run */
+            action: string;
+            /** @description Target node (node_id or nodename) */
+            node_id?: string;
+            /** @description Resource ids to limit an instance action to, comma separated */
+            rid?: string;
+            /** @description Target service (svc_id or svcname) */
+            svc_id?: string;
+            /** @description Target node by name, in place of node_id, for an encapsulated node */
+            vmname?: string;
+        };
         AlertListResponse: {
             data: components["schemas"]["AlertRow"][] | {
                 [key: string]: {
@@ -3132,6 +3102,39 @@ export interface operations {
                     "application/json": components["schemas"]["ListResponse"];
                 };
             };
+            500: components["responses"]["500"];
+        };
+    };
+    PutActions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionEnqueue"] | components["schemas"]["ActionEnqueue"][];
+            };
+        };
+        responses: {
+            /**
+             * @description The queued action for one entry; for a list, an object with the
+             *     queued actions in data and the refusals in error.
+             */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
             500: components["responses"]["500"];
         };
     };
@@ -6738,53 +6741,6 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
-    PostNodeAction: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the node */
-                node_id: components["parameters"]["inPathNodeId"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /**
-                     * @description Action to queue
-                     * @enum {string}
-                     */
-                    action: "pushasset" | "pushdisks" | "pushpkg" | "pushpatch" | "pushstats" | "checks" | "sysreport" | "scanscsi" | "freeze" | "thaw";
-                };
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @description Command queued for the agent */
-                        command?: string;
-                        /**
-                         * Format: int64
-                         * @description Action queue entry id
-                         */
-                        id?: number;
-                        info?: string;
-                    };
-                };
-            };
-            400: components["responses"]["400"];
-            401: components["responses"]["401"];
-            403: components["responses"]["403"];
-            404: components["responses"]["404"];
-            500: components["responses"]["500"];
-        };
-    };
     GetNodeAlerts: {
         parameters: {
             query?: {
@@ -8275,62 +8231,6 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
-    PostServiceAction: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Service identifier (svc_id UUID or svcname) */
-                svc_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /**
-                     * @description Action to queue
-                     * @enum {string}
-                     */
-                    action: "push resinfo" | "push config" | "freeze" | "thaw";
-                };
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @description Command queued for the agent */
-                        command?: string;
-                        /**
-                         * Format: int64
-                         * @description Action queue entry id
-                         */
-                        id?: number;
-                        info?: string;
-                        /** @description Node the action was queued on */
-                        node_id?: string;
-                    };
-                };
-            };
-            400: components["responses"]["400"];
-            401: components["responses"]["401"];
-            403: components["responses"]["403"];
-            404: components["responses"]["404"];
-            /** @description No node of the service has been seen alive recently */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            500: components["responses"]["500"];
-        };
-    };
     GetServiceAlerts: {
         parameters: {
             query?: {
@@ -8957,55 +8857,6 @@ export interface operations {
                     "application/json": Record<string, never>;
                 };
             };
-            401: components["responses"]["401"];
-            403: components["responses"]["403"];
-            404: components["responses"]["404"];
-            500: components["responses"]["500"];
-        };
-    };
-    PostServiceInstanceAction: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Service identifier (svc_id UUID or svcname) */
-                svc_id: string;
-                /** @description ID of the node */
-                node_id: components["parameters"]["inPathNodeId"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /**
-                     * @description Action to queue
-                     * @enum {string}
-                     */
-                    action: "push resinfo" | "push config" | "freeze" | "thaw";
-                };
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @description Command queued for the agent */
-                        command?: string;
-                        /**
-                         * Format: int64
-                         * @description Action queue entry id
-                         */
-                        id?: number;
-                        info?: string;
-                    };
-                };
-            };
-            400: components["responses"]["400"];
             401: components["responses"]["401"];
             403: components["responses"]["403"];
             404: components["responses"]["404"];

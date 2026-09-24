@@ -8,7 +8,7 @@ import { problemText } from "@/lib/api/problem";
  * service, not to that one instance. As for nodes, only the actions that do not
  * interrupt the service are offered; start, stop, switch, synchronisations and
  * provisioning are left out for now, here as in the API allowlist (`serviceActions`,
- * `post_service_action.go`).
+ * `queue_service_action.go`).
  */
 export const SERVICE_ACTIONS = [
   { action: "push resinfo" },
@@ -24,10 +24,8 @@ export function ServiceActionsMenu({ services }: { services: ActionTarget[] }) {
       actions={SERVICE_ACTIONS}
       prefix="services.actions"
       queue={async (target, action) => {
-        const { error } = await api.POST("/services/{svc_id}/actions", {
-          params: { path: { svc_id: target.id } },
-          body: { action: action as "freeze" },
-        });
+        // `svc_id` alone targets the whole service, as in the historical collector.
+        const { error } = await api.PUT("/actions", { body: { svc_id: target.id, action } });
         return error === undefined ? null : problemText(error);
       }}
     />

@@ -7,7 +7,7 @@ import { problemText } from "@/lib/api/problem";
  * then the state of the node. These are the "node agent" entries of the old collector
  * that do not interrupt the service; reboot, shutdown, drain and agent update are
  * left out for now, here as in the API allowlist (`nodeActions`,
- * `post_node_action.go`).
+ * `queue_node_action.go`).
  */
 const ACTIONS = [
   { action: "pushasset" },
@@ -29,10 +29,8 @@ export function NodeActionsMenu({ nodes }: { nodes: ActionTarget[] }) {
       actions={ACTIONS}
       prefix="nodes.actions"
       queue={async (target, action) => {
-        const { error } = await api.POST("/nodes/{node_id}/actions", {
-          params: { path: { node_id: target.id } },
-          body: { action: action as "pushasset" },
-        });
+        // `node_id` alone targets the node, as in the historical collector.
+        const { error } = await api.PUT("/actions", { body: { node_id: target.id, action } });
         return error === undefined ? null : problemText(error);
       }}
     />
