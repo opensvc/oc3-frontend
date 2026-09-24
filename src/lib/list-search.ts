@@ -1,6 +1,13 @@
+import {
+  FILTER_KEY_PREFIX,
+  filterKey,
+  filtersFromSearch,
+  type ColumnFilters,
+} from "./column-filters";
+
 /**
  * URL state shared by the "collector list" views: sort, pagination, filterset,
- * visible columns and selected row. The "definition of done" grid asks for these
+ * column filters, visible columns and selected row. The "definition of done" grid asks for these
  * states to be shareable by link alone.
  *
  * Two shapes coexist on purpose:
@@ -22,7 +29,7 @@ export interface ListSearch {
   fset?: string;
   /** Id of the row whose detail panel is open. */
   sel?: string;
-  /** Props des colonnes visibles ; absent signifie « toutes les colonnes de la vue ». */
+  /** Props of the visible columns; absent means the view's default columns. */
   cols?: string;
   /**
    * Tab open in the detail panel. In the URL so that a link, a reload or the Back
@@ -39,6 +46,11 @@ export interface ListSearch {
   peektab?: string;
   /** Position in `peek` of the record on display; the last one when absent. */
   peekat?: number;
+  /**
+   * Column filters, one key per filtered prop: `f.nodename=~^dev`. Flat keys rather
+   * than one object, which the router would serialise as JSON.
+   */
+  [key: `f.${string}`]: string | undefined;
 }
 
 export interface ResolvedListSearch {
@@ -52,6 +64,8 @@ export interface ResolvedListSearch {
   peek?: string;
   peektab?: string;
   peekat?: number;
+  /** Active column filters, prop → apicollector expression. */
+  filters: ColumnFilters;
 }
 
 export const PAGE_SIZES = [25, 50, 100] as const;
@@ -84,6 +98,7 @@ function toCommaList(value: unknown): string | undefined {
 export function parseListSearch(raw: Record<string, unknown>): ListSearch {
   const limit = toPositiveInt(raw.limit);
   return {
+    ...toFilterParams(filtersFromSearch(raw)),
     sort: toCommaList(raw.sort),
     offset: toPositiveInt(raw.offset),
     limit: PAGE_SIZES.some((size) => size === limit) ? limit : undefined,
@@ -109,7 +124,15 @@ export function resolveListSearch(search: ListSearch, defaultSort: string[]): Re
     peek: search.peek,
     peektab: search.peektab,
     peekat: search.peekat,
+    filters: filtersFromSearch(search),
   };
+}
+
+/** Filters as URL keys. */
+function toFilterParams(filters: ColumnFilters): Partial<ListSearch> {
+  return Object.fromEntries(
+    Object.entries(filters).map(([prop, expr]) => [filterKey(prop), expr]),
+  ) as Partial<ListSearch>;
 }
 
 /**
@@ -139,7 +162,24 @@ export function toSearchParams(next: Partial<ResolvedListSearch>): Partial<ListS
   if ("peek" in next) out.peek = next.peek;
   if ("peektab" in next) out.peektab = next.peektab;
   if ("peekat" in next) out.peekat = next.peekat;
+  if (next.filters !== undefined) Object.assign(out, toFilterParams(next.filters));
   return out;
+}
+
+/**
+ * The URL state after an update: `toSearchParams` applied over the previous state.
+ *
+ * Filters are replaced as a whole: a filter absent from the update is dropped from
+ * the URL, which a plain merge would leave behind.
+ */
+export function mergeSearch(previous: ListSearch, next: Partial<ResolvedListSearch>): ListSearch {
+  const base: ListSearch = { ...previous };
+  if ("filters" in next) {
+    for (const key of Object.keys(base)) {
+      if (key.startsWith(FILTER_KEY_PREFIX)) delete base[key as `f.${string}`];
+    }
+  }
+  return { ...base, ...toSearchParams(next) };
 }
 
 /**

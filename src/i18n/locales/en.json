@@ -39,7 +39,9 @@
     "warn": "warn",
     "down": "down",
     "unknown": "n/a",
-    "frozen": "Frozen"
+    "frozen": "Frozen",
+    "thawed": "Not frozen",
+    "frozenMixed": "Partly frozen"
   },
   "nodes": {
     "title": "Nodes",
@@ -241,7 +243,22 @@
     "selectEverything": "Select all matching rows",
     "selectingEverything": "Selecting…",
     "selectedEverywhere": "{{count}} selected, every page",
-    "selectedEverywhere_other": "{{count}} selected, every page"
+    "selectedEverywhere_other": "{{count}} selected, every page",
+    "filters": {
+      "title": "Filters",
+      "label": "Filter {{column}}",
+      "active": "Filtered",
+      "hidden": "hidden column",
+      "unknown": "unknown column",
+      "all": "All",
+      "regex": "Regular expression",
+      "invalidRegex": "Invalid regular expression: {{reason}}",
+      "numberHint": "e.g. >=8",
+      "clearOne": "Clear the {{column}} filter",
+      "clearAll_one": "Clear filter",
+      "clearAll_other": "Clear filters ({{count}})",
+      "noMatch": "No row matches the filters."
+    }
   },
   "detail": {
     "close": "Close",
@@ -603,13 +620,13 @@
     },
     "viewPrefs": {
       "title": "Saved view settings",
-      "hint": "The columns and sort order you chose in each list follow your account.",
-      "reset": "Forget saved columns and sorting",
-      "question": "Forget the columns and sort order saved for every view?",
+      "hint": "The columns, sort order and filters you chose in each list follow your account.",
+      "reset": "Forget saved columns, sorting and filters",
+      "question": "Forget the columns, sort order and filters saved for every view?",
       "confirm": "Forget",
       "pending": "Forgetting…",
-      "done": "Saved columns and sorting forgotten. Every list is back to its defaults.",
-      "none": "No view has saved columns or sort order."
+      "done": "Saved columns, sorting and filters forgotten. Every list is back to its defaults.",
+      "none": "No view has saved columns, sort order or filters."
     }
   },
   "instances": {
@@ -935,6 +952,13 @@
       "queued_one": "{{action}} applied to 1 action.",
       "queued_other": "{{action}} applied to {{count}} actions.",
       "failure": "{{name}}: {{message}}"
+    },
+    "statusNames": {
+      "W": "Waiting",
+      "Q": "Queued",
+      "R": "Running",
+      "T": "Done",
+      "C": "Cancelled"
     }
   },
   "trail": {

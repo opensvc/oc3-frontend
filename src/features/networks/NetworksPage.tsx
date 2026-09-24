@@ -12,7 +12,7 @@ import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import {
   resolveListSearch,
   resetsScroll,
-  toSearchParams,
+  mergeSearch,
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
@@ -182,7 +182,7 @@ export function NetworksPage() {
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     void navigate({
-      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      search: (previous) => mergeSearch(previous, next),
       resetScroll: resetsScroll(next),
     });
   }

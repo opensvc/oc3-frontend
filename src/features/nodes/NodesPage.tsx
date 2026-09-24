@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { DateTime } from "@/components/ui/DateTime";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
+import { problemText } from "@/lib/api/problem";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { CrossLink } from "@/components/opensvc/CrossLink";
 import { TeamLink } from "@/features/groups/TeamLink";
 import { NodeActionsMenu } from "./NodeActionsMenu";
 import { FrozenMark } from "@/components/opensvc/FrozenMark";
+import { frozenFilterOptions } from "@/components/opensvc/filter-options";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { OsLogo } from "@/components/opensvc/OsLogo";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -19,10 +21,11 @@ import { formatSizeMiB } from "@/lib/format";
 import {
   resolveListSearch,
   resetsScroll,
-  toSearchParams,
+  mergeSearch,
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateNodePanel } from "./CreateNodePanel";
 import { NodeDetailPanel } from "./NodeDetailPanel";
@@ -238,6 +241,10 @@ const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
   labelKey: `nodes.fields.${prop}`,
   numeric: NUMERIC_PROPS.has(prop),
   family: FAMILY[prop] ?? "node",
+  filter:
+    prop === "node_frozen"
+      ? { kind: "enum" as const, options: frozenFilterOptions("T", "F") }
+      : undefined,
   render: (row: NodeRow, locale: string) => {
     const value = row[prop];
     // The memory column is in mebibytes despite its name, see lib/format.
@@ -283,7 +290,18 @@ function queryProps(cols: string[] | undefined): string {
 
 function useNodes(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["nodes", search.sort, search.offset, search.limit, search.fset, search.cols],
+    queryKey: [
+      "nodes",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.fset,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       // apicollector does not return the total of a selection: one row more than the
       // page is requested, to know whether any remain after it.
@@ -292,6 +310,7 @@ function useNodes(search: ResolvedListSearch) {
         orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
       };
       const response =
         search.fset === ""
@@ -299,7 +318,7 @@ function useNodes(search: ResolvedListSearch) {
           : await api.GET("/filtersets/{filterset_id}/nodes", {
               params: { path: { filterset_id: search.fset }, query },
             });
-      if (response.error !== undefined) throw new Error(JSON.stringify(response.error));
+      if (response.error !== undefined) throw new Error(problemText(response.error));
       const all: NodeRow[] = Array.isArray(response.data.data) ? response.data.data : [];
       return { rows: all.slice(0, search.limit), hasMore: all.length > search.limit };
     },
@@ -321,26 +340,27 @@ export function NodesPage() {
   // The names come from the page on display, hence the fallback to the id.
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  /** Ids of the whole selection, filterset included, without pagination. */
+  /** Ids of the whole selection, filterset and filters included, without pagination. */
   async function allIds(): Promise<string[]> {
-    const query = { props: "node_id", limit: 0 };
+    const query = { props: "node_id", limit: 0, filter: filterQuery(search.filters) };
     const response =
       search.fset === ""
         ? await api.GET("/nodes", { params: { query } })
         : await api.GET("/filtersets/{filterset_id}/nodes", {
             params: { path: { filterset_id: search.fset }, query },
           });
-    if (response.error !== undefined) throw new Error(JSON.stringify(response.error));
+    if (response.error !== undefined) throw new Error(problemText(response.error));
     const rows: NodeRow[] = Array.isArray(response.data.data) ? response.data.data : [];
     return rows.map((row) => row.node_id).filter((id): id is string => id !== undefined);
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Columns and sort follow the account, the other states stay in the URL.
+    // Columns, sort and filters follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
+    if ("filters" in next) prefs.saveFilters(next.filters);
     void navigate({
-      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      search: (previous) => mergeSearch(previous, next),
       resetScroll: resetsScroll(next),
     });
   }
@@ -388,6 +408,7 @@ export function NodesPage() {
         rowLead={(row) => <FrozenMark frozen={row.node_frozen === "T"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
+        filterable
       />
 
       <NodeDetailPanel

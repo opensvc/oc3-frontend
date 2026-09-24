@@ -11,8 +11,12 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
-import { ColumnsIcon, ResetIcon, SearchIcon } from "@/components/ui/icons";
+import type { TFunction } from "i18next";
+import { CloseIcon, ColumnsIcon, FilterIcon, ResetIcon, SearchIcon } from "@/components/ui/icons";
+import { EnumFilter } from "@/components/ui/EnumFilter";
+import { TextFilter } from "@/components/ui/TextFilter";
 import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
+import { toEnumValues, toTextDraft, withFilter } from "@/lib/column-filters";
 import { PAGE_SIZES, visibleProps, type ResolvedListSearch } from "@/lib/list-search";
 import { readProp } from "@/lib/row";
 
@@ -24,11 +28,31 @@ export interface ListColumn<T> {
   /** Subject of the column, to place it at a glance in the picker. */
   family: ColumnFamily;
   /**
-   * Faux pour une colonne qu'apicollector ne sait pas trier, par exemple un prop
-   * joint : `orderby` n'accepte que les colonnes de la table principale.
+   * False for a column apicollector cannot sort, for instance a joined prop: `orderby`
+   * only accepts the columns of the main table.
    */
   sortable?: boolean;
+  /**
+   * How the column is filtered, in a list that offers filters: a text field by
+   * default, a list of values for a column holding a known set, or nothing.
+   */
+  filter?: ColumnFilterSpec;
   render: (row: T, locale: string) => ReactNode;
+}
+
+export type ColumnFilterSpec =
+  { kind: "text" } | { kind: "enum"; options: ColumnFilterOption[] } | { kind: "none" };
+
+/**
+ * Value offered by an enumerated filter. `labelKey` names it for the summary and for
+ * assistive technologies; without it, the value is its own label, as for statuses
+ * whose code is what the cells show.
+ */
+export interface ColumnFilterOption {
+  value: string;
+  labelKey?: string;
+  /** Rendering in the list, as the cells show the value. */
+  render?: ReactNode;
 }
 
 /** Metadata carried by each TanStack column, beyond what it knows itself. */
@@ -43,7 +67,7 @@ function toSortingState(sort: string[]): SortingState {
   );
 }
 
-/** Et retour. */
+/** And back. */
 function fromSortingState(sorting: SortingState): string[] {
   return sorting.map((entry) => (entry.desc ? `-${entry.id}` : entry.id));
 }
@@ -61,9 +85,15 @@ function resolveUpdater<S>(updater: S | ((old: S) => S), current: S): S {
  * every change goes through `onChange` rather than through a state internal to the
  * table.
  *
- * Two limits come from the API rather than from the table: it does not return the
- * total of a selection, hence an unknown `pageCount` and a pagination without a page
- * number; and it accepts no ad hoc filter, so TanStack's filtering stays unused.
+ * Column filters are server-side too, through apicollector's `filter` parameter: a
+ * filter on a paginated list must apply to every page, not to the rows on display.
+ * They live in `search.filters` rather than in TanStack's `columnFilters`, which
+ * would only restate the same state. A filter on a hidden column stays active: the
+ * bar above the table lists every active filter, hidden columns included, with a
+ * way to clear each.
+ *
+ * The API does not return the total of a selection, hence an unknown `pageCount` and
+ * a pagination without a page number.
  */
 export function CollectorList<T>({
   columns,
@@ -80,6 +110,7 @@ export function CollectorList<T>({
   onSelectionChange,
   rowLead,
   selectAllMatching,
+  filterable = false,
 }: {
   columns: ListColumn<T>[];
   /** Props shown as long as the user has not chosen their columns. */
@@ -110,6 +141,11 @@ export function CollectorList<T>({
    * display.
    */
   selectAllMatching?: () => Promise<string[]>;
+  /**
+   * Offers a filter row under the headers. Only for views whose endpoint accepts
+   * `filter` and whose page forwards `search.filters` to it.
+   */
+  filterable?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
@@ -202,6 +238,21 @@ export function CollectorList<T>({
       setSelectingAll(false);
     }
   }
+
+  /** Sets or clears the filter of a column; the population changes, as with a filterset. */
+  function setFilter(prop: string, expr: string | undefined) {
+    table.resetRowSelection();
+    onChange({ filters: withFilter(search.filters, prop, expr), offset: 0 });
+  }
+
+  // Every active filter, those of hidden columns included, and those a hand-made link
+  // puts on a prop the view does not know: the API refuses them, and the bar is where
+  // they can be cleared.
+  const activeFilters = Object.entries(search.filters).map(([prop, expr]) => ({
+    prop,
+    expr,
+    column: columns.find((column) => column.prop === prop),
+  }));
 
   const onColumnVisibilityChange: OnChangeFn<VisibilityState> = (updater) => {
     const next = resolveUpdater(updater, columnVisibility);
@@ -323,8 +374,8 @@ export function CollectorList<T>({
             {t("list.columns", { shown: shown.length, total: columns.length })}
           </summary>
           <div className="absolute z-20 mt-1 w-72 rounded-(--radius-panel) border border-line bg-surface-raised p-2 shadow-lg">
-            {/* Une vue peut proposer des dizaines de colonnes : sans filtre, la liste
-                devient impraticable. */}
+            {/* A view may offer dozens of columns: without a filter, the list
+                becomes impractical. */}
             <div className="mb-2 flex h-7 items-center gap-1.5 rounded-(--radius-control) border border-line bg-surface px-2 text-ink-muted">
               <SearchIcon />
               <input
@@ -354,6 +405,12 @@ export function CollectorList<T>({
                       />
                       <ColumnFamilyIcon family={meta.family} />
                       {t(meta.labelKey)}
+                      {search.filters[meta.prop] !== undefined && (
+                        <span title={t("list.filters.active")} className="ml-auto text-accent">
+                          <FilterIcon className="h-3 w-3" />
+                          <span className="sr-only">{t("list.filters.active")}</span>
+                        </span>
+                      )}
                     </label>
                   </li>
                 );
@@ -432,6 +489,64 @@ export function CollectorList<T>({
         </div>
       </div>
 
+      {activeFilters.length > 0 && (
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <span className="flex items-center gap-1 text-ink-muted">
+            <FilterIcon className="h-3.5 w-3.5" />
+            {t("list.filters.title")}
+          </span>
+          <ul className="contents">
+            {activeFilters.map(({ prop, expr, column }) => {
+              const hidden = !shown.includes(prop);
+              const label = column === undefined ? prop : t(column.labelKey);
+              return (
+                <li
+                  key={prop}
+                  className={`flex h-6 items-center gap-1 rounded-(--radius-control) border bg-surface-raised pl-1.5 ${
+                    hidden ? "border-dashed border-line-strong" : "border-line"
+                  }`}
+                >
+                  {column !== undefined && <ColumnFamilyIcon family={column.family} />}
+                  <span className="text-ink-muted">{label}</span>
+                  {column?.filter?.kind === "enum" ? (
+                    <span className="text-ink">{describeFilter(column, expr, t)}</span>
+                  ) : (
+                    <code className="text-data text-ink">{describeFilter(column, expr, t)}</code>
+                  )}
+                  {hidden && (
+                    <span className="text-ink-muted italic">
+                      {column === undefined ? t("list.filters.unknown") : t("list.filters.hidden")}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilter(prop, undefined);
+                    }}
+                    aria-label={t("list.filters.clearOne", { column: label })}
+                    title={t("list.filters.clearOne", { column: label })}
+                    className="flex h-full items-center px-1 text-ink-muted hover:text-ink"
+                  >
+                    <CloseIcon className="h-3 w-3" />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <button
+            type="button"
+            onClick={() => {
+              table.resetRowSelection();
+              onChange({ filters: {}, offset: 0 });
+            }}
+            className="flex h-6 items-center gap-1 rounded-(--radius-control) border border-line px-2 text-ink-muted hover:text-ink"
+          >
+            <ResetIcon className="h-3.5 w-3.5" />
+            {t("list.filters.clearAll", { count: activeFilters.length })}
+          </button>
+        </div>
+      )}
+
       {selectionError !== null && (
         <p role="alert" className="mb-2 text-state-down">
           ■ {selectionError}
@@ -448,11 +563,13 @@ export function CollectorList<T>({
 
       {isPending && <p className="text-ink-muted">{t("list.loading")}</p>}
 
-      {!isPending && errorMessage === null && rows.length === 0 && (
+      {!filterable && !isPending && errorMessage === null && rows.length === 0 && (
         <p className="text-ink-muted">{t("list.empty")}</p>
       )}
 
-      {rows.length > 0 && (
+      {/* A filterable list keeps its table when nothing matches: the filter row is
+          where the filter that emptied it gets changed. */}
+      {(rows.length > 0 || (filterable && !isPending)) && (
         <div className="overflow-x-auto rounded-(--radius-panel) border border-line bg-surface-raised">
           <table className="w-full border-collapse text-data">
             <thead>
@@ -516,17 +633,45 @@ export function CollectorList<T>({
                   })}
                 </tr>
               ))}
+              {filterable && (
+                <tr className="border-b border-line text-left">
+                  <td className="w-8 px-2">
+                    <span className="sr-only">{t("list.filters.title")}</span>
+                  </td>
+                  {table.getVisibleLeafColumns().map((column) => {
+                    const meta = getMeta(column.columnDef).column;
+                    return (
+                      <td key={column.id} className="px-2 pb-1.5">
+                        <ColumnFilterControl
+                          column={meta}
+                          value={search.filters[meta.prop]}
+                          onChange={(expr) => {
+                            setFilter(meta.prop, expr);
+                          }}
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              )}
             </thead>
             <tbody>
+              {rows.length === 0 && errorMessage === null && (
+                <tr>
+                  <td colSpan={shown.length + 1} className="px-2 py-3 text-ink-muted">
+                    {activeFilters.length > 0 ? t("list.filters.noMatch") : t("list.empty")}
+                  </td>
+                </tr>
+              )}
               {table.getRowModel().rows.map((row) => {
                 const id = rowId(row.original);
                 const selected = id !== undefined && id === search.sel;
                 return (
                   <tr
                     key={row.id}
-                    // La ligne porte l'ouverture du panneau, au clic comme au clavier :
-                    // une cellule peut contenir ses propres boutons, et un bouton dans
-                    // un bouton ne serait ni valide ni utilisable au clavier.
+                    // The row carries the opening of the panel, by click as by keyboard:
+                    // a cell may hold its own buttons, and a button inside a button
+                    // would be neither valid nor usable from the keyboard.
                     tabIndex={0}
                     aria-haspopup="dialog"
                     onClick={() => {
@@ -591,4 +736,67 @@ export function CollectorList<T>({
 /** Reads the metadata of a column, which TanStack types as `unknown`. */
 function getMeta<T>(columnDef: ColumnDef<T>): ColumnMeta<T> {
   return columnDef.meta as ColumnMeta<T>;
+}
+
+/** Filter control of a column, according to what the column declares. */
+function ColumnFilterControl<T>({
+  column,
+  value,
+  onChange,
+}: {
+  column: ListColumn<T>;
+  value: string | undefined;
+  onChange: (expr: string | undefined) => void;
+}) {
+  const { t } = useTranslation();
+  const label = t("list.filters.label", { column: t(column.labelKey) });
+  const spec = column.filter ?? { kind: "text" };
+  if (spec.kind === "none") return null;
+  if (spec.kind === "enum")
+    return (
+      <EnumFilter
+        value={value}
+        onChange={onChange}
+        options={spec.options.map((option) => ({
+          value: option.value,
+          label: optionLabel(option, t),
+          render: option.render,
+        }))}
+        label={label}
+        allLabel={t("list.filters.all")}
+      />
+    );
+  return (
+    <TextFilter
+      value={value}
+      onChange={onChange}
+      label={label}
+      regexLabel={t("list.filters.regex")}
+      clearLabel={t("list.filters.clearOne", { column: t(column.labelKey) })}
+      invalidLabel={(reason) => t("list.filters.invalidRegex", { reason })}
+      placeholder={column.numeric === true ? t("list.filters.numberHint") : undefined}
+    />
+  );
+}
+
+function optionLabel(option: ColumnFilterOption, t: TFunction): string {
+  return option.labelKey === undefined ? option.value : t(option.labelKey);
+}
+
+/** A filter as the bar of active filters shows it: as it was typed or chosen. */
+function describeFilter<T>(column: ListColumn<T> | undefined, expr: string, t: TFunction): string {
+  if (column === undefined) return expr;
+  const spec = column.filter;
+  if (spec?.kind === "enum") {
+    const values = toEnumValues(expr);
+    if (values.length > 0)
+      return values
+        .map((value) => {
+          const option = spec.options.find((candidate) => candidate.value === value);
+          return option === undefined ? value : optionLabel(option, t);
+        })
+        .join(", ");
+  }
+  const draft = toTextDraft(expr);
+  return draft.regex ? `/${draft.text}/` : draft.text;
 }

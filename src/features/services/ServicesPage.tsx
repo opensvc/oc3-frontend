@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { DateTime } from "@/components/ui/DateTime";
 import { RelativeTime } from "@/components/ui/RelativeTime";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
+import { problemText } from "@/lib/api/problem";
 import { useFiltersets } from "@/lib/api/filtersets";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { CrossLink } from "@/components/opensvc/CrossLink";
 import { FrozenMark } from "@/components/opensvc/FrozenMark";
+import { frozenFilterOptions, STATUS_FILTER_OPTIONS } from "@/components/opensvc/filter-options";
 import { ServiceActionsMenu } from "./ServiceActionsMenu";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -18,10 +20,11 @@ import { statusBadge } from "@/components/opensvc/status";
 import {
   resolveListSearch,
   resetsScroll,
-  toSearchParams,
+  mergeSearch,
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ServiceDetailPanel } from "./ServiceDetailPanel";
 
@@ -94,7 +97,7 @@ const NUMERIC_PROPS = new Set<string>([
   "svc_flex_cpu_high_threshold",
 ]);
 
-/** Props que le collector stocke en datetime. */
+/** Props the collector stores as datetime. */
 const DATE_PROPS = new Set<string>([
   "svc_created",
   "svc_status_updated",
@@ -106,7 +109,7 @@ const DATE_PROPS = new Set<string>([
 /** State props, rendered with the shape and label of the badge rather than as raw text. */
 const STATUS_PROPS = new Set<string>(["svc_status", "svc_availstatus"]);
 
-/** Famille de chaque colonne, dans le vocabulaire du collector historique. */
+/** Family of each column, in the vocabulary of the historical collector. */
 const FAMILY: Record<string, ColumnFamily> = {
   id: "service",
   svc_id: "service",
@@ -150,6 +153,11 @@ const COLUMNS: ListColumn<ServiceRow>[] = SERVICE_PROPS.map((prop) => ({
   labelKey: `services.fields.${prop}`,
   numeric: NUMERIC_PROPS.has(prop),
   family: FAMILY[prop] ?? "node",
+  filter: STATUS_PROPS.has(prop)
+    ? { kind: "enum" as const, options: STATUS_FILTER_OPTIONS }
+    : prop === "svc_frozen"
+      ? { kind: "enum" as const, options: frozenFilterOptions("frozen", "unfrozen", "mixed") }
+      : undefined,
   render: (row: ServiceRow, locale: string) => {
     const value = row[prop];
     if (prop === "svc_app")
@@ -181,7 +189,18 @@ function queryProps(cols: string[] | undefined): string {
 
 function useServices(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["services", search.sort, search.offset, search.limit, search.fset, search.cols],
+    queryKey: [
+      "services",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.fset,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       // One row more than the page: apicollector does not return the total of a selection.
       const query = {
@@ -189,6 +208,7 @@ function useServices(search: ResolvedListSearch) {
         orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
       };
       const response =
         search.fset === ""
@@ -196,7 +216,7 @@ function useServices(search: ResolvedListSearch) {
           : await api.GET("/filtersets/{filterset_id}/services", {
               params: { path: { filterset_id: search.fset }, query },
             });
-      if (response.error !== undefined) throw new Error(JSON.stringify(response.error));
+      if (response.error !== undefined) throw new Error(problemText(response.error));
       const all: ServiceRow[] = Array.isArray(response.data.data) ? response.data.data : [];
       return { rows: all.slice(0, search.limit), hasMore: all.length > search.limit };
     },
@@ -215,26 +235,27 @@ export function ServicesPage() {
   const filtersets = useFiltersets();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  /** Ids of the whole selection, filterset included, without pagination. */
+  /** Ids of the whole selection, filterset and filters included, without pagination. */
   async function allIds(): Promise<string[]> {
-    const query = { props: "svc_id", limit: 0 };
+    const query = { props: "svc_id", limit: 0, filter: filterQuery(search.filters) };
     const response =
       search.fset === ""
         ? await api.GET("/services", { params: { query } })
         : await api.GET("/filtersets/{filterset_id}/services", {
             params: { path: { filterset_id: search.fset }, query },
           });
-    if (response.error !== undefined) throw new Error(JSON.stringify(response.error));
+    if (response.error !== undefined) throw new Error(problemText(response.error));
     const rows: ServiceRow[] = Array.isArray(response.data.data) ? response.data.data : [];
     return rows.map((row) => row.svc_id).filter((id): id is string => id !== undefined);
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Columns and sort follow the account, the other states stay in the URL.
+    // Columns, sort and filters follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
+    if ("filters" in next) prefs.saveFilters(next.filters);
     void navigate({
-      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      search: (previous) => mergeSearch(previous, next),
       resetScroll: resetsScroll(next),
     });
   }
@@ -273,6 +294,7 @@ export function ServicesPage() {
         rowLead={(row) => <FrozenMark frozen={row.svc_frozen === "frozen"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
+        filterable
       />
 
       <ServiceDetailPanel

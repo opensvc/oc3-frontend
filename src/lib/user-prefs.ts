@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { api } from "./api/client";
 import { problemText } from "./api/problem";
+import { FILTER_KEY_PREFIX, filterKey, type ColumnFilters } from "./column-filters";
 import type { ListSearch } from "./list-search";
 import { applyTheme, cachedTheme, isTheme, watchSystemTheme, type Theme } from "./theme";
 
@@ -12,16 +13,20 @@ import { applyTheme, cachedTheme, isTheme, watchSystemTheme, type Theme } from "
  * `init/static/js/osvc/tables/table.js`, so that an account finds its columns again
  * from one interface to the other. The sort sits next to them, under
  * `tables.<view>.sort`: the old interface did not keep it, so that key is unknown to
- * it and without effect there.
+ * it and without effect there. Column filters follow under
+ * `tables.<view>.column_filters`, in the apicollector syntax: the old interface keeps
+ * its own, in another syntax, under `filters`, and each ignores the other's.
  *
- * The rest of the object — column filters, live mode, hidden menu entries — belongs
- * to the old interface: it is read back and stored again untouched.
+ * The rest of the object — the old column filters, live mode, hidden menu entries —
+ * belongs to the old interface: it is read back and stored again untouched.
  */
 /** Preferences of a view: what follows the account rather than the URL. */
 export interface ViewPrefs {
   visible_columns?: string[];
   /** Sort keys, prefixed with `-` for descending order, as in the URL. */
   sort?: string[];
+  /** Column filters, prop → apicollector expression, as in the URL. */
+  column_filters?: ColumnFilters;
 }
 
 export interface UserPrefs {
@@ -54,84 +59,108 @@ export function useUserPrefs() {
 }
 
 /**
- * Columns and sort saved for a view, and what it takes to update them.
+ * Columns, sort and filters saved for a view, and what it takes to update them.
  *
- * The URL keeps priority: a shared link shows its columns and its sort, not those of
- * whoever opens it. Preferences therefore only serve when the URL carries none, and
- * going back to the default columns clears the saved entry.
+ * The URL keeps priority: a shared link shows its columns, its sort and its filters,
+ * not those of whoever opens it. Preferences therefore only serve when the URL carries
+ * none, and going back to the defaults clears the saved entry.
  */
 export function useViewPrefs(view: string) {
   const queryClient = useQueryClient();
   const prefs = useUserPrefs();
 
-  const save = useMutation({
-    mutationFn: async ({ key, value }: { key: keyof ViewPrefs; value: string[] | undefined }) =>
-      savePrefs(queryClient, (current) => {
-        const tables = { ...current.tables };
-        const entry: ViewPrefs = { ...tables[view] };
-        if (value === undefined || value.length === 0) {
-          delete entry[key];
-        } else {
-          entry[key] = value;
-        }
-        if (Object.keys(entry).length === 0) {
-          delete tables[view];
-        } else {
-          tables[view] = entry;
-        }
-        return { ...current, tables };
-      }),
-  });
-
-  /** Saves after a short delay; a new call cancels the previous one. */
-  function later(key: keyof ViewPrefs, value: string[] | undefined) {
-    const timer = `${view}:${key}`;
-    clearTimeout(timers.get(timer));
-    timers.set(
-      timer,
-      setTimeout(() => {
-        save.mutate({ key, value });
-      }, SAVE_DELAY),
-    );
+  function save<K extends keyof ViewPrefs>(key: K, value: ViewPrefs[K]) {
+    const empty =
+      value === undefined ||
+      (Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0);
+    schedule(queryClient, `${view}:${key}`, (current) => {
+      const tables = { ...current.tables };
+      const entry: ViewPrefs = { ...tables[view] };
+      if (empty) {
+        delete entry[key];
+      } else {
+        entry[key] = value;
+      }
+      if (Object.keys(entry).length === 0) {
+        delete tables[view];
+      } else {
+        tables[view] = entry;
+      }
+      return { ...current, tables };
+    });
   }
 
   const entry = prefs.data?.tables?.[view];
   return {
     cols: entry?.visible_columns,
     sort: entry?.sort,
+    filters: entry?.column_filters,
     saveCols: (cols: string[] | undefined) => {
-      later("visible_columns", cols);
+      save("visible_columns", cols);
     },
     saveSort: (sort: string[] | undefined) => {
-      later("sort", sort);
+      save("sort", sort);
+    },
+    saveFilters: (filters: ColumnFilters | undefined) => {
+      save("column_filters", filters);
     },
   };
 }
 
-/** One timer per view and per key: two writes do not cancel each other. */
-const timers = new Map<string, ReturnType<typeof setTimeout>>();
+type PrefsChange = (current: UserPrefs) => UserPrefs;
 
-async function ensurePrefs(queryClient: QueryClient): Promise<UserPrefs> {
-  return asPrefs(await queryClient.fetchQuery({ queryKey: PREFS_KEY, queryFn: fetchPrefs }));
+/** Changes waiting to be written, one per view and key: a newer one replaces it. */
+const pending = new Map<string, PrefsChange>();
+let flushTimer: ReturnType<typeof setTimeout> | undefined;
+
+/** Changes scheduled but not written yet, over a state read from the server. */
+function applyPending(prefs: UserPrefs): UserPrefs {
+  return [...pending.values()].reduce((current, change) => change(current), prefs);
+}
+
+/**
+ * Applies a change at once to the cached preferences and writes it a little later.
+ *
+ * The view reads its state from the cache: without the immediate update, a filter
+ * just cleared from the URL would come back from the saved preferences until the
+ * write lands. The write itself waits, as in the old collector, so that ticking three
+ * columns or typing a filter writes only once.
+ */
+function schedule(queryClient: QueryClient, id: string, change: PrefsChange) {
+  pending.set(id, change);
+  queryClient.setQueryData<UserPrefs>(PREFS_KEY, (current) => change(asPrefs(current)));
+  clearTimeout(flushTimer);
+  flushTimer = setTimeout(() => {
+    const changes = [...pending.values()];
+    pending.clear();
+    savePrefs(queryClient, (current) =>
+      changes.reduce((prefs, apply) => apply(prefs), current),
+    ).catch(() => {
+      // The cache holds a state the server refused: read the stored one again.
+      void queryClient.invalidateQueries({ queryKey: PREFS_KEY });
+    });
+  }, SAVE_DELAY);
 }
 
 /**
  * Applies a change to the preferences object and saves it.
  *
  * The object is read back before being written again: the server replaces the whole
- * of it, and another view may have saved its columns in the meantime.
+ * of it, and another tab may have saved its columns in the meantime. It is read
+ * outside the cache, which holds changes not written yet; those are applied again
+ * over the stored state once it is saved.
  */
 export async function savePrefs(
   queryClient: QueryClient,
   change: (current: UserPrefs) => UserPrefs,
 ): Promise<void> {
-  const next = change(await ensurePrefs(queryClient));
+  const next = change(await fetchPrefs());
   const { error } = await api.POST("/users/{user_id}/prefs", {
     params: { path: { user_id: "self" } },
     body: { data: next },
   });
   if (error !== undefined) throw new Error(problemText(error));
-  queryClient.setQueryData(PREFS_KEY, next);
+  queryClient.setQueryData(PREFS_KEY, applyPending(next));
 }
 
 /**
@@ -140,9 +169,18 @@ export async function savePrefs(
  */
 export function withSavedSearch(
   search: ListSearch,
-  saved: { cols?: string[]; sort?: string[] },
+  saved: { cols?: string[]; sort?: string[]; filters?: ColumnFilters },
 ): ListSearch {
+  // Filters go as a whole: a link filtering on one column does not inherit the
+  // saved filters of the others.
+  const urlFilters = Object.keys(search).some((key) => key.startsWith(FILTER_KEY_PREFIX));
+  const savedFilters = urlFilters
+    ? {}
+    : Object.fromEntries(
+        Object.entries(saved.filters ?? {}).map(([prop, expr]) => [filterKey(prop), expr]),
+      );
   return {
+    ...savedFilters,
     ...search,
     cols: search.cols ?? saved.cols?.join(","),
     sort: search.sort ?? saved.sort?.join(","),
@@ -189,9 +227,9 @@ export function useThemePref() {
 }
 
 /**
- * Forgets the columns and the sort saved for every view.
+ * Forgets the columns, the sort and the column filters saved for every view.
  *
- * Only those two keys are removed: the old interface keeps the page size, its column
+ * Only those keys are removed: the old interface keeps the page size, its column
  * filters and the folded state of its sections in the same object, and those are not
  * ours to clear. A view left with nothing disappears from `tables`.
  */
@@ -205,6 +243,7 @@ export function useResetViewPrefs() {
           const rest = { ...entry };
           delete rest.visible_columns;
           delete rest.sort;
+          delete rest.column_filters;
           if (Object.keys(rest).length > 0) tables[view] = rest;
         }
         return { ...current, tables };
@@ -220,9 +259,12 @@ export function useResetViewPrefs() {
   };
 }
 
-/** True when at least one view has saved columns or a saved sort. */
+/** True when at least one view has saved columns, sort or filters. */
 export function hasSavedViewPrefs(prefs: UserPrefs | undefined): boolean {
   return Object.values(prefs?.tables ?? {}).some(
-    (entry) => entry?.visible_columns !== undefined || entry?.sort !== undefined,
+    (entry) =>
+      entry?.visible_columns !== undefined ||
+      entry?.sort !== undefined ||
+      entry?.column_filters !== undefined,
   );
 }

@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
+import { problemText } from "@/lib/api/problem";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
@@ -15,13 +16,15 @@ import { RelativeTime } from "@/components/ui/RelativeTime";
 import {
   resolveListSearch,
   resetsScroll,
-  toSearchParams,
+  mergeSearch,
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { InstanceDetailPanel } from "./InstanceDetailPanel";
 import { FrozenMark } from "@/components/opensvc/FrozenMark";
+import { frozenFilterOptions, STATUS_FILTER_OPTIONS } from "@/components/opensvc/filter-options";
 import { InstanceActionsMenu } from "./InstanceActionsMenu";
 import { toInstanceId } from "./instance-id";
 
@@ -83,7 +86,7 @@ const DATE_PROPS = new Set<string>([
   "mon_changed",
 ]);
 
-/** Statuts rendus en badge, veilles comprises : voir `statusBadge`. */
+/** Statuses rendered as badges, standby states included: see `statusBadge`. */
 const STATUS_PROPS = new Set<string>([
   "mon_availstatus",
   "mon_overallstatus",
@@ -133,6 +136,11 @@ const COLUMNS: ListColumn<InstanceRow>[] = INSTANCE_PROPS.map((prop) => ({
   labelKey: `instances.fields.${prop}`,
   numeric: NUMERIC_PROPS.has(prop),
   family: FAMILY[prop] ?? "service",
+  filter: STATUS_PROPS.has(prop)
+    ? { kind: "enum" as const, options: STATUS_FILTER_OPTIONS }
+    : prop === "mon_frozen"
+      ? { kind: "enum" as const, options: frozenFilterOptions("1", "0") }
+      : undefined,
   render: (row: InstanceRow, locale: string) => {
     const value = row[prop];
     if (prop === "nodes.nodename")
@@ -173,7 +181,17 @@ function queryProps(cols: string[] | undefined): string {
 
 function useInstances(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["instances", search.sort, search.offset, search.limit, search.cols],
+    queryKey: [
+      "instances",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/services_instances", {
@@ -183,10 +201,11 @@ function useInstances(search: ResolvedListSearch) {
             orderby: search.sort.join(","),
             offset: search.offset,
             limit: search.limit + 1,
+            filter: filterQuery(search.filters),
           },
         },
       });
-      if (error !== undefined) throw new Error(JSON.stringify(error));
+      if (error !== undefined) throw new Error(problemText(error));
       const all: InstanceRow[] = Array.isArray(data.data) ? data.data : [];
       return { rows: all.slice(0, search.limit), hasMore: all.length > search.limit };
     },
@@ -203,12 +222,12 @@ export function InstancesPage() {
   const navigate = useNavigate({ from: "/instances" });
   const { data, isPending, isError, error, isFetching } = useInstances(search);
 
-  /** Ids of the whole selection, without pagination. */
+  /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/services_instances", {
-      params: { query: { props: "svc_id,node_id", limit: 0 } },
+      params: { query: { props: "svc_id,node_id", limit: 0, filter: filterQuery(search.filters) } },
     });
-    if (error !== undefined) throw new Error(JSON.stringify(error));
+    if (error !== undefined) throw new Error(problemText(error));
     const rows: InstanceRow[] = Array.isArray(data.data) ? data.data : [];
     return rows
       .map((row) => toInstanceId(row.svc_id, row.node_id))
@@ -216,11 +235,12 @@ export function InstancesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Columns and sort follow the account, the other states stay in the URL.
+    // Columns, sort and filters follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
+    if ("filters" in next) prefs.saveFilters(next.filters);
     void navigate({
-      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      search: (previous) => mergeSearch(previous, next),
       resetScroll: resetsScroll(next),
     });
   }
@@ -264,6 +284,7 @@ export function InstancesPage() {
         rowLead={(row) => <FrozenMark frozen={row.mon_frozen === "1"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
+        filterable
       />
 
       <InstanceDetailPanel

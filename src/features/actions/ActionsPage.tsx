@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
-import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import {
+  CollectorList,
+  type ColumnFilterOption,
+  type ListColumn,
+} from "@/components/opensvc/CollectorList";
 import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { StatusBadge } from "@/components/opensvc/StatusBadge";
@@ -14,10 +18,11 @@ import { RelativeTime } from "@/components/ui/RelativeTime";
 import {
   resolveListSearch,
   resetsScroll,
-  toSearchParams,
+  mergeSearch,
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ActionDetailPanel } from "./ActionDetailPanel";
 import { ActionQueueMenu } from "./ActionQueueMenu";
@@ -53,7 +58,7 @@ const FAMILY: Record<string, ColumnFamily> = {
   svc_id: "service",
 };
 
-/** Sortie d'agent : utile dans le panneau, illisible dans une cellule de table. */
+/** Agent output: useful in the panel, unreadable in a table cell. */
 const LONG_PROPS = new Set(["stdout", "stderr"]);
 
 /**
@@ -67,13 +72,20 @@ function statusState(row: ActionRow): "up" | "warn" | "down" | "unknown" {
   return row.ret === "0" ? "up" : "down";
 }
 
+/** Codes of the old collector's queue, named in the filter; the cells show the code. */
+const STATUS_OPTIONS: ColumnFilterOption[] = ["W", "Q", "R", "T", "C"].map((value) => ({
+  value,
+  labelKey: `actions.statusNames.${value}`,
+}));
+
 const COLUMNS: ListColumn<ActionRow>[] = ACTION_PROPS.map((prop) => ({
   prop,
   labelKey: `actions.fields.${prop}`,
   numeric: prop === "id" || prop === "ret",
   family: FAMILY[prop] ?? "state",
-  // `orderby` n'accepte pas les props joints, et la sortie ne se trie pas utilement.
+  // `orderby` does not accept joined props, and the output does not sort usefully.
   sortable: !prop.includes(".") && !LONG_PROPS.has(prop),
+  filter: prop === "status" ? { kind: "enum" as const, options: STATUS_OPTIONS } : undefined,
   render: (row: ActionRow, locale: string) => {
     const value = row[prop];
     if (prop === "status") return <StatusBadge state={statusState(row)} label={row.status} />;
@@ -110,7 +122,17 @@ function queryProps(cols: string[] | undefined): string {
 
 function useActions(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["actions", search.sort, search.offset, search.limit, search.cols],
+    queryKey: [
+      "actions",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/actions", {
@@ -120,6 +142,7 @@ function useActions(search: ResolvedListSearch) {
             orderby: search.sort.join(","),
             offset: search.offset,
             limit: search.limit + 1,
+            filter: filterQuery(search.filters),
           },
         },
       });
@@ -140,23 +163,24 @@ export function ActionsPage() {
   const navigate = useNavigate({ from: "/actions" });
   const { data, isPending: loading, isError, error, isFetching } = useActions(search);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  // Une action se nomme par sa commande dans les messages ; l'identifiant sinon.
+  // An action is named by its command in the messages; by its id otherwise.
   const commands = Object.fromEntries((data?.rows ?? []).map((row) => [row.id, row.command]));
 
   async function allIds(): Promise<string[]> {
     const { data: page, error: failure } = await api.GET("/actions", {
-      params: { query: { props: "id", limit: 0 } },
+      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
     });
     if (failure !== undefined) throw new Error(problemText(failure));
     return toActionRows(page.data).map((row) => row.id);
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Columns and sort follow the account, the other states stay in the URL.
+    // Columns, sort and filters follow the account, the other states stay in the URL.
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
+    if ("filters" in next) prefs.saveFilters(next.filters);
     void navigate({
-      search: (previous) => ({ ...previous, ...toSearchParams(next) }),
+      search: (previous) => mergeSearch(previous, next),
       resetScroll: resetsScroll(next),
     });
   }
@@ -186,6 +210,7 @@ export function ActionsPage() {
         hasMore={data?.hasMore ?? false}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
+        filterable
       />
 
       <ActionDetailPanel

@@ -39,7 +39,9 @@
     "warn": "warn",
     "down": "down",
     "unknown": "n/a",
-    "frozen": "Gelé"
+    "frozen": "Gelé",
+    "thawed": "Non gelé",
+    "frozenMixed": "Partiellement gelé"
   },
   "nodes": {
     "title": "Nodes",
@@ -241,7 +243,22 @@
     "selectEverything": "Sélectionner toutes les lignes",
     "selectingEverything": "Sélection…",
     "selectedEverywhere": "{{count}} sélectionnée, toutes pages",
-    "selectedEverywhere_other": "{{count}} sélectionnées, toutes pages"
+    "selectedEverywhere_other": "{{count}} sélectionnées, toutes pages",
+    "filters": {
+      "title": "Filtres",
+      "label": "Filtrer {{column}}",
+      "active": "Filtrée",
+      "hidden": "colonne masquée",
+      "unknown": "colonne inconnue",
+      "all": "Tous",
+      "regex": "Expression régulière",
+      "invalidRegex": "Expression régulière invalide : {{reason}}",
+      "numberHint": "ex. >=8",
+      "clearOne": "Retirer le filtre {{column}}",
+      "clearAll_one": "Retirer le filtre",
+      "clearAll_other": "Retirer les filtres ({{count}})",
+      "noMatch": "Aucune ligne ne correspond aux filtres."
+    }
   },
   "detail": {
     "close": "Fermer",
@@ -603,13 +620,13 @@
     },
     "viewPrefs": {
       "title": "Réglages de vue enregistrés",
-      "hint": "Les colonnes et le tri choisis dans chaque liste suivent votre compte.",
-      "reset": "Oublier les colonnes et le tri",
-      "question": "Oublier les colonnes et le tri enregistrés pour toutes les vues ?",
+      "hint": "Les colonnes, le tri et les filtres choisis dans chaque liste suivent votre compte.",
+      "reset": "Oublier les colonnes, le tri et les filtres",
+      "question": "Oublier les colonnes, le tri et les filtres enregistrés pour toutes les vues ?",
       "confirm": "Oublier",
       "pending": "Effacement…",
-      "done": "Colonnes et tri oubliés. Chaque liste retrouve ses réglages par défaut.",
-      "none": "Aucune vue n'a de colonnes ou de tri enregistrés."
+      "done": "Colonnes, tri et filtres oubliés. Chaque liste retrouve ses réglages par défaut.",
+      "none": "Aucune vue n'a de colonnes, de tri ou de filtres enregistrés."
     }
   },
   "instances": {
@@ -935,6 +952,13 @@
       "queued_one": "{{action}} appliqué à 1 action.",
       "queued_other": "{{action}} appliqué à {{count}} actions.",
       "failure": "{{name}} : {{message}}"
+    },
+    "statusNames": {
+      "W": "En attente",
+      "Q": "Dans la file",
+      "R": "En cours",
+      "T": "Terminée",
+      "C": "Annulée"
     }
   },
   "trail": {
