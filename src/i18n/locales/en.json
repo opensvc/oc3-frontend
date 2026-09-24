@@ -1008,7 +1008,8 @@
         "identity": "Identity",
         "record": "Record"
       },
-      "noDefinition": "No definition yet."
+      "noDefinition": "No definition yet.",
+      "tabs": "Form tabs"
     },
     "form": {
       "open": "New form",
@@ -1024,6 +1025,33 @@
     },
     "delete": {
       "question": "Delete the form {{name}}, with its publications and responsibles?"
+    },
+    "preview": {
+      "tab": "Preview",
+      "notice": "Preview of the form as its users see it. Fill it to try its conditions and checks: submitting shows the data it would send, without running its outputs.",
+      "submit": "Submit (preview)",
+      "submitted": "Data a submission would send:",
+      "unparsable": "The definition does not parse: fix its YAML to preview the form.",
+      "noOutput": "The definition has no Outputs: its users could not submit it."
+    },
+    "render": {
+      "submit": "Submit",
+      "addGroup": "Add an entry",
+      "removeGroup": "Remove this entry",
+      "violations_one": "{{count}} input to correct before submitting.",
+      "violations_other": "{{count}} inputs to correct before submitting.",
+      "mandatory": "mandatory",
+      "required": "A value is required.",
+      "constraint": "The value does not satisfy {{constraint}}.",
+      "yes": "Yes",
+      "no": "No",
+      "selectCandidate": "Select a candidate",
+      "candidatesLoading": "Loading…",
+      "candidatesWaiting": "Fill the inputs this list depends on.",
+      "candidatesError": "Candidates unavailable: {{message}}",
+      "toggleAll": "Toggle all",
+      "subFormMissing": "The sub-form is not named.",
+      "subFormNotFound": "Sub-form {{name}} not found."
     }
   }
 }

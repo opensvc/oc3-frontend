@@ -24,7 +24,8 @@ export function useForm(formId: string | undefined) {
         params: {
           path: { form_id: Number(formId) },
           query: {
-            props: "id,form_name,form_type,form_folder,form_author,form_created,form_yaml",
+            props:
+              "id,form_name,form_type,form_folder,form_author,form_created,form_yaml,form_definition",
           },
         },
       });

@@ -1008,7 +1008,8 @@
         "identity": "Identité",
         "record": "Enregistrement"
       },
-      "noDefinition": "Pas encore de définition."
+      "noDefinition": "Pas encore de définition.",
+      "tabs": "Onglets du formulaire"
     },
     "form": {
       "open": "Nouveau formulaire",
@@ -1024,6 +1025,33 @@
     },
     "delete": {
       "question": "Supprimer le formulaire {{name}}, avec ses publications et ses responsables ?"
+    },
+    "preview": {
+      "tab": "Aperçu",
+      "notice": "Aperçu du formulaire tel que le voient ses utilisateurs. Remplissez-le pour essayer ses conditions et ses contrôles : la soumission affiche les données qu'elle enverrait, sans exécuter ses sorties.",
+      "submit": "Soumettre (aperçu)",
+      "submitted": "Données qu'une soumission enverrait :",
+      "unparsable": "La définition ne s'analyse pas : corrigez son YAML pour prévisualiser le formulaire.",
+      "noOutput": "La définition n'a pas d'Outputs : ses utilisateurs ne pourraient pas le soumettre."
+    },
+    "render": {
+      "submit": "Soumettre",
+      "addGroup": "Ajouter une entrée",
+      "removeGroup": "Retirer cette entrée",
+      "violations_one": "{{count}} entrée à corriger avant de soumettre.",
+      "violations_other": "{{count}} entrées à corriger avant de soumettre.",
+      "mandatory": "obligatoire",
+      "required": "Une valeur est requise.",
+      "constraint": "La valeur ne satisfait pas {{constraint}}.",
+      "yes": "Oui",
+      "no": "Non",
+      "selectCandidate": "Choisir une valeur",
+      "candidatesLoading": "Chargement…",
+      "candidatesWaiting": "Renseignez les entrées dont cette liste dépend.",
+      "candidatesError": "Valeurs indisponibles : {{message}}",
+      "toggleAll": "Tout cocher",
+      "subFormMissing": "Le sous-formulaire n'est pas nommé.",
+      "subFormNotFound": "Sous-formulaire {{name}} introuvable."
     }
   }
 }

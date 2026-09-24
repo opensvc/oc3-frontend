@@ -199,10 +199,14 @@ export function FormsPage() {
         formId={panel === null ? search.sel : undefined}
         name={selected?.form_name ?? ""}
         onClose={() => {
-          update({ sel: undefined });
+          update({ sel: undefined, tab: undefined });
         }}
         onEdit={() => {
           setPanel("edit");
+        }}
+        tab={search.tab}
+        onTabChange={(tab) => {
+          update({ tab });
         }}
       />
 
