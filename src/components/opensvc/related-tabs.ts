@@ -17,6 +17,12 @@ export interface SummaryPart {
 export interface RelatedSummary {
   count: number | undefined;
   parts?: SummaryPart[];
+  /**
+   * Why the tab has no count to give, when it cannot apply to the object (nothing
+   * to compare on a single node, for instance): the counter then shows "n/a", with
+   * this reason as its tooltip and for screen readers.
+   */
+  notApplicable?: string;
 }
 
 /**

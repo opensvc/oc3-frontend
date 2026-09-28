@@ -17,7 +17,15 @@ const PILL =
  */
 export function RelatedCount({ tab, id }: { tab: RelatedTab; id: string | undefined }) {
   const { t } = useTranslation();
-  const { count, parts = [] } = tab.useSummary(id);
+  const { count, parts = [], notApplicable } = tab.useSummary(id);
+  // Not applicable: said, dimmed as a zero, rather than a count the tab cannot give.
+  if (notApplicable !== undefined)
+    return (
+      <span title={notApplicable} className={`${PILL} bg-surface text-ink-muted/60`}>
+        <span aria-hidden="true">{t("related.notApplicable")}</span>
+        <span className="sr-only">{notApplicable}</span>
+      </span>
+    );
   if (count === undefined) return null;
   const shown = parts.filter((part) => part.count > 0);
   if (count === 0 || shown.length === 0) {

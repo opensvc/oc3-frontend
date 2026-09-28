@@ -953,7 +953,8 @@
   "related": {
     "properties": "Propriétés",
     "count_one": "{{count}} élément",
-    "count_other": "{{count}} éléments"
+    "count_other": "{{count}} éléments",
+    "notApplicable": "n/a"
   },
   "storage": {
     "hbas": {
