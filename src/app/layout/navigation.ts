@@ -71,6 +71,14 @@ export const NAV_CATEGORIES: NavCategory[] = [
     entries: [
       { to: "/apps", labelKey: "nav.apps", icon: "app" },
       { to: "/tags", labelKey: "nav.tags", icon: "app" },
+    ],
+  },
+  {
+    // The Requests section of the historical menu, placed before Administration as
+    // there: the request portal, and later the pending requests and their history.
+    key: "requests",
+    labelKey: "nav.categories.requests",
+    entries: [
       // `req-new` of the historical Requests menu: the catalog of the forms to submit.
       { to: "/requests", labelKey: "nav.newRequest", icon: "form" },
     ],

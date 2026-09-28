@@ -9,6 +9,7 @@
     "categories": {
       "infrastructure": "Infrastructure",
       "dataManagement": "Gestion des données",
+      "requests": "Demandes",
       "administration": "Administration"
     },
     "apps": "Codes application",
