@@ -4,7 +4,7 @@ import { RelatedTable, type RelatedColumn } from "@/components/opensvc/RelatedTa
 import { StatusBadge, type ObjectState } from "@/components/opensvc/StatusBadge";
 import { CheckIcon, SearchIcon } from "@/components/ui/icons";
 import { NODE_PROPS } from "@/features/nodes/node-props";
-import { PackagesDiffSection } from "./ServicePackagesDiff";
+import { PackagesDiffSection } from "./PackagesDiffSection";
 import {
   assetDifferences,
   attachmentDifferences,

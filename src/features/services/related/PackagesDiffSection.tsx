@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { RelatedTable, type RelatedColumn } from "@/components/opensvc/RelatedTable";
-import { SearchIcon } from "@/components/ui/icons";
 import { useServicePackagesDiff } from "./queries";
 
 type PackagesDiff = components["schemas"]["PackagesDiffResponse"];
@@ -39,39 +37,9 @@ function diffLines(diff: PackagesDiff): DiffLine[] {
 }
 
 /**
- * Packages that differ between the nodes of the service, as the historical PkgDiff
- * tab: first between the nodes running its instances, then between its
- * encapsulated nodes. A package is listed when one of its versions is not
- * installed on every node; each node column says the version it has.
- */
-export function ServicePackagesDiff({ svcId }: { svcId: string }) {
-  const { t } = useTranslation();
-  const [query, setQuery] = useState("");
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex h-8 w-64 items-center gap-1.5 rounded-(--radius-control) border border-line bg-surface px-2 text-ink-muted">
-        <SearchIcon />
-        <input
-          type="search"
-          value={query}
-          onChange={(event) => {
-            setQuery(event.target.value);
-          }}
-          placeholder={t("services.pkgdiff.search")}
-          aria-label={t("services.pkgdiff.search")}
-          className="w-full bg-transparent text-ink outline-none placeholder:text-ink-muted"
-        />
-      </div>
-      <PackagesDiffSection svcId={svcId} encap={false} query={query} />
-      <PackagesDiffSection svcId={svcId} encap query={query} />
-    </div>
-  );
-}
-
-/**
  * The packages that differ between the service's nodes, or its encapsulated nodes,
- * narrowed by a search on the name; also a section of the Nodes differences tab,
- * under its own title.
+ * as the historical PkgDiff tab listed them, narrowed by a search on the name: a
+ * section of the Nodes differences tab, under its own title.
  */
 export function PackagesDiffSection({
   svcId,

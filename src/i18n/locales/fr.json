@@ -359,7 +359,6 @@
     "related": {
       "label": "Données du service",
       "storage": "Stockage",
-      "pkgdiff": "PkgDiff",
       "nodediff": "Différences entre nodes"
     },
     "actions": {
@@ -379,7 +378,6 @@
       }
     },
     "pkgdiff": {
-      "search": "Rechercher un paquet",
       "clusterTitle": "Différences de paquets installés entre les nodes du service",
       "encapTitle": "Différences de paquets installés entre les nodes encapsulés",
       "count_one": "{{count}} paquet diffère entre {{nodes}} nodes",

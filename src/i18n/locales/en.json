@@ -359,7 +359,6 @@
     "related": {
       "label": "Service data",
       "storage": "Storage",
-      "pkgdiff": "PkgDiff",
       "nodediff": "Nodes Differences"
     },
     "actions": {
@@ -379,7 +378,6 @@
       }
     },
     "pkgdiff": {
-      "search": "Search a package",
       "clusterTitle": "Installed package differences between the service's nodes",
       "encapTitle": "Installed package differences between the encapsulated nodes",
       "count_one": "{{count}} package differs between {{nodes}} nodes",
