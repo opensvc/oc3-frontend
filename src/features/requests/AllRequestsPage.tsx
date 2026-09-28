@@ -20,6 +20,7 @@ import {
   resetsScroll,
   mergeSearch,
   visibleProps,
+  type ListSearch,
   type ResolvedListSearch,
 } from "@/lib/list-search";
 import { filterQuery, filtersKey } from "@/lib/column-filters";
@@ -122,10 +123,14 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
 
-function useRequests(search: ResolvedListSearch) {
+/** Which requests a list shows: all, or the historical team views. */
+type Assigned = "team" | "tiers" | undefined;
+
+function useRequests(search: ResolvedListSearch, assigned: Assigned) {
   return useQuery({
     queryKey: [
       "workflows",
+      assigned,
       search.sort,
       search.offset,
       search.limit,
@@ -144,6 +149,7 @@ function useRequests(search: ResolvedListSearch) {
             offset: search.offset,
             limit: search.limit + 1,
             filter: filterQuery(search.filters),
+            assigned,
           },
         },
       });
@@ -155,25 +161,33 @@ function useRequests(search: ResolvedListSearch) {
 }
 
 /**
- * All the requests submitted, as the historical "All requests" table (`req-all`):
- * one row per workflow started by the submission of a form with a workflow output,
- * whoever submitted it, with its status, its steps and who it awaits. Read-only;
- * the rows are filtered and sorted by the server.
+ * A list of requests: one row per workflow started by the submission of a form
+ * with a workflow output, with its status, its steps and who it awaits. Read-only;
+ * the rows are filtered and sorted by the server. Each view keeps its own columns,
+ * sort and filters (`prefsKey`); the route that shows it passes its URL state.
  */
-export function AllRequestsPage() {
+function RequestsList({
+  view,
+  assigned,
+  rawSearch,
+  navigate,
+}: {
+  view: "allRequests" | "teamRequests" | "tiersRequests";
+  assigned: Assigned;
+  rawSearch: ListSearch;
+  navigate: (next: Partial<ResolvedListSearch>) => void;
+}) {
   const { t } = useTranslation();
-  const prefs = useViewPrefs("allRequests");
-  const search = resolveListSearch(
-    withSavedSearch(useSearch({ from: "/requests/all" }), prefs),
-    DEFAULT_SORT,
-  );
-  const navigate = useNavigate({ from: "/requests/all" });
-  const { data, isPending, isError, error, isFetching } = useRequests(search);
+  const prefs = useViewPrefs(view);
+  const search = resolveListSearch(withSavedSearch(rawSearch, prefs), DEFAULT_SORT);
+  const { data, isPending, isError, error, isFetching } = useRequests(search, assigned);
 
   /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/workflows", {
-      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
+      params: {
+        query: { props: "id", limit: 0, filter: filterQuery(search.filters), assigned },
+      },
     });
     if (error !== undefined) throw new Error(problemText(error));
     const rows: WorkflowRow[] = Array.isArray(data.data) ? data.data : [];
@@ -185,19 +199,16 @@ export function AllRequestsPage() {
     if ("cols" in next) prefs.saveCols(next.cols);
     if ("sort" in next) prefs.saveSort(next.sort);
     if ("filters" in next) prefs.saveFilters(next.filters);
-    void navigate({
-      search: (previous) => mergeSearch(previous, next),
-      resetScroll: resetsScroll(next),
-    });
+    navigate(next);
   }
 
   return (
     <section>
       <h1 className="mb-1 flex items-center gap-2 text-title font-semibold">
         <ObjectIcon kind="form" className="h-5 w-5" />
-        {t("allRequests.title")}
+        {t(`${view}.title`)}
       </h1>
-      <p className="mb-3 max-w-3xl text-ink-muted">{t("allRequests.intro")}</p>
+      <p className="mb-3 max-w-3xl text-ink-muted">{t(`${view}.intro`)}</p>
 
       <CollectorList
         columns={columns(t)}
@@ -217,5 +228,65 @@ export function AllRequestsPage() {
         filterable
       />
     </section>
+  );
+}
+
+/** Every request submitted, whoever submitted it: the historical `req-all`. */
+export function AllRequestsPage() {
+  const navigate = useNavigate({ from: "/requests/all" });
+  return (
+    <RequestsList
+      view="allRequests"
+      assigned={undefined}
+      rawSearch={useSearch({ from: "/requests/all" })}
+      navigate={(next) => {
+        void navigate({
+          search: (previous) => mergeSearch(previous, next),
+          resetScroll: resetsScroll(next),
+        });
+      }}
+    />
+  );
+}
+
+/**
+ * The pending requests awaiting the user or one of their groups: the historical
+ * "Assigned to my team" (`req-pending-my`).
+ */
+export function TeamRequestsPage() {
+  const navigate = useNavigate({ from: "/requests/team" });
+  return (
+    <RequestsList
+      view="teamRequests"
+      assigned="team"
+      rawSearch={useSearch({ from: "/requests/team" })}
+      navigate={(next) => {
+        void navigate({
+          search: (previous) => mergeSearch(previous, next),
+          resetScroll: resetsScroll(next),
+        });
+      }}
+    />
+  );
+}
+
+/**
+ * The pending requests started by the user or one of their groups and awaiting
+ * someone else: the historical "Pending tiers action" (`req-pending-tiers`).
+ */
+export function TiersRequestsPage() {
+  const navigate = useNavigate({ from: "/requests/tiers" });
+  return (
+    <RequestsList
+      view="tiersRequests"
+      assigned="tiers"
+      rawSearch={useSearch({ from: "/requests/tiers" })}
+      navigate={(next) => {
+        void navigate({
+          search: (previous) => mergeSearch(previous, next),
+          resetScroll: resetsScroll(next),
+        });
+      }}
+    />
   );
 }

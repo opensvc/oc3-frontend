@@ -27,7 +27,9 @@
     "newRequest": "Nouvelle demande",
     "packages": "Paquets",
     "hardware": "Matériel des nodes",
-    "allRequests": "Toutes les demandes"
+    "allRequests": "Toutes les demandes",
+    "teamRequests": "Assignées à mon équipe",
+    "tiersRequests": "En attente d'action de tiers"
   },
   "header": {
     "search": "Rechercher dans le collector",
@@ -1200,5 +1202,13 @@
       "id": "Id du workflow",
       "form_md5": "Md5 de la révision"
     }
+  },
+  "teamRequests": {
+    "title": "Assignées à mon équipe",
+    "intro": "Les demandes en attente d'action de mon équipe : celles dont la dernière étape m'est assignée, ou à l'un de mes groupes."
+  },
+  "tiersRequests": {
+    "title": "En attente d'action de tiers",
+    "intro": "Les demandes déclenchées par mon équipe et en attente d'action d'un tiers : créées par moi ou l'un de mes groupes, et assignées à quelqu'un d'autre."
   }
 }

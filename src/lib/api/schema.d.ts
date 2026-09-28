@@ -2749,7 +2749,7 @@ export interface paths {
         };
         /**
          * @description List the requests: the workflows started by the submission of a form with a
-         *     workflow output, the most recent first by default. As the historical API,
+         *     workflow output. As the historical API,
          *     every workflow is listed to any authenticated user. `form_name`,
          *     `form_folder` and `form_yaml` are those of the form revision the request
          *     started from.
@@ -12611,6 +12611,14 @@ export interface operations {
                 filter?: components["parameters"]["inQueryFilter"];
                 /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
                 groupby?: components["parameters"]["inQueryGroupby"];
+                /**
+                 * @description Keep the pending workflows (status not closed) related to the caller's
+                 *     team, the caller's full name and the roles of their non-privilege
+                 *     groups: `team` those whose last assignee is in the team, as the
+                 *     historical "Assigned to my team"; `tiers` those created by the team and
+                 *     assigned to someone else, as the historical "Pending tiers action".
+                 */
+                assigned?: "team" | "tiers";
             };
             header?: never;
             path?: never;

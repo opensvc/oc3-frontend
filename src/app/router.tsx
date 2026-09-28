@@ -9,7 +9,11 @@ import { FiltersPage } from "@/features/filters/FiltersPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
 import { FormsPage } from "@/features/forms/FormsPage";
 import { NewRequestPage } from "@/features/requests/NewRequestPage";
-import { AllRequestsPage } from "@/features/requests/AllRequestsPage";
+import {
+  AllRequestsPage,
+  TeamRequestsPage,
+  TiersRequestsPage,
+} from "@/features/requests/AllRequestsPage";
 import { parseRequestSearch } from "@/features/requests/catalog";
 import { GroupsPage } from "@/features/groups/GroupsPage";
 import { InstancesPage } from "@/features/instances/InstancesPage";
@@ -161,6 +165,21 @@ const allRequestsRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
+// The pending requests of the user's team, awaiting it or awaiting someone else.
+const teamRequestsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/requests/team",
+  component: TeamRequestsPage,
+  validateSearch: parseListSearch,
+});
+
+const tiersRequestsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/requests/tiers",
+  component: TiersRequestsPage,
+  validateSearch: parseListSearch,
+});
+
 // The request catalog: the form chosen lives in the URL.
 const requestsRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -212,6 +231,8 @@ const routeTree = rootRoute.addChildren([
   formsRoute,
   requestsRoute,
   allRequestsRoute,
+  teamRequestsRoute,
+  tiersRequestsRoute,
   actionsRoute,
   profileRoute,
 ]);

@@ -29,7 +29,9 @@ export interface NavEntry {
     | "/filtersets"
     | "/forms"
     | "/requests"
-    | "/requests/all";
+    | "/requests/all"
+    | "/requests/team"
+    | "/requests/tiers";
   labelKey: string;
   icon: ObjectKind;
   /** True for the root: without it, prefix matching would activate it everywhere. */
@@ -83,6 +85,10 @@ export const NAV_CATEGORIES: NavCategory[] = [
       // `req-new` of the historical Requests menu: the catalog of the forms to submit.
       // Exact: the prefix would also match the requests list below.
       { to: "/requests", labelKey: "nav.newRequest", icon: "form", exact: true },
+      // `req-pending-my`: the pending requests awaiting the user's team.
+      { to: "/requests/team", labelKey: "nav.teamRequests", icon: "form" },
+      // `req-pending-tiers`: the team's pending requests awaiting someone else.
+      { to: "/requests/tiers", labelKey: "nav.tiersRequests", icon: "form" },
       // `req-all` of the historical Requests menu: every request submitted.
       { to: "/requests/all", labelKey: "nav.allRequests", icon: "form" },
     ],

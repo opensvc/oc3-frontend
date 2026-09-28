@@ -27,7 +27,9 @@
     "newRequest": "New request",
     "packages": "Packages",
     "hardware": "Nodes Hardware",
-    "allRequests": "All requests"
+    "allRequests": "All requests",
+    "teamRequests": "Assigned to my team",
+    "tiersRequests": "Pending tiers action"
   },
   "header": {
     "search": "Search the collector",
@@ -1200,5 +1202,13 @@
       "id": "Workflow id",
       "form_md5": "Revision md5"
     }
+  },
+  "teamRequests": {
+    "title": "Assigned to my team",
+    "intro": "The pending requests waiting for action from my team: those whose last step is assigned to me or to one of my groups."
+  },
+  "tiersRequests": {
+    "title": "Pending tiers action",
+    "intro": "The pending requests started by my team and waiting for action from a tier: created by me or one of my groups, and assigned to someone else."
   }
 }
