@@ -37,7 +37,8 @@ export type ObjectKind =
   | "package"
   | "hardware"
   | "moduleset"
-  | "ruleset";
+  | "ruleset"
+  | "complianceLog";
 
 /**
  * Pictogram and tint of an object kind. The same vocabulary in the menu, in panel
@@ -77,6 +78,8 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   moduleset: { Icon: GearIcon, className: "text-icon-compliance" },
   // The cube of the historical collector (`rset16`), in its compliance crimson.
   ruleset: { Icon: CubeIcon, className: "text-icon-compliance" },
+  // The history clock of the historical compliance log (`complog`), in its crimson.
+  complianceLog: { Icon: HistoryIcon, className: "text-icon-compliance" },
 };
 
 export function ObjectIcon({ kind, className }: { kind: ObjectKind; className?: string }) {

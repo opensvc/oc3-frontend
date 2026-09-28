@@ -439,7 +439,8 @@ export interface paths {
         /**
          * @description List the compliance modules' check, fixable and fix runs of the nodes the
          *     user can see: those whose app is published to one of the user's groups, every
-         *     node for a manager. The most recent first by default.
+         *     node for a manager. The most recent first by default. The nodes.* and
+         *     services.* props give the node and service names.
          */
         get: operations["GetComplianceLogs"];
         put?: never;
@@ -4079,12 +4080,16 @@ export interface components {
         ComplianceLogRow: {
             id?: number;
             node_id?: string;
+            /** @description The name of the node, joined. */
+            "nodes.nodename"?: string | null;
             rset_md5?: string;
             run_action?: string;
             run_date?: string;
             run_log?: string;
             run_module?: string;
             run_status?: number;
+            /** @description The name of the service, joined; null for a run on the node itself. */
+            "services.svcname"?: string | null;
             svc_id?: string;
         };
         ComplianceStatusListResponse: {
@@ -6418,6 +6423,8 @@ export interface operations {
     GetComplianceLogs: {
         parameters: {
             query?: {
+                /** @description Restrict to the runs of the nodes this filterset selects (gen_filtersets.id or fset_name) */
+                fset_id?: string;
                 /** @description A list of properties to include in each data dictionnary. */
                 props?: components["parameters"]["inQueryProps"];
                 /** @description The maximum number of entries to return. 0 means no limit. */

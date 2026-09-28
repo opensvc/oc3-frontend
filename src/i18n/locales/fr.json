@@ -32,7 +32,8 @@
     "teamRequests": "Assignées à mon équipe",
     "tiersRequests": "En attente d'action de tiers",
     "modulesets": "Modulesets",
-    "rulesets": "Rulesets"
+    "rulesets": "Rulesets",
+    "complianceLogs": "Journaux"
   },
   "header": {
     "search": "Rechercher dans le collector",
@@ -1270,6 +1271,28 @@
       "var_author": "Auteur",
       "encap_rset_id": "Id du ruleset encapsulé",
       "fset_id": "Id du filterset"
+    }
+  },
+  "complianceLogs": {
+    "title": "Journaux de conformité",
+    "fields": {
+      "id": "Id",
+      "run_date": "Date d'exécution",
+      "node_id": "Id du node",
+      "nodes.nodename": "Node",
+      "svc_id": "Id du service",
+      "services.svcname": "Service",
+      "run_module": "Module",
+      "run_action": "Action",
+      "run_status": "Statut",
+      "run_log": "Journal",
+      "rset_md5": "Empreinte md5 du ruleset"
+    },
+    "status": {
+      "ok": "ok",
+      "nok": "non ok",
+      "na": "n/a",
+      "killed": "tué"
     }
   }
 }
