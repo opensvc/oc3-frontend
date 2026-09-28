@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DateTime } from "@/components/ui/DateTime";
 import { useNavigate, useSearch } from "@tanstack/react-router";
@@ -14,15 +15,17 @@ import {
   type ResolvedListSearch,
 } from "@/lib/list-search";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
+import { TagCreatePanel } from "./TagCreatePanel";
 import { TagDetailPanel } from "./TagDetailPanel";
 import { toTagRows, type TagRow } from "./tag-row";
+import { useTag } from "./use-tag";
 
 const DEFAULT_SORT = ["tag_name"];
 
 /**
  * Props exposed by apicollector for a tag. `id`, the integer id, is refused by the
  * API ("prop "id" is not allowed"), although it is what editing and deletion expect:
- * this view therefore only lists. See notes.md.
+ * this view therefore lists and creates, but neither edits nor deletes. See notes.md.
  */
 const TAG_PROPS = ["tag_name", "tag_exclude", "tag_data", "tag_created", "tag_id"] as const;
 
@@ -101,14 +104,32 @@ export function TagsPage() {
     });
   }
 
-  const selected = data?.rows.find((row) => row.tag_id === search.sel);
+  const [creating, setCreating] = useState(false);
+  // The detail reads the whole tag: the page row only holds the visible columns, and
+  // a tag outside the page, such as one just created, is not among them.
+  const pageRow = data?.rows.find((row) => row.tag_id === search.sel);
+  const full = useTag(search.sel);
+  const selected = full.tag ?? pageRow;
 
   return (
     <section>
-      <h1 className="mb-3 flex items-center gap-2 text-title font-semibold">
-        <ObjectIcon kind="app" className="h-5 w-5" />
-        {t("tags.title")}
-      </h1>
+      <div className="mb-3 flex items-center gap-3">
+        <h1 className="flex items-center gap-2 text-title font-semibold">
+          <ObjectIcon kind="app" className="h-5 w-5" />
+          {t("tags.title")}
+        </h1>
+        <button
+          type="button"
+          onClick={() => {
+            // The drawers share the right edge: opening the creation closes the detail.
+            update({ sel: undefined });
+            setCreating(true);
+          }}
+          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+        >
+          {t("tags.create.open")}
+        </button>
+      </div>
 
       <CollectorList
         columns={COLUMNS}
@@ -127,8 +148,19 @@ export function TagsPage() {
         selectAllMatching={allIds}
       />
 
+      <TagCreatePanel
+        open={creating}
+        onClose={() => {
+          setCreating(false);
+        }}
+        onCreated={(tagId) => {
+          // The new tag opens in the detail.
+          if (tagId !== undefined && tagId !== "") update({ sel: tagId });
+        }}
+      />
+
       <TagDetailPanel
-        tag={selected}
+        tag={creating ? undefined : selected}
         onClose={() => {
           update({ sel: undefined });
         }}

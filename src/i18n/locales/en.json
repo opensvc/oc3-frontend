@@ -568,6 +568,18 @@
       "groups": {
         "identity": "Properties"
       }
+    },
+    "create": {
+      "open": "New tag",
+      "title": "New tag",
+      "intro": "A tag marks nodes and services, to group them in filters and views. Only its name is required.",
+      "required": "required",
+      "excludeHint": "Regular expression of the tag names that cannot be attached along with this one. Optional.",
+      "excludeInvalid": "This is not a valid regular expression.",
+      "dataHint": "Free data attached to the tag, in JSON. Optional.",
+      "dataInvalid": "This is not valid JSON.",
+      "save": "Create the tag",
+      "saving": "Creating…"
     }
   },
   "users": {

@@ -568,6 +568,18 @@
       "groups": {
         "identity": "Propriétés"
       }
+    },
+    "create": {
+      "open": "Nouveau tag",
+      "title": "Nouveau tag",
+      "intro": "Un tag marque des nœuds et des services, pour les regrouper dans les filtres et les vues. Seul son nom est obligatoire.",
+      "required": "obligatoire",
+      "excludeHint": "Expression régulière des noms de tags qui ne peuvent pas être attachés en même temps que celui-ci. Facultatif.",
+      "excludeInvalid": "Ce n'est pas une expression régulière valide.",
+      "dataHint": "Données libres attachées au tag, en JSON. Facultatif.",
+      "dataInvalid": "Ce n'est pas du JSON valide.",
+      "save": "Créer le tag",
+      "saving": "Création…"
     }
   },
   "users": {
