@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { parseDefinition } from "./form-engine";
+import { LegacyCssIcon } from "@/components/opensvc/LegacyCssIcon";
 import { FormRender } from "./FormRender";
 import { useForm } from "./use-form";
 import { useFormUser } from "./use-form-user";
@@ -38,7 +39,12 @@ export function FormPreview({ formId }: { formId: string }) {
       </p>
       {(def.label !== "" || def.desc !== "") && (
         <div className="mb-4">
-          {def.label !== "" && <h3 className="font-semibold text-ink">{def.label}</h3>}
+          {def.label !== "" && (
+            <h3 className="flex items-center gap-2 font-semibold text-ink">
+              <LegacyCssIcon css={def.css} className="h-5 w-5" />
+              {def.label}
+            </h3>
+          )}
           {def.desc !== "" && <p className="whitespace-pre-line text-ink-muted">{def.desc}</p>}
         </div>
       )}

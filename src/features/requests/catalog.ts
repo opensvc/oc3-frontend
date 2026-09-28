@@ -20,6 +20,20 @@ export interface CatalogEntry {
   form: CatalogForm;
   label: string;
   desc: string;
+  /** Legacy classes of the form (Css): the icon of its card. */
+  css: string;
+}
+
+/**
+ * A folder of the catalog: its path, and what the "folder" form leading to it
+ * says of it, if any (FolderLabel, FolderDesc, FolderCss for its icon).
+ */
+export interface CatalogFolder {
+  folder: string;
+  label: string;
+  desc: string;
+  css: string;
+  entries: CatalogEntry[];
 }
 
 function text(v: unknown): string {
@@ -39,6 +53,7 @@ function formEntry(form: CatalogForm): CatalogEntry {
     form,
     label: text(d.Label) || form.name,
     desc: text(d.Desc),
+    css: text(d.Css),
   };
 }
 
@@ -57,13 +72,11 @@ function searchPattern(search: string): RegExp {
 /**
  * The forms to offer, grouped by folder, folders and forms sorted by name. An
  * empty search keeps every form; otherwise the pattern is tried on the name, the
- * Label and the Desc. The "folder" forms only lay out the historical folder
- * navigation and are not offered.
+ * Label and the Desc. The "folder" forms, which laid out the historical folder
+ * navigation, are not offered: they name, describe and decorate the folder their
+ * FolderName leads to.
  */
-export function catalogGroups(
-  forms: CatalogForm[],
-  search: string,
-): { folder: string; entries: CatalogEntry[] }[] {
+export function catalogGroups(forms: CatalogForm[], search: string): CatalogFolder[] {
   const re = search.trim() === "" ? null : searchPattern(search.trim());
   const groups = new Map<string, CatalogEntry[]>();
   for (const f of [...forms].sort((a, b) => a.name.localeCompare(b.name))) {
@@ -75,9 +88,23 @@ export function catalogGroups(
     const folder = normalizeFolder(f.folder);
     groups.set(folder, [...(groups.get(folder) ?? []), entry]);
   }
+  const folders = new Map<string, Omit<CatalogFolder, "folder" | "entries">>();
+  for (const f of forms) {
+    const d = f.definition ?? {};
+    if (f.type !== "folder" || text(d.FolderName) === "") continue;
+    folders.set(normalizeFolder(`${f.folder}/${text(d.FolderName)}`), {
+      label: text(d.FolderLabel),
+      desc: text(d.FolderDesc),
+      css: text(d.FolderCss),
+    });
+  }
   return [...groups]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([folder, entries]) => ({ folder, entries }));
+    .map(([folder, entries]) => ({
+      folder,
+      entries,
+      ...(folders.get(folder) ?? { label: "", desc: "", css: "" }),
+    }));
 }
 
 /** URL state of the request page: the form chosen. */

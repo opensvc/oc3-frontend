@@ -1,8 +1,18 @@
-import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { apiGetDynamic } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import { LegacyCssIcon } from "@/components/opensvc/LegacyCssIcon";
+import { parseLegacyCss } from "@/components/opensvc/legacy-css";
 import { Switch } from "@/components/ui/Switch";
 import { CloseIcon, PlusIcon } from "@/components/ui/icons";
 import {
@@ -45,6 +55,16 @@ function newGroup(def: FormDefinition, user: FormUser): GroupState {
     }
   }
   return group;
+}
+
+/**
+ * The size of a control: its Width, else the form's, and the form's MinWidth, as
+ * the historical renderer sets them; never wider than its column.
+ */
+function controlStyle(def: FormDefinition, input: FormInput): CSSProperties | undefined {
+  const width = input.width ?? def.width;
+  if (width === undefined && def.minWidth === undefined) return undefined;
+  return { width, minWidth: def.minWidth, maxWidth: "100%" };
 }
 
 /** The problems of an input that disable the submission. */
@@ -177,6 +197,7 @@ export function FormRender({
                   data={datas[index] ?? {}}
                   user={user}
                   vertical={def.vertical}
+                  style={controlStyle(def, input)}
                   onChange={(value, optionData) => {
                     change(index, input.id, value, optionData);
                   }}
@@ -231,6 +252,7 @@ function InputRow({
   data,
   user,
   vertical,
+  style,
   onChange,
 }: {
   input: FormInput;
@@ -238,6 +260,7 @@ function InputRow({
   data: Record<string, unknown>;
   user: FormUser;
   vertical: boolean;
+  style: CSSProperties | undefined;
   onChange: (value: InputValue, optionData?: unknown) => void;
 }) {
   const { t } = useTranslation();
@@ -248,6 +271,8 @@ function InputRow({
   return (
     <>
       <label htmlFor={id} className={`font-medium text-ink ${vertical ? "" : "pt-1.5"}`}>
+        {/* LabelCss: the icon the historical renderer puts before the label. */}
+        <LegacyCssIcon css={input.labelCss} className="mr-1.5 inline h-4 w-4 align-[-2px]" />
         {input.label}
         {input.mandatory && (
           <span className="text-state-down" title={t("forms.render.mandatory")}>
@@ -265,6 +290,7 @@ function InputRow({
           user={user}
           invalid={problems.length > 0}
           describedBy={describedBy}
+          style={style}
           onChange={onChange}
         />
         <div id={describedBy}>
@@ -331,6 +357,7 @@ function InputControl({
   user,
   invalid,
   describedBy,
+  style,
   onChange,
 }: {
   id: string;
@@ -340,12 +367,17 @@ function InputControl({
   user: FormUser;
   invalid: boolean;
   describedBy: string;
+  style: CSSProperties | undefined;
   onChange: (value: InputValue, optionData?: unknown) => void;
 }) {
   const { t } = useTranslation();
   const border = invalid ? "border-state-down" : "border-line";
+  // Css of an input: the historical renderer styles the value with it (an icon,
+  // or `pre` for preformatted text); `pre` also sets the typing of a text field.
+  const mono = parseLegacyCss(input.css).pre ? "font-mono text-data" : "";
   const common = {
     id,
+    style,
     disabled: input.readOnly,
     "aria-invalid": invalid,
     "aria-describedby": describedBy,
@@ -410,9 +442,12 @@ function InputControl({
       const text =
         input.fn !== "" ? (candidates ?? []).map((c) => c.text).join("\n") : asString(value);
       return (
-        <div id={id} className="py-1.5 whitespace-pre-wrap text-ink">
-          {text}
-          {candidateStatus}
+        <div id={id} className={`flex gap-1.5 py-1.5 text-ink ${mono}`}>
+          {text !== "" && <LegacyCssIcon css={input.css} className="mt-0.5 h-4 w-4" />}
+          <div className="min-w-0 break-words whitespace-pre-wrap">
+            {text}
+            {candidateStatus}
+          </div>
         </div>
       );
     }
@@ -535,7 +570,7 @@ function InputControl({
       onChange={(event) => {
         onChange(event.target.value);
       }}
-      className={`${CONTROL} ${border}`}
+      className={`${CONTROL} ${border} ${mono}`}
     />
   );
 }

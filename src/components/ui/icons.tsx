@@ -401,3 +401,166 @@ export function SnowflakeIcon(props: IconProps) {
     </Svg>
   );
 }
+
+/*
+ * Glyphs of the historical icon classes a form definition names (LabelCss, Css,
+ * FolderCss), translated by src/components/opensvc/legacy-css.ts.
+ */
+
+/** Actions (`action16`, fa-cog). */
+export function GearIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M10.3 2h3.4l.5 2.6 1.6.7 2.2-1.5 2.4 2.4-1.5 2.2.7 1.6 2.6.5v3.4l-2.6.5-.7 1.6 1.5 2.2-2.4 2.4-2.2-1.5-1.6.7-.5 2.6h-3.4l-.5-2.6-1.6-.7-2.2 1.5-2.4-2.4 1.5-2.2-.7-1.6L2 13.7v-3.4l2.6-.5.7-1.6-1.5-2.2 2.4-2.4 2.2 1.5 1.6-.7.5-2.6ZM12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"
+      />
+    </Svg>
+  );
+}
+
+/** Compliance (`comp16`, fa-bullseye). */
+export function TargetIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 2.8a7.2 7.2 0 1 0 0 14.4 7.2 7.2 0 0 0 0-14.4Zm0 2.7a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm0 2.4a2.1 2.1 0 1 0 0 4.2 2.1 2.1 0 0 0 0-4.2Z"
+      />
+    </Svg>
+  );
+}
+
+/** Packages (`pkg16`, fa-cubes). */
+export function CubeIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M12 2 21 6.5v11L12 22l-9-4.5v-11L12 2Zm0 2.4L5.7 7.5 12 10.6l6.3-3.1L12 4.4Z"
+      />
+    </Svg>
+  );
+}
+
+/** Keys and secrets (`key`, fa-key). */
+export function KeyIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M8 3.5a6 6 0 0 1 5.7 7.9l8.3 8.3V22h-3.5v-2h-2v-2h-2l-1.9-1.9A6 6 0 1 1 8 3.5Zm-1.5 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"
+      />
+    </Svg>
+  );
+}
+
+/** Files (`file16`, fa-file). */
+export function FileIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M6.5 2H13v5.5c0 .8.7 1.5 1.5 1.5H20v11.5c0 .8-.7 1.5-1.5 1.5h-12c-.8 0-1.5-.7-1.5-1.5v-17C5 2.7 5.7 2 6.5 2Zm8 .4 5.1 5.1h-5.1V2.4Z" />
+    </Svg>
+  );
+}
+
+/** Locked, safe (`safe16`, fa-lock). */
+export function LockIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M12 2a5 5 0 0 1 5 5v3h1.5c.8 0 1.5.7 1.5 1.5v9c0 .8-.7 1.5-1.5 1.5h-13C4.7 22 4 21.3 4 20.5v-9c0-.8.7-1.5 1.5-1.5H7V7a5 5 0 0 1 5-5Zm0 2.2A2.8 2.8 0 0 0 9.2 7v3h5.6V7A2.8 2.8 0 0 0 12 4.2Z"
+      />
+    </Svg>
+  );
+}
+
+/** Mail (fa-envelope). */
+export function MailIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3.5 5h17c.8 0 1.5.7 1.5 1.5v.7l-10 6.2L2 7.2v-.7C2 5.7 2.7 5 3.5 5ZM2 9.5l10 6.2 10-6.2v8c0 .8-.7 1.5-1.5 1.5h-17C2.7 19 2 18.3 2 17.5v-8Z" />
+    </Svg>
+  );
+}
+
+/** Name resolution (`dns16`). */
+export function GlobeIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 1.8a8.2 8.2 0 1 0 0 16.4 8.2 8.2 0 0 0 0-16.4Z"
+      />
+      <path
+        fillRule="evenodd"
+        d="M12 2.5c2.6 2.2 4.1 5.7 4.1 9.5s-1.5 7.3-4.1 9.5c-2.6-2.2-4.1-5.7-4.1-9.5s1.5-7.3 4.1-9.5Zm0 2.6c-1.5 1.8-2.3 4.3-2.3 6.9s.8 5.1 2.3 6.9c1.5-1.8 2.3-4.3 2.3-6.9s-.8-5.1-2.3-6.9Z"
+      />
+      <path d="M2.5 11.1h19v1.8h-19z" />
+    </Svg>
+  );
+}
+
+/** Links (`link16`, fa-link). */
+export function LinkIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M9.2 14.8a1 1 0 0 1 0-1.4l4.2-4.2a1 1 0 1 1 1.4 1.4l-4.2 4.2a1 1 0 0 1-1.4 0Zm-1.6-4 1.4 1.4-2.1 2.1a2 2 0 0 0 2.8 2.8l2.1-2.1 1.4 1.4-2.1 2.1a4 4 0 0 1-5.6-5.6l2.1-2.1Zm8.8 2.4-1.4-1.4 2.1-2.1a2 2 0 0 0-2.8-2.8l-2.1 2.1-1.4-1.4 2.1-2.1a4 4 0 0 1 5.6 5.6l-2.1 2.1Z" />
+    </Svg>
+  );
+}
+
+/** Back to the parent (`parentfolder`, fa-arrow-left). */
+export function ArrowLeftIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M10.7 5.3a1.2 1.2 0 0 1 0 1.7l-3.8 3.8H19a1.2 1.2 0 1 1 0 2.4H6.9l3.8 3.8a1.2 1.2 0 1 1-1.7 1.7l-5.8-5.8a1.2 1.2 0 0 1 0-1.7L9 5.3a1.2 1.2 0 0 1 1.7 0Z" />
+    </Svg>
+  );
+}
+
+/** Pointing onward (`right16`, fa-caret-right). */
+export function CaretRightIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M9 5.5v13c0 .9 1 1.3 1.7.7l6.5-6.5a1 1 0 0 0 0-1.4L10.7 4.8C10 4.2 9 4.6 9 5.5Z" />
+    </Svg>
+  );
+}
+
+/** Next step (fa-step-forward). */
+export function StepForwardIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M5 5.4v13.2c0 .8.9 1.3 1.6.8L15 13.1v5.4a1.5 1.5 0 0 0 3 0v-13a1.5 1.5 0 0 0-3 0v5.4L6.6 4.6C5.9 4.1 5 4.6 5 5.4Z" />
+    </Svg>
+  );
+}
+
+/** Previous step (fa-step-backward). */
+export function StepBackwardIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M19 5.4v13.2c0 .8-.9 1.3-1.6.8L9 13.1v5.4a1.5 1.5 0 0 1-3 0v-13a1.5 1.5 0 0 1 3 0v5.4l8.4-6.3c.7-.5 1.6 0 1.6.8Z" />
+    </Svg>
+  );
+}
+
+/** Ordering (fa-sort). */
+export function SortIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 2.5 18 9H6l6-6.5Zm0 19L6 15h12l-6 6.5Z" />
+    </Svg>
+  );
+}
+
+/** Feeds, subscriptions (fa-rss). */
+export function RssIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M5 3.5A15.5 15.5 0 0 1 20.5 19h-3A12.5 12.5 0 0 0 5 6.5v-3Zm0 6a9.5 9.5 0 0 1 9.5 9.5h-3A6.5 6.5 0 0 0 5 12.5v-3Zm2 7.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z" />
+    </Svg>
+  );
+}

@@ -42,6 +42,11 @@ export interface FormInput {
   unit: string;
   /** Name of the form of a "form" type input. */
   subForm: string;
+  /** Legacy classes of the label (an icon) and of the value (an icon, `pre`). */
+  labelCss: string;
+  css: string;
+  /** Width of the control, a CSS length; the form's Width when unset. */
+  width: string | undefined;
 }
 
 export interface FormOutputShape {
@@ -57,6 +62,11 @@ export interface FormOutputShape {
 export interface FormDefinition {
   label: string;
   desc: string;
+  /** Legacy classes of the form: the icon of its card and of its title. */
+  css: string;
+  /** Default width and minimum width of the controls, CSS lengths. */
+  width: string | undefined;
+  minWidth: string | undefined;
   vertical: boolean;
   inputs: FormInput[];
   output: FormOutputShape | null;
@@ -77,6 +87,18 @@ function str(v: unknown): string {
 
 function bool(v: unknown): boolean {
   return v === true || v === "true" || v === "yes" || v === "True";
+}
+
+/**
+ * A Width or MinWidth: a number of pixels, as jQuery's width() reads it, or a
+ * CSS length. Anything else is dropped rather than written into a style.
+ */
+export function cssLength(v: unknown): string | undefined {
+  if (typeof v === "number" && Number.isFinite(v) && v > 0) return `${String(v)}px`;
+  if (typeof v !== "string") return undefined;
+  const m = /^\s*(\d+(?:\.\d+)?)\s*(px|em|rem|%|ch|ex|vw|vh)?\s*$/.exec(v);
+  if (m === null) return undefined;
+  return `${m[1] ?? ""}${m[2] ?? "px"}`;
 }
 
 function strList(v: unknown): string[] {
@@ -147,6 +169,9 @@ export function parseDefinition(raw: unknown): FormDefinition | null {
       constraint: str(item.Constraint),
       unit: str(item.Unit),
       subForm: str(item.Form),
+      labelCss: str(item.LabelCss),
+      css: str(item.Css),
+      width: cssLength(item.Width),
     });
   }
   const outputs = Array.isArray(raw.Outputs) ? raw.Outputs : null;
@@ -167,6 +192,9 @@ export function parseDefinition(raw: unknown): FormDefinition | null {
   return {
     label: str(raw.Label),
     desc: str(raw.Desc),
+    css: str(raw.Css),
+    width: cssLength(raw.Width),
+    minWidth: cssLength(raw.MinWidth),
     vertical: bool(raw.Vertical),
     inputs,
     output,

@@ -4,6 +4,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import { LegacyCssIcon } from "@/components/opensvc/LegacyCssIcon";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { FolderIcon, PuzzleIcon, SearchIcon } from "@/components/ui/icons";
 import { parseDefinition } from "@/features/forms/form-engine";
@@ -112,9 +113,20 @@ export function NewRequestPage() {
                 id={`folder-${group.folder}`}
                 className="mb-2 flex items-center gap-1.5 font-medium text-ink-muted"
               >
-                <FolderIcon className="h-4 w-4" />
-                {group.folder}
+                <LegacyCssIcon
+                  css={group.css}
+                  fallback={<FolderIcon className="h-4 w-4 shrink-0" />}
+                />
+                {group.label === "" ? (
+                  group.folder
+                ) : (
+                  <>
+                    <span className="text-ink">{group.label}</span>
+                    <span className="font-mono text-data font-normal">{group.folder}</span>
+                  </>
+                )}
               </h2>
+              {group.desc !== "" && <p className="-mt-1 mb-2 text-ink-muted">{group.desc}</p>}
               <ul className="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-3">
                 {group.entries.map((entry) => (
                   <li key={entry.key}>
@@ -144,7 +156,12 @@ function CatalogCard({ entry, onOpen }: { entry: CatalogEntry; onOpen: () => voi
       className="flex h-full w-full items-start gap-3 rounded-(--radius-panel) border border-line bg-surface-raised p-3 text-left hover:border-line-strong hover:bg-surface-sunken"
     >
       <span className="mt-0.5 shrink-0">
-        <PuzzleIcon className="h-6 w-6 text-icon-form" />
+        {/* Css: the historical card icon, the workflow puzzle (`wf48`) by default. */}
+        <LegacyCssIcon
+          css={entry.css}
+          className="h-6 w-6"
+          fallback={<PuzzleIcon className="h-6 w-6 text-icon-form" />}
+        />
       </span>
       <span className="min-w-0">
         <span className="block font-medium text-ink">{entry.label}</span>
@@ -206,7 +223,10 @@ function RequestForm({
         <p className="text-ink-muted">{t("requests.unusable")}</p>
       ) : (
         <div className="rounded-(--radius-panel) border border-line bg-surface-raised p-4">
-          <h2 className="font-semibold text-ink">{def.label || form.name}</h2>
+          <h2 className="flex items-center gap-2 font-semibold text-ink">
+            <LegacyCssIcon css={def.css} className="h-5 w-5" />
+            {def.label || form.name}
+          </h2>
           {def.desc !== "" && <p className="mb-4 whitespace-pre-line text-ink-muted">{def.desc}</p>}
           <FormRender
             key={form.id}
