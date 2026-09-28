@@ -13,6 +13,7 @@ export interface NavEntry {
   to:
     | "/"
     | "/nodes"
+    | "/hardware"
     | "/services"
     | "/instances"
     | "/networks"
@@ -55,6 +56,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
       { to: "/instances", labelKey: "nav.instances", icon: "instance" },
       { to: "/networks", labelKey: "nav.networks", icon: "network" },
       { to: "/disks", labelKey: "nav.disks", icon: "disk" },
+      // `view-nodes-hw` of the historical menu: the hardware components of every node.
+      { to: "/hardware", labelKey: "nav.hardware", icon: "hardware" },
       // `view-pkg` of the historical menu: the packages installed on the nodes.
       { to: "/packages", labelKey: "nav.packages", icon: "package" },
     ],

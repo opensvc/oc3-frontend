@@ -1466,7 +1466,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description List all nodes PCI and memory hardware */
+        /**
+         * @description List the PCI and memory hardware of the nodes the user can see, as their
+         *     agents report it. The `nodes.` properties come from the joined nodes table.
+         */
         get: operations["GetNodesHardware"];
         put?: never;
         post?: never;
@@ -3244,7 +3247,8 @@ export interface components {
          * @description A hardware component of a node, as reported by the agent's asset push:
          *     `hw_type` is the component family (for example `pci` or `mem`), `hw_path` its
          *     address. Every property is optional: the `props` query parameter selects which
-         *     columns the server returns.
+         *     columns the server returns. The `nodes.` properties come from the joined nodes
+         *     table, null for a component of an unknown node.
          */
         NodeHardwareRow: {
             hw_class?: string;
@@ -3254,6 +3258,9 @@ export interface components {
             hw_type?: string;
             id?: number;
             node_id?: string;
+            "nodes.app"?: string | null;
+            "nodes.nodename"?: string | null;
+            "nodes.os_name"?: string | null;
             updated?: string;
         };
         NodeListResponse: {
@@ -8428,6 +8435,20 @@ export interface operations {
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
                 /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
                 groupby?: components["parameters"]["inQueryGroupby"];
             };
@@ -8443,9 +8464,10 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListResponse"];
+                    "application/json": components["schemas"]["NodeHardwareListResponse"];
                 };
             };
+            401: components["responses"]["401"];
             500: components["responses"]["500"];
         };
     };

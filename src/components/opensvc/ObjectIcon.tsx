@@ -1,6 +1,7 @@
 import {
   AlertTriangleIcon,
   AsteriskIcon,
+  CpuIcon,
   CubeIcon,
   DatabaseIcon,
   FilterIcon,
@@ -32,7 +33,8 @@ export type ObjectKind =
   | "filter"
   | "filterset"
   | "form"
-  | "package";
+  | "package"
+  | "hardware";
 
 /**
  * Pictogram and tint of an object kind. The same vocabulary in the menu, in panel
@@ -66,6 +68,8 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   filterset: { Icon: FilterIcon, className: "text-icon-dashboard" },
   form: { Icon: PuzzleIcon, className: "text-icon-form" },
   package: { Icon: CubeIcon, className: "text-icon-package" },
+  // Cornflower blue in the historical collector (`hw16`): the tint of nodes.
+  hardware: { Icon: CpuIcon, className: "text-icon-node" },
 };
 
 export function ObjectIcon({ kind, className }: { kind: ObjectKind; className?: string }) {

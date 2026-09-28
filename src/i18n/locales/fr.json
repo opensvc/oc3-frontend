@@ -24,7 +24,8 @@
     "filtersets": "Filtersets",
     "forms": "Formulaires",
     "newRequest": "Nouvelle demande",
-    "packages": "Paquets"
+    "packages": "Paquets",
+    "hardware": "Matériel des nodes"
   },
   "header": {
     "search": "Rechercher dans le collector",
@@ -195,7 +196,8 @@
         "hw_class": "Classe",
         "hw_description": "Description",
         "hw_driver": "Pilote"
-      }
+      },
+      "openView": "Ouvrir dans la vue Matériel des nodes"
     },
     "alerts": {
       "open": "Ouvrir dans le dashboard",
@@ -1153,6 +1155,22 @@
       "sig_provider": "Signé par",
       "pkg_install_date": "Installé le",
       "pkg_updated": "Mis à jour",
+      "nodes.app": "App du node",
+      "nodes.os_name": "OS"
+    }
+  },
+  "hardware": {
+    "title": "Matériel des nodes",
+    "fields": {
+      "nodes.nodename": "Node",
+      "id": "Identifiant",
+      "node_id": "Identifiant du node",
+      "hw_type": "Type",
+      "hw_path": "Adresse",
+      "hw_class": "Classe",
+      "hw_description": "Description",
+      "hw_driver": "Pilote",
+      "updated": "Mis à jour",
       "nodes.app": "App du node",
       "nodes.os_name": "OS"
     }

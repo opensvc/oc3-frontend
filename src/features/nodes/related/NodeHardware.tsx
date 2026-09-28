@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { RelatedTable, type RelatedColumn } from "@/components/opensvc/RelatedTable";
@@ -64,11 +65,21 @@ export function NodeHardware({ nodeId, locale }: { nodeId: string; locale: strin
 
   return (
     <div className="flex flex-col gap-2">
-      {updated !== undefined && (
-        <p className="text-ink-muted">
-          {t("nodes.hardware.reported")} <RelativeTime value={updated} locale={locale} />
-        </p>
-      )}
+      <div className="flex flex-wrap items-center gap-3">
+        {updated !== undefined && (
+          <p className="text-ink-muted">
+            {t("nodes.hardware.reported")} <RelativeTime value={updated} locale={locale} />
+          </p>
+        )}
+        {/* The whole list, with its column filters and sorts, on this node only. */}
+        <Link
+          to="/hardware"
+          search={{ "f.node_id": `eq:${nodeId}` }}
+          className="ml-auto text-accent hover:underline"
+        >
+          {t("nodes.hardware.openView")}
+        </Link>
+      </div>
       <RelatedTable
         columns={columns}
         groups={groups}
