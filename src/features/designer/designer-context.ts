@@ -1,0 +1,40 @@
+import { createContext, useContext } from "react";
+import type { Draft, LogLine, ObjectRef, Operation, Refusal } from "./model";
+
+/** A message of the designer: a translation key with its values, and its tone. */
+export interface Notice {
+  id: number;
+  key: string;
+  values?: Record<string, string>;
+  /** A change log line the message is about, translated into its `what` value. */
+  inner?: LogLine;
+  tone: "done" | "refused";
+}
+
+/** The designer sandbox as the components see it, provided by `DesignerProvider`. */
+export interface Designer {
+  original: Draft;
+  draft: Draft;
+  log: LogLine[];
+  /**
+   * Applies an operation to the draft; the refusal when the collector would not
+   * accept it, and the object it created, if any.
+   */
+  run: (operation: Operation) => { refused: Refusal | null; created?: ObjectRef };
+  /** Like run, telling the outcome in a notice. */
+  runAndTell: (operation: Operation) => ObjectRef | undefined;
+  describe: (operation: Operation) => LogLine;
+  undo: () => void;
+  reset: () => void;
+  notices: Notice[];
+  notify: (notice: Omit<Notice, "id">) => void;
+  dismiss: (id: number) => void;
+}
+
+export const DesignerContext = createContext<Designer | null>(null);
+
+export function useDesigner(): Designer {
+  const designer = useContext(DesignerContext);
+  if (designer === null) throw new Error("useDesigner outside of DesignerProvider");
+  return designer;
+}

@@ -34,7 +34,8 @@ export interface NavEntry {
     | "/requests/tiers"
     | "/compliance/modulesets"
     | "/compliance/rulesets"
-    | "/compliance/logs";
+    | "/compliance/logs"
+    | "/compliance/designer";
   labelKey: string;
   icon: ObjectKind;
   /** True for the root: without it, prefix matching would activate it everywhere. */
@@ -106,6 +107,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
       { to: "/compliance/modulesets", labelKey: "nav.modulesets", icon: "moduleset" },
       // `comp-rsets` of the historical menu.
       { to: "/compliance/rulesets", labelKey: "nav.rulesets", icon: "ruleset" },
+      // `comp-designer` of the historical menu.
+      { to: "/compliance/designer", labelKey: "nav.designer", icon: "designer" },
       // `comp-log` of the historical menu.
       { to: "/compliance/logs", labelKey: "nav.complianceLogs", icon: "complianceLog" },
     ],

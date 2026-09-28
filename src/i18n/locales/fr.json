@@ -33,7 +33,8 @@
     "tiersRequests": "En attente d'action de tiers",
     "modulesets": "Modulesets",
     "rulesets": "Rulesets",
-    "complianceLogs": "Journaux"
+    "complianceLogs": "Journaux",
+    "designer": "Concepteur"
   },
   "header": {
     "search": "Rechercher dans le collector",
@@ -1294,5 +1295,232 @@
       "na": "n/a",
       "killed": "tué"
     }
+  },
+  "designer": {
+    "create": "Créer",
+    "newName": {
+      "ruleset": "Nom du nouveau ruleset",
+      "moduleset": "Nom du nouveau moduleset"
+    },
+    "actions": "Actions",
+    "title": "Concepteur de conformité",
+    "loading": "Chargement des rulesets et des modulesets…",
+    "navigator": "Rulesets et modulesets",
+    "filter": "Filtrer par nom",
+    "quickFilters": "Filtres rapides",
+    "quick": {
+      "modified": "Modifiés",
+      "contextual": "Contextuels",
+      "private": "Privés",
+      "unused": "Inutilisés"
+    },
+    "rulesets": "Rulesets",
+    "modulesets": "Modulesets",
+    "nodes": "Nodes",
+    "services": "Services",
+    "new": {
+      "ruleset": "Nouveau ruleset",
+      "moduleset": "Nouveau moduleset"
+    },
+    "kind": {
+      "ruleset": "Ruleset",
+      "moduleset": "Moduleset",
+      "filterset": "Filterset",
+      "group": "Groupe"
+    },
+    "namePlaceholder": "Nom",
+    "noMatch": "Aucune correspondance",
+    "none": "Aucun",
+    "noFilterset": "Aucun filterset",
+    "private": "Privé",
+    "modified": "Modifié dans le bac à sable",
+    "created": "Créé dans le bac à sable",
+    "count": {
+      "variables_one": "{{count}} var",
+      "variables_other": "{{count}} vars",
+      "modules_one": "{{count}} module",
+      "modules_other": "{{count}} modules",
+      "rulesets_one": "{{count}} ruleset",
+      "rulesets_other": "{{count}} rulesets",
+      "objects_one": "{{count}} objet",
+      "objects_other": "{{count}} objets"
+    },
+    "clone": "Cloner",
+    "export": "JSON",
+    "delete": "Supprimer",
+    "deleteQuestion": "Supprimer {{name}} ?",
+    "deleteQuestionUsed_one": "{{name}} est utilisé une fois. Le supprimer quand même ?",
+    "deleteQuestionUsed_other": "{{name}} est utilisé {{count}} fois. Le supprimer quand même ?",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "detach": "Détacher",
+    "dismiss": "Fermer",
+    "renameLabel": "Renommer {{name}}",
+    "usedBy": "Utilisé par",
+    "unused": "Rien ne l'utilise.",
+    "properties": "Propriétés",
+    "type": "Type",
+    "types": {
+      "explicit": "Explicite",
+      "contextual": "Contextuel"
+    },
+    "typeHelp": {
+      "explicit": "S'applique là où il est attaché.",
+      "contextual": "S'applique aux nodes que son filterset sélectionne."
+    },
+    "filterset": "Filterset",
+    "chooseFilterset": "Choisir un filterset",
+    "noFiltersetWarning": "Sans filterset, un ruleset contextuel ne sélectionne aucun node.",
+    "public": "Public",
+    "publicHelp": "Listé seul et attachable.",
+    "privateHelp": "Accessible seulement par les rulesets qui l'incluent.",
+    "variables": "Variables",
+    "variablesHint": "Glisser une variable sur un ruleset de la liste pour l'y copier ou l'y déplacer.",
+    "noVariable": "Aucune variable pour l'instant.",
+    "addVariable": "Ajouter une variable",
+    "variableName": "Nom de la variable",
+    "variableClass": "Classe",
+    "variableDragHint": "Glisser sur un ruleset pour y copier ou y déplacer cette variable",
+    "changeClass": "Changer la classe",
+    "copyTo": "Copier vers un ruleset",
+    "moveTo": "Déplacer vers un ruleset",
+    "emptyValue": "Pas encore de valeur : la modifier pour remplir son formulaire.",
+    "applyToDraft": "Appliquer",
+    "inherited_one": "{{count}} variable héritée des rulesets inclus",
+    "inherited_other": "{{count}} variables héritées des rulesets inclus",
+    "from": "de",
+    "includes": "Rulesets inclus",
+    "includesHint": "Déposer un ruleset ici, ou sur ce ruleset dans la liste, pour l'inclure.",
+    "includeRuleset": "Inclure un ruleset",
+    "modules": "Modules",
+    "modulesHint": "La correction automatique laisse l'agent corriger un module sans qu'on le lui demande.",
+    "noModule": "Aucun module pour l'instant.",
+    "module": "Module",
+    "autofix": "Correction auto",
+    "autofixOf": "Correction auto de {{name}}",
+    "removeModule": "Retirer {{name}}",
+    "addModule": "Ajouter un module",
+    "moduleName": "Nom du module",
+    "attachedRulesets": "Rulesets attachés",
+    "attachedRulesetsHint": "Déposer un ruleset ici, ou sur ce moduleset dans la liste, pour l'attacher.",
+    "attachRuleset": "Attacher un ruleset",
+    "includedModulesets": "Modulesets inclus",
+    "includedModulesetsHint": "Déposer un moduleset ici, ou sur ce moduleset dans la liste, pour l'inclure.",
+    "includeModuleset": "Inclure un moduleset",
+    "teams": {
+      "title": "Équipes",
+      "responsibles": "Responsables",
+      "publications": "Publié à",
+      "none": "Aucune équipe",
+      "add": "Ajouter à {{list}}",
+      "remove": "Retirer {{team}}",
+      "dragHint": "Glisser vers l'autre liste pour changer son rôle",
+      "removeShort": "Retirer"
+    },
+    "dropVariable": "{{name}} sur {{ruleset}}",
+    "copyHere": "Copier ici",
+    "moveHere": "Déplacer ici",
+    "undone": "Annulé : {{what}}",
+    "drag": {
+      "idle": "Déposer sur une cible en surbrillance"
+    },
+    "sandbox": {
+      "title": "Bac à sable",
+      "text": "Les modifications restent dans cet onglet et ne sont jamais enregistrées dans le collector.",
+      "changes_one": "{{count}} modification",
+      "changes_other": "{{count}} modifications",
+      "undo": "Annuler",
+      "undoHint": "Annuler la dernière modification (Ctrl+Z)",
+      "reset": "Réinitialiser",
+      "resetQuestion_one": "Abandonner {{count}} modification ?",
+      "resetQuestion_other": "Abandonner {{count}} modifications ?"
+    },
+    "welcome": {
+      "missing": "L'objet sélectionné n'est plus dans le brouillon.",
+      "title": "Sélectionner un ruleset ou un moduleset dans la liste pour le modifier.",
+      "select": "Le filtre et les filtres rapides réduisent la liste ; les flèches la parcourent.",
+      "drag": "Glisser un ruleset sur un moduleset pour l'attacher, sur un ruleset pour l'inclure ; un moduleset sur un moduleset pour l'inclure ; un filterset sur un ruleset pour le rendre contextuel.",
+      "variables": "Glisser une variable sur un autre ruleset pour l'y copier ou l'y déplacer.",
+      "teams": "Glisser un groupe sur un ruleset ou un moduleset pour le publier à ce groupe, sur une liste des Équipes pour ce rôle ; glisser une équipe entre Responsables et Publié à pour changer son rôle.",
+      "undo": "Toute modification s'annule (Ctrl+Z), et Réinitialiser revient aux données du collector."
+    },
+    "refused": {
+      "emptyName": "Un nom est requis.",
+      "nameTaken": "Le nom {{name}} est déjà pris.",
+      "variableTaken": "{{ruleset}} a déjà une variable nommée {{name}}.",
+      "moduleTaken": "{{moduleset}} a déjà un module nommé {{name}}.",
+      "missing": "Cet objet n'est plus dans le brouillon.",
+      "sameRuleset": "La variable est déjà dans ce ruleset.",
+      "modulesetInRuleset": "Un ruleset ne peut pas inclure un moduleset.",
+      "self": "{{name}} ne peut pas s'inclure lui-même.",
+      "already": "{{child}} est déjà dans {{parent}}.",
+      "loop": "{{parent}} est déjà dans {{child}} : l'inclure ferait une boucle.",
+      "teamAlready": {
+        "responsibles": "{{team}} est déjà responsable de {{name}}.",
+        "publications": "{{name}} est déjà publié à {{team}}."
+      },
+      "everybodyResponsible": "Everybody ne peut pas être rendu responsable.",
+      "filtersetAlready": "{{filterset}} est déjà le filterset de {{ruleset}}."
+    },
+    "log": {
+      "create": {
+        "ruleset": "Ruleset {{name}} créé",
+        "moduleset": "Moduleset {{name}} créé"
+      },
+      "rename": "{{from}} renommé {{to}}",
+      "clone": "{{name}} cloné",
+      "delete": {
+        "ruleset": "Ruleset {{name}} supprimé",
+        "moduleset": "Moduleset {{name}} supprimé"
+      },
+      "type": {
+        "explicit": "{{name}} rendu explicite",
+        "contextual": "{{name}} rendu contextuel"
+      },
+      "filterset": "Filterset {{filterset}} posé sur {{name}}",
+      "filtersetRemoved": "Filterset retiré de {{name}}",
+      "public": "{{name}} rendu public",
+      "private": "{{name}} rendu privé",
+      "addVariable": "Variable {{name}} ajoutée à {{ruleset}}",
+      "updateVariable": "Variable {{name}} de {{ruleset}} modifiée",
+      "deleteVariable": "Variable {{name}} retirée de {{ruleset}}",
+      "copyVariable": "Variable {{name}} copiée de {{from}} vers {{to}}",
+      "moveVariable": "Variable {{name}} déplacée de {{from}} vers {{to}}",
+      "include": "{{child}} ajouté à {{parent}}",
+      "detach": "{{child}} détaché de {{parent}}",
+      "addModule": "Module {{name}} ajouté à {{moduleset}}",
+      "deleteModule": "Module {{name}} retiré de {{moduleset}}",
+      "autofixOn": "Correction auto activée pour {{name}}",
+      "autofixOff": "Correction auto désactivée pour {{name}}",
+      "addTeam": {
+        "responsibles": "{{team}} rendu responsable de {{name}}",
+        "publications": "{{name}} publié à {{team}}"
+      },
+      "removeTeam": {
+        "responsibles": "{{team}} n'est plus responsable de {{name}}",
+        "publications": "{{name}} n'est plus publié à {{team}}"
+      },
+      "moveTeam": {
+        "responsibles": "{{team}} passé dans les équipes responsables de {{name}}",
+        "publications": "{{team}} passé dans les équipes de publication de {{name}}"
+      }
+    },
+    "filtersets": "Filtersets",
+    "unusedShort": "inutilisé",
+    "filtersetDragHint": "Glisser sur un ruleset pour le rendre contextuel avec ce filterset",
+    "editInFiltersets": "Modifier dans la vue Filtersets",
+    "filtersetReadOnly": "En lecture seule ici : le concepteur attache les filtersets aux rulesets, leur contenu se modifie dans la vue Filtersets.",
+    "filtersetEntries": "Entrées",
+    "filtersetSelects": "Sélectionne",
+    "filtersetUsedBy": "Rulesets qui l'utilisent",
+    "propertiesHint": "Déposer un filterset ici pour rendre ce ruleset contextuel avec lui.",
+    "showFilterset": "Afficher",
+    "groups": "Groupes",
+    "groupDragHint": "Glisser sur un ruleset ou un moduleset pour le publier à ce groupe, ou sur une liste des Équipes pour ce rôle",
+    "editInGroups": "Gérer dans la vue Groupes",
+    "groupReadOnly": "En lecture seule ici : le concepteur donne aux groupes un rôle sur les rulesets et les modulesets, le groupe lui-même se gère dans la vue Groupes.",
+    "groupResponsibleFor": "Responsable de",
+    "groupPublishedTo": "Publiés à ce groupe",
+    "contextualTitle": "Contextuel : {{filterset}}"
   }
 }

@@ -3,6 +3,7 @@ import { AppShell } from "./layout/AppShell";
 import { AppsPage } from "@/features/apps/AppsPage";
 import { ComplianceLogsPage } from "@/features/compliance-logs/ComplianceLogsPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { DesignerPage } from "@/features/designer/DesignerPage";
 import { DisksPage } from "@/features/disks/DisksPage";
 import { PackagesPage } from "@/features/packages/PackagesPage";
 import { HardwarePage } from "@/features/hardware/HardwarePage";
@@ -198,6 +199,13 @@ const modulesetsRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
+const designerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/compliance/designer",
+  component: DesignerPage,
+  validateSearch: parseListSearch,
+});
+
 const complianceLogsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/compliance/logs",
@@ -260,6 +268,7 @@ const routeTree = rootRoute.addChildren([
   modulesetsRoute,
   rulesetsRoute,
   complianceLogsRoute,
+  designerRoute,
   actionsRoute,
   profileRoute,
 ]);
