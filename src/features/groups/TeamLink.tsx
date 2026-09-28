@@ -40,3 +40,15 @@ export function TeamLink({ name }: { name: unknown }) {
     </CrossLink>
   );
 }
+
+/** Teams listed as "a, b, c", as the collector aggregates them: one badge per team. */
+export function TeamLinks({ value }: { value: string | undefined }) {
+  if (value === undefined || value === "") return null;
+  return (
+    <span className="flex flex-wrap gap-1">
+      {value.split(", ").map((role) => (
+        <TeamLink key={role} name={role} />
+      ))}
+    </span>
+  );
+}

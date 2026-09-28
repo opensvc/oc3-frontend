@@ -33,3 +33,9 @@ export function frozenFilterOptions(
   if (mixed !== undefined) options.push({ value: mixed, labelKey: "state.frozenMixed" });
   return options;
 }
+
+/** The collector stores its flags as T or F, shown by `FlagSwitch`. */
+export const FLAG_FILTER_OPTIONS: ColumnFilterOption[] = [
+  { value: "T", labelKey: "detail.yes" },
+  { value: "F", labelKey: "detail.no" },
+];

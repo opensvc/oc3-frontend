@@ -9,8 +9,9 @@ import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorLi
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { DateTime } from "@/components/ui/DateTime";
-import { Switch } from "@/components/ui/Switch";
-import { TeamLink } from "@/features/groups/TeamLink";
+import { FlagSwitch } from "@/components/opensvc/FlagSwitch";
+import { FLAG_FILTER_OPTIONS } from "@/components/opensvc/filter-options";
+import { TeamLinks } from "@/features/groups/TeamLink";
 import { UserLink } from "@/features/users/UserLink";
 import {
   resolveListSearch,
@@ -70,37 +71,6 @@ const FAMILY: Partial<Record<ModulesetProp, ColumnFamily>> = {
 /** The id props, keys of the rows. */
 const KEY_PROPS = ["id", "modset_id"];
 
-/** Autofix is stored as T or F; a moduleset without module has neither. */
-const AUTOFIX_OPTIONS = [
-  { value: "T", labelKey: "detail.yes" },
-  { value: "F", labelKey: "detail.no" },
-];
-
-/** One badge per group role, as the collector shows teams, each opening its group. */
-function Teams({ value }: { value: string | undefined }) {
-  if (value === undefined || value === "") return null;
-  return (
-    <span className="flex flex-wrap gap-1">
-      {value.split(", ").map((role) => (
-        <TeamLink key={role} name={role} />
-      ))}
-    </span>
-  );
-}
-
-function Autofix({ value }: { value: string | undefined }) {
-  const { t } = useTranslation();
-  if (value !== "T" && value !== "F") return null;
-  return (
-    <Switch
-      checked={value === "T"}
-      label={t("modulesets.fields.autofix")}
-      stateLabel={t(value === "T" ? "detail.yes" : "detail.no")}
-      disabled
-    />
-  );
-}
-
 function renderCell(prop: ModulesetProp, row: ModulesetRow, locale: string) {
   switch (prop) {
     case "modset_updated":
@@ -108,9 +78,9 @@ function renderCell(prop: ModulesetProp, row: ModulesetRow, locale: string) {
       return <DateTime value={row[prop]} locale={locale} />;
     case "teams_responsible":
     case "teams_publication":
-      return <Teams value={row[prop]} />;
+      return <TeamLinks value={row[prop]} />;
     case "autofix":
-      return <Autofix value={row.autofix} />;
+      return <FlagSwitch value={row.autofix} labelKey="modulesets.fields.autofix" />;
     case "modset_author":
     case "modset_mod_author":
       return <UserLink name={row[prop]} />;
@@ -127,7 +97,7 @@ const COLUMNS: ListColumn<ModulesetRow>[] = MODULESET_PROPS.map((prop) => ({
   labelKey: `modulesets.fields.${prop}`,
   numeric: KEY_PROPS.includes(prop),
   family: FAMILY[prop] ?? "moduleset",
-  filter: prop === "autofix" ? { kind: "enum" as const, options: AUTOFIX_OPTIONS } : undefined,
+  filter: prop === "autofix" ? { kind: "enum" as const, options: FLAG_FILTER_OPTIONS } : undefined,
   render: (row, locale) => renderCell(prop, row, locale),
 }));
 
