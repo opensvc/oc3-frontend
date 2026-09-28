@@ -31,6 +31,7 @@ export function RelatedTable<T>({
   errorMessage,
   empty,
   caption,
+  headerTop,
 }: {
   columns: RelatedColumn<T>[];
   groups: RelatedGroup<T>[];
@@ -41,6 +42,11 @@ export function RelatedTable<T>({
   empty: string;
   /** Accessible name of the table. */
   caption: string;
+  /**
+   * Offset of the sticky header row, a CSS length, when something else sticks
+   * above the table in the panel.
+   */
+  headerTop?: string;
 }) {
   const { t } = useTranslation();
   if (isPending) return <p className="text-ink-muted">{t("detail.loading")}</p>;
@@ -57,7 +63,10 @@ export function RelatedTable<T>({
   return (
     <table className="w-full border-collapse text-data">
       <caption className="sr-only">{caption}</caption>
-      <thead className="sticky -top-3 bg-surface-raised">
+      <thead
+        className="sticky -top-3 bg-surface-raised"
+        style={headerTop === undefined ? undefined : { top: headerTop }}
+      >
         <tr className="border-b border-line text-left text-ink-muted">
           {columns.map((column) => (
             <th

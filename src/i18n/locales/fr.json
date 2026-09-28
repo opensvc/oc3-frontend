@@ -378,26 +378,12 @@
       }
     },
     "pkgdiff": {
-      "clusterTitle": "Différences de paquets installés entre les nodes du service",
-      "encapTitle": "Différences de paquets installés entre les nodes encapsulés",
-      "count_one": "{{count}} paquet diffère entre {{nodes}} nodes",
-      "count_other": "{{count}} paquets diffèrent entre {{nodes}} nodes",
-      "matching_one": "{{count}} paquet sur {{total}}",
-      "matching_other": "{{count}} paquets sur {{total}}",
       "missing": "non installé",
       "identical": "Aucune différence trouvée.",
-      "noMatch": "Aucun paquet différent ne correspond à la recherche.",
-      "singleNode": "Le service tourne sur moins de deux nodes : rien à comparer.",
-      "noEncap": "Le service a moins de deux nodes encapsulés : rien à comparer."
+      "singleNode": "Le service tourne sur moins de deux nodes : rien à comparer."
     },
     "nodediff": {
-      "search": "Rechercher une propriété, un paquet ou un module",
       "compared": "Nodes comparés : {{nodes}}",
-      "assetTitle": "Différences d'inventaire",
-      "pkgTitle": "Différences de paquets installés",
-      "moduleTitle": "Différences de statut des modules",
-      "modsetTitle": "Différences de modulesets attachés",
-      "rsetTitle": "Différences de rulesets attachés",
       "property": "Propriété",
       "module": "Module",
       "moduleset": "Moduleset",
@@ -412,6 +398,39 @@
         "nok": "non conforme",
         "na": "n/a",
         "unknown": "inconnu"
+      },
+      "categories": {
+        "assets": "Inventaire",
+        "packages": "Paquets",
+        "modules": "Statut des modules",
+        "modulesets": "Modulesets",
+        "rulesets": "Rulesets"
+      },
+      "groups": {
+        "inventory": "Inventaire",
+        "compliance": "Conformité"
+      },
+      "categoriesLabel": "Catégories de différences",
+      "search": {
+        "assets": "Rechercher une propriété",
+        "packages": "Rechercher un paquet",
+        "modules": "Rechercher un module",
+        "modulesets": "Rechercher un moduleset",
+        "rulesets": "Rechercher un ruleset"
+      },
+      "count_one": "{{count}} différence",
+      "count_other": "{{count}} différences",
+      "matching_one": "{{count}} différence sur {{total}}",
+      "matching_other": "{{count}} différences sur {{total}}",
+      "shown": "{{shown}} premières sur {{total}}",
+      "showAll": "Tout afficher ({{total}})",
+      "chip": {
+        "differs_one": "{{count}} différence",
+        "differs_other": "{{count}} différences",
+        "identical": "identique sur tous les nodes",
+        "pending": "chargement",
+        "error": "lecture impossible",
+        "none": "rien à comparer"
       }
     }
   },

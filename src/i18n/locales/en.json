@@ -378,26 +378,12 @@
       }
     },
     "pkgdiff": {
-      "clusterTitle": "Installed package differences between the service's nodes",
-      "encapTitle": "Installed package differences between the encapsulated nodes",
-      "count_one": "{{count}} package differs between {{nodes}} nodes",
-      "count_other": "{{count}} packages differ between {{nodes}} nodes",
-      "matching_one": "{{count}} of {{total}} package",
-      "matching_other": "{{count}} of {{total}} packages",
       "missing": "not installed",
       "identical": "No difference found.",
-      "noMatch": "No differing package matches the search.",
-      "singleNode": "The service runs on fewer than two nodes: nothing to compare.",
-      "noEncap": "The service has fewer than two encapsulated nodes: nothing to compare."
+      "singleNode": "The service runs on fewer than two nodes: nothing to compare."
     },
     "nodediff": {
-      "search": "Search a property, package or module",
       "compared": "Compared nodes: {{nodes}}",
-      "assetTitle": "Asset differences",
-      "pkgTitle": "Installed package differences",
-      "moduleTitle": "Module status differences",
-      "modsetTitle": "Moduleset attachment differences",
-      "rsetTitle": "Ruleset attachment differences",
       "property": "Property",
       "module": "Module",
       "moduleset": "Moduleset",
@@ -412,6 +398,39 @@
         "nok": "not ok",
         "na": "n/a",
         "unknown": "unknown"
+      },
+      "categories": {
+        "assets": "Assets",
+        "packages": "Packages",
+        "modules": "Module status",
+        "modulesets": "Modulesets",
+        "rulesets": "Rulesets"
+      },
+      "groups": {
+        "inventory": "Inventory",
+        "compliance": "Compliance"
+      },
+      "categoriesLabel": "Difference categories",
+      "search": {
+        "assets": "Search a property",
+        "packages": "Search a package",
+        "modules": "Search a module",
+        "modulesets": "Search a moduleset",
+        "rulesets": "Search a ruleset"
+      },
+      "count_one": "{{count}} difference",
+      "count_other": "{{count}} differences",
+      "matching_one": "{{count}} of {{total}} differences",
+      "matching_other": "{{count}} of {{total}} differences",
+      "shown": "First {{shown}} of {{total}} shown",
+      "showAll": "Show all {{total}}",
+      "chip": {
+        "differs_one": "{{count}} difference",
+        "differs_other": "{{count}} differences",
+        "identical": "identical on every node",
+        "pending": "loading",
+        "error": "could not be read",
+        "none": "nothing to compare"
       }
     }
   },

@@ -44,6 +44,11 @@ export interface ListSearch {
   peek?: string;
   /** Tab open in that panel, when the object looked at has any. */
   peektab?: string;
+  /**
+   * Category shown by a tab made of several lists, such as the differences
+   * between the nodes of a service. Reset when the panel or its tab changes.
+   */
+  diff?: string;
   /** Position in `peek` of the record on display; the last one when absent. */
   peekat?: number;
   /**
@@ -64,6 +69,7 @@ export interface ResolvedListSearch {
   peek?: string;
   peektab?: string;
   peekat?: number;
+  diff?: string;
   /** Active column filters, prop → apicollector expression. */
   filters: ColumnFilters;
 }
@@ -108,6 +114,7 @@ export function parseListSearch(raw: Record<string, unknown>): ListSearch {
     tab: toNonEmptyString(raw.tab),
     peek: toNonEmptyString(raw.peek),
     peektab: toNonEmptyString(raw.peektab),
+    diff: toNonEmptyString(raw.diff),
     peekat: toPositiveInt(raw.peekat),
   };
 }
@@ -123,6 +130,7 @@ export function resolveListSearch(search: ListSearch, defaultSort: string[]): Re
     tab: search.tab,
     peek: search.peek,
     peektab: search.peektab,
+    diff: search.diff,
     peekat: search.peekat,
     filters: filtersFromSearch(search),
   };
@@ -157,11 +165,16 @@ export function toSearchParams(next: Partial<ResolvedListSearch>): Partial<ListS
     out.peek = undefined;
     out.peektab = undefined;
     out.peekat = undefined;
+    out.diff = undefined;
   }
-  if ("tab" in next) out.tab = next.tab;
+  if ("tab" in next) {
+    out.tab = next.tab;
+    out.diff = undefined;
+  }
   if ("peek" in next) out.peek = next.peek;
   if ("peektab" in next) out.peektab = next.peektab;
   if ("peekat" in next) out.peekat = next.peekat;
+  if ("diff" in next) out.diff = next.diff;
   if (next.filters !== undefined) Object.assign(out, toFilterParams(next.filters));
   return out;
 }

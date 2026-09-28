@@ -42,7 +42,12 @@ export function PeekPanel() {
   function update(next: { peek?: string; peektab?: string; peekat?: number; sel?: string }) {
     void navigate({
       to: ".",
-      search: (previous) => ({ ...(previous as Record<string, unknown>), ...next }),
+      // Another record or tab: the category a tab had shown (`diff`) no longer applies.
+      search: (previous) => ({
+        ...(previous as Record<string, unknown>),
+        diff: undefined,
+        ...next,
+      }),
       resetScroll: false,
     });
   }

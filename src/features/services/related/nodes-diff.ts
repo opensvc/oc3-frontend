@@ -8,6 +8,8 @@
 import type { components } from "@/lib/api/schema";
 import type { NodeCompliance } from "./queries";
 
+type PackagesDiff = components["schemas"]["PackagesDiffResponse"];
+
 type NodeRow = components["schemas"]["NodeRow"];
 
 /** Properties naming the node rather than describing it: they always differ. */
@@ -95,4 +97,36 @@ export function attachmentDifferences(
     .filter(([, on]) => on.size !== nodes.length)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([name, on]) => ({ name, nodes: on }));
+}
+
+/** A package that differs between the nodes: its versions on each of them. */
+export interface PackageDifference {
+  key: string;
+  name: string;
+  arch: string;
+  type: string;
+  /** Versions installed, by node id; a node missing here lacks this package. */
+  versions: Record<string, string[]>;
+}
+
+/**
+ * The rows of `GET /packages/diff`, one per node having a package version, folded
+ * into one line per package (name, architecture, type), as the historical PkgDiff
+ * table shows them.
+ */
+export function packageDifferences(diff: PackagesDiff): PackageDifference[] {
+  const lines = new Map<string, PackageDifference>();
+  for (const row of diff.data) {
+    const key = `${row.pkg_name}\u0000${row.pkg_arch}\u0000${row.pkg_type}`;
+    const line = lines.get(key) ?? {
+      key,
+      name: row.pkg_name,
+      arch: row.pkg_arch,
+      type: row.pkg_type,
+      versions: {},
+    };
+    (line.versions[row.node_id] ??= []).push(row.pkg_version);
+    lines.set(key, line);
+  }
+  return [...lines.values()];
 }
