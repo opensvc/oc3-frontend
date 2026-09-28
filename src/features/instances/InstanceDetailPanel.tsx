@@ -10,7 +10,7 @@ import { useServiceTags } from "@/features/services/related/queries";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { problemText } from "@/lib/api/problem";
 import { formatDateTime } from "@/lib/format";
-import { fromInstanceId } from "./instance-id";
+import { fromInstanceId, instanceName, pickInstanceRow } from "./instance-id";
 
 type InstanceRow = components["schemas"]["InstanceRow"];
 
@@ -126,7 +126,8 @@ export function InstanceDetailPanel({
       });
       if (failure !== undefined) throw new Error(problemText(failure));
       const rows: InstanceRow[] = Array.isArray(data.data) ? data.data : [];
-      return rows[0] ?? null;
+      // An encapsulated service has one row per container: keep this one's.
+      return pickInstanceRow(rows, key?.vmname) ?? null;
     },
   });
 
@@ -141,7 +142,11 @@ export function InstanceDetailPanel({
       ? label === ""
         ? t("instances.detail.title")
         : label
-      : `${instance["services.svcname"] ?? ""} @ ${instance["nodes.nodename"] ?? ""}`;
+      : instanceName(
+          instance["services.svcname"] ?? "",
+          instance["nodes.nodename"] ?? "",
+          instance.mon_vmname,
+        );
 
   return (
     <DetailPanel

@@ -2,7 +2,7 @@ import { useQueries } from "@tanstack/react-query";
 import { api } from "@/lib/api/client";
 import { readProp } from "@/lib/row";
 import type { PeekStep } from "@/lib/peek-trail";
-import { fromInstanceId } from "@/features/instances/instance-id";
+import { fromInstanceId, instanceName, pickInstanceRow } from "@/features/instances/instance-id";
 
 /**
  * Name of an object, for the panel breadcrumb.
@@ -35,13 +35,14 @@ async function fetchLabel(step: PeekStep): Promise<string> {
       const { data } = await api.GET("/services/{svc_id}/instances/{node_id}", {
         params: {
           path: { svc_id: key.svcId, node_id: key.nodeId },
-          query: { props: "services.svcname,nodes.nodename" },
+          query: { props: "services.svcname,nodes.nodename,mon_vmname" },
         },
       });
       const rows = Array.isArray(data?.data) ? data.data : [];
-      const svc = text(readProp(rows[0] ?? {}, "services.svcname"));
-      const node = text(readProp(rows[0] ?? {}, "nodes.nodename"));
-      return svc === "" && node === "" ? step.id : `${svc} @ ${node}`;
+      const row = pickInstanceRow(rows, key.vmname) ?? {};
+      const svc = text(readProp(row, "services.svcname"));
+      const node = text(readProp(row, "nodes.nodename"));
+      return svc === "" && node === "" ? step.id : instanceName(svc, node, key.vmname);
     }
     case "group": {
       // A team is named by an integer id: its role is what a reader recognises.

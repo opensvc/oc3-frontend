@@ -27,7 +27,7 @@ import { InstanceDetailPanel } from "./InstanceDetailPanel";
 import { FrozenMark } from "@/components/opensvc/FrozenMark";
 import { frozenFilterOptions, STATUS_FILTER_OPTIONS } from "@/components/opensvc/filter-options";
 import { InstanceActionsMenu } from "./InstanceActionsMenu";
-import { toInstanceId } from "./instance-id";
+import { instanceName, toInstanceId } from "./instance-id";
 
 type InstanceRow = components["schemas"]["InstanceRow"];
 
@@ -68,10 +68,14 @@ const INSTANCE_PROPS = [
   "mon_changed",
 ] as const satisfies readonly (keyof InstanceRow)[];
 
-/** Default columns: which instance, in which state, seen when. */
+/**
+ * Default columns: which instance, in which state, seen when. The container name
+ * tells apart the rows of an encapsulated service, one per container on a node.
+ */
 const DEFAULT_COLS: string[] = [
   "services.svcname",
   "nodes.nodename",
+  "mon_vmname",
   "mon_availstatus",
   "mon_overallstatus",
   "mon_smon_status",
@@ -177,7 +181,10 @@ function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
   const extra: string[] = [];
   // `mon_frozen` always requested: freezing is marked even with the column hidden.
-  return [...new Set(["svc_id", "node_id", "mon_frozen", ...shown, ...extra])].join(",");
+  // mon_vmname completes the id of an encapsulated instance, one row per container.
+  return [...new Set(["svc_id", "node_id", "mon_vmname", "mon_frozen", ...shown, ...extra])].join(
+    ",",
+  );
 }
 
 function useInstances(search: ResolvedListSearch) {
@@ -226,12 +233,18 @@ export function InstancesPage() {
   /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/services_instances", {
-      params: { query: { props: "svc_id,node_id", limit: 0, filter: filterQuery(search.filters) } },
+      params: {
+        query: {
+          props: "svc_id,node_id,mon_vmname",
+          limit: 0,
+          filter: filterQuery(search.filters),
+        },
+      },
     });
     if (error !== undefined) throw new Error(problemText(error));
     const rows: InstanceRow[] = Array.isArray(data.data) ? data.data : [];
     return rows
-      .map((row) => toInstanceId(row.svc_id, row.node_id))
+      .map((row) => toInstanceId(row.svc_id, row.node_id, row.mon_vmname))
       .filter((id): id is string => id !== undefined);
   }
 
@@ -248,12 +261,18 @@ export function InstancesPage() {
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  const selected = data?.rows.find((row) => toInstanceId(row.svc_id, row.node_id) === search.sel);
+  const selected = data?.rows.find(
+    (row) => toInstanceId(row.svc_id, row.node_id, row.mon_vmname) === search.sel,
+  );
   // "service @ node" rather than the compound id, to name the refusals.
   const instanceNames = Object.fromEntries(
     (data?.rows ?? []).map((row) => [
-      toInstanceId(row.svc_id, row.node_id) ?? "",
-      `${row["services.svcname"] ?? row.svc_id ?? ""} @ ${row["nodes.nodename"] ?? row.node_id ?? ""}`,
+      toInstanceId(row.svc_id, row.node_id, row.mon_vmname) ?? "",
+      instanceName(
+        row["services.svcname"] ?? row.svc_id ?? "",
+        row["nodes.nodename"] ?? row.node_id ?? "",
+        row.mon_vmname,
+      ),
     ]),
   );
 
@@ -273,7 +292,7 @@ export function InstancesPage() {
         columns={COLUMNS}
         defaultCols={DEFAULT_COLS}
         rows={data?.rows ?? []}
-        rowId={(row) => toInstanceId(row.svc_id, row.node_id)}
+        rowId={(row) => toInstanceId(row.svc_id, row.node_id, row.mon_vmname)}
         search={search}
         onChange={update}
         // apicollector has no instances endpoint filtered by filterset.
@@ -294,7 +313,11 @@ export function InstancesPage() {
         label={
           selected === undefined
             ? ""
-            : `${selected["services.svcname"] ?? ""} @ ${selected["nodes.nodename"] ?? ""}`
+            : instanceName(
+                selected["services.svcname"] ?? "",
+                selected["nodes.nodename"] ?? "",
+                selected.mon_vmname,
+              )
         }
         onClose={() => {
           update({ sel: undefined });
