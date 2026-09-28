@@ -3,7 +3,14 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { RelatedTable, type RelatedColumn } from "@/components/opensvc/RelatedTable";
 import { StatusBadge, type ObjectState } from "@/components/opensvc/StatusBadge";
-import { CheckIcon, SearchIcon } from "@/components/ui/icons";
+import {
+  CheckIcon,
+  CubeIcon,
+  GearIcon,
+  SearchIcon,
+  ServerIcon,
+  TargetIcon,
+} from "@/components/ui/icons";
 import { NODE_PROPS } from "@/features/nodes/node-props";
 import {
   assetDifferences,
@@ -50,7 +57,20 @@ function Missing({ label }: { label: string }) {
 }
 
 type CategoryKey = "assets" | "packages" | "modules" | "modulesets" | "rulesets";
-type GroupKey = "inventory" | "compliance";
+
+/**
+ * The mark of each category, after the historical icons: the node for its asset
+ * properties, the package cube, and in the compliance tint the module status check
+ * (`compstatus`), the moduleset cogs (`modset16`) and, rulesets, the compliance
+ * bullseye (`comp16`) rather than their cube, which the packages already show.
+ */
+const CATEGORY_ICONS: Record<CategoryKey, ReactNode> = {
+  assets: <ServerIcon className="h-3.5 w-3.5 shrink-0 text-icon-node" />,
+  packages: <CubeIcon className="h-3.5 w-3.5 shrink-0 text-icon-package" />,
+  modules: <CheckIcon className="h-3.5 w-3.5 shrink-0 text-icon-form" />,
+  modulesets: <GearIcon className="h-3.5 w-3.5 shrink-0 text-icon-form" />,
+  rulesets: <TargetIcon className="h-3.5 w-3.5 shrink-0 text-icon-form" />,
+};
 
 /**
  * A category of differences, with what its chip says and what its table shows.
@@ -58,7 +78,6 @@ type GroupKey = "inventory" | "compliance";
  */
 interface Category {
   key: CategoryKey;
-  group: GroupKey;
   count: number | undefined;
   error: string | null;
   isPending: boolean;
@@ -102,7 +121,7 @@ function categoryTable<T>(
  * compliance (module statuses, attached modulesets and rulesets). Only what is not
  * the same on every node is listed.
  *
- * One category at a time: a strip of chips, grouped by family, says for each how
+ * One category at a time: a strip of chips, on one line, says for each how
  * many differences it holds, or that it is identical, and selects the one shown.
  * The strip and the search stay in view while the table scrolls; long tables show
  * their first rows, the rest on demand. The category chosen lives in the URL
@@ -244,7 +263,6 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
   const categories: Category[] = [
     {
       key: "assets",
-      group: "inventory",
       count: assets.isSuccess ? assetAll.length : undefined,
       error: assets.isError ? assets.error.message : null,
       isPending: assets.isPending,
@@ -261,7 +279,6 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
     },
     {
       key: "packages",
-      group: "inventory",
       count: packages.isSuccess ? packageAll.length : undefined,
       error: packages.isError ? packages.error.message : null,
       isPending: packages.isPending,
@@ -280,7 +297,6 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
     },
     {
       key: "modules",
-      group: "compliance",
       count: compliance.data === undefined ? undefined : moduleAll.length,
       error: complianceError,
       isPending: compliance.isPending,
@@ -297,7 +313,6 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
     },
     {
       key: "modulesets",
-      group: "compliance",
       count: compliance.data === undefined ? undefined : modsetAll.length,
       error: complianceError,
       isPending: compliance.isPending,
@@ -314,7 +329,6 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
     },
     {
       key: "rulesets",
-      group: "compliance",
       count: compliance.data === undefined ? undefined : rsetAll.length,
       error: complianceError,
       isPending: compliance.isPending,
@@ -368,7 +382,6 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
 
   const limit = expanded === `${active.key}\u0000${needle}` ? Infinity : ROW_LIMIT;
   const table = active.table(limit);
-  const groups: GroupKey[] = ["inventory", "compliance"];
 
   return (
     <div className="flex flex-col gap-2">
@@ -377,37 +390,23 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
         // Covers the panel padding, so that the rows scrolling under it stay hidden.
         className="sticky -top-3 z-10 -mx-3 -mt-3 flex flex-col gap-2 border-b border-line bg-surface-raised px-3 pt-3 pb-2"
       >
-        <p className="text-ink-muted">
-          {t("services.nodediff.compared", { nodes: nodes.map((n) => n.name).join(", ") })}
-        </p>
         <div
           role="tablist"
           aria-label={t("services.nodediff.categoriesLabel")}
           onKeyDown={onKeyDown}
-          className="grid grid-cols-[max-content_1fr] items-center gap-x-3 gap-y-1.5"
+          // One line: it scrolls sideways rather than wrap, should the chips outgrow it.
+          className="flex gap-1.5 overflow-x-auto"
         >
-          {groups.map((group) => (
-            <div key={group} className="contents">
-              {/* A visual grouping: each chip names its category in full. */}
-              <span aria-hidden="true" className="text-data font-semibold text-ink-muted uppercase">
-                {t(`services.nodediff.groups.${group}`)}
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {categories
-                  .filter((c) => c.group === group)
-                  .map((c) => (
-                    <CategoryChip
-                      key={c.key}
-                      category={c}
-                      label={title(c.key)}
-                      selected={c.key === active.key}
-                      onSelect={() => {
-                        select(c.key);
-                      }}
-                    />
-                  ))}
-              </div>
-            </div>
+          {categories.map((c) => (
+            <CategoryChip
+              key={c.key}
+              category={c}
+              label={title(c.key)}
+              selected={c.key === active.key}
+              onSelect={() => {
+                select(c.key);
+              }}
+            />
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -425,13 +424,16 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
               className="w-full bg-transparent text-ink outline-none placeholder:text-ink-muted"
             />
           </div>
-          {active.count !== undefined && active.notice === undefined && (
-            <p role="status" className="text-ink-muted tabular-nums">
-              {needle === ""
-                ? t("services.nodediff.count", { count: active.count })
-                : t("services.nodediff.matching", { count: table.total, total: active.count })}
-            </p>
-          )}
+          {/* No counter for an identical category: the table says there is no difference. */}
+          {active.count !== undefined &&
+            active.notice === undefined &&
+            (active.count > 0 || needle !== "") && (
+              <p role="status" className="text-ink-muted tabular-nums">
+                {needle === ""
+                  ? t("services.nodediff.count", { count: active.count })
+                  : t("services.nodediff.matching", { count: table.total, total: active.count })}
+              </p>
+            )}
         </div>
       </div>
 
@@ -469,9 +471,9 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
 }
 
 /**
- * A category chip: its name and its count when it holds differences (≠), a check
- * when identical (✓), an ellipsis while it loads, a square on error. The mark and
- * the words, not the tint alone, tell the states apart.
+ * A category chip: its icon and name, then its count when it holds differences, a
+ * check when identical (✓), an ellipsis while it loads, a square on error. The mark
+ * and the words, not the tint alone, tell the states apart.
  */
 function CategoryChip({
   category,
@@ -528,24 +530,18 @@ function CategoryChip({
           : `bg-surface ${tone} hover:bg-surface-sunken`
       }`}
     >
-      <span aria-hidden="true" className={state === "identical" ? "text-state-up" : undefined}>
-        {state === "differs"
-          ? "≠"
-          : state === "identical"
-            ? "✓"
-            : state === "error"
-              ? "■"
-              : state === "pending"
-                ? "…"
-                : "–"}
-      </span>
+      {CATEGORY_ICONS[category.key]}
       {label}
-      {state === "differs" && (
+      {state === "differs" ? (
         <span
           aria-hidden="true"
           className="rounded-full bg-surface-sunken px-1.5 text-data font-medium tabular-nums"
         >
           {count}
+        </span>
+      ) : (
+        <span aria-hidden="true" className={state === "identical" ? "text-state-up" : undefined}>
+          {state === "identical" ? "✓" : state === "error" ? "■" : state === "pending" ? "…" : "–"}
         </span>
       )}
     </button>

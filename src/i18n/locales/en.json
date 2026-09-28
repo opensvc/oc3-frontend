@@ -383,7 +383,6 @@
       "singleNode": "The service runs on fewer than two nodes: nothing to compare."
     },
     "nodediff": {
-      "compared": "Compared nodes: {{nodes}}",
       "property": "Property",
       "module": "Module",
       "moduleset": "Moduleset",
@@ -405,10 +404,6 @@
         "modules": "Module status",
         "modulesets": "Modulesets",
         "rulesets": "Rulesets"
-      },
-      "groups": {
-        "inventory": "Inventory",
-        "compliance": "Compliance"
       },
       "categoriesLabel": "Difference categories",
       "search": {
