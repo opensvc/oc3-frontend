@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tansta
 import { api } from "./api/client";
 import { problemText } from "./api/problem";
 import { FILTER_KEY_PREFIX, filterKey, type ColumnFilters } from "./column-filters";
-import type { ListSearch } from "./list-search";
+import { DEFAULT_LIMIT, PAGE_SIZES, type ListSearch, type ResolvedListSearch } from "./list-search";
 import {
   applyPalette,
   applyTheme,
@@ -25,7 +25,9 @@ import {
  * `tables.<view>.sort`: the old interface did not keep it, so that key is unknown to
  * it and without effect there. Column filters follow under
  * `tables.<view>.column_filters`, in the apicollector syntax: the old interface keeps
- * its own, in another syntax, under `filters`, and each ignores the other's.
+ * its own, in another syntax, under `filters`, and each ignores the other's. The
+ * number of rows per page is kept under `tables.<view>.perpage`, the key of the old
+ * interface, which both therefore share.
  *
  * The rest of the object — the old column filters, live mode, hidden menu entries —
  * belongs to the old interface: it is read back and stored again untouched.
@@ -37,6 +39,17 @@ export interface ViewPrefs {
   sort?: string[];
   /** Column filters, prop → apicollector expression, as in the URL. */
   column_filters?: ColumnFilters;
+  /**
+   * Rows per page. The old interface may have written it as a string, or a size
+   * this one does not offer: such a value is ignored.
+   */
+  perpage?: number | string;
+}
+
+/** A saved page size, when it is one the lists offer. */
+function savedLimit(value: unknown): number | undefined {
+  const n = typeof value === "string" ? Number.parseInt(value, 10) : value;
+  return PAGE_SIZES.find((size) => size === n);
 }
 
 export interface UserPrefs {
@@ -71,7 +84,8 @@ export function useUserPrefs() {
 }
 
 /**
- * Columns, sort and filters saved for a view, and what it takes to update them.
+ * Columns, sort, filters and page size saved for a view, and what it takes to update
+ * them.
  *
  * The URL keeps priority: a shared link shows its columns, its sort and its filters,
  * not those of whoever opens it. Preferences therefore only serve when the URL carries
@@ -84,7 +98,8 @@ export function useViewPrefs(view: string) {
   function save<K extends keyof ViewPrefs>(key: K, value: ViewPrefs[K]) {
     const empty =
       value === undefined ||
-      (Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0);
+      (typeof value === "object" &&
+        (Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0));
     schedule(queryClient, `${view}:${key}`, (current) => {
       const tables = { ...current.tables };
       const entry: ViewPrefs = { ...tables[view] };
@@ -103,18 +118,37 @@ export function useViewPrefs(view: string) {
   }
 
   const entry = prefs.data?.tables?.[view];
+  const saveCols = (cols: string[] | undefined) => {
+    save("visible_columns", cols);
+  };
+  const saveSort = (sort: string[] | undefined) => {
+    save("sort", sort);
+  };
+  const saveFilters = (filters: ColumnFilters | undefined) => {
+    save("column_filters", filters);
+  };
+  /** The default page size is not saved: it clears the entry. */
+  const saveLimit = (limit: number | undefined) => {
+    save("perpage", limit === DEFAULT_LIMIT ? undefined : limit);
+  };
   return {
     cols: entry?.visible_columns,
     sort: entry?.sort,
     filters: entry?.column_filters,
-    saveCols: (cols: string[] | undefined) => {
-      save("visible_columns", cols);
-    },
-    saveSort: (sort: string[] | undefined) => {
-      save("sort", sort);
-    },
-    saveFilters: (filters: ColumnFilters | undefined) => {
-      save("column_filters", filters);
+    limit: savedLimit(entry?.perpage),
+    saveCols,
+    saveSort,
+    saveFilters,
+    saveLimit,
+    /**
+     * Saves what follows the account in a list update — columns, sort, filters and
+     * page size — the other states staying in the URL only.
+     */
+    saveSearch: (next: Partial<ResolvedListSearch>) => {
+      if ("cols" in next) saveCols(next.cols);
+      if ("sort" in next) saveSort(next.sort);
+      if ("filters" in next) saveFilters(next.filters);
+      if ("limit" in next) saveLimit(next.limit);
     },
   };
 }
@@ -181,7 +215,7 @@ export async function savePrefs(
  */
 export function withSavedSearch(
   search: ListSearch,
-  saved: { cols?: string[]; sort?: string[]; filters?: ColumnFilters },
+  saved: { cols?: string[]; sort?: string[]; filters?: ColumnFilters; limit?: number },
 ): ListSearch {
   // Filters go as a whole: a link filtering on one column does not inherit the
   // saved filters of the others.
@@ -196,6 +230,7 @@ export function withSavedSearch(
     ...search,
     cols: search.cols ?? saved.cols?.join(","),
     sort: search.sort ?? saved.sort?.join(","),
+    limit: search.limit ?? saved.limit,
   };
 }
 
@@ -285,11 +320,13 @@ export function usePalettePref() {
 }
 
 /**
- * Forgets the columns, the sort and the column filters saved for every view.
+ * Forgets the columns, the sort, the column filters and the page size saved for
+ * every view.
  *
- * Only those keys are removed: the old interface keeps the page size, its column
- * filters and the folded state of its sections in the same object, and those are not
- * ours to clear. A view left with nothing disappears from `tables`.
+ * Only those keys are removed: the old interface keeps its column filters and the
+ * folded state of its sections in the same object, and those are not ours to clear.
+ * The page size (`perpage`) is shared with it: forgetting it brings both interfaces
+ * back to their default. A view left with nothing disappears from `tables`.
  */
 export function useResetViewPrefs() {
   const queryClient = useQueryClient();
@@ -302,6 +339,7 @@ export function useResetViewPrefs() {
           delete rest.visible_columns;
           delete rest.sort;
           delete rest.column_filters;
+          delete rest.perpage;
           if (Object.keys(rest).length > 0) tables[view] = rest;
         }
         return { ...current, tables };
@@ -317,12 +355,13 @@ export function useResetViewPrefs() {
   };
 }
 
-/** True when at least one view has saved columns, sort or filters. */
+/** True when at least one view has saved columns, sort, filters or page size. */
 export function hasSavedViewPrefs(prefs: UserPrefs | undefined): boolean {
   return Object.values(prefs?.tables ?? {}).some(
     (entry) =>
       entry?.visible_columns !== undefined ||
       entry?.sort !== undefined ||
-      entry?.column_filters !== undefined,
+      entry?.column_filters !== undefined ||
+      entry?.perpage !== undefined,
   );
 }

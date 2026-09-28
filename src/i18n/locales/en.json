@@ -720,13 +720,13 @@
     },
     "viewPrefs": {
       "title": "Saved view settings",
-      "hint": "The columns, sort order and filters you chose in each list follow your account.",
-      "reset": "Forget saved columns, sorting and filters",
-      "question": "Forget the columns, sort order and filters saved for every view?",
+      "hint": "The columns, sort order, filters and page size you chose in each list follow your account.",
+      "reset": "Forget saved columns, sorting, filters and page sizes",
+      "question": "Forget the columns, sort order, filters and page size saved for every view?",
       "confirm": "Forget",
       "pending": "Forgetting…",
-      "done": "Saved columns, sorting and filters forgotten. Every list is back to its defaults.",
-      "none": "No view has saved columns, sort order or filters."
+      "done": "Saved columns, sorting, filters and page sizes forgotten. Every list is back to its defaults.",
+      "none": "No view has saved columns, sort order, filters or page size."
     }
   },
   "instances": {

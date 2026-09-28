@@ -76,7 +76,7 @@ export interface ResolvedListSearch {
 
 export const PAGE_SIZES = [25, 50, 100] as const;
 
-const DEFAULT_LIMIT = 50;
+export const DEFAULT_LIMIT = 50;
 
 function toPositiveInt(value: unknown): number | undefined {
   const parsed = typeof value === "number" ? value : Number(value);

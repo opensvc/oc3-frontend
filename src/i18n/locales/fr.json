@@ -720,13 +720,13 @@
     },
     "viewPrefs": {
       "title": "Réglages de vue enregistrés",
-      "hint": "Les colonnes, le tri et les filtres choisis dans chaque liste suivent votre compte.",
-      "reset": "Oublier les colonnes, le tri et les filtres",
-      "question": "Oublier les colonnes, le tri et les filtres enregistrés pour toutes les vues ?",
+      "hint": "Les colonnes, le tri, les filtres et le nombre de lignes par page choisis dans chaque liste suivent votre compte.",
+      "reset": "Oublier les colonnes, le tri, les filtres et les tailles de page",
+      "question": "Oublier les colonnes, le tri, les filtres et la taille de page enregistrés pour toutes les vues ?",
       "confirm": "Oublier",
       "pending": "Effacement…",
-      "done": "Colonnes, tri et filtres oubliés. Chaque liste retrouve ses réglages par défaut.",
-      "none": "Aucune vue n'a de colonnes, de tri ou de filtres enregistrés."
+      "done": "Colonnes, tri, filtres et tailles de page oubliés. Chaque liste retrouve ses réglages par défaut.",
+      "none": "Aucune vue n'a de colonnes, de tri, de filtres ou de taille de page enregistrés."
     }
   },
   "instances": {

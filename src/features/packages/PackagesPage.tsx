@@ -155,10 +155,9 @@ export function PackagesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
-    // Columns, sort and filters follow the account, the other states stay in the URL.
-    if ("cols" in next) prefs.saveCols(next.cols);
-    if ("sort" in next) prefs.saveSort(next.sort);
-    if ("filters" in next) prefs.saveFilters(next.filters);
+    // Columns, sort, filters and page size follow the account, the other states
+    // stay in the URL.
+    prefs.saveSearch(next);
     void navigate({
       search: (previous) => mergeSearch(previous, next),
       resetScroll: resetsScroll(next),

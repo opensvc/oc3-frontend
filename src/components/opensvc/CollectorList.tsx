@@ -218,7 +218,13 @@ export function CollectorList<T>({
 
   const onPaginationChange: OnChangeFn<PaginationState> = (updater) => {
     const next = resolveUpdater(updater, pagination);
-    onChange({ offset: next.pageIndex * next.pageSize, limit: next.pageSize });
+    // The page size only when it changes: the view saves it to the account, which
+    // turning a page must not do.
+    onChange(
+      next.pageSize === pagination.pageSize
+        ? { offset: next.pageIndex * next.pageSize }
+        : { offset: next.pageIndex * next.pageSize, limit: next.pageSize },
+    );
   };
 
   const onRowSelectionChange: OnChangeFn<RowSelectionState> = (updater) => {
