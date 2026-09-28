@@ -10,6 +10,7 @@ import {
   DatabaseIcon,
   EnvIcon,
   FirewallIcon,
+  GearIcon,
   LocationIcon,
   MemoryIcon,
   NetworkIcon,
@@ -48,7 +49,8 @@ export type ColumnFamily =
   | "alert"
   | "state"
   | "drp"
-  | "package";
+  | "package"
+  | "moduleset";
 
 /**
  * The collector colours by domain rather than by family: everything about the node is
@@ -79,6 +81,9 @@ const FAMILIES: Record<ColumnFamily, { Icon: typeof ServerIcon; className: strin
   drp: { Icon: DrpIcon, className: "text-ink-muted" },
   // The historical packages table marks its columns with `pkg16`, the tan cube.
   package: { Icon: CubeIcon, className: "text-icon-package" },
+  // The historical moduleset columns carry a cog (`action16`): the cogs of the
+  // Modulesets menu entry, in the compliance tint.
+  moduleset: { Icon: GearIcon, className: "text-icon-compliance" },
 };
 
 export function ColumnFamilyIcon({ family }: { family: ColumnFamily }) {

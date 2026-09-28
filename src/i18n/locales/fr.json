@@ -10,6 +10,7 @@
       "infrastructure": "Infrastructure",
       "dataManagement": "Gestion des données",
       "requests": "Demandes",
+      "compliance": "Conformité",
       "administration": "Administration"
     },
     "apps": "Codes application",
@@ -29,7 +30,8 @@
     "hardware": "Matériel des nodes",
     "allRequests": "Toutes les demandes",
     "teamRequests": "Assignées à mon équipe",
-    "tiersRequests": "En attente d'action de tiers"
+    "tiersRequests": "En attente d'action de tiers",
+    "modulesets": "Modulesets"
   },
   "header": {
     "search": "Rechercher dans le collector",
@@ -1224,5 +1226,21 @@
   "tiersRequests": {
     "title": "En attente d'action de tiers",
     "intro": "Les demandes déclenchées par mon équipe et en attente d'action d'un tiers : créées par moi ou l'un de mes groupes, et assignées à quelqu'un d'autre."
+  },
+  "modulesets": {
+    "title": "Modulesets",
+    "fields": {
+      "id": "Id du module",
+      "modset_id": "Id du moduleset",
+      "modset_name": "Moduleset",
+      "modset_author": "Auteur du moduleset",
+      "modset_updated": "Moduleset mis à jour",
+      "modset_mod_name": "Module",
+      "autofix": "Correction auto",
+      "modset_mod_author": "Auteur",
+      "modset_mod_updated": "Mis à jour",
+      "teams_responsible": "Équipes responsables",
+      "teams_publication": "Équipes de publication"
+    }
   }
 }

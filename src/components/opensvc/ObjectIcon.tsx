@@ -5,6 +5,7 @@ import {
   CubeIcon,
   DatabaseIcon,
   FilterIcon,
+  GearIcon,
   HistoryIcon,
   InstanceIcon,
   LifeRingIcon,
@@ -34,7 +35,8 @@ export type ObjectKind =
   | "filterset"
   | "form"
   | "package"
-  | "hardware";
+  | "hardware"
+  | "moduleset";
 
 /**
  * Pictogram and tint of an object kind. The same vocabulary in the menu, in panel
@@ -70,6 +72,8 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   package: { Icon: CubeIcon, className: "text-icon-package" },
   // Cornflower blue in the historical collector (`hw16`): the tint of nodes.
   hardware: { Icon: CpuIcon, className: "text-icon-node" },
+  // The cogs of the historical collector (`modset16`), in its compliance crimson.
+  moduleset: { Icon: GearIcon, className: "text-icon-compliance" },
 };
 
 export function ObjectIcon({ kind, className }: { kind: ObjectKind; className?: string }) {

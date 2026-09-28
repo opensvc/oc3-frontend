@@ -10,6 +10,7 @@
       "infrastructure": "Infrastructure",
       "dataManagement": "Data Management",
       "requests": "Requests",
+      "compliance": "Compliance",
       "administration": "Administration"
     },
     "apps": "Apps",
@@ -29,7 +30,8 @@
     "hardware": "Nodes Hardware",
     "allRequests": "All requests",
     "teamRequests": "Assigned to my team",
-    "tiersRequests": "Pending tiers action"
+    "tiersRequests": "Pending tiers action",
+    "modulesets": "Modulesets"
   },
   "header": {
     "search": "Search the collector",
@@ -1224,5 +1226,21 @@
   "tiersRequests": {
     "title": "Pending tiers action",
     "intro": "The pending requests started by my team and waiting for action from a tier: created by me or one of my groups, and assigned to someone else."
+  },
+  "modulesets": {
+    "title": "Modulesets",
+    "fields": {
+      "id": "Module id",
+      "modset_id": "Moduleset id",
+      "modset_name": "Moduleset",
+      "modset_author": "Moduleset author",
+      "modset_updated": "Moduleset updated",
+      "modset_mod_name": "Module",
+      "autofix": "Autofix",
+      "modset_mod_author": "Author",
+      "modset_mod_updated": "Updated",
+      "teams_responsible": "Teams responsible",
+      "teams_publication": "Teams publication"
+    }
   }
 }

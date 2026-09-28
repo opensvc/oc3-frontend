@@ -31,7 +31,8 @@ export interface NavEntry {
     | "/requests"
     | "/requests/all"
     | "/requests/team"
-    | "/requests/tiers";
+    | "/requests/tiers"
+    | "/compliance/modulesets";
   labelKey: string;
   icon: ObjectKind;
   /** True for the root: without it, prefix matching would activate it everywhere. */
@@ -91,6 +92,16 @@ export const NAV_CATEGORIES: NavCategory[] = [
       { to: "/requests/tiers", labelKey: "nav.tiersRequests", icon: "form" },
       // `req-all` of the historical Requests menu: every request submitted.
       { to: "/requests/all", labelKey: "nav.allRequests", icon: "form" },
+    ],
+  },
+  {
+    // The Compliance section of the historical menu, placed between Requests and
+    // Administration.
+    key: "compliance",
+    labelKey: "nav.categories.compliance",
+    entries: [
+      // `comp-modsets` of the historical menu.
+      { to: "/compliance/modulesets", labelKey: "nav.modulesets", icon: "moduleset" },
     ],
   },
   {

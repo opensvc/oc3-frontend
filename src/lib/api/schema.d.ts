@@ -404,6 +404,1172 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/compliance/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Import the filters, filtersets, rulesets and modulesets of an export. An object
+         *     existing by name is reused, and the relations missing are added; the new objects
+         *     are given the user's default group as publication and responsible group, the
+         *     groups of the export are not imported. Requires the CompManager privilege, and
+         *     the responsibility of any existing ruleset or moduleset the import adds to. A
+         *     relation closing a loop is refused. The import applies all or nothing; the info
+         *     list tells what was added and what already existed.
+         */
+        post: operations["PostComplianceImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the compliance modules' check, fixable and fix runs of the nodes the
+         *     user can see: those whose app is published to one of the user's groups, every
+         *     node for a manager. The most recent first by default.
+         */
+        get: operations["GetComplianceLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/logs/{log_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display the properties of a module run. */
+        get: operations["GetComplianceLog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the modulesets published to one of the user's groups, every moduleset for
+         *     a manager.
+         */
+        get: operations["GetComplianceModulesets"];
+        put?: never;
+        /**
+         * @description Create a moduleset named modset_name, authored by the user, published to and
+         *     under the responsibility of the user's default group (the Manager group without
+         *     one). A taken name is a 409. Requires the CompManager privilege. The creation is
+         *     logged.
+         */
+        post: operations["PostComplianceModulesets"];
+        /**
+         * @description Delete the moduleset named by the id key of the body, as
+         *     DELETE /compliance/modulesets/{modset_id}.
+         */
+        delete: operations["DeleteComplianceModulesets"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Export the modulesets published to the user, with their descendants and the
+         *     rulesets and filtersets they use.
+         */
+        get: operations["GetComplianceModulesetsExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display a moduleset published to one of the user's groups. */
+        get: operations["GetComplianceModuleset"];
+        /**
+         * @description Special actions on a moduleset. `clone` copies it as "<name>_clone", authored by
+         *     the user, with its modules, rulesets and children, published to and under the
+         *     responsibility of the user's default group. Requires the CompManager privilege.
+         */
+        put: operations["PutComplianceModuleset"];
+        /**
+         * @description Rename a moduleset, recording its update date. Requires the CompManager
+         *     privilege and the responsibility of the moduleset. The change is logged.
+         */
+        post: operations["PostComplianceModuleset"];
+        /**
+         * @description Delete a moduleset, with its parent and child relations, node and service
+         *     attachments, publication and responsible groups, modules and ruleset links.
+         *     Requires the CompManager privilege and the responsibility of the moduleset. The
+         *     deletion is logged.
+         */
+        delete: operations["DeleteComplianceModuleset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/am_i_responsible": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Tell whether one of the user's groups is responsible for the moduleset. */
+        get: operations["GetComplianceModulesetAmIResponsible"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/candidate_nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the nodes a moduleset published to the user may be attached to: the nodes
+         *     the user can see whose responsible team is one of the moduleset's publication
+         *     groups, not attached yet.
+         */
+        get: operations["GetComplianceModulesetCandidateNodes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/candidate_services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the services a moduleset published to the user may be attached to, as the
+         *     service or with slave as its encapsulated service: the services the user can see
+         *     whose app has one of the moduleset's publication groups among its responsibles,
+         *     not attached yet.
+         */
+        get: operations["GetComplianceModulesetCandidateServices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Export a moduleset published to the user, with its descendants and the rulesets
+         *     and filtersets they use.
+         */
+        get: operations["GetComplianceModulesetExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the modules of a moduleset published to the user (to one of the user's
+         *     groups, or to Everybody).
+         */
+        get: operations["GetComplianceModulesetModules"];
+        put?: never;
+        /**
+         * @description Create a module named modset_mod_name in the moduleset; a taken name is a 409.
+         *     Requires the CompManager privilege and the responsibility of the moduleset. The
+         *     creation is logged.
+         */
+        post: operations["PostComplianceModulesetModules"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/modules/{mod_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display a module of a moduleset published to the user. */
+        get: operations["GetComplianceModulesetModule"];
+        put?: never;
+        /**
+         * @description Update the name or the autofix flag of a module. Requires the CompManager
+         *     privilege and the responsibility of the moduleset. The change is logged.
+         */
+        post: operations["PostComplianceModulesetModule"];
+        /**
+         * @description Delete a module. Requires the CompManager privilege and the responsibility of
+         *     the moduleset. The deletion is logged.
+         */
+        delete: operations["DeleteComplianceModulesetModule"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/modulesets/{child_modset_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Attach a moduleset published to the user to a moduleset, as a child. Requires
+         *     the CompManager privilege and the responsibility of the parent. An attachment
+         *     closing a loop is a 409; an existing one answers an info message. The change is
+         *     logged.
+         */
+        post: operations["PostComplianceModulesetModuleset"];
+        /**
+         * @description Detach a child moduleset from a moduleset. Requires the CompManager privilege
+         *     and the responsibility of the parent. The change is logged.
+         */
+        delete: operations["DeleteComplianceModulesetModuleset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the nodes a moduleset published to the user is attached to, among the nodes
+         *     the user can see.
+         */
+        get: operations["GetComplianceModulesetNodes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/publications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the publication groups of a moduleset; a non-manager sees only the ones they are
+         *     a member of.
+         */
+        get: operations["GetComplianceModulesetPublications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/publications/{group_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Make a group a publication group of the moduleset. Requires the CompManager privilege
+         *     and the responsibility of the moduleset; a non-manager may attach only one of their
+         *     groups. Everybody may not be made responsible. The change is logged.
+         */
+        post: operations["PostComplianceModulesetPublication"];
+        /**
+         * @description Remove a publication group from the moduleset. Requires the CompManager privilege and
+         *     the responsibility of the moduleset. The change is logged.
+         */
+        delete: operations["DeleteComplianceModulesetPublication"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/responsibles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the responsible groups of a moduleset; a non-manager sees only the ones they are
+         *     a member of.
+         */
+        get: operations["GetComplianceModulesetResponsibles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/responsibles/{group_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Make a group a responsible group of the moduleset. Requires the CompManager privilege
+         *     and the responsibility of the moduleset; a non-manager may attach only one of their
+         *     groups. Everybody may not be made responsible. The change is logged.
+         */
+        post: operations["PostComplianceModulesetResponsible"];
+        /**
+         * @description Remove a responsible group from the moduleset. Requires the CompManager privilege and
+         *     the responsibility of the moduleset. The change is logged.
+         */
+        delete: operations["DeleteComplianceModulesetResponsible"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/rulesets/{rset_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Attach a ruleset published to the user to a moduleset: its variables join the
+         *     execution environment of the moduleset's modules. Requires the CompManager
+         *     privilege and the responsibility of the moduleset. An existing attachment
+         *     answers an info message. The change is logged.
+         */
+        post: operations["PostComplianceModulesetRuleset"];
+        /**
+         * @description Detach a ruleset published to the user from a moduleset. Requires the
+         *     CompManager privilege and the responsibility of the moduleset. The change is
+         *     logged.
+         */
+        delete: operations["DeleteComplianceModulesetRuleset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the services a moduleset published to the user is attached to, as the
+         *     service itself or, with slave, as its encapsulated service, among the services
+         *     the user can see.
+         */
+        get: operations["GetComplianceModulesetServices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets/{modset_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Display what uses a moduleset published to the user: the modulesets holding it
+         *     as a child.
+         */
+        get: operations["GetComplianceModulesetUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets_modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the modules of the modulesets published to one of the user's groups, every
+         *     moduleset for a manager, as the historical v_comp_modulesets view: one row per
+         *     module, with its moduleset and the moduleset's responsible and publication
+         *     teams. A moduleset without module is listed on a row with a zero id and empty
+         *     module props.
+         */
+        get: operations["GetComplianceModulesetsModules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets_nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Attach a moduleset to a node, as POST /nodes/{node_id}/compliance/modulesets/{mset_id}. */
+        post: operations["PostComplianceModulesetsNodes"];
+        /** @description Detach a moduleset from a node, as DELETE /nodes/{node_id}/compliance/modulesets/{mset_id}. */
+        delete: operations["DeleteComplianceModulesetsNodes"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets_publications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Attach a publication group to a moduleset, as
+         *     POST /compliance/modulesets/{modset_id}/publications/{group_id}, both named in the body.
+         */
+        post: operations["PostComplianceModulesetsPublications"];
+        /**
+         * @description Detach a publication group from a moduleset, as
+         *     DELETE /compliance/modulesets/{modset_id}/publications/{group_id}, both named in the body.
+         */
+        delete: operations["DeleteComplianceModulesetsPublications"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets_responsibles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Attach a responsible group to a moduleset, as
+         *     POST /compliance/modulesets/{modset_id}/responsibles/{group_id}, both named in the body.
+         */
+        post: operations["PostComplianceModulesetsResponsibles"];
+        /**
+         * @description Detach a responsible group from a moduleset, as
+         *     DELETE /compliance/modulesets/{modset_id}/responsibles/{group_id}, both named in the body.
+         */
+        delete: operations["DeleteComplianceModulesetsResponsibles"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/modulesets_services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Attach a moduleset to a service, as POST /services/{svc_id}/compliance/modulesets/{mset_id}. */
+        post: operations["PostComplianceModulesetsServices"];
+        /** @description Detach a moduleset from a service, as DELETE /services/{svc_id}/compliance/modulesets/{mset_id}. */
+        delete: operations["DeleteComplianceModulesetsServices"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the rulesets published to one of the user's groups, every ruleset for a
+         *     manager.
+         */
+        get: operations["GetComplianceRulesets"];
+        put?: never;
+        /**
+         * @description Create a ruleset named ruleset_name, of type explicit and public unless given,
+         *     published to and under the responsibility of the user's default group (the
+         *     Manager group without one). When a ruleset of that name exists, its other given
+         *     properties are updated instead, as POST /compliance/rulesets/{rset_id}.
+         *     Requires the CompManager privilege. The change is logged and the ruleset chains
+         *     are rebuilt.
+         */
+        post: operations["PostComplianceRulesets"];
+        /**
+         * @description Delete the ruleset named by the id key of the body, as
+         *     DELETE /compliance/rulesets/{rset_id}.
+         */
+        delete: operations["DeleteComplianceRulesets"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Export the rulesets published to the user, with their descendants and the
+         *     filtersets they use.
+         */
+        get: operations["GetComplianceRulesetsExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display a ruleset published to one of the user's groups. */
+        get: operations["GetComplianceRuleset"];
+        /**
+         * @description Special actions on a ruleset. `clone` copies it as "<name>_clone", with its type,
+         *     publicity, variables, children and, for a contextual ruleset, its filterset,
+         *     published to and under the responsibility of the user's default group. Requires
+         *     the CompManager privilege.
+         */
+        put: operations["PutComplianceRuleset"];
+        /**
+         * @description Update the given properties of a ruleset. Requires the CompManager privilege and
+         *     the responsibility of the ruleset. The change is logged.
+         */
+        post: operations["PostComplianceRuleset"];
+        /**
+         * @description Delete a ruleset, with its parent and child relations, node and service
+         *     attachments, publication and responsible groups, variables, filtersets and
+         *     moduleset links. Requires the CompManager privilege and the responsibility of
+         *     the ruleset. The deletion is logged.
+         */
+        delete: operations["DeleteComplianceRuleset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/am_i_responsible": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Tell whether one of the user's groups is responsible for the ruleset. */
+        get: operations["GetComplianceRulesetAmIResponsible"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/candidate_nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the nodes a ruleset published to the user may be attached to: the nodes
+         *     the user can see whose responsible team is one of the ruleset's publication
+         *     groups, not attached yet.
+         */
+        get: operations["GetComplianceRulesetCandidateNodes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/candidate_services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the services a ruleset published to the user may be attached to, as the
+         *     service or with slave as its encapsulated service: the services the user can see
+         *     whose app has one of the ruleset's publication groups among its responsibles,
+         *     not attached yet.
+         */
+        get: operations["GetComplianceRulesetCandidateServices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Export a ruleset published to the user, with its descendants and its
+         *     filterset.
+         */
+        get: operations["GetComplianceRulesetExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/filtersets/{fset_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Give a contextual ruleset the filterset selecting the nodes and services it
+         *     applies to, replacing its previous one. Requires the CompManager privilege and
+         *     the responsibility of the ruleset. The change is logged.
+         */
+        post: operations["PostComplianceRulesetFilterset"];
+        /**
+         * @description Remove the filterset of a ruleset, whichever it is, as the historical handler.
+         *     Requires the CompManager privilege and the responsibility of the ruleset. The
+         *     change is logged.
+         */
+        delete: operations["DeleteComplianceRulesetFilterset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the nodes a ruleset published to the user is attached to, among the nodes
+         *     the user can see.
+         */
+        get: operations["GetComplianceRulesetNodes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/publications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the publication groups of a ruleset; a non-manager sees only the ones they are
+         *     a member of.
+         */
+        get: operations["GetComplianceRulesetPublications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/publications/{group_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Make a group a publication group of the ruleset. Requires the CompManager privilege
+         *     and the responsibility of the ruleset; a non-manager may attach only one of their
+         *     groups. Everybody may not be made responsible, nor be given the publication of a
+         *     contextual ruleset. The change is logged.
+         */
+        post: operations["PostComplianceRulesetPublication"];
+        /**
+         * @description Remove a publication group from the ruleset. Requires the CompManager privilege and
+         *     the responsibility of the ruleset. The change is logged.
+         */
+        delete: operations["DeleteComplianceRulesetPublication"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/responsibles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the responsible groups of a ruleset; a non-manager sees only the ones they are
+         *     a member of.
+         */
+        get: operations["GetComplianceRulesetResponsibles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/responsibles/{group_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Make a group a responsible group of the ruleset. Requires the CompManager privilege
+         *     and the responsibility of the ruleset; a non-manager may attach only one of their
+         *     groups. Everybody may not be made responsible, nor be given the publication of a
+         *     contextual ruleset. The change is logged.
+         */
+        post: operations["PostComplianceRulesetResponsible"];
+        /**
+         * @description Remove a responsible group from the ruleset. Requires the CompManager privilege and
+         *     the responsibility of the ruleset. The change is logged.
+         */
+        delete: operations["DeleteComplianceRulesetResponsible"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/rulesets/{child_rset_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Make a ruleset a child of another. Requires the CompManager privilege and the
+         *     responsibility of the parent. Attaching a ruleset to itself, twice, or under
+         *     one of its own descendants is refused. The change is logged and the ruleset
+         *     chains are rebuilt.
+         */
+        post: operations["PostComplianceRulesetRuleset"];
+        /**
+         * @description Remove a ruleset from the children of another. Requires the CompManager
+         *     privilege, the responsibility of the parent and the publication of the child.
+         *     The change is logged and the ruleset chains are rebuilt.
+         */
+        delete: operations["DeleteComplianceRulesetRuleset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the services a ruleset published to the user is attached to, as the
+         *     service itself or, with slave, as its encapsulated service, among the services
+         *     the user can see.
+         */
+        get: operations["GetComplianceRulesetServices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Display what uses a ruleset published to one of the user's groups: the
+         *     modulesets and parent rulesets holding it, the nodes and services it is attached
+         *     to.
+         */
+        get: operations["GetComplianceRulesetUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/variables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the variables of a ruleset published to the user (to one of the user's
+         *     groups, or to Everybody).
+         */
+        get: operations["GetComplianceRulesetVariables"];
+        put?: never;
+        /**
+         * @description Create a variable named var_name in the ruleset; when the ruleset has one of
+         *     that name, its other given properties are updated instead. Requires the
+         *     CompManager privilege and the responsibility of the ruleset. The change is
+         *     logged.
+         */
+        post: operations["PostComplianceRulesetVariables"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets/{rset_id}/variables/{var_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display a variable of a ruleset published to the user. */
+        get: operations["GetComplianceRulesetVariable"];
+        /**
+         * @description Special actions on a variable: copy or move it to dst_ruleset (id or name).
+         *     Requires the CompManager privilege, the publication of the source ruleset for a
+         *     copy or its responsibility for a move, and the responsibility of the destination,
+         *     which must not have a variable of the same name.
+         */
+        put: operations["PutComplianceRulesetVariable"];
+        /**
+         * @description Update the given properties of a variable. Requires the CompManager privilege
+         *     and the responsibility of the ruleset. The change is logged.
+         */
+        post: operations["PostComplianceRulesetVariable"];
+        /**
+         * @description Delete a variable. Requires the CompManager privilege and the responsibility of
+         *     the ruleset. The deletion is logged.
+         */
+        delete: operations["DeleteComplianceRulesetVariable"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets_nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Attach a ruleset to a node, as POST /nodes/{node_id}/compliance/rulesets/{rset_id}. */
+        post: operations["PostComplianceRulesetsNodes"];
+        /** @description Detach a ruleset from a node, as DELETE /nodes/{node_id}/compliance/rulesets/{rset_id}. */
+        delete: operations["DeleteComplianceRulesetsNodes"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets_publications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Attach a publication group to a ruleset, as
+         *     POST /compliance/rulesets/{rset_id}/publications/{group_id}, both named in the body.
+         */
+        post: operations["PostComplianceRulesetsPublications"];
+        /**
+         * @description Detach a publication group from a ruleset, as
+         *     DELETE /compliance/rulesets/{rset_id}/publications/{group_id}, both named in the body.
+         */
+        delete: operations["DeleteComplianceRulesetsPublications"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets_responsibles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Attach a responsible group to a ruleset, as
+         *     POST /compliance/rulesets/{rset_id}/responsibles/{group_id}, both named in the body.
+         */
+        post: operations["PostComplianceRulesetsResponsibles"];
+        /**
+         * @description Detach a responsible group from a ruleset, as
+         *     DELETE /compliance/rulesets/{rset_id}/responsibles/{group_id}, both named in the body.
+         */
+        delete: operations["DeleteComplianceRulesetsResponsibles"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets_services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Attach a ruleset to a service, as POST /services/{svc_id}/compliance/rulesets/{rset_id}. */
+        post: operations["PostComplianceRulesetsServices"];
+        /** @description Detach a ruleset from a service, as DELETE /services/{svc_id}/compliance/rulesets/{rset_id}. */
+        delete: operations["DeleteComplianceRulesetsServices"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/rulesets_variables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Create or update a variable, as POST /compliance/rulesets/{rset_id}/variables,
+         *     the ruleset being named by the ruleset_id or ruleset_name key of the body.
+         */
+        post: operations["PostComplianceRulesetsVariables"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the last check run of each module-node-service tuple, for the nodes the
+         *     user can see: those whose app is published to one of the user's groups, every
+         *     node for a manager.
+         */
+        get: operations["GetComplianceStatus"];
+        put?: never;
+        post?: never;
+        /**
+         * @description Delete the last check run of a module-node-service tuple, named by the `id`
+         *     key of the body. Requires the CompExec privilege and the responsibility of the
+         *     node. The deletion is logged.
+         */
+        delete: operations["DeleteComplianceStatus"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/compliance/status/{status_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display the last check run of a module-node-service tuple. */
+        get: operations["GetComplianceStatusRun"];
+        put?: never;
+        post?: never;
+        /**
+         * @description Delete the last check run of a module-node-service tuple. Requires the
+         *     CompExec privilege and the responsibility of the node. The deletion is logged.
+         */
+        delete: operations["DeleteComplianceStatusRun"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/disks": {
         parameters: {
             query?: never;
@@ -2834,6 +4000,85 @@ export interface components {
             id?: number;
             updated?: string;
         };
+        CompExportModule: {
+            autofix?: string;
+            modset_mod_name?: string;
+        };
+        CompExportModuleset: {
+            id?: number;
+            modset_name?: string;
+            modules?: components["schemas"]["CompExportModule"][];
+            /** @description The names of the child modulesets */
+            modulesets?: string[];
+            publications?: string[];
+            responsibles?: string[];
+            /** @description The names of the attached rulesets */
+            rulesets?: string[];
+        };
+        CompExportRuleset: {
+            fset_name?: string | null;
+            id?: number;
+            /** @description The roles of the publication groups */
+            publications?: string[];
+            /** @description The roles of the responsible groups */
+            responsibles?: string[];
+            ruleset_name?: string;
+            ruleset_public?: string;
+            ruleset_type?: string;
+            /** @description The names of the child rulesets */
+            rulesets?: string[];
+            variables?: components["schemas"]["CompExportVariable"][];
+        };
+        CompExportVariable: {
+            id?: number;
+            var_author?: string;
+            var_class?: string;
+            var_name?: string;
+            var_updated?: string;
+            var_value?: string;
+        };
+        /**
+         * @description Modulesets with their descendants, and the rulesets and filtersets they use,
+         *     in the format POST /compliance/import reads.
+         */
+        CompModulesetExport: {
+            filtersets?: components["schemas"]["FiltersetExportItem"][];
+            modulesets?: components["schemas"]["CompExportModuleset"][];
+            rulesets?: components["schemas"]["CompExportRuleset"][];
+        };
+        /**
+         * @description Rulesets with their descendants and the filtersets they use, in the format
+         *     POST /compliance/import reads.
+         */
+        CompRulesetExport: {
+            filtersets?: components["schemas"]["FiltersetExportItem"][];
+            rulesets?: components["schemas"]["CompExportRuleset"][];
+        };
+        ComplianceLogListResponse: {
+            data: components["schemas"]["ComplianceLogRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A run of a compliance module on a node, or on a service instance on that
+         *     node: its action (check, fixable, fix), its exit code (`run_status`: 0 ok,
+         *     1 not ok, 2 not applicable) and its log. Every property is optional: the
+         *     `props` query parameter selects which columns the server returns.
+         */
+        ComplianceLogRow: {
+            id?: number;
+            node_id?: string;
+            rset_md5?: string;
+            run_action?: string;
+            run_date?: string;
+            run_log?: string;
+            run_module?: string;
+            run_status?: number;
+            svc_id?: string;
+        };
         ComplianceStatusListResponse: {
             data: components["schemas"]["ComplianceStatusRow"][] | {
                 [key: string]: {
@@ -3228,12 +4473,62 @@ export interface components {
             };
             meta?: components["schemas"]["ListMeta"];
         };
+        ModulesetModuleListResponse: {
+            data: components["schemas"]["ModulesetModuleRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A module of a compliance moduleset. Every property is optional: the `props`
+         *     query parameter selects which columns the server returns.
+         */
+        ModulesetModuleRow: {
+            autofix?: string | null;
+            id?: number;
+            modset_id?: number;
+            modset_mod_author?: string | null;
+            modset_mod_name?: string;
+            modset_mod_updated?: string;
+        };
         /** @description A compliance moduleset. Every property is optional, as selected by `props`. */
         ModulesetRow: {
             id?: number;
             modset_author?: string;
             modset_name?: string;
             modset_updated?: string;
+        };
+        ModulesetsModuleListResponse: {
+            data: components["schemas"]["ModulesetsModuleRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A module of a compliance moduleset, with its moduleset and the moduleset's
+         *     teams. Every property is optional: the `props` query parameter selects which
+         *     columns the server returns.
+         */
+        ModulesetsModuleRow: {
+            /** @description T when the module is fixed without being asked, F otherwise. */
+            autofix?: string;
+            /** @description The module id, 0 on the row of a moduleset without module. */
+            id?: number;
+            modset_author?: string;
+            modset_id?: number;
+            modset_mod_author?: string;
+            modset_mod_name?: string;
+            modset_mod_updated?: string;
+            modset_name?: string;
+            modset_updated?: string;
+            /** @description The roles of the groups the moduleset is published to, comma separated. */
+            teams_publication?: string;
+            /** @description The roles of the groups responsible for the moduleset, comma separated. */
+            teams_responsible?: string;
         };
         NetworkListResponse: {
             data: components["schemas"]["NetworkRow"][];
@@ -3481,6 +4776,47 @@ export interface components {
             ruleset_name?: string;
             ruleset_public?: string;
             ruleset_type?: string;
+        };
+        /** @description What uses a ruleset. */
+        RulesetUsage: {
+            modulesets?: {
+                id?: number;
+                modset_name?: string;
+            }[];
+            nodes?: {
+                node_id?: string;
+                nodename?: string;
+            }[];
+            /** @description The rulesets holding this one as a child. */
+            rulesets?: {
+                id?: number;
+                ruleset_name?: string;
+            }[];
+            services?: {
+                svc_id?: string;
+                svcname?: string;
+            }[];
+        };
+        RulesetVariableListResponse: {
+            data: components["schemas"]["RulesetVariableRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A variable of a compliance ruleset. Every property is optional: the `props`
+         *     query parameter selects which columns the server returns.
+         */
+        RulesetVariableRow: {
+            id?: number;
+            ruleset_id?: number;
+            var_author?: string;
+            var_class?: string;
+            var_name?: string;
+            var_updated?: string;
+            var_value?: string | null;
         };
         ServiceListResponse: {
             data: components["schemas"]["ServiceRow"][] | {
@@ -4991,6 +6327,3388 @@ export interface operations {
             };
             403: components["responses"]["403"];
             409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    filtersets?: components["schemas"]["FiltersetExportItem"][];
+                    modulesets?: components["schemas"]["CompExportModuleset"][];
+                    rulesets?: components["schemas"]["CompExportRuleset"][];
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string[];
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceLogs: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplianceLogListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceLog: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Id of the run (comp_log.id) */
+                log_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplianceLogListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesets: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModulesetListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    modset_name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModulesetListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Moduleset id or name */
+                    id?: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetsExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompModulesetExport"];
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModuleset: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModulesetListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PutComplianceModuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    action: "clone";
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    modset_name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModulesetListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetAmIResponsible: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetCandidateNodes: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetCandidateServices: {
+        parameters: {
+            query?: {
+                /** @description With true, the encapsulated services */
+                slave?: boolean;
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompModulesetExport"];
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetModules: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModulesetModuleListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetModules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description A boolean, or "T" / "F" as stored. Whether the agent fixes the module on check failure. */
+                    autofix?: unknown;
+                    modset_mod_name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModulesetModuleListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetModule: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Module id or name */
+                mod_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModulesetModuleListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Module id or name */
+                mod_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description A boolean, or "T" / "F" as stored. Whether the agent fixes the module on check failure. */
+                    autofix?: unknown;
+                    modset_mod_name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModulesetModuleListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesetModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Module id or name */
+                mod_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetModuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Child moduleset id or name */
+                child_modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesetModuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Child moduleset id or name */
+                child_modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetNodes: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetPublications: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetPublication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesetPublication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetResponsibles: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetResponsible: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesetResponsible: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetRuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesetRuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetServices: {
+        parameters: {
+            query?: {
+                /** @description With true, the encapsulated services */
+                slave?: boolean;
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetUsage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Moduleset id or name */
+                modset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            modulesets?: {
+                                id?: number;
+                                modset_name?: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceModulesetsModules: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModulesetsModuleListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetsNodes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Moduleset id or name */
+                    modset_id?: unknown;
+                    modset_name?: string;
+                    node_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesetsNodes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Moduleset id or name */
+                    modset_id?: unknown;
+                    modset_name?: string;
+                    node_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetsPublications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Group id or role */
+                    group_id: unknown;
+                    /** @description Moduleset id or name */
+                    modset_id: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesetsPublications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Group id or role */
+                    group_id: unknown;
+                    /** @description Moduleset id or name */
+                    modset_id: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetsResponsibles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Group id or role */
+                    group_id: unknown;
+                    /** @description Moduleset id or name */
+                    modset_id: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesetsResponsibles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Group id or role */
+                    group_id: unknown;
+                    /** @description Moduleset id or name */
+                    modset_id: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceModulesetsServices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Moduleset id or name */
+                    modset_id?: unknown;
+                    modset_name?: string;
+                    /** @description A boolean; true for the encapsulated service. encap is accepted as well. */
+                    slave?: unknown;
+                    svc_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceModulesetsServices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Moduleset id or name */
+                    modset_id?: unknown;
+                    modset_name?: string;
+                    /** @description A boolean; true for the encapsulated service. encap is accepted as well. */
+                    slave?: unknown;
+                    svc_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesets: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ruleset_name?: string;
+                    /** @description A boolean, or "T" / "F" as stored. */
+                    ruleset_public?: unknown;
+                    /** @enum {string} */
+                    ruleset_type?: "explicit" | "contextual";
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Ruleset id or name */
+                    id?: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetsExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompRulesetExport"];
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRuleset: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PutComplianceRuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    action: "clone";
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ruleset_name?: string;
+                    /** @description A boolean, or "T" / "F" as stored. */
+                    ruleset_public?: unknown;
+                    /** @enum {string} */
+                    ruleset_type?: "explicit" | "contextual";
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetAmIResponsible: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetCandidateNodes: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetCandidateServices: {
+        parameters: {
+            query?: {
+                /** @description With true, the encapsulated services */
+                slave?: boolean;
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompRulesetExport"];
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetFilterset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Filterset id or name */
+                fset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesetFilterset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Filterset id or name */
+                fset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetNodes: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetPublications: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetPublication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesetPublication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetResponsibles: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetResponsible: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesetResponsible: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Group id or role */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetRuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Parent ruleset id or name */
+                rset_id: string;
+                /** @description Child ruleset id or name */
+                child_rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesetRuleset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Parent ruleset id or name */
+                rset_id: string;
+                /** @description Child ruleset id or name */
+                child_rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetServices: {
+        parameters: {
+            query?: {
+                /** @description With true, the encapsulated services */
+                slave?: boolean;
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetUsage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RulesetUsage"];
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetVariables: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetVariableListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetVariables: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The class of the variable, telling the modules how to read its value. */
+                    var_class?: string;
+                    var_name?: string;
+                    /** @description The value, a string or any JSON value, stored serialized. */
+                    var_value?: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetVariableListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetVariable: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Variable id or name */
+                var_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetVariableListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PutComplianceRulesetVariable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Variable id or name */
+                var_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    action: "copy" | "move";
+                    /** @description Id or name of the destination ruleset */
+                    dst_ruleset: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetVariable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Variable id or name */
+                var_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The class of the variable, telling the modules how to read its value. */
+                    var_class?: string;
+                    var_name?: string;
+                    /** @description The value, a string or any JSON value, stored serialized. */
+                    var_value?: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetVariableListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesetVariable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Ruleset id or name */
+                rset_id: string;
+                /** @description Variable id or name */
+                var_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetsNodes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    node_id: string;
+                    /** @description Ruleset id or name */
+                    ruleset_id?: unknown;
+                    ruleset_name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesetsNodes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    node_id: string;
+                    /** @description Ruleset id or name */
+                    ruleset_id?: unknown;
+                    ruleset_name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetsPublications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Group id or role */
+                    group_id: unknown;
+                    /** @description Ruleset id or name */
+                    ruleset_id: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesetsPublications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Group id or role */
+                    group_id: unknown;
+                    /** @description Ruleset id or name */
+                    ruleset_id: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetsResponsibles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Group id or role */
+                    group_id: unknown;
+                    /** @description Ruleset id or name */
+                    ruleset_id: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesetsResponsibles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Group id or role */
+                    group_id: unknown;
+                    /** @description Ruleset id or name */
+                    ruleset_id: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetsServices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Ruleset id or name */
+                    ruleset_id?: unknown;
+                    ruleset_name?: string;
+                    /** @description A boolean; true for the encapsulated service. encap is accepted as well. */
+                    slave?: unknown;
+                    svc_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceRulesetsServices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Ruleset id or name */
+                    ruleset_id?: unknown;
+                    ruleset_name?: string;
+                    /** @description A boolean; true for the encapsulated service. encap is accepted as well. */
+                    slave?: unknown;
+                    svc_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostComplianceRulesetsVariables: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ruleset_id?: number;
+                    ruleset_name?: string;
+                    var_class?: string;
+                    var_name?: string;
+                    /** @description The value, a string or any JSON value, stored serialized. */
+                    var_value?: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetVariableListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceStatus: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplianceStatusListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Id of the run (comp_status.id) */
+                    id?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceStatusRun: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Id of the run (comp_status.id) */
+                status_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplianceStatusListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteComplianceStatusRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the run (comp_status.id) */
+                status_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
             500: components["responses"]["500"];
         };
     };

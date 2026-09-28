@@ -47,6 +47,9 @@
   --icon-form: #b0456c;
   /* Packages: the tan cube of the historical collector (pkg16). */
   --icon-package: #95642f;
+  /* Compliance: the crimson cogs of the historical collector (modset16), toned down
+     like the others. */
+  --icon-compliance: #a8243a;
 
   /* Tags attached to an object: the teal of the historical collector
      (.tag_attached), distinct from the petrol accent so that a badge does not read as
@@ -100,6 +103,7 @@
   --icon-group: #d1907f;
   --icon-form: #e08aa8;
   --icon-package: #d4a574;
+  --icon-compliance: #e8798a;
 
   /* Lightened background, dark ink: contrast 5.6:1. */
   --tag: #3a9aa8;
@@ -147,6 +151,7 @@
   --icon-group: #9a2c16;
   --icon-form: #8e1c46;
   --icon-package: #6b4212;
+  --icon-compliance: #8a0f25;
 
   --tag: #006272;
   --tag-hover: #004c59;
@@ -185,6 +190,7 @@
   --icon-group: #ffab94;
   --icon-form: #ff9ec3;
   --icon-package: #f2c28f;
+  --icon-compliance: #ff8fa0;
 
   --tag: #3fd0e3;
   --tag-hover: #72dfee;

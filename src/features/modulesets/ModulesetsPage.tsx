@@ -1,0 +1,249 @@
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import type { components } from "@/lib/api/schema";
+import { api } from "@/lib/api/client";
+import { toPage } from "@/lib/api/page";
+import { problemText } from "@/lib/api/problem";
+import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
+import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
+import { DateTime } from "@/components/ui/DateTime";
+import { Switch } from "@/components/ui/Switch";
+import { TeamLink } from "@/features/groups/TeamLink";
+import { UserLink } from "@/features/users/UserLink";
+import {
+  resolveListSearch,
+  resetsScroll,
+  mergeSearch,
+  visibleProps,
+  type ResolvedListSearch,
+} from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
+import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
+
+/** A module of a moduleset, or a moduleset without module on a row of its own. */
+type ModulesetRow = components["schemas"]["ModulesetsModuleRow"];
+
+const DEFAULT_SORT = ["modset_name", "modset_mod_name"];
+
+/**
+ * Props exposed by apicollector, in the order of `meta.available_props`.
+ * `satisfies` confronts them with the generated schema.
+ */
+const MODULESET_PROPS = [
+  "id",
+  "modset_id",
+  "modset_name",
+  "teams_responsible",
+  "teams_publication",
+  "modset_mod_name",
+  "autofix",
+  "modset_mod_updated",
+  "modset_mod_author",
+  "modset_author",
+  "modset_updated",
+] as const satisfies readonly (keyof ModulesetRow)[];
+
+type ModulesetProp = (typeof MODULESET_PROPS)[number];
+
+/** The columns of the historical view, in its order. */
+const DEFAULT_COLS: string[] = [
+  "modset_name",
+  "teams_responsible",
+  "teams_publication",
+  "modset_mod_name",
+  "autofix",
+  "modset_mod_updated",
+  "modset_mod_author",
+];
+
+const FAMILY: Partial<Record<ModulesetProp, ColumnFamily>> = {
+  modset_author: "team",
+  modset_updated: "time",
+  modset_mod_author: "team",
+  modset_mod_updated: "time",
+  teams_responsible: "team",
+  teams_publication: "team",
+};
+
+/** The id props, keys of the rows. */
+const KEY_PROPS = ["id", "modset_id"];
+
+/** Autofix is stored as T or F; a moduleset without module has neither. */
+const AUTOFIX_OPTIONS = [
+  { value: "T", labelKey: "detail.yes" },
+  { value: "F", labelKey: "detail.no" },
+];
+
+/** One badge per group role, as the collector shows teams, each opening its group. */
+function Teams({ value }: { value: string | undefined }) {
+  if (value === undefined || value === "") return null;
+  return (
+    <span className="flex flex-wrap gap-1">
+      {value.split(", ").map((role) => (
+        <TeamLink key={role} name={role} />
+      ))}
+    </span>
+  );
+}
+
+function Autofix({ value }: { value: string | undefined }) {
+  const { t } = useTranslation();
+  if (value !== "T" && value !== "F") return null;
+  return (
+    <Switch
+      checked={value === "T"}
+      label={t("modulesets.fields.autofix")}
+      stateLabel={t(value === "T" ? "detail.yes" : "detail.no")}
+      disabled
+    />
+  );
+}
+
+function renderCell(prop: ModulesetProp, row: ModulesetRow, locale: string) {
+  switch (prop) {
+    case "modset_updated":
+    case "modset_mod_updated":
+      return <DateTime value={row[prop]} locale={locale} />;
+    case "teams_responsible":
+    case "teams_publication":
+      return <Teams value={row[prop]} />;
+    case "autofix":
+      return <Autofix value={row.autofix} />;
+    case "modset_author":
+    case "modset_mod_author":
+      return <UserLink name={row[prop]} />;
+    case "id":
+      // A moduleset without module has no module id.
+      return row.id === 0 ? null : row.id;
+    default:
+      return row[prop];
+  }
+}
+
+const COLUMNS: ListColumn<ModulesetRow>[] = MODULESET_PROPS.map((prop) => ({
+  prop,
+  labelKey: `modulesets.fields.${prop}`,
+  numeric: KEY_PROPS.includes(prop),
+  family: FAMILY[prop] ?? "moduleset",
+  filter: prop === "autofix" ? { kind: "enum" as const, options: AUTOFIX_OPTIONS } : undefined,
+  render: (row, locale) => renderCell(prop, row, locale),
+}));
+
+const ALL_PROPS: string[] = [...MODULESET_PROPS];
+
+/** Columns shown, plus the ids the rows are keyed by. */
+function queryProps(cols: string[] | undefined): string {
+  return [...new Set([...KEY_PROPS, ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
+}
+
+/**
+ * A module row is keyed by its module id, which is 0 for every moduleset without
+ * module: the moduleset id keeps those apart.
+ */
+function rowKey(row: ModulesetRow): string | undefined {
+  return row.id === undefined || row.modset_id === undefined
+    ? undefined
+    : `${String(row.modset_id)}:${String(row.id)}`;
+}
+
+function useModulesets(search: ResolvedListSearch) {
+  return useQuery({
+    queryKey: [
+      "modulesets",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
+    queryFn: async () => {
+      // One row more than the page: apicollector does not return the total of a selection.
+      const { data, error } = await api.GET("/compliance/modulesets_modules", {
+        params: {
+          query: {
+            props: queryProps(search.cols),
+            orderby: search.sort.join(","),
+            offset: search.offset,
+            limit: search.limit + 1,
+            filter: filterQuery(search.filters),
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      // `data` holds the rows, or the counts when `stats` is asked for.
+      const all: ModulesetRow[] = Array.isArray(data.data) ? data.data : [];
+      return toPage(all, data.meta, search.limit);
+    },
+  });
+}
+
+/**
+ * The modules of the compliance modulesets published to the user's groups, one row
+ * per module with its moduleset and the moduleset's teams, as the collector's
+ * modulesets view. Read-only; the rows are filtered and sorted by the server.
+ */
+export function ModulesetsPage() {
+  const { t } = useTranslation();
+  const prefs = useViewPrefs("modulesets");
+  const search = resolveListSearch(
+    withSavedSearch(useSearch({ from: "/compliance/modulesets" }), prefs),
+    DEFAULT_SORT,
+  );
+  const navigate = useNavigate({ from: "/compliance/modulesets" });
+  const { data, isPending, isError, error, isFetching } = useModulesets(search);
+
+  /** Ids of the whole selection, filters included, without pagination. */
+  async function allIds(): Promise<string[]> {
+    const { data, error } = await api.GET("/compliance/modulesets_modules", {
+      params: { query: { props: KEY_PROPS.join(","), limit: 0, filter: filterQuery(search.filters) } },
+    });
+    if (error !== undefined) throw new Error(problemText(error));
+    const rows: ModulesetRow[] = Array.isArray(data.data) ? data.data : [];
+    return rows.flatMap((row) => {
+      const key = rowKey(row);
+      return key === undefined ? [] : [key];
+    });
+  }
+
+  function update(next: Partial<ResolvedListSearch>) {
+    // Columns, sort, filters and page size follow the account, the other states
+    // stay in the URL.
+    prefs.saveSearch(next);
+    void navigate({
+      search: (previous) => mergeSearch(previous, next),
+      resetScroll: resetsScroll(next),
+    });
+  }
+
+  return (
+    <section>
+      <h1 className="mb-3 flex items-center gap-2 text-title font-semibold">
+        <ObjectIcon kind="moduleset" className="h-5 w-5" />
+        {t("modulesets.title")}
+      </h1>
+
+      <CollectorList
+        columns={COLUMNS}
+        defaultCols={DEFAULT_COLS}
+        rows={data?.rows ?? []}
+        rowId={rowKey}
+        search={search}
+        onChange={update}
+        // The collector's filtersets select nodes and services, not modulesets.
+        filtersets={[]}
+        isPending={isPending}
+        isFetching={isFetching}
+        errorMessage={isError ? error.message : null}
+        hasMore={data?.hasMore ?? false}
+        total={data?.total}
+        selectAllMatching={allIds}
+        filterable
+      />
+    </section>
+  );
+}

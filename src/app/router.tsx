@@ -18,6 +18,7 @@ import { parseRequestSearch } from "@/features/requests/catalog";
 import { GroupsPage } from "@/features/groups/GroupsPage";
 import { InstancesPage } from "@/features/instances/InstancesPage";
 import { LogsPage } from "@/features/logs/LogsPage";
+import { ModulesetsPage } from "@/features/modulesets/ModulesetsPage";
 import { NetworksPage } from "@/features/networks/NetworksPage";
 import { NodesPage } from "@/features/nodes/NodesPage";
 import { ObsolescencePage } from "@/features/obsolescence/ObsolescencePage";
@@ -188,6 +189,13 @@ const requestsRoute = createRoute({
   validateSearch: parseRequestSearch,
 });
 
+const modulesetsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/compliance/modulesets",
+  component: ModulesetsPage,
+  validateSearch: parseListSearch,
+});
+
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users",
@@ -233,6 +241,7 @@ const routeTree = rootRoute.addChildren([
   allRequestsRoute,
   teamRequestsRoute,
   tiersRequestsRoute,
+  modulesetsRoute,
   actionsRoute,
   profileRoute,
 ]);
