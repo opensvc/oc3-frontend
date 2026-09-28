@@ -5,6 +5,7 @@ import { ServiceDetailPanel } from "@/features/services/ServiceDetailPanel";
 import { InstanceDetailPanel } from "@/features/instances/InstanceDetailPanel";
 import { AppDetailPanel } from "@/features/apps/AppDetailPanel";
 import { GroupDetailPanel } from "@/features/groups/GroupDetailPanel";
+import { UserDetailPanel } from "@/features/users/UserDetailPanel";
 import { TagDetailPanel } from "@/features/tags/TagDetailPanel";
 import { useTag } from "@/features/tags/use-tag";
 import { ObjectIcon, type ObjectKind } from "@/components/opensvc/ObjectIcon";
@@ -109,6 +110,8 @@ export function PeekPanel() {
         return <AppDetailPanel appId={id} label="" onClose={close} />;
       case "group":
         return <GroupDetailPanel groupId={id} label="" onClose={close} />;
+      case "user":
+        return <UserDetailPanel userId={id} label="" onClose={close} />;
       case "tag":
         return <TagPeek tagId={id} onClose={close} />;
       default:

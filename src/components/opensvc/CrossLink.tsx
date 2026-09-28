@@ -4,7 +4,7 @@ import { ObjectIcon } from "./ObjectIcon";
 import { usePeek } from "./use-peek";
 
 /** Objects whose record `PeekPanel` knows how to show. */
-export type CrossKind = "node" | "service" | "instance" | "app" | "group" | "tag";
+export type CrossKind = "node" | "service" | "instance" | "app" | "group" | "tag" | "user";
 
 /**
  * Value of a cell that names an object from another view: the node of an instance,

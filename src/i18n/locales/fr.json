@@ -1012,7 +1012,8 @@
       "instance": "instance",
       "app": "application",
       "group": "équipe",
-      "tag": "tag"
+      "tag": "tag",
+      "user": "utilisateur"
     }
   },
   "actions": {
