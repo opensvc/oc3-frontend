@@ -3,6 +3,7 @@ import type { RelatedTab } from "@/components/opensvc/related-tabs";
 import { ServiceNodesDiff } from "./ServiceNodesDiff";
 import { ServiceStorage } from "./ServiceStorage";
 import { useServiceDisks } from "./queries";
+import { useNodesDiffCount } from "./use-nodes-diff-count";
 
 /**
  * Data attached to a service, one tab each, on the model of the node
@@ -22,9 +23,9 @@ export const SERVICE_RELATED_TABS: RelatedTab[] = [
     key: "nodediff",
     labelKey: "services.related.nodediff",
     icon: <ColumnFamilyIcon family="node" />,
-    // No count: it would read the assets and the compliance of every node whenever
-    // the panel opens, for a tab that is a report rather than a list.
-    useSummary: () => ({ count: undefined }),
+    // The total of its categories. It reads the assets, the packages and the
+    // compliance of every node when the panel opens; the tab then reuses them.
+    useSummary: (svcId) => ({ count: useNodesDiffCount(svcId) }),
     render: (svcId) => <ServiceNodesDiff svcId={svcId} />,
   },
 ];
