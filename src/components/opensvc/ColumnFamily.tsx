@@ -5,6 +5,7 @@ import {
   CloudIcon,
   ClusterIcon,
   CpuIcon,
+  CubeIcon,
   DrpIcon,
   DatabaseIcon,
   EnvIcon,
@@ -46,7 +47,8 @@ export type ColumnFamily =
   | "disk"
   | "alert"
   | "state"
-  | "drp";
+  | "drp"
+  | "package";
 
 /**
  * The collector colours by domain rather than by family: everything about the node is
@@ -75,6 +77,8 @@ const FAMILIES: Record<ColumnFamily, { Icon: typeof ServerIcon; className: strin
   state: { Icon: StateIcon, className: "text-ink-muted" },
   // The collector's `drp16` has no colour of its own: neutral as well.
   drp: { Icon: DrpIcon, className: "text-ink-muted" },
+  // The historical packages table marks its columns with `pkg16`, the tan cube.
+  package: { Icon: CubeIcon, className: "text-icon-package" },
 };
 
 export function ColumnFamilyIcon({ family }: { family: ColumnFamily }) {

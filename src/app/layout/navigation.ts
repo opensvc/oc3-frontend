@@ -17,6 +17,7 @@ export interface NavEntry {
     | "/instances"
     | "/networks"
     | "/disks"
+    | "/packages"
     | "/apps"
     | "/groups"
     | "/tags"
@@ -54,6 +55,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
       { to: "/instances", labelKey: "nav.instances", icon: "instance" },
       { to: "/networks", labelKey: "nav.networks", icon: "network" },
       { to: "/disks", labelKey: "nav.disks", icon: "disk" },
+      // `view-pkg` of the historical menu: the packages installed on the nodes.
+      { to: "/packages", labelKey: "nav.packages", icon: "package" },
     ],
   },
   {

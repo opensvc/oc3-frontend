@@ -23,7 +23,8 @@
     "filters": "Filters",
     "filtersets": "Filtersets",
     "forms": "Forms",
-    "newRequest": "New request"
+    "newRequest": "New request",
+    "packages": "Packages"
   },
   "header": {
     "search": "Search the collector",
@@ -1085,5 +1086,23 @@
       "noLog": "Nothing logged."
     },
     "empty": "No form is available to you."
+  },
+  "packages": {
+    "title": "Packages",
+    "fields": {
+      "nodes.nodename": "Node",
+      "id": "Record id",
+      "node_id": "Node id",
+      "pkg_name": "Name",
+      "pkg_version": "Version",
+      "pkg_arch": "Architecture",
+      "pkg_type": "Type",
+      "pkg_sig": "Signature",
+      "sig_provider": "Signed by",
+      "pkg_install_date": "Installed",
+      "pkg_updated": "Updated",
+      "nodes.app": "Node app",
+      "nodes.os_name": "OS"
+    }
   }
 }

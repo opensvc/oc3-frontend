@@ -1,6 +1,7 @@
 import {
   AlertTriangleIcon,
   AsteriskIcon,
+  CubeIcon,
   DatabaseIcon,
   FilterIcon,
   HistoryIcon,
@@ -30,7 +31,8 @@ export type ObjectKind =
   | "log"
   | "filter"
   | "filterset"
-  | "form";
+  | "form"
+  | "package";
 
 /**
  * Pictogram and tint of an object kind. The same vocabulary in the menu, in panel
@@ -63,6 +65,7 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   // Same icon as the filter: the historical collector marks both of them `filter16`.
   filterset: { Icon: FilterIcon, className: "text-icon-dashboard" },
   form: { Icon: PuzzleIcon, className: "text-icon-form" },
+  package: { Icon: CubeIcon, className: "text-icon-package" },
 };
 
 export function ObjectIcon({ kind, className }: { kind: ObjectKind; className?: string }) {

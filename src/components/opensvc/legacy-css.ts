@@ -85,7 +85,7 @@ const ICONS: Record<string, { Icon: Glyph; tone: string }> = {
   guy16: { Icon: UserIcon, tone: "text-icon-group" },
   guy48: { Icon: UserIcon, tone: "text-icon-group" },
   guys16: { Icon: UsersIcon, tone: "text-icon-group" },
-  pkg16: { Icon: CubeIcon, tone: "text-icon-group" },
+  pkg16: { Icon: CubeIcon, tone: "text-icon-package" },
   app16: { Icon: AsteriskIcon, tone: "text-icon-app" },
   comp16: { Icon: TargetIcon, tone: "text-icon-form" },
   comp48: { Icon: TargetIcon, tone: "text-icon-form" },

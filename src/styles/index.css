@@ -32,6 +32,7 @@
   --color-icon-app: var(--icon-app);
   --color-icon-group: var(--icon-group);
   --color-icon-form: var(--icon-form);
+  --color-icon-package: var(--icon-package);
 
   --color-tag: var(--tag);
   --color-tag-hover: var(--tag-hover);

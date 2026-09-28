@@ -45,6 +45,8 @@
   --icon-group: #a55446;
   /* Forms: the pale violet red puzzle piece of the historical collector (wf16). */
   --icon-form: #b0456c;
+  /* Packages: the tan cube of the historical collector (pkg16). */
+  --icon-package: #95642f;
 
   /* Tags attached to an object: the teal of the historical collector
      (.tag_attached), distinct from the petrol accent so that a badge does not read as
@@ -97,6 +99,7 @@
   --icon-app: #d178ab;
   --icon-group: #d1907f;
   --icon-form: #e08aa8;
+  --icon-package: #d4a574;
 
   /* Lightened background, dark ink: contrast 5.6:1. */
   --tag: #3a9aa8;
@@ -143,6 +146,7 @@
   --icon-app: #9c005d;
   --icon-group: #9a2c16;
   --icon-form: #8e1c46;
+  --icon-package: #6b4212;
 
   --tag: #006272;
   --tag-hover: #004c59;
@@ -180,6 +184,7 @@
   --icon-app: #ff8fcf;
   --icon-group: #ffab94;
   --icon-form: #ff9ec3;
+  --icon-package: #f2c28f;
 
   --tag: #3fd0e3;
   --tag-hover: #72dfee;

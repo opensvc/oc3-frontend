@@ -23,7 +23,8 @@
     "filters": "Filtres",
     "filtersets": "Filtersets",
     "forms": "Formulaires",
-    "newRequest": "Nouvelle demande"
+    "newRequest": "Nouvelle demande",
+    "packages": "Paquets"
   },
   "header": {
     "search": "Rechercher dans le collector",
@@ -1085,5 +1086,23 @@
       "noLog": "Rien de journalisé."
     },
     "empty": "Aucun formulaire ne vous est proposé."
+  },
+  "packages": {
+    "title": "Paquets",
+    "fields": {
+      "nodes.nodename": "Node",
+      "id": "Identifiant",
+      "node_id": "Identifiant du node",
+      "pkg_name": "Nom",
+      "pkg_version": "Version",
+      "pkg_arch": "Architecture",
+      "pkg_type": "Type",
+      "pkg_sig": "Signature",
+      "sig_provider": "Signé par",
+      "pkg_install_date": "Installé le",
+      "pkg_updated": "Mis à jour",
+      "nodes.app": "App du node",
+      "nodes.os_name": "OS"
+    }
   }
 }
