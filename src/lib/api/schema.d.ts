@@ -1989,6 +1989,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/packages/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the differences in installed packages between nodes: the package
+         *     versions installed on some of the compared nodes but not on all of them,
+         *     one row per node having it. The nodes compared are the given nodes, plus
+         *     the nodes running the given services, or with `encap` the encapsulated
+         *     nodes of those services (the nodes named after their instances'
+         *     `mon_vmname`). Only the nodes and services of the apps the user's groups
+         *     are responsible for are compared, unless the user is a manager.
+         *     Fewer than two nodes is a 400, except with `encap`, which then returns an
+         *     empty list.
+         */
+        get: operations["GetPackagesDiff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/services": {
         parameters: {
             query?: never;
@@ -3312,6 +3339,18 @@ export interface components {
             obs_warn_date_updated?: string;
             obs_warn_date_updated_by?: string;
         };
+        PackageDiffNode: {
+            node_id: string;
+            nodename: string;
+        };
+        /** @description A package version installed on a compared node, and missing from at least one other. */
+        PackageDiffRow: {
+            node_id: string;
+            pkg_arch: string;
+            pkg_name: string;
+            pkg_type: string;
+            pkg_version: string;
+        };
         PackageListResponse: {
             data: components["schemas"]["PackageRow"][] | {
                 [key: string]: {
@@ -3341,6 +3380,15 @@ export interface components {
             pkg_updated?: string;
             pkg_version?: string;
             sig_provider?: string | null;
+        };
+        PackagesDiffResponse: {
+            data: components["schemas"]["PackageDiffRow"][];
+            meta: {
+                /** @description The ids of the compared nodes, as the historical API returns them. */
+                node_ids: string[];
+                /** @description The compared nodes with their names, ordered by name. */
+                nodes: components["schemas"]["PackageDiffNode"][];
+            };
         };
         Problem: {
             /**
@@ -9942,6 +9990,36 @@ export interface operations {
                     "application/json": components["schemas"]["PackageListResponse"];
                 };
             };
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetPackagesDiff: {
+        parameters: {
+            query?: {
+                /** @description A comma-separated list of node ids to compare */
+                node_ids?: string;
+                /** @description A comma-separated list of service ids whose nodes to compare */
+                svc_ids?: string;
+                /** @description With svc_ids, compare the services' encapsulated nodes instead of their hosts */
+                encap?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackagesDiffResponse"];
+                };
+            };
+            400: components["responses"]["400"];
             401: components["responses"]["401"];
             500: components["responses"]["500"];
         };

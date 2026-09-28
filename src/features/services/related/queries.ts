@@ -89,3 +89,26 @@ export function useServiceTags(svcId: string | undefined) {
     },
   });
 }
+
+type PackagesDiff = components["schemas"]["PackagesDiffResponse"];
+
+/**
+ * Packages that differ between the nodes of the service, as the historical
+ * PkgDiff tab: between the nodes running its instances, or with `encap` between
+ * its encapsulated nodes. Null when there is nothing to compare: the API answers
+ * 400 below two nodes, which a service on a single node always meets.
+ */
+export function useServicePackagesDiff(svcId: string | undefined, encap: boolean) {
+  return useQuery({
+    queryKey: ["service", svcId, "pkgdiff", encap],
+    enabled: svcId !== undefined,
+    queryFn: async (): Promise<PackagesDiff | null> => {
+      const { data, error, response } = await api.GET("/packages/diff", {
+        params: { query: { svc_ids: svcId ?? "", encap } },
+      });
+      if (response.status === 400) return null;
+      if (error !== undefined) throw new Error(problemText(error));
+      return data;
+    },
+  });
+}

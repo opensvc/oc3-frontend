@@ -352,7 +352,8 @@
     },
     "related": {
       "label": "Données du service",
-      "storage": "Stockage"
+      "storage": "Stockage",
+      "pkgdiff": "PkgDiff"
     },
     "actions": {
       "open": "Actions",
@@ -369,6 +370,20 @@
         "freeze": "Geler",
         "thaw": "Dégeler"
       }
+    },
+    "pkgdiff": {
+      "search": "Rechercher un paquet",
+      "clusterTitle": "Différences de paquets installés entre les nodes du service",
+      "encapTitle": "Différences de paquets installés entre les nodes encapsulés",
+      "count_one": "{{count}} paquet diffère entre {{nodes}} nodes",
+      "count_other": "{{count}} paquets diffèrent entre {{nodes}} nodes",
+      "matching_one": "{{count}} paquet sur {{total}}",
+      "matching_other": "{{count}} paquets sur {{total}}",
+      "missing": "non installé",
+      "identical": "Aucune différence trouvée.",
+      "noMatch": "Aucun paquet différent ne correspond à la recherche.",
+      "singleNode": "Le service tourne sur moins de deux nodes : rien à comparer.",
+      "noEncap": "Le service a moins de deux nodes encapsulés : rien à comparer."
     }
   },
   "alerts": {
