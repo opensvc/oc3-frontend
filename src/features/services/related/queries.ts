@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { toTagRows } from "@/features/tags/tag-row";
+import { NODE_PROPS } from "@/features/nodes/node-props";
 
 type DiskRow = components["schemas"]["DiskRow"];
 type HbaRow = components["schemas"]["HbaRow"];
@@ -110,5 +111,102 @@ export function useServicePackagesDiff(svcId: string | undefined, encap: boolean
       if (error !== undefined) throw new Error(problemText(error));
       return data;
     },
+  });
+}
+
+type NodeRow = components["schemas"]["NodeRow"];
+type ComplianceStatusRow = components["schemas"]["ComplianceStatusRow"];
+type ModulesetRow = components["schemas"]["ModulesetRow"];
+type RulesetRow = components["schemas"]["RulesetRow"];
+
+/** The ids of the nodes running an instance of the service, as the historical nodediff reads them. */
+export function useServiceNodeIds(svcId: string | undefined) {
+  return useQuery({
+    queryKey: ["service", svcId, "node-ids"],
+    enabled: svcId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/services_instances", {
+        params: {
+          query: { props: "node_id", limit: 0, filter: [`svc_id:eq:${svcId ?? ""}`] },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      const rows: InstanceRow[] = Array.isArray(data.data) ? data.data : [];
+      // An encapsulated service has one row per container on a node: counted once.
+      return [...new Set(rows.flatMap((row) => (row.node_id ? [row.node_id] : [])))].sort();
+    },
+  });
+}
+
+/** Every property of the given nodes, by name, for the asset differences. */
+export function useNodesAssets(nodeIds: string[] | undefined) {
+  return useQuery({
+    queryKey: ["nodes", "assets", nodeIds],
+    enabled: nodeIds !== undefined && nodeIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/nodes", {
+        params: {
+          query: {
+            props: NODE_PROPS.join(","),
+            orderby: "nodename",
+            limit: 0,
+            filter: [`node_id:in:${(nodeIds ?? []).join(",")}`],
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      const rows: NodeRow[] = Array.isArray(data.data) ? data.data : [];
+      return rows;
+    },
+  });
+}
+
+/** What the compliance of a node is made of, for the compliance differences. */
+export interface NodeCompliance {
+  nodeId: string;
+  status: ComplianceStatusRow[];
+  modulesets: ModulesetRow[];
+  rulesets: RulesetRow[];
+}
+
+/**
+ * The compliance of each of the given nodes: the last run of each module, and the
+ * modulesets and rulesets attached. Read node by node, the API having no request
+ * over several nodes; a service runs on a handful of them.
+ */
+export function useNodesCompliance(nodeIds: string[] | undefined) {
+  return useQueries({
+    queries: (nodeIds ?? []).map((nodeId) => ({
+      queryKey: ["node", nodeId, "compliance-summary"],
+      queryFn: async (): Promise<NodeCompliance> => {
+        const path = { node_id: nodeId };
+        const [status, modulesets, rulesets] = await Promise.all([
+          api.GET("/nodes/{node_id}/compliance/status", {
+            params: { path, query: { props: "run_module,run_status,svc_id", limit: 0 } },
+          }),
+          api.GET("/nodes/{node_id}/compliance/modulesets", {
+            params: { path, query: { props: "id,modset_name", limit: 0 } },
+          }),
+          api.GET("/nodes/{node_id}/compliance/rulesets", {
+            params: { path, query: { props: "id,ruleset_name", limit: 0 } },
+          }),
+        ]);
+        for (const r of [status, modulesets, rulesets])
+          if (r.error !== undefined) throw new Error(problemText(r.error));
+        return {
+          nodeId,
+          status: Array.isArray(status.data?.data) ? status.data.data : [],
+          modulesets: Array.isArray(modulesets.data?.data) ? modulesets.data.data : [],
+          rulesets: Array.isArray(rulesets.data?.data) ? rulesets.data.data : [],
+        };
+      },
+    })),
+    combine: (results) => ({
+      data: results.every((r) => r.isSuccess)
+        ? results.flatMap((r) => (r.data === undefined ? [] : [r.data]))
+        : undefined,
+      isPending: results.some((r) => r.isPending),
+      error: results.find((r) => r.isError)?.error ?? null,
+    }),
   });
 }

@@ -353,7 +353,8 @@
     "related": {
       "label": "Service data",
       "storage": "Storage",
-      "pkgdiff": "PkgDiff"
+      "pkgdiff": "PkgDiff",
+      "nodediff": "Nodes Differences"
     },
     "actions": {
       "open": "Actions",
@@ -384,6 +385,30 @@
       "noMatch": "No differing package matches the search.",
       "singleNode": "The service runs on fewer than two nodes: nothing to compare.",
       "noEncap": "The service has fewer than two encapsulated nodes: nothing to compare."
+    },
+    "nodediff": {
+      "search": "Search a property, package or module",
+      "compared": "Compared nodes: {{nodes}}",
+      "assetTitle": "Asset differences",
+      "pkgTitle": "Installed package differences",
+      "moduleTitle": "Module status differences",
+      "modsetTitle": "Moduleset attachment differences",
+      "rsetTitle": "Ruleset attachment differences",
+      "property": "Property",
+      "module": "Module",
+      "moduleset": "Moduleset",
+      "ruleset": "Ruleset",
+      "unset": "not set",
+      "notRun": "not run on this node",
+      "attached": "attached",
+      "notAttached": "not attached",
+      "noMatch": "Nothing matches the search.",
+      "runStatus": {
+        "ok": "ok",
+        "nok": "not ok",
+        "na": "n/a",
+        "unknown": "unknown"
+      }
     }
   },
   "alerts": {

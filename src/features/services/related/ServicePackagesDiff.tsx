@@ -62,16 +62,32 @@ export function ServicePackagesDiff({ svcId }: { svcId: string }) {
           className="w-full bg-transparent text-ink outline-none placeholder:text-ink-muted"
         />
       </div>
-      <DiffSection svcId={svcId} encap={false} query={query} />
-      <DiffSection svcId={svcId} encap query={query} />
+      <PackagesDiffSection svcId={svcId} encap={false} query={query} />
+      <PackagesDiffSection svcId={svcId} encap query={query} />
     </div>
   );
 }
 
-function DiffSection({ svcId, encap, query }: { svcId: string; encap: boolean; query: string }) {
+/**
+ * The packages that differ between the service's nodes, or its encapsulated nodes,
+ * narrowed by a search on the name; also a section of the Nodes differences tab,
+ * under its own title.
+ */
+export function PackagesDiffSection({
+  svcId,
+  encap,
+  query,
+  title: heading,
+}: {
+  svcId: string;
+  encap: boolean;
+  query: string;
+  title?: string;
+}) {
   const { t } = useTranslation();
   const diff = useServicePackagesDiff(svcId, encap);
-  const title = encap ? t("services.pkgdiff.encapTitle") : t("services.pkgdiff.clusterTitle");
+  const title =
+    heading ?? (encap ? t("services.pkgdiff.encapTitle") : t("services.pkgdiff.clusterTitle"));
   const needle = query.trim().toLowerCase();
   const all = diff.data === undefined || diff.data === null ? [] : diffLines(diff.data);
   const lines = needle === "" ? all : all.filter((l) => l.name.toLowerCase().includes(needle));

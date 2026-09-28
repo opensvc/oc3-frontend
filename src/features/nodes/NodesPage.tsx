@@ -29,98 +29,12 @@ import {
 import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateNodePanel } from "./CreateNodePanel";
+import { NODE_PROPS } from "./node-props";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 
 type NodeRow = components["schemas"]["NodeRow"];
 
 const DEFAULT_SORT = ["nodename"];
-
-/**
- * Every node property exposed by apicollector, in the order of its
- * `meta.available_props`. `satisfies` confronts them with the generated schema: a
- * prop renamed on the oc3 side breaks the typecheck instead of disappearing
- * silently.
- */
-const NODE_PROPS = [
-  "node_id",
-  "nodename",
-  "app",
-  "node_env",
-  "cluster_id",
-  "clusters.cluster_name",
-  "loc_country",
-  "loc_city",
-  "loc_addr",
-  "loc_building",
-  "loc_floor",
-  "loc_room",
-  "loc_rack",
-  "loc_zip",
-  "cpu_freq",
-  "cpu_cores",
-  "cpu_dies",
-  "cpu_vendor",
-  "cpu_model",
-  "cpu_threads",
-  "mem_banks",
-  "mem_slots",
-  "mem_bytes",
-  "os_name",
-  "os_release",
-  "os_update",
-  "os_segment",
-  "os_arch",
-  "os_vendor",
-  "os_kernel",
-  "os_concat",
-  "team_responsible",
-  "team_integ",
-  "team_support",
-  "serial",
-  "model",
-  "manufacturer",
-  "type",
-  "assetname",
-  "asset_env",
-  "warranty_end",
-  "maintenance_end",
-  "status",
-  "role",
-  "sec_zone",
-  "power_cabinet1",
-  "power_cabinet2",
-  "power_supply_nb",
-  "power_protect",
-  "power_protect_breaker",
-  "power_breaker1",
-  "power_breaker2",
-  "blade_cabinet",
-  "enclosure",
-  "enclosureslot",
-  "hv",
-  "hvpool",
-  "hvvdc",
-  "fqdn",
-  "connect_to",
-  "listener_port",
-  "version",
-  "collector",
-  "sp_version",
-  "bios_version",
-  "tz",
-  "last_boot",
-  "last_comm",
-  "node_frozen",
-  "node_frozen_at",
-  "snooze_till",
-  "notifications",
-  "action_type",
-  "hw_obs_warn_date",
-  "hw_obs_alert_date",
-  "os_obs_warn_date",
-  "os_obs_alert_date",
-  "updated",
-] as const satisfies readonly (keyof NodeRow)[];
 
 /** Columns shown by default: enough to identify a node, not to audit it. */
 const DEFAULT_COLS: string[] = ["nodename", "app", "node_env", "os_concat", "last_comm"];

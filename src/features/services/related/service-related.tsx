@@ -1,5 +1,6 @@
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import type { RelatedTab } from "@/components/opensvc/related-tabs";
+import { ServiceNodesDiff } from "./ServiceNodesDiff";
 import { ServicePackagesDiff } from "./ServicePackagesDiff";
 import { ServiceStorage } from "./ServiceStorage";
 import { useServiceDisks, useServicePackagesDiff } from "./queries";
@@ -37,5 +38,14 @@ export const SERVICE_RELATED_TABS: RelatedTab[] = [
       };
     },
     render: (svcId) => <ServicePackagesDiff svcId={svcId} />,
+  },
+  {
+    key: "nodediff",
+    labelKey: "services.related.nodediff",
+    icon: <ColumnFamilyIcon family="node" />,
+    // No count: it would read the assets and the compliance of every node whenever
+    // the panel opens, for a tab that is a report rather than a list.
+    useSummary: () => ({ count: undefined }),
+    render: (svcId) => <ServiceNodesDiff svcId={svcId} />,
   },
 ];

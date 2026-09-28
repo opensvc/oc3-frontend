@@ -2808,6 +2808,31 @@ export interface components {
             id?: number;
             updated?: string;
         };
+        ComplianceStatusListResponse: {
+            data: components["schemas"]["ComplianceStatusRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description The last run of a compliance module on a node, or on a service's instance
+         *     on it. Every property is optional: the `props` query parameter selects which
+         *     columns the server returns. `run_status` is the module's exit code: 0 ok,
+         *     1 not ok, 2 not applicable.
+         */
+        ComplianceStatusRow: {
+            id?: number;
+            node_id?: string;
+            rset_md5?: string;
+            run_action?: string;
+            run_date?: string;
+            run_log?: string;
+            run_module?: string;
+            run_status?: number;
+            svc_id?: string;
+        };
         DiskListResponse: {
             data: components["schemas"]["DiskRow"][] | {
                 [key: string]: {
@@ -3169,6 +3194,21 @@ export interface components {
             "services.svcname"?: string | null;
             svc_id?: string;
         };
+        ModulesetListResponse: {
+            data: components["schemas"]["ModulesetRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /** @description A compliance moduleset. Every property is optional, as selected by `props`. */
+        ModulesetRow: {
+            id?: number;
+            modset_author?: string;
+            modset_name?: string;
+            modset_updated?: string;
+        };
         NetworkListResponse: {
             data: components["schemas"]["NetworkRow"][];
             info?: string;
@@ -3396,6 +3436,21 @@ export interface components {
              *     problem.
              */
             text: string;
+        };
+        RulesetListResponse: {
+            data: components["schemas"]["RulesetRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /** @description A compliance ruleset. Every property is optional, as selected by `props`. */
+        RulesetRow: {
+            id?: number;
+            ruleset_name?: string;
+            ruleset_public?: string;
+            ruleset_type?: string;
         };
         ServiceListResponse: {
             data: components["schemas"]["ServiceRow"][] | {
@@ -8973,7 +9028,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListResponse"];
+                    "application/json": components["schemas"]["ModulesetListResponse"];
                 };
             };
             /** @description Node not found */
@@ -9098,7 +9153,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListResponse"];
+                    "application/json": components["schemas"]["RulesetListResponse"];
                 };
             };
             /** @description Node not found */
@@ -9223,7 +9278,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListResponse"];
+                    "application/json": components["schemas"]["ComplianceStatusListResponse"];
                 };
             };
             /** @description Node not found */
