@@ -1073,6 +1073,11 @@
     "forward": "Avancer vers {{name}}"
   },
   "forms": {
+    "display": {
+      "notFound": "Définition du formulaire introuvable",
+      "showJson": "Afficher le JSON",
+      "showForm": "Afficher la valeur mise en forme par son formulaire"
+    },
     "title": "Formulaires",
     "intro": "Un formulaire décrit en YAML les entrées qu'une soumission attend et les sorties qu'elle exécute : insertion en base, appel d'API, script, courriel ou étape de workflow. La liste montre les formulaires publiés à l'un de vos groupes ; les créer et les modifier demande le privilège FormsManager.",
     "fields": {

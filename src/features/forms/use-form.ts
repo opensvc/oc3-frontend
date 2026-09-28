@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type { components } from "@/lib/api/schema";
-import { api } from "@/lib/api/client";
+import { api, apiGetDynamic } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import { parseDefinition, type FormDefinition } from "./form-engine";
 
 export type FormRow = components["schemas"]["FormRow"];
 
@@ -33,5 +34,35 @@ export function useForm(formId: string | undefined) {
       const rows: FormRow[] = Array.isArray(data.data) ? data.data : [];
       return rows[0] ?? null;
     },
+  });
+}
+
+/**
+ * The definition of the form named `name`, null when there is none: a sub-form
+ * input or a compliance variable names its form rather than giving its id. Cached
+ * by name, so the rows sharing a form load it once.
+ */
+export function useFormDefinitionByName(name: string) {
+  return useQuery({
+    queryKey: ["form-by-name", name],
+    enabled: name !== "",
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const response = await apiGetDynamic("/forms", {
+        props: "form_definition",
+        filter: `form_name:eq:${name}`,
+      });
+      if (response.status >= 300) throw new Error(problemText(response.body));
+      const body = response.body;
+      const rows =
+        typeof body === "object" && body !== null && "data" in body && Array.isArray(body.data)
+          ? (body.data as unknown[])
+          : [];
+      const first = rows[0];
+      return typeof first === "object" && first !== null && "form_definition" in first
+        ? first.form_definition
+        : null;
+    },
+    select: (raw): FormDefinition | null => (raw === null ? null : parseDefinition(raw)),
   });
 }

@@ -25,7 +25,6 @@ import {
   initialValue,
   isEmptyValue,
   isRepeated,
-  parseDefinition,
   prepareArgs,
   restCandidates,
   substRefs,
@@ -37,6 +36,7 @@ import {
   type GroupState,
   type InputValue,
 } from "./form-engine";
+import { useFormDefinitionByName } from "./use-form";
 
 const CONTROL =
   "h-8 w-full rounded-(--radius-control) border bg-surface px-2 text-ink disabled:bg-surface-sunken disabled:text-ink-muted";
@@ -647,30 +647,8 @@ function SubFormInput({
   onChange: (value: InputValue) => void;
 }) {
   const { t } = useTranslation();
-  const sub = useQuery({
-    queryKey: ["form-by-name", name],
-    enabled: name !== "",
-    queryFn: async () => {
-      const response = await apiGetDynamic("/forms", {
-        props: "form_definition",
-        filter: `form_name:eq:${name}`,
-      });
-      if (response.status >= 300) throw new Error(problemText(response.body));
-      const body = response.body;
-      const rows =
-        typeof body === "object" && body !== null && "data" in body && Array.isArray(body.data)
-          ? (body.data as unknown[])
-          : [];
-      const first = rows[0];
-      return typeof first === "object" && first !== null && "form_definition" in first
-        ? first.form_definition
-        : null;
-    },
-  });
-  const def = useMemo(
-    () => (sub.data === undefined ? null : parseDefinition(sub.data)),
-    [sub.data],
-  );
+  const sub = useFormDefinitionByName(name);
+  const def = sub.data ?? null;
   if (name === "") return <p className="text-state-down">■ {t("forms.render.subFormMissing")}</p>;
   if (sub.isPending) return <p className="text-ink-muted">{t("forms.render.candidatesLoading")}</p>;
   if (sub.isError) return <p className="text-state-down">■ {sub.error.message}</p>;

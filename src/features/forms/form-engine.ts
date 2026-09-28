@@ -47,6 +47,12 @@ export interface FormInput {
   css: string;
   /** Width of the control, a CSS length; the form's Width when unset. */
   width: string | undefined;
+  /** Label in display mode, when it differs from the form's. */
+  displayModeLabel: string;
+  /** False when the input has no column in the digest of a displayed value. */
+  displayInDigest: boolean;
+  /** Length beyond which a displayed value is shortened, 0 for never. */
+  displayModeTrim: number;
 }
 
 export interface FormOutputShape {
@@ -172,6 +178,19 @@ export function parseDefinition(raw: unknown): FormDefinition | null {
       labelCss: str(item.LabelCss),
       css: str(item.Css),
       width: cssLength(item.Width),
+      displayModeLabel: str(item.DisplayModeLabel),
+      // The historical renderer tests `DisplayInDigest == false`, which only a false,
+      // 0, "0" or empty value satisfies: null or an absent key keeps the column.
+      displayInDigest: !(
+        item.DisplayInDigest === false ||
+        item.DisplayInDigest === 0 ||
+        item.DisplayInDigest === "0" ||
+        item.DisplayInDigest === ""
+      ),
+      displayModeTrim:
+        typeof item.DisplayModeTrim === "number" && item.DisplayModeTrim > 0
+          ? item.DisplayModeTrim
+          : 0,
     });
   }
   const outputs = Array.isArray(raw.Outputs) ? raw.Outputs : null;

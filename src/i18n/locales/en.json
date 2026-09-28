@@ -1073,6 +1073,11 @@
     "forward": "Forward to {{name}}"
   },
   "forms": {
+    "display": {
+      "notFound": "Form definition not found",
+      "showJson": "Show the JSON",
+      "showForm": "Show the value laid out by its form"
+    },
     "title": "Forms",
     "intro": "A form describes, in YAML, the inputs a submission expects and the outputs it runs: database insert, API call, script, mail or workflow step. The list shows the forms published to one of your groups; creating and changing them requires the FormsManager privilege.",
     "fields": {
