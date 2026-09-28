@@ -31,7 +31,8 @@
     "allRequests": "All requests",
     "teamRequests": "Assigned to my team",
     "tiersRequests": "Pending tiers action",
-    "modulesets": "Modulesets"
+    "modulesets": "Modulesets",
+    "rulesets": "Rulesets"
   },
   "header": {
     "search": "Search the collector",
@@ -1246,6 +1247,29 @@
       "modset_mod_updated": "Updated",
       "teams_responsible": "Teams responsible",
       "teams_publication": "Teams publication"
+    }
+  },
+  "rulesets": {
+    "title": "Rulesets",
+    "fields": {
+      "id": "Variable id",
+      "ruleset_id": "Ruleset id",
+      "ruleset_name": "Ruleset",
+      "ruleset_type": "Type",
+      "ruleset_public": "Public",
+      "teams_responsible": "Teams responsible",
+      "teams_publication": "Teams publication",
+      "fset_name": "Filterset",
+      "chain": "Chain",
+      "chain_len": "Chain length",
+      "encap_rset": "Encapsulated ruleset",
+      "var_class": "Class",
+      "var_name": "Variable",
+      "var_value": "Value",
+      "var_updated": "Updated",
+      "var_author": "Author",
+      "encap_rset_id": "Encapsulated ruleset id",
+      "fset_id": "Filterset id"
     }
   }
 }

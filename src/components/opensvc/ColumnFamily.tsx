@@ -9,6 +9,7 @@ import {
   DrpIcon,
   DatabaseIcon,
   EnvIcon,
+  FilterIcon,
   FirewallIcon,
   GearIcon,
   LocationIcon,
@@ -19,6 +20,7 @@ import {
   ServerIcon,
   StateIcon,
   StackIcon,
+  TargetIcon,
   UsersIcon,
 } from "@/components/ui/icons";
 
@@ -50,7 +52,9 @@ export type ColumnFamily =
   | "state"
   | "drp"
   | "package"
-  | "moduleset";
+  | "moduleset"
+  | "ruleset"
+  | "filterset";
 
 /**
  * The collector colours by domain rather than by family: everything about the node is
@@ -84,6 +88,10 @@ const FAMILIES: Record<ColumnFamily, { Icon: typeof ServerIcon; className: strin
   // The historical moduleset columns carry a cog (`action16`): the cogs of the
   // Modulesets menu entry, in the compliance tint.
   moduleset: { Icon: GearIcon, className: "text-icon-compliance" },
+  // The historical ruleset columns carry the compliance bullseye (`comp16`).
+  ruleset: { Icon: TargetIcon, className: "text-icon-compliance" },
+  // `filter16`, in the tint of the Filtersets view.
+  filterset: { Icon: FilterIcon, className: "text-icon-dashboard" },
 };
 
 export function ColumnFamilyIcon({ family }: { family: ColumnFamily }) {

@@ -1510,7 +1510,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * @description List the variables of the rulesets published to one of the user's groups, every
+         *     ruleset for a manager, as the historical v_comp_rulesets view: a ruleset lists
+         *     its own variables, then those of each ruleset it encapsulates, named by
+         *     encap_rset and chain, with the ruleset's filterset and its responsible and
+         *     publication teams. A ruleset of the chain without variable is listed on a row
+         *     with a zero id and empty variable props.
+         */
+        get: operations["GetComplianceRulesetsVariables"];
         put?: never;
         /**
          * @description Create or update a variable, as POST /compliance/rulesets/{rset_id}/variables,
@@ -4817,6 +4825,49 @@ export interface components {
             var_name?: string;
             var_updated?: string;
             var_value?: string | null;
+        };
+        RulesetsVariableListResponse: {
+            data: components["schemas"]["RulesetsVariableRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A variable of a compliance ruleset, own or encapsulated, with its ruleset and
+         *     the ruleset's filterset and teams. Every property is optional: the `props`
+         *     query parameter selects which columns the server returns.
+         */
+        RulesetsVariableRow: {
+            /** @description The path from the ruleset to the encapsulated one, as "a > b > c", empty for its own variables. */
+            chain?: string;
+            /** @description The number of rulesets in the chain, 1 for its own variables. */
+            chain_len?: number;
+            /** @description The encapsulated ruleset holding the variable, empty for its own variables. */
+            encap_rset?: string;
+            /** @description The id of encap_rset, 0 for its own variables. */
+            encap_rset_id?: number;
+            fset_id?: number;
+            /** @description The filterset of a contextual ruleset. */
+            fset_name?: string;
+            /** @description The variable id, 0 on the row of a ruleset without variable. */
+            id?: number;
+            ruleset_id?: number;
+            ruleset_name?: string;
+            /** @description T when the ruleset is public, F otherwise. */
+            ruleset_public?: string;
+            /** @description explicit or contextual. */
+            ruleset_type?: string;
+            /** @description The roles of the groups the ruleset is published to, comma separated. */
+            teams_publication?: string;
+            /** @description The roles of the groups responsible for the ruleset, comma separated. */
+            teams_responsible?: string;
+            var_author?: string;
+            var_class?: string;
+            var_name?: string;
+            var_updated?: string;
+            var_value?: string;
         };
         ServiceListResponse: {
             data: components["schemas"]["ServiceRow"][] | {
@@ -9523,6 +9574,63 @@ export interface operations {
             401: components["responses"]["401"];
             403: components["responses"]["403"];
             404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetComplianceRulesetsVariables: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetsVariableListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
             500: components["responses"]["500"];
         };
     };

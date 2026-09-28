@@ -31,7 +31,8 @@
     "allRequests": "Toutes les demandes",
     "teamRequests": "Assignées à mon équipe",
     "tiersRequests": "En attente d'action de tiers",
-    "modulesets": "Modulesets"
+    "modulesets": "Modulesets",
+    "rulesets": "Rulesets"
   },
   "header": {
     "search": "Rechercher dans le collector",
@@ -1246,6 +1247,29 @@
       "modset_mod_updated": "Mis à jour",
       "teams_responsible": "Équipes responsables",
       "teams_publication": "Équipes de publication"
+    }
+  },
+  "rulesets": {
+    "title": "Rulesets",
+    "fields": {
+      "id": "Id de la variable",
+      "ruleset_id": "Id du ruleset",
+      "ruleset_name": "Ruleset",
+      "ruleset_type": "Type",
+      "ruleset_public": "Public",
+      "teams_responsible": "Équipes responsables",
+      "teams_publication": "Équipes de publication",
+      "fset_name": "Filterset",
+      "chain": "Chaîne",
+      "chain_len": "Longueur de la chaîne",
+      "encap_rset": "Ruleset encapsulé",
+      "var_class": "Classe",
+      "var_name": "Variable",
+      "var_value": "Valeur",
+      "var_updated": "Mis à jour",
+      "var_author": "Auteur",
+      "encap_rset_id": "Id du ruleset encapsulé",
+      "fset_id": "Id du filterset"
     }
   }
 }

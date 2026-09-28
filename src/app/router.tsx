@@ -24,6 +24,7 @@ import { NodesPage } from "@/features/nodes/NodesPage";
 import { ObsolescencePage } from "@/features/obsolescence/ObsolescencePage";
 import { ActionsPage } from "@/features/actions/ActionsPage";
 import { ProfilePage } from "@/features/profile/ProfilePage";
+import { RulesetsPage } from "@/features/rulesets/RulesetsPage";
 import { ServicesPage } from "@/features/services/ServicesPage";
 import { TagsPage } from "@/features/tags/TagsPage";
 import { UsersPage } from "@/features/users/UsersPage";
@@ -196,6 +197,13 @@ const modulesetsRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
+const rulesetsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/compliance/rulesets",
+  component: RulesetsPage,
+  validateSearch: parseListSearch,
+});
+
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users",
@@ -242,6 +250,7 @@ const routeTree = rootRoute.addChildren([
   teamRequestsRoute,
   tiersRequestsRoute,
   modulesetsRoute,
+  rulesetsRoute,
   actionsRoute,
   profileRoute,
 ]);
