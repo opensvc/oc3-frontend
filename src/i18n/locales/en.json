@@ -26,7 +26,8 @@
     "forms": "Forms",
     "newRequest": "New request",
     "packages": "Packages",
-    "hardware": "Nodes Hardware"
+    "hardware": "Nodes Hardware",
+    "allRequests": "All requests"
   },
   "header": {
     "search": "Search the collector",
@@ -1174,6 +1175,30 @@
       "updated": "Updated",
       "nodes.app": "Node app",
       "nodes.os_name": "OS"
+    }
+  },
+  "allRequests": {
+    "title": "All requests",
+    "intro": "The requests submitted with a form having a workflow output, whoever submitted them: their status, their steps and who they await.",
+    "status": {
+      "pending": "pending",
+      "closed": "closed"
+    },
+    "fields": {
+      "form_head_id": "Request",
+      "form_name": "Form",
+      "last_form_id": "Last step",
+      "last_form_name": "Last step form",
+      "form_folder": "Folder",
+      "status": "Status",
+      "steps": "Steps",
+      "creator": "Creator",
+      "last_assignee": "Assignee",
+      "create_date": "Created",
+      "last_update": "Updated",
+      "form_yaml": "Form definition",
+      "id": "Workflow id",
+      "form_md5": "Revision md5"
     }
   }
 }

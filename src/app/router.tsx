@@ -9,6 +9,7 @@ import { FiltersPage } from "@/features/filters/FiltersPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
 import { FormsPage } from "@/features/forms/FormsPage";
 import { NewRequestPage } from "@/features/requests/NewRequestPage";
+import { AllRequestsPage } from "@/features/requests/AllRequestsPage";
 import { parseRequestSearch } from "@/features/requests/catalog";
 import { GroupsPage } from "@/features/groups/GroupsPage";
 import { InstancesPage } from "@/features/instances/InstancesPage";
@@ -152,7 +153,15 @@ const formsRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
-// The request catalog: the folder browsed and the form chosen live in the URL.
+// Every request submitted, a list as the others.
+const allRequestsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/requests/all",
+  component: AllRequestsPage,
+  validateSearch: parseListSearch,
+});
+
+// The request catalog: the form chosen lives in the URL.
 const requestsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/requests",
@@ -202,6 +211,7 @@ const routeTree = rootRoute.addChildren([
   filtersetsRoute,
   formsRoute,
   requestsRoute,
+  allRequestsRoute,
   actionsRoute,
   profileRoute,
 ]);

@@ -2740,6 +2740,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workflows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the requests: the workflows started by the submission of a form with a
+         *     workflow output, the most recent first by default. As the historical API,
+         *     every workflow is listed to any authenticated user. `form_name`,
+         *     `form_folder` and `form_yaml` are those of the form revision the request
+         *     started from.
+         */
+        get: operations["GetWorkflows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3556,6 +3579,39 @@ export interface components {
             registration_id?: string;
             reset_password_key?: string;
             username?: string;
+        };
+        WorkflowListResponse: {
+            data: components["schemas"]["WorkflowRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A request: the workflow started by the submission of a form with a workflow
+         *     output. `form_head_id` is the stored submission that started it,
+         *     `last_form_id` and `last_form_name` its latest step; `status` is `pending`
+         *     while a next step awaits `last_assignee`, `closed` otherwise. Every property
+         *     is optional: the `props` query parameter selects which columns the server
+         *     returns. `form_name`, `form_folder` and `form_yaml` come from the joined form
+         *     revision and are null when it is missing.
+         */
+        WorkflowRow: {
+            create_date?: string;
+            creator?: string;
+            form_folder?: string | null;
+            form_head_id?: number;
+            form_md5?: string | null;
+            form_name?: string | null;
+            form_yaml?: string | null;
+            id?: number;
+            last_assignee?: string;
+            last_form_id?: number | null;
+            last_form_name?: string | null;
+            last_update?: string;
+            status?: string;
+            steps?: number;
         };
         version: {
             /** @example 0.0.1 */
@@ -12516,6 +12572,62 @@ export interface operations {
                     "application/json": components["schemas"]["version"];
                 };
             };
+            500: components["responses"]["500"];
+        };
+    };
+    GetWorkflows: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkflowListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
             500: components["responses"]["500"];
         };
     };

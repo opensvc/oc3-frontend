@@ -28,7 +28,8 @@ export interface NavEntry {
     | "/filters"
     | "/filtersets"
     | "/forms"
-    | "/requests";
+    | "/requests"
+    | "/requests/all";
   labelKey: string;
   icon: ObjectKind;
   /** True for the root: without it, prefix matching would activate it everywhere. */
@@ -80,7 +81,10 @@ export const NAV_CATEGORIES: NavCategory[] = [
     labelKey: "nav.categories.requests",
     entries: [
       // `req-new` of the historical Requests menu: the catalog of the forms to submit.
-      { to: "/requests", labelKey: "nav.newRequest", icon: "form" },
+      // Exact: the prefix would also match the requests list below.
+      { to: "/requests", labelKey: "nav.newRequest", icon: "form", exact: true },
+      // `req-all` of the historical Requests menu: every request submitted.
+      { to: "/requests/all", labelKey: "nav.allRequests", icon: "form" },
     ],
   },
   {

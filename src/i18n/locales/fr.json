@@ -26,7 +26,8 @@
     "forms": "Formulaires",
     "newRequest": "Nouvelle demande",
     "packages": "Paquets",
-    "hardware": "Matériel des nodes"
+    "hardware": "Matériel des nodes",
+    "allRequests": "Toutes les demandes"
   },
   "header": {
     "search": "Rechercher dans le collector",
@@ -1174,6 +1175,30 @@
       "updated": "Mis à jour",
       "nodes.app": "App du node",
       "nodes.os_name": "OS"
+    }
+  },
+  "allRequests": {
+    "title": "Toutes les demandes",
+    "intro": "Les demandes soumises par un formulaire à sortie workflow, quel qu'en soit l'auteur : leur statut, leurs étapes et qui elles attendent.",
+    "status": {
+      "pending": "en attente",
+      "closed": "close"
+    },
+    "fields": {
+      "form_head_id": "Demande",
+      "form_name": "Formulaire",
+      "last_form_id": "Dernière étape",
+      "last_form_name": "Formulaire de la dernière étape",
+      "form_folder": "Dossier",
+      "status": "Statut",
+      "steps": "Étapes",
+      "creator": "Auteur",
+      "last_assignee": "Assignée à",
+      "create_date": "Créée le",
+      "last_update": "Mise à jour",
+      "form_yaml": "Définition du formulaire",
+      "id": "Id du workflow",
+      "form_md5": "Md5 de la révision"
     }
   }
 }
