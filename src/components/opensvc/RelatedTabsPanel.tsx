@@ -65,7 +65,8 @@ export function RelatedTabsPanel({
   return (
     <SlideOver
       open={open}
-      wide
+      // The tab bar lists every kind of related data: a node has six tabs, with counts.
+      size="wider"
       title={title}
       onClose={onClose}
       closeLabel={t("detail.close")}

@@ -18,6 +18,9 @@ import { TrailBar } from "./TrailBar";
 const INTERACTIVE =
   'a, button, input, select, textarea, label, summary, details, table, [role="dialog"], [role="button"], [role="menu"], [role="menuitem"], [role="tab"], [role="listbox"], [role="option"], [role="combobox"], [tabindex]';
 
+/** Maximum widths, written out in full: Tailwind does not see names built at runtime. */
+const SIZES = { default: "max-w-xl", wide: "max-w-3xl", wider: "max-w-4xl" } as const;
+
 export function SlideOver({
   open,
   title,
@@ -25,7 +28,7 @@ export function SlideOver({
   closeLabel,
   leading,
   subheader,
-  wide = false,
+  size = "default",
   closeOnOutsideClick = true,
   children,
 }: {
@@ -37,8 +40,11 @@ export function SlideOver({
   leading?: ReactNode;
   /** Strip fixed under the title, outside the scroll: tabs, for instance. */
   subheader?: ReactNode;
-  /** Wider drawer, for content made of lists rather than properties. */
-  wide?: boolean;
+  /**
+   * Width of the drawer: "wide" for content made of lists rather than properties,
+   * "wider" for a drawer whose tab bar lists many kinds of related data.
+   */
+  size?: "default" | "wide" | "wider";
   /**
    * False for a data-entry drawer: a click beside it would clear a form being filled
    * in, whereas it only puts down a record one was reading.
@@ -108,7 +114,7 @@ export function SlideOver({
       aria-modal="false"
       tabIndex={-1}
       inert={!open}
-      className={`fixed inset-y-0 right-0 z-10 flex w-full ${wide ? "max-w-3xl" : "max-w-xl"} flex-col border-l border-line bg-surface-raised shadow-lg transition-transform duration-200 ease-out ${
+      className={`fixed inset-y-0 right-0 z-10 flex w-full ${SIZES[size]} flex-col border-l border-line bg-surface-raised shadow-lg transition-transform duration-200 ease-out ${
         open ? "translate-x-0" : "translate-x-full"
       }`}
     >

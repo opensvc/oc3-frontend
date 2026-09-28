@@ -67,7 +67,7 @@ export function ActionDetailPanel({
       onClose={onClose}
       closeLabel={t("detail.close")}
       leading={<ObjectIcon kind="log" />}
-      wide
+      size="wide"
     >
       {actionId !== undefined && loading ? (
         <p className="text-ink-muted">{t("detail.loading")}</p>
