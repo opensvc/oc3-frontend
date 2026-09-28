@@ -155,7 +155,8 @@
       "hardware": "Hardware inventory",
       "alerts": "Alerts",
       "networks": "Networks",
-      "storage": "Storage"
+      "storage": "Storage",
+      "packages": "Packages"
     },
     "actions": {
       "open": "Actions",
@@ -212,6 +213,17 @@
         "net_gateway": "Gateway",
         "flag_deprecated": "State"
       }
+    },
+    "packages": {
+      "search": "Search a package or version",
+      "count_one": "{{count}} package",
+      "count_other": "{{count}} packages",
+      "matching_one": "{{count}} of {{total}} package",
+      "matching_other": "{{count}} of {{total}} packages",
+      "openView": "Open in the Packages view",
+      "reported": "Reported by the agent",
+      "empty": "No package: the agent has not reported any for this node.",
+      "noMatch": "No package matches the search."
     }
   },
   "auth": {

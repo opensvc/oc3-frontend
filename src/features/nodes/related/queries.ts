@@ -143,3 +143,53 @@ export function useNodeTags(nodeId: string | undefined) {
     },
   });
 }
+
+type PackageRow = components["schemas"]["PackageRow"];
+
+/** The filter naming the node's packages in `GET /packages`. */
+function nodePackagesFilter(nodeId: string | undefined): string {
+  return `node_id:eq:${nodeId ?? ""}`;
+}
+
+/**
+ * Number of packages installed on the node, for the tab counter: read from the
+ * total of a one-row page, a node counting a couple of thousand packages that the
+ * counter need not load whenever the panel opens.
+ */
+export function useNodePackageCount(nodeId: string | undefined) {
+  return useQuery({
+    queryKey: ["node", nodeId, "packages", "count"],
+    enabled: nodeId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/packages", {
+        params: { query: { props: "id", limit: 1, filter: [nodePackagesFilter(nodeId)] } },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return data.meta?.total;
+    },
+  });
+}
+
+/** Packages installed on the node, by name then architecture; loaded when the tab opens. */
+export function useNodePackages(nodeId: string | undefined) {
+  return useQuery({
+    queryKey: ["node", nodeId, "packages"],
+    enabled: nodeId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/packages", {
+        params: {
+          query: {
+            props:
+              "id,pkg_name,pkg_version,pkg_arch,pkg_type,sig_provider,pkg_install_date,pkg_updated",
+            orderby: "pkg_name,pkg_arch",
+            limit: 0,
+            filter: [nodePackagesFilter(nodeId)],
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      const rows: PackageRow[] = Array.isArray(data.data) ? data.data : [];
+      return rows;
+    },
+  });
+}

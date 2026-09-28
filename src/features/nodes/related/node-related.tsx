@@ -5,8 +5,15 @@ import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import { NodeAlerts } from "./NodeAlerts";
 import { NodeHardware } from "./NodeHardware";
 import { NodeNetworks } from "./NodeNetworks";
+import { NodePackages } from "./NodePackages";
 import { NodeStorage } from "./NodeStorage";
-import { useNodeAlerts, useNodeDisks, useNodeHardware, useNodeIps } from "./queries";
+import {
+  useNodeAlerts,
+  useNodeDisks,
+  useNodeHardware,
+  useNodeIps,
+  useNodePackageCount,
+} from "./queries";
 
 /**
  * Data attached to a node, one tab each, in display order.
@@ -36,6 +43,14 @@ export const NODE_RELATED_TABS: RelatedTab[] = [
     icon: <ColumnFamilyIcon family="disk" />,
     useSummary: (nodeId) => ({ count: useNodeDisks(nodeId).data?.length }),
     render: (nodeId, locale) => <NodeStorage nodeId={nodeId} locale={locale} />,
+  },
+  {
+    key: "packages",
+    labelKey: "nodes.related.packages",
+    icon: <ColumnFamilyIcon family="package" />,
+    // Counted apart: the list itself, a couple of thousand rows, loads with the tab.
+    useSummary: (nodeId) => ({ count: useNodePackageCount(nodeId).data }),
+    render: (nodeId, locale) => <NodePackages nodeId={nodeId} locale={locale} />,
   },
   {
     key: "alerts",

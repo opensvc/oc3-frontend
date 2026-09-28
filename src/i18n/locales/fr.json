@@ -155,7 +155,8 @@
       "hardware": "Inventaire matériel",
       "alerts": "Alertes",
       "networks": "Réseaux",
-      "storage": "Stockage"
+      "storage": "Stockage",
+      "packages": "Paquets"
     },
     "actions": {
       "open": "Actions",
@@ -212,6 +213,17 @@
         "net_gateway": "Passerelle",
         "flag_deprecated": "État"
       }
+    },
+    "packages": {
+      "search": "Rechercher un paquet ou une version",
+      "count_one": "{{count}} paquet",
+      "count_other": "{{count}} paquets",
+      "matching_one": "{{count}} paquet sur {{total}}",
+      "matching_other": "{{count}} paquets sur {{total}}",
+      "openView": "Ouvrir dans la vue Paquets",
+      "reported": "Remonté par l'agent",
+      "empty": "Aucun paquet : l'agent n'en a pas remonté pour ce node.",
+      "noMatch": "Aucun paquet ne correspond à la recherche."
     }
   },
   "auth": {
