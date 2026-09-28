@@ -11,7 +11,7 @@ import { useFormDefinitionByName } from "./use-form";
  * produced it, as `render_display_mode()` of `init/static/js/osvc/forms.js` shows a
  * compliance rule value. `digest` gives the compact table the lists use; without
  * it, a label per input. A toggle shows the JSON instead, as the `fa-code` icon of
- * the historical box. Read-only: the edit icon of the historical box is not ported.
+ * the historical box, except for plain text, whose JSON would read the same. Read-only: the edit icon of the historical box is not ported.
  */
 export function FormValue({
   formName,
@@ -29,18 +29,20 @@ export function FormValue({
   // A value without form has nothing to lay it out, as in the historical renderer.
   if (formName === "" || formName === "empty" || value === undefined) return null;
   const data = parseValue(value);
+  // Plain text is shown as it is stored: its JSON view would show the same text.
+  const plain = typeof data === "string" || typeof data === "number" || formName === "raw";
 
   let body;
-  if (json) {
-    body = <pre className="font-mono whitespace-pre-wrap break-all">{jsonText(data)}</pre>;
+  if (json && !plain) {
+    body = <pre className="font-mono break-all whitespace-pre-wrap">{jsonText(data)}</pre>;
   } else if (form.isPending) {
     body = <span className="text-ink-muted">…</span>;
   } else if (form.isError) {
     body = <span className="text-state-down">■ {form.error.message}</span>;
   } else if (form.data === null || form.data === undefined) {
     body = <span className="text-state-down">■ {t("forms.display.notFound")}</span>;
-  } else if (typeof data === "string" || typeof data === "number" || formName === "raw") {
-    body = <pre className="font-mono whitespace-pre-wrap break-all">{plainText(data)}</pre>;
+  } else if (plain) {
+    body = <pre className="font-mono break-all whitespace-pre-wrap">{plainText(data)}</pre>;
   } else if (digest) {
     body = <Digest def={form.data} data={data} />;
   } else {
@@ -48,20 +50,24 @@ export function FormValue({
   }
 
   return (
-    <div className="relative min-w-64 rounded-(--radius-control) border border-line bg-surface-sunken py-1 pr-12 pl-2">
-      <button
-        type="button"
-        aria-pressed={json}
-        title={t(json ? "forms.display.showForm" : "forms.display.showJson")}
-        onClick={(event) => {
-          // The click belongs to the toggle, not to the row under it.
-          event.stopPropagation();
-          setJson(!json);
-        }}
-        className="absolute top-1 right-1 rounded-(--radius-control) border border-line bg-surface px-1 font-mono text-ink-muted hover:text-ink aria-pressed:bg-accent-soft aria-pressed:text-ink"
-      >
-        {"{ }"}
-      </button>
+    <div
+      className={`relative my-1 min-w-64 rounded-(--radius-control) border border-line bg-surface-sunken py-1 pl-2 ${plain ? "pr-2" : "pr-12"}`}
+    >
+      {!plain && (
+        <button
+          type="button"
+          aria-pressed={json}
+          title={t(json ? "forms.display.showForm" : "forms.display.showJson")}
+          onClick={(event) => {
+            // The click belongs to the toggle, not to the row under it.
+            event.stopPropagation();
+            setJson(!json);
+          }}
+          className="absolute top-1 right-1 rounded-(--radius-control) border border-line bg-surface px-1 font-mono text-ink-muted hover:text-ink aria-pressed:bg-accent-soft aria-pressed:text-ink"
+        >
+          {"{ }"}
+        </button>
+      )}
       {body}
     </div>
   );
@@ -78,7 +84,7 @@ function SubFormValue({ formName, data }: { formName: string; data: unknown }) {
   return (
     <div className="rounded-(--radius-control) border border-line bg-surface p-1">
       {typeof data === "string" || typeof data === "number" || formName === "raw" ? (
-        <pre className="font-mono whitespace-pre-wrap break-all">{plainText(data)}</pre>
+        <pre className="font-mono break-all whitespace-pre-wrap">{plainText(data)}</pre>
       ) : (
         <Normal def={form.data} data={data} />
       )}
@@ -192,7 +198,10 @@ function Digest({ def, data }: { def: FormDefinition; data: unknown }) {
                 return (
                   <td key={input.id} className="pr-3 align-top">
                     <span className="inline-flex items-center gap-1">
-                      <LegacyCssIcon css={`${input.css} ${input.labelCss}`} className="h-3.5 w-3.5" />
+                      <LegacyCssIcon
+                        css={[input.css, input.labelCss].join(" ")}
+                        className="h-3.5 w-3.5"
+                      />
                       {shown(item, input)}
                     </span>
                   </td>
@@ -274,7 +283,7 @@ function NormalDict({ def, data }: { def: FormDefinition; data: Record<string, u
               <td className="align-top">
                 <span className="inline-flex items-start gap-1">
                   <LegacyCssIcon css={input.css} className="mt-0.5 h-3.5 w-3.5" />
-                  <span className={pre ? "font-mono whitespace-pre-wrap break-all" : "break-words"}>
+                  <span className={pre ? "font-mono break-all whitespace-pre-wrap" : "break-words"}>
                     {shown(content, input)}
                   </span>
                 </span>
