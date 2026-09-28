@@ -18,6 +18,7 @@ import { CloseIcon, PlusIcon } from "@/components/ui/icons";
 import {
   candidatesPath,
   constraintHolds,
+  convertBoolean,
   convertedValue,
   dependents,
   formData,
@@ -55,6 +56,63 @@ function newGroup(def: FormDefinition, user: FormUser): GroupState {
     }
   }
   return group;
+}
+
+/** A stored value as the control of an input holds it. */
+function controlValue(input: FormInput, v: unknown): InputValue {
+  if (input.type === "form") return v;
+  if (input.type === "boolean") return convertBoolean(v);
+  if (input.multiple || input.type === "checklist")
+    return Array.isArray(v)
+      ? v.map((item) => controlValue({ ...input, multiple: false, type: "string" }, item))
+      : [];
+  if (v === undefined || v === null) return "";
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+}
+
+/**
+ * The groups of inputs holding a stored value, the inverse of formData(): one per
+ * entry of a list or of a dict of dicts, one for a dict. An input the value does
+ * not name keeps its initial value; a templated output cannot be read back and
+ * starts from the defaults.
+ */
+function groupsFromData(def: FormDefinition, data: unknown, user: FormUser): GroupState[] {
+  const output = def.output;
+  if (output?.template) return [newGroup(def, user)];
+  const record = (v: unknown): v is Record<string, unknown> =>
+    typeof v === "object" && v !== null && !Array.isArray(v);
+  let entries: unknown[];
+  switch (output?.format) {
+    case "list":
+    case "list of dict":
+      entries = Array.isArray(data) ? data : [];
+      break;
+    case "dict of dict":
+      entries = record(data)
+        ? Object.entries(data).map(([key, entry]) => ({
+            ...(record(entry) ? entry : {}),
+            [output.key]: key,
+          }))
+        : [];
+      break;
+    default:
+      entries = [data];
+  }
+  if (entries.length === 0) return isRepeated(def) ? [] : [newGroup(def, user)];
+  return entries.map((entry) => {
+    const group = newGroup(def, user);
+    if (record(entry)) {
+      for (const input of def.inputs) {
+        if (input.key in entry) group.values[input.id] = controlValue(input, entry[input.key]);
+      }
+    } else {
+      // A plain entry, as a list of strings stores it, fills the first shown input.
+      const first = def.inputs.find((input) => !input.hidden);
+      if (first !== undefined) group.values[first.id] = controlValue(first, entry);
+    }
+    return group;
+  });
 }
 
 /**
@@ -101,9 +159,12 @@ export function FormRender({
   onSubmit,
   onDataChange,
   submitLabel,
+  initialData,
 }: {
   def: FormDefinition;
   user: FormUser;
+  /** A stored value to start from, instead of the form's defaults. */
+  initialData?: unknown;
   onSubmit?: (data: unknown) => void;
   onDataChange?: (data: unknown) => void;
   submitLabel?: string;
@@ -112,7 +173,9 @@ export function FormRender({
   const repeated = isRepeated(def);
   const minEntries = def.output?.minEntries ?? 0;
   const maxEntries = def.output?.maxEntries ?? null;
-  const [groups, setGroups] = useState<GroupState[]>(() => [newGroup(def, user)]);
+  const [groups, setGroups] = useState<GroupState[]>(() =>
+    initialData === undefined ? [newGroup(def, user)] : groupsFromData(def, initialData, user),
+  );
   const deps = useMemo(() => dependents(def), [def]);
 
   const visible = groups.map((group) => visibleInputs(def, group));
