@@ -14,6 +14,7 @@ export function ConfirmButton({
   pendingLabel,
   pending = false,
   icon,
+  inline = false,
   onConfirm,
 }: {
   label: string;
@@ -24,6 +25,12 @@ export function ConfirmButton({
   pending?: boolean;
   /** Visual placed before the label of the arming button. */
   icon?: ReactNode;
+  /**
+   * The question and its buttons take the place of the arming button on the same
+   * line and at the same height, instead of a question above the buttons: for a
+   * strip, a bar at the foot of the page say, which must not grow while it asks.
+   */
+  inline?: boolean;
   onConfirm: () => void;
 }) {
   const [armed, setArmed] = useState(false);
@@ -49,8 +56,12 @@ export function ConfirmButton({
   }
 
   return (
-    <div role="group" aria-label={question}>
-      <p className="mb-2">{question}</p>
+    <div
+      role="group"
+      aria-label={question}
+      className={inline ? "flex items-center gap-2 whitespace-nowrap" : undefined}
+    >
+      {inline ? <span>{question}</span> : <p className="mb-2">{question}</p>}
       <div className="flex gap-2">
         <button
           ref={confirm}

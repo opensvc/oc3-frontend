@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ConfirmButton } from "./ConfirmButton";
-import { CloseIcon } from "./icons";
+import { BookmarkIcon, CloseIcon } from "./icons";
 import { useTrail } from "./trail";
 
 const CHIP =
@@ -30,7 +30,10 @@ export function TrailBar({ current, onClear }: { current?: string; onClear?: () 
       aria-label={t("bookmarks.title")}
       className="flex shrink-0 items-center gap-2 border-t border-line bg-surface-raised px-3 py-1.5"
     >
-      <span className="shrink-0 text-data text-ink-muted">{t("bookmarks.title")}</span>
+      {/* The bar is named by its aria-label: the icon only has to be seen. */}
+      <span title={t("bookmarks.title")} className="shrink-0 text-ink-muted">
+        <BookmarkIcon filled className="h-4 w-4" />
+      </span>
       <ol className="flex min-w-0 flex-wrap items-center gap-1">
         {hidden > 0 && (
           <li>
@@ -94,6 +97,7 @@ export function TrailBar({ current, onClear }: { current?: string; onClear?: () 
             confirmLabel={t("bookmarks.clearAll")}
             cancelLabel={t("detail.cancel")}
             pendingLabel={t("bookmarks.clearAll")}
+            inline
             onConfirm={onClear}
           />
         </div>
