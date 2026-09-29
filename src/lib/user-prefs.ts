@@ -58,6 +58,11 @@ export interface UserPrefs {
   theme?: string;
   /** Chosen colour palette; absent means "standard". */
   palette?: string;
+  /**
+   * The side menu: the keys of the collapsed sections. Absent, every section is
+   * expanded. The old interface does not fold its menu, so the key is ours alone.
+   */
+  nav?: { collapsed?: string[] };
   [key: string]: unknown;
 }
 
@@ -364,4 +369,44 @@ export function hasSavedViewPrefs(prefs: UserPrefs | undefined): boolean {
       entry?.column_filters !== undefined ||
       entry?.perpage !== undefined,
   );
+}
+
+/** The sections of the side menu collapsed by the account. */
+function collapsedSections(prefs: UserPrefs | undefined): string[] {
+  const collapsed = prefs?.nav?.collapsed;
+  return Array.isArray(collapsed) ? collapsed.filter((key) => typeof key === "string") : [];
+}
+
+/**
+ * Which sections of the side menu are collapsed, and the toggle of one. The change
+ * shows at once and is saved in the background; if the save fails, the stored
+ * state is read again.
+ */
+export function useNavCollapsedPref() {
+  const queryClient = useQueryClient();
+  const prefs = useUserPrefs();
+  const collapsed = collapsedSections(prefs.data);
+  const save = useMutation({
+    mutationFn: async (next: string[]) => {
+      queryClient.setQueryData<UserPrefs>(PREFS_KEY, (current) => ({
+        ...current,
+        nav: { ...current?.nav, collapsed: next },
+      }));
+      await savePrefs(queryClient, (current) => ({
+        ...current,
+        nav: { ...current.nav, collapsed: next },
+      }));
+    },
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: PREFS_KEY });
+    },
+  });
+  return {
+    isCollapsed: (key: string) => collapsed.includes(key),
+    toggle: (key: string) => {
+      save.mutate(
+        collapsed.includes(key) ? collapsed.filter((k) => k !== key) : [...collapsed, key],
+      );
+    },
+  };
 }

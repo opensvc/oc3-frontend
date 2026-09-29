@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
+import { CaretRightIcon } from "@/components/ui/icons";
+import { useNavCollapsedPref } from "@/lib/user-prefs";
 import { NAV_CATEGORIES, NAV_TOP, type NavEntry } from "./navigation";
 
 const LINK =
@@ -29,10 +31,12 @@ function NavLink({ entry }: { entry: NavEntry }) {
 /**
  * Side menu. Foldable: on a narrow screen, or when a wide table needs all the room.
  * Folded, it keeps its place in the grid but not its width, and `inert` takes it out
- * of the keyboard path.
+ * of the keyboard path. Each section folds too, and the account keeps which ones
+ * are folded; all are open by default.
  */
 export function Sidebar({ open }: { open: boolean }) {
   const { t } = useTranslation();
+  const sections = useNavCollapsedPref();
 
   return (
     <aside
@@ -49,21 +53,39 @@ export function Sidebar({ open }: { open: boolean }) {
           ))}
         </ul>
 
-        {NAV_CATEGORIES.map((category) => (
-          <section key={category.key} className="mt-3">
-            <h2
-              id={`nav-category-${category.key}`}
-              className="px-2 py-1 text-data font-semibold text-ink-muted uppercase"
-            >
-              {t(category.labelKey)}
-            </h2>
-            <ul aria-labelledby={`nav-category-${category.key}`}>
-              {category.entries.map((entry) => (
-                <NavLink key={entry.to} entry={entry} />
-              ))}
-            </ul>
-          </section>
-        ))}
+        {NAV_CATEGORIES.map((category) => {
+          const expanded = !sections.isCollapsed(category.key);
+          return (
+            <section key={category.key} className="mt-3">
+              <h2 className="text-data font-semibold text-ink-muted uppercase">
+                <button
+                  type="button"
+                  id={`nav-category-${category.key}`}
+                  aria-expanded={expanded}
+                  aria-controls={`nav-entries-${category.key}`}
+                  onClick={() => {
+                    sections.toggle(category.key);
+                  }}
+                  className="flex w-full items-center gap-1 rounded-(--radius-control) px-2 py-1 text-left uppercase hover:text-ink"
+                >
+                  <CaretRightIcon
+                    className={`h-2.5 w-2.5 shrink-0 transition-transform ${expanded ? "rotate-90" : ""}`}
+                  />
+                  {t(category.labelKey)}
+                </button>
+              </h2>
+              <ul
+                id={`nav-entries-${category.key}`}
+                aria-labelledby={`nav-category-${category.key}`}
+                hidden={!expanded}
+              >
+                {category.entries.map((entry) => (
+                  <NavLink key={entry.to} entry={entry} />
+                ))}
+              </ul>
+            </section>
+          );
+        })}
       </nav>
     </aside>
   );
