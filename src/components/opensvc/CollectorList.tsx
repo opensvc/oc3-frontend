@@ -180,6 +180,23 @@ export function CollectorList<T>({
     element.querySelector<HTMLElement>("summary")?.focus();
   }
 
+  /**
+   * A click outside the open column picker closes it, as the other menus close; the
+   * click then does what it does anywhere else. `<details>` stays open by itself.
+   */
+  useEffect(() => {
+    function onPointerDown(event: PointerEvent) {
+      const element = picker.current;
+      if (element === null || !element.open) return;
+      if (event.target instanceof Node && element.contains(event.target)) return;
+      element.open = false;
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, []);
+
   const allProps = useMemo(() => columns.map((column) => column.prop), [columns]);
   // At least one page, even for an empty list.
   const pageCount = total === undefined ? undefined : Math.max(1, Math.ceil(total / search.limit));
