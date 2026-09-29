@@ -543,7 +543,7 @@
     "create": {
       "open": "Nouveau réseau",
       "title": "Nouveau réseau",
-      "intro": "Déclarer un réseau IPv4. Le collector ne liste pas les réseaux déclarés : les adresses de node comprises dans la plage afficheront son nom, sa passerelle et sa plage dans la colonne Réseau.",
+      "intro": "Déclarer un réseau IPv4. La vue Réseaux liste les adresses des nœuds, pas les réseaux déclarés : les adresses de nœud comprises dans la plage afficheront son nom, sa passerelle et sa plage dans la colonne Réseau.",
       "noRow": "Le réseau a été créé mais n'a pas été renvoyé.",
       "hostBits": "Cette adresse a des bits d'hôte ; l'adresse du réseau est {{network}}.",
       "useNetwork": "Utiliser {{network}}",
@@ -564,6 +564,40 @@
         "prio": "Priorité",
         "team_responsible": "Équipe responsable",
         "comment": "Commentaire"
+      }
+    },
+    "segment": {
+      "open": "Nouveau segment",
+      "title": "Nouveau segment de réseau",
+      "intro": "Déclarer une plage d'adresses d'un réseau. Les membres des groupes responsables du segment peuvent en attribuer les adresses ; votre groupe principal en devient responsable. La plage doit être comprise dans le réseau et ne pas chevaucher un autre de ses segments.",
+      "pick": "Choisir un réseau",
+      "loading": "Chargement des réseaux…",
+      "noNetwork": "Aucun réseau n'est encore déclaré : déclarez-en un avec Nouveau réseau d'abord.",
+      "networkRange": "Adresses du réseau :",
+      "preview_one": "{{formatted}} adresse dans le segment",
+      "preview_other": "{{formatted}} adresses dans le segment",
+      "noRow": "Le segment a été créé mais n'a pas été renvoyé.",
+      "submit": "Créer",
+      "submitting": "Création…",
+      "done": "Segment {{range}} ({{type}}) déclaré dans {{network}}.",
+      "fields": {
+        "network": "Réseau",
+        "seg_type": "Type",
+        "seg_begin": "Première adresse",
+        "seg_end": "Dernière adresse"
+      },
+      "types": {
+        "static": "Statique",
+        "dynamic": "Dynamique"
+      },
+      "typeHints": {
+        "static": "Les adresses sont attribuées à la main.",
+        "dynamic": "Les adresses sont distribuées par le provisionnement."
+      },
+      "problems": {
+        "invalid": "Ce n'est pas une adresse IPv4.",
+        "outside": "Hors du réseau.",
+        "before": "La dernière adresse précède la première."
       }
     }
   },

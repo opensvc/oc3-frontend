@@ -18,9 +18,9 @@ function toInt(value: string): number | undefined {
 }
 
 /**
- * Declaring a network. apicollector does not list the declared networks: a network
- * once created shows through the node addresses it contains, whose Network column
- * takes its name. The range preview reproduces the computation of the table's
+ * Declaring a network. The Networks view lists node addresses, not the declared
+ * networks: a network once created shows through the node addresses it contains,
+ * whose Network column takes its name, and in the network picker of a segment. The range preview reproduces the computation of the table's
  * generated columns; the server stays the only judge (network address, gateway,
  * uniqueness).
  */
@@ -80,6 +80,8 @@ export function CreateNetworkPanel({
       setComment("");
       // The addresses of the new network change their Network column.
       await queryClient.invalidateQueries({ queryKey: ["ips"] });
+      // The segment form offers it as a parent.
+      await queryClient.invalidateQueries({ queryKey: ["networks"] });
       await queryClient.invalidateQueries({ queryKey: ["ip"] });
       await queryClient.invalidateQueries({ queryKey: ["node"] });
       onCreated(created);

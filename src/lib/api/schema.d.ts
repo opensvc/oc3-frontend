@@ -2596,7 +2596,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * @description List the declared networks, by name then address. Every authenticated user
+         *     may read them. `begin`, `end` and `broadcast` are computed from `network` and
+         *     `netmask`.
+         */
+        get: operations["GetNetworks"];
         put?: never;
         /**
          * @description Declare a network. Requires the NetworkManager privilege. `network` must be
@@ -2605,6 +2610,29 @@ export interface paths {
          *     group. A name or an address already declared is refused with a 409.
          */
         post: operations["PostNetworks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/networks/{net_id}/segments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Declare a segment of a network: an address range whose responsible groups
+         *     may allocate its addresses. Requires the NetworkManager privilege and, unless
+         *     the caller is a manager, membership of the network's responsible team. The
+         *     range must lie inside the network and must not overlap another segment of it
+         *     (409). The caller's primary group becomes responsible for the segment.
+         */
+        post: operations["PostNetworkSegments"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4568,6 +4596,7 @@ export interface components {
         NetworkListResponse: {
             data: components["schemas"]["NetworkRow"][];
             info?: string;
+            meta?: components["schemas"]["ListMeta"];
         };
         /**
          * @description A declared network. `begin`, `end` and `broadcast` are computed from
@@ -4587,6 +4616,19 @@ export interface components {
             pvid?: number;
             team_responsible?: string;
             updated?: string;
+        };
+        NetworkSegmentListResponse: {
+            data: components["schemas"]["NetworkSegmentRow"][];
+            info?: string;
+        };
+        /** @description An address range of a network, delegated to its responsible groups. */
+        NetworkSegmentRow: {
+            id?: number;
+            net_id?: number;
+            seg_begin?: string;
+            seg_end?: string;
+            /** @enum {string} */
+            seg_type?: "static" | "dynamic";
         };
         NodeHardwareListResponse: {
             data: components["schemas"]["NodeHardwareRow"][] | {
@@ -13089,6 +13131,63 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
+    GetNetworks: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`, `!empty`: no value, any value.
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NetworkListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
     PostNetworks: {
         parameters: {
             query?: never;
@@ -13129,6 +13228,50 @@ export interface operations {
             400: components["responses"]["400"];
             401: components["responses"]["401"];
             403: components["responses"]["403"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostNetworkSegments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Record id of the network */
+                net_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description First IPv4 address of the segment */
+                    seg_begin: string;
+                    /** @description Last IPv4 address of the segment */
+                    seg_end: string;
+                    /**
+                     * @description How the addresses of the segment are allocated
+                     * @default static
+                     * @enum {string}
+                     */
+                    seg_type?: "static" | "dynamic";
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NetworkSegmentListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
             409: components["responses"]["409"];
             500: components["responses"]["500"];
         };

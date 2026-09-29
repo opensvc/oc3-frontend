@@ -1,6 +1,7 @@
-/** Computing an IPv4 range, for the preview of the network form. */
+/** Computing an IPv4 range, for the preview of the network and segment forms. */
 
-function toInt(address: string): number | null {
+/** An IPv4 address as a number, to compare addresses; `null` for an invalid one. */
+export function ipv4Value(address: string): number | null {
   const parts = address.trim().split(".");
   if (parts.length !== 4) return null;
   let value = 0;
@@ -34,7 +35,7 @@ export interface Ipv4Range {
  * table are (`begin`, `end`, `broadcast`). `null` for an incomplete or invalid entry.
  */
 export function ipv4Range(address: string, prefix: number): Ipv4Range | null {
-  const value = toInt(address);
+  const value = ipv4Value(address);
   if (value === null || !Number.isInteger(prefix) || prefix < 0 || prefix > 32) return null;
   const size = 2 ** (32 - prefix);
   const network = Math.floor(value / size) * size;
@@ -50,8 +51,8 @@ export function ipv4Range(address: string, prefix: number): Ipv4Range | null {
 
 /** True when the address belongs to the range. */
 export function ipv4Contains(range: Ipv4Range, prefix: number, address: string): boolean {
-  const value = toInt(address);
-  const network = toInt(range.network);
+  const value = ipv4Value(address);
+  const network = ipv4Value(range.network);
   if (value === null || network === null) return false;
   return Math.floor(value / 2 ** (32 - prefix)) * 2 ** (32 - prefix) === network;
 }

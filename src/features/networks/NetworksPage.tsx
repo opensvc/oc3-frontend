@@ -19,10 +19,11 @@ import {
 } from "@/lib/list-search";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateNetworkPanel } from "./CreateNetworkPanel";
+import { CreateSegmentPanel } from "./CreateSegmentPanel";
+import { networkLabel } from "./network-label";
 import { NetworkDetailPanel } from "./NetworkDetailPanel";
 
 type IpRow = components["schemas"]["IpRow"];
-type NetworkRow = components["schemas"]["NetworkRow"];
 
 /**
  * Empty: apicollector refuses any `orderby` on this endpoint. The `node_ip` mapping
@@ -181,7 +182,7 @@ export function NetworksPage() {
   function update(next: Partial<ResolvedListSearch>) {
     // Choosing a row ends a creation in progress: the row's detail takes the right
     // edge, where the two drawers would otherwise overlap.
-    if (next.sel !== undefined) setCreating(false);
+    if (next.sel !== undefined) setCreating(null);
     // Columns, sort, filters and page size follow the account, the other states
     // stay in the URL.
     prefs.saveSearch(next);
@@ -192,9 +193,10 @@ export function NetworksPage() {
   }
 
   const selected = data?.rows.find((row) => String(row.id) === search.sel);
-  const [creating, setCreating] = useState(false);
-  // A created network only shows through its addresses: its creation is confirmed here.
-  const [created, setCreated] = useState<NetworkRow | null>(null);
+  const [creating, setCreating] = useState<"network" | "segment" | null>(null);
+  // Neither a created network nor a created segment shows in the list of addresses:
+  // the creation is confirmed here.
+  const [created, setCreated] = useState<string | null>(null);
 
   return (
     <section>
@@ -208,22 +210,25 @@ export function NetworksPage() {
           onClick={() => {
             // The two drawers share the right edge: opening the creation closes the detail.
             update({ sel: undefined });
-            setCreating(true);
+            setCreating("network");
           }}
           className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
         >
           {t("networks.create.open")}
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            update({ sel: undefined });
+            setCreating("segment");
+          }}
+          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+        >
+          {t("networks.segment.open")}
+        </button>
         {created !== null && (
           <span role="status" className="text-ink-muted">
-            ●{" "}
-            {t("networks.create.done", {
-              name:
-                created.name === "" || created.name === undefined
-                  ? `${created.network ?? ""}/${String(created.netmask ?? "")}`
-                  : created.name,
-              range: `${created.begin ?? ""} – ${created.end ?? ""}`,
-            })}
+            ● {created}
           </span>
         )}
       </div>
@@ -246,15 +251,41 @@ export function NetworksPage() {
       />
 
       <CreateNetworkPanel
-        open={creating}
+        open={creating === "network"}
         onClose={() => {
-          setCreating(false);
+          setCreating(null);
         }}
-        onCreated={setCreated}
+        onCreated={(network) => {
+          setCreated(
+            t("networks.create.done", {
+              name:
+                network.name === "" || network.name === undefined
+                  ? networkLabel(network)
+                  : network.name,
+              range: `${network.begin ?? ""} – ${network.end ?? ""}`,
+            }),
+          );
+        }}
+      />
+
+      <CreateSegmentPanel
+        open={creating === "segment"}
+        onClose={() => {
+          setCreating(null);
+        }}
+        onCreated={(segment, network) => {
+          setCreated(
+            t("networks.segment.done", {
+              type: t(`networks.segment.types.${segment.seg_type ?? "static"}`).toLocaleLowerCase(),
+              range: `${segment.seg_begin ?? ""} – ${segment.seg_end ?? ""}`,
+              network: network === undefined ? "" : networkLabel(network),
+            }),
+          );
+        }}
       />
 
       <NetworkDetailPanel
-        ipId={creating ? undefined : search.sel}
+        ipId={creating !== null ? undefined : search.sel}
         label={selected?.addr ?? ""}
         onClose={() => {
           update({ sel: undefined });

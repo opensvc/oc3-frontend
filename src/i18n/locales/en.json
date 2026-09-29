@@ -543,7 +543,7 @@
     "create": {
       "open": "New network",
       "title": "New network",
-      "intro": "Declare an IPv4 network. The collector does not list declared networks: node addresses inside the range will show its name, gateway and range in the Network column.",
+      "intro": "Declare an IPv4 network. The Networks view lists node addresses, not declared networks: node addresses inside the range will show its name, gateway and range in the Network column.",
       "noRow": "The network was created but not returned.",
       "hostBits": "This address has host bits set; the network address is {{network}}.",
       "useNetwork": "Use {{network}}",
@@ -564,6 +564,40 @@
         "prio": "Priority",
         "team_responsible": "Responsible team",
         "comment": "Comment"
+      }
+    },
+    "segment": {
+      "open": "New segment",
+      "title": "New network segment",
+      "intro": "Declare an address range of a network. Members of the segment's responsible groups may allocate its addresses; your primary group becomes responsible for it. The range must lie inside the network and must not overlap another of its segments.",
+      "pick": "Choose a network",
+      "loading": "Loading networks…",
+      "noNetwork": "No network is declared yet: declare one with New network first.",
+      "networkRange": "Addresses of the network:",
+      "preview_one": "{{formatted}} address in the segment",
+      "preview_other": "{{formatted}} addresses in the segment",
+      "noRow": "The segment was created but not returned.",
+      "submit": "Create",
+      "submitting": "Creating…",
+      "done": "Segment {{range}} ({{type}}) declared in {{network}}.",
+      "fields": {
+        "network": "Network",
+        "seg_type": "Type",
+        "seg_begin": "First address",
+        "seg_end": "Last address"
+      },
+      "types": {
+        "static": "Static",
+        "dynamic": "Dynamic"
+      },
+      "typeHints": {
+        "static": "Addresses are assigned by hand.",
+        "dynamic": "Addresses are handed out by provisioning."
+      },
+      "problems": {
+        "invalid": "Not an IPv4 address.",
+        "outside": "Outside the network.",
+        "before": "The last address comes before the first."
       }
     }
   },
