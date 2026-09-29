@@ -104,7 +104,6 @@ export function CreateNetworkPanel({
 
   return (
     <SlideOver
-      // Data-entry drawer: a click beside it must not clear what has been typed.
       open={open}
       title={t("networks.create.title")}
       onClose={onClose}

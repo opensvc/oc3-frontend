@@ -96,7 +96,6 @@ export function FilterFormPanel({
 
   return (
     <SlideOver
-      // Data-entry drawer: a click beside it must not clear what has been typed.
       // Created like the other objects, closing on a click beside it; an existing one
       // being edited is not dropped by a stray click.
       closeOnOutsideClick={!editing}

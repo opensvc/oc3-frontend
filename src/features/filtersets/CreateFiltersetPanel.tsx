@@ -56,7 +56,6 @@ export function CreateFiltersetPanel({
 
   return (
     <SlideOver
-      // Data-entry drawer: a click beside it must not clear what has been typed.
       open={open}
       title={t("filtersets.create.title")}
       onClose={onClose}

@@ -97,7 +97,6 @@ export function TagCreatePanel({
 
   return (
     <SlideOver
-      // Data-entry drawer: a click beside it must not clear what has been typed.
       open={open}
       title={t("tags.create.title")}
       onClose={onClose}
