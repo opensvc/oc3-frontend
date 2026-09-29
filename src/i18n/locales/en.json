@@ -1638,7 +1638,7 @@
     }
   },
   "panelTitle": {
-    "label": "Records opened in this panel",
+    "label": "Records shown in the panel, the most recent first",
     "show": "Show {{name}}"
   }
 }

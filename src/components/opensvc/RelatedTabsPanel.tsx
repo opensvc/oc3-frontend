@@ -9,7 +9,6 @@ import { RelatedCount } from "./RelatedCount";
 import { BookmarkButton } from "./BookmarkButton";
 import { BOOKMARK_KINDS } from "./bookmark-kinds";
 import { PanelTitle } from "./PanelTitle";
-import { PanelRecordContext } from "./panel-trail";
 import { PROPERTIES_TAB, type RelatedTab } from "./related-tabs";
 
 /**
@@ -92,14 +91,11 @@ export function RelatedTabsPanel({
         />
       }
     >
-      {/* A badge of the record, in any tab, opens its object as a step further. */}
-      <PanelRecordContext.Provider value={objectId === undefined ? null : { kind, id: objectId }}>
-        <div {...tabPanelProps(tabsId, active)} className="outline-none">
-          {related === undefined || objectId === undefined
-            ? children
-            : related.render(objectId, i18n.language)}
-        </div>
-      </PanelRecordContext.Provider>
+      <div {...tabPanelProps(tabsId, active)} className="outline-none">
+        {related === undefined || objectId === undefined
+          ? children
+          : related.render(objectId, i18n.language)}
+      </div>
     </SlideOver>
   );
 }

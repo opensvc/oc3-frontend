@@ -1638,7 +1638,7 @@
     }
   },
   "panelTitle": {
-    "label": "Fiches ouvertes dans ce panneau",
+    "label": "Fiches affichées dans le panneau, la plus récente d'abord",
     "show": "Afficher {{name}}"
   }
 }

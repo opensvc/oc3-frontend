@@ -10,7 +10,6 @@ import { readPropAsString } from "@/lib/row";
 import { problemText } from "@/lib/api/problem";
 import { BookmarkButton } from "./BookmarkButton";
 import { PanelTitle } from "./PanelTitle";
-import { PanelRecordContext } from "./panel-trail";
 import { BOOKMARK_KINDS } from "./bookmark-kinds";
 
 export interface DetailField<T> {
@@ -459,7 +458,6 @@ export function DetailPanel<T>({
 }) {
   const { t } = useTranslation();
   const bookmarkable = recordId !== undefined && recordId !== "" && BOOKMARK_KINDS.has(kind);
-  const record = recordId === undefined || recordId === "" ? null : { kind, id: recordId };
   return (
     <SlideOver
       open={open}
@@ -469,12 +467,9 @@ export function DetailPanel<T>({
       heading={<PanelTitle kind={kind} title={title} recordId={recordId} open={open} />}
       actions={bookmarkable ? <BookmarkButton kind={kind} id={recordId} /> : undefined}
     >
-      {/* A badge of the record opens its object as a step further (usePeek). */}
-      <PanelRecordContext.Provider value={record}>
-        {before}
-        {/* A disabled query stays "pending": panel closed, nothing to load. */}
-        <DetailContent {...content} isPending={open && isPending} />
-      </PanelRecordContext.Provider>
+      {before}
+      {/* A disabled query stays "pending": panel closed, nothing to load. */}
+      <DetailContent {...content} isPending={open && isPending} />
     </SlideOver>
   );
 }

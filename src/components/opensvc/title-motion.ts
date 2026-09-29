@@ -1,53 +1,40 @@
 /**
- * Motion of the panel title when a record is opened from inside the panel: the
- * titles already shown slide from where they were to their new place, and the new
- * one comes in from the left.
+ * Motion of the panel title: when the order of its titles changes — a record shown
+ * goes in front — the titles slide from where they were to their new place, and a
+ * new one comes in from the left.
  *
- * Opening a record may swap the whole panel (a node opened from a service), so the
- * positions are kept here, outside the panels: the open panel title registers its
- * row, `usePeek` measures it just before opening the next record, and the title of
- * the panel then on display plays the move once from those positions.
+ * Showing another record may swap the whole panel (a node opened from a service),
+ * or come after the panel was closed, so the last layout is kept here, outside the
+ * panels: each open panel title measures its row after rendering, and plays the
+ * move from the previous layout when its order differs.
  */
 
 type Positions = Map<string, number>;
 
-let active: HTMLElement | null = null;
-let pending: { taken: number; positions: Positions } | null = null;
+let last: { signature: string; positions: Positions } | null = null;
 
-/** A measure older than this belongs to another gesture: it is not played. */
-const PENDING_MS = 1500;
 const DURATION_MS = 220;
 
+/** Positions within the row; `offsetLeft` ignores a move still playing. */
 function measure(row: HTMLElement): Positions {
-  const origin = row.getBoundingClientRect().left;
   const positions: Positions = new Map();
   for (const pill of row.querySelectorAll<HTMLElement>("[data-pill]")) {
     const key = pill.dataset.pill;
-    if (key !== undefined) positions.set(key, pill.getBoundingClientRect().left - origin);
+    if (key !== undefined) positions.set(key, pill.offsetLeft);
   }
   return positions;
 }
 
-export function registerTitleRow(row: HTMLElement): void {
-  active = row;
-}
-
-export function unregisterTitleRow(row: HTMLElement): void {
-  if (active === row) active = null;
-}
-
-/** Called just before a record is opened from inside a panel. */
-export function captureTitlePositions(): void {
-  pending = active === null ? null : { taken: performance.now(), positions: measure(active) };
-}
-
-/** Plays the move measured by `captureTitlePositions`, once, on the given title row. */
-export function playTitleMotion(row: HTMLElement): void {
-  const before = pending;
-  pending = null;
-  if (before === null || performance.now() - before.taken > PENDING_MS) return;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+/**
+ * Called by an open panel title after each render. `signature` names the order of
+ * its titles and the one on display: the move plays only when it changed.
+ */
+export function moveTitleRow(row: HTMLElement, signature: string): void {
   const now = measure(row);
+  const before = last;
+  last = { signature, positions: now };
+  if (before === null || before.signature === signature) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   for (const pill of row.querySelectorAll<HTMLElement>("[data-pill]")) {
     const key = pill.dataset.pill;
     if (key === undefined) continue;

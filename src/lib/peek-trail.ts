@@ -1,12 +1,11 @@
 /**
- * The records opened in the panel over the current view, kept in the URL (`peek`)
- * like the rest of the panel state: a reload or a shared link reopen them, and the
- * browser Back button returns to what was on display before.
+ * The record opened in the panel over the current view, kept in the URL (`peek`) as
+ * `kind:id` like the rest of the panel state: a reload or a shared link reopen it,
+ * and the browser Back button returns to what was on display before. The records
+ * shown before it are the panel history, kept with the account (`useHistoryPref`).
  *
- * `peek` lists them as `kind:id,kind:id…`, the most recently opened first: a badge
- * clicked inside the panel adds its object in front (see `usePeek`), one clicked
- * anywhere else starts the list again. `peekat` gives the record on display, the
- * first by default; showing an older one changes only `peekat`, never the order.
+ * An older URL may carry several records, `kind:id,kind:id…`, with `peekat` giving
+ * the one on display, the first by default: that record opens.
  */
 export interface PeekStep {
   kind: string;
@@ -38,19 +37,4 @@ export function currentIndex(trail: PeekStep[], raw: unknown): number {
   const parsed = typeof raw === "number" ? raw : Number(raw);
   if (raw === undefined || raw === null || raw === "" || !Number.isFinite(parsed)) return 0;
   return Math.min(Math.max(Math.trunc(parsed), 0), last);
-}
-
-/** Records kept in the list: beyond, the oldest are forgotten. */
-const TRAIL_SIZE = 8;
-
-export function sameStep(a: PeekStep, b: PeekStep): boolean {
-  return a.kind === b.kind && a.id === b.id;
-}
-
-/**
- * The list once `next` is opened from a record of `trail`: in front, as the most
- * recent. Opened again, a record already listed moves to the front.
- */
-export function drillTrail(trail: PeekStep[], next: PeekStep): PeekStep[] {
-  return [next, ...trail.filter((step) => !sameStep(step, next))].slice(0, TRAIL_SIZE);
 }

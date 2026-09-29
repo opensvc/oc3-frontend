@@ -68,6 +68,8 @@ export interface UserPrefs {
    * id. The old interface has no bookmarks: the key is ours alone.
    */
   bookmarks?: Bookmark[];
+  /** Records last shown in a panel, the most recent first (`useHistoryPref`). */
+  history?: Bookmark[];
   [key: string]: unknown;
 }
 
@@ -474,6 +476,52 @@ export function useBookmarksPref() {
     },
     clear: () => {
       save.mutate([]);
+    },
+  };
+}
+
+/** Records kept in the panel history, for now: the most recent only. */
+const HISTORY_SIZE = 4;
+
+/** A history saved when the limit was higher shows its most recent records only. */
+function storedHistory(prefs: UserPrefs | undefined): Bookmark[] {
+  return storedBookmarks({ bookmarks: prefs?.history }).slice(0, HISTORY_SIZE);
+}
+
+/**
+ * The records last shown in a panel, the most recent first, and what records one.
+ * Saved with the account like the bookmarks, so that closing the panel, opening
+ * another object, reloading or signing in elsewhere keeps them; beyond
+ * `HISTORY_SIZE` the oldest are forgotten. A record shown again moves to the front.
+ */
+export function useHistoryPref() {
+  const queryClient = useQueryClient();
+  const prefs = useUserPrefs();
+  const entries = storedHistory(prefs.data);
+  const save = useMutation({
+    mutationFn: async (step: Bookmark) => {
+      // Computed from the prefs of the moment, not from this render's copy: two
+      // records shown in a row must both be kept.
+      const update = (current: UserPrefs | undefined): UserPrefs => ({
+        ...current,
+        history: [
+          step,
+          ...storedHistory(current).filter((e) => e.kind !== step.kind || e.id !== step.id),
+        ].slice(0, HISTORY_SIZE),
+      });
+      queryClient.setQueryData<UserPrefs>(PREFS_KEY, update);
+      await savePrefs(queryClient, update);
+    },
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: PREFS_KEY });
+    },
+  });
+  return {
+    entries,
+    record: (kind: string, id: string) => {
+      const first = entries[0];
+      if (first !== undefined && first.kind === kind && first.id === id) return;
+      save.mutate({ kind, id });
     },
   };
 }

@@ -12,7 +12,7 @@ import { FiltersetDetailPanel } from "@/features/filtersets/FiltersetDetailPanel
 import { FormDetailPanel } from "@/features/forms/FormDetailPanel";
 import { useTag } from "@/features/tags/use-tag";
 import { currentIndex, parseTrail } from "@/lib/peek-trail";
-import { isPeekStep, PanelTrailContext } from "@/components/opensvc/panel-trail";
+import { isPeekStep } from "@/components/opensvc/panel-trail";
 import { useObjectLabels } from "@/components/opensvc/object-label";
 
 /**
@@ -23,13 +23,11 @@ import { useObjectLabels } from "@/components/opensvc/object-label";
  * nor losing its sort, its page or its selection. Placed in the application shell:
  * every view benefits from it, and there is only one panel of this kind on screen.
  *
- * The records live in the URL (`peek`, `peekat`), like the row panel: a shared link
- * reopens them, and Escape or the cross closes the panel. A badge inside the panel
- * opens its object as a step further, listed in the panel title with the records
- * opened before (`PanelTitle`); the bookmarks (`BookmarksProvider`) and the global
- * search open theirs here too, alone, from any view. The row panel and this one do
- * not coexist: `toSearchParams` clears the record as soon as a row is selected, and
- * the row panel wins if the URL carries both.
+ * The record lives in the URL (`peek`), like the row panel: a shared link reopens it,
+ * and Escape or the cross closes the panel. The bookmarks (`BookmarksProvider`), the
+ * global search and the panel history (`PanelTitle`) open theirs here too, from any
+ * view. The row panel and this one do not coexist: `toSearchParams` clears the
+ * record as soon as a row is selected, and the row panel wins if the URL carries both.
  */
 export function PeekPanel() {
   const search = useSearch({ strict: false }) as Record<string, unknown>;
@@ -129,21 +127,7 @@ export function PeekPanel() {
     }
   })();
 
-  // The panel title lists the records opened here; showing an older one keeps
-  // the order, only the record on display changes.
-  return (
-    <PanelTrailContext.Provider
-      value={{
-        steps: trail,
-        at,
-        select: (index) => {
-          update({ peekat: index === 0 ? undefined : index, peektab: undefined });
-        },
-      }}
-    >
-      {panel}
-    </PanelTrailContext.Provider>
-  );
+  return panel;
 }
 
 /** A tag opened from a badge: read by its id, then shown like a row of the Tags list. */
