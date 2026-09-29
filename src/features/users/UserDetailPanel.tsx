@@ -4,10 +4,17 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel } from "@/components/opensvc/DetailPanel";
 import { problemText } from "@/lib/api/problem";
-import { USER_GROUPS, USER_PROPS_QUERY } from "./user-fields";
+import { useCredentials } from "@/lib/api/auth";
+import { EDITABLE_USER_GROUPS, USER_PROPS_QUERY } from "./user-fields";
+import { useSaveUser } from "./use-save-user";
 
 type UserRow = components["schemas"]["UserRow"];
 
+/**
+ * Detail of a user. The name and email carry a pencil: a user may change their
+ * own, a UserManager anyone's, and the server refuses the others with a message
+ * under the field — the interface does not know the caller's privileges yet.
+ */
 export function UserDetailPanel({
   userId,
   label,
@@ -18,6 +25,7 @@ export function UserDetailPanel({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  const credentials = useCredentials();
   const {
     data: user,
     isPending,
@@ -36,6 +44,12 @@ export function UserDetailPanel({
     },
   });
 
+  const isSelf =
+    credentials !== null &&
+    user?.email !== undefined &&
+    user.email.toLowerCase() === credentials.user.toLowerCase();
+  const save = useSaveUser(userId, isSelf);
+
   return (
     <DetailPanel
       kind="user"
@@ -43,12 +57,14 @@ export function UserDetailPanel({
       open={userId !== undefined}
       title={user?.email ?? (label === "" ? t("users.detail.title") : label)}
       onClose={onClose}
-      groups={USER_GROUPS}
+      groups={EDITABLE_USER_GROUPS}
       row={user}
       labelPrefix="users.fields"
       groupPrefix="users.detail.groups"
       isPending={isPending}
       errorMessage={isError ? error.message : null}
+      onSave={save}
+      editHint={t("users.detail.editHint")}
     />
   );
 }

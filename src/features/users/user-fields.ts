@@ -60,3 +60,16 @@ export const USER_GROUPS: DetailGroup<UserRow>[] = [
 export const USER_PROPS_QUERY = USER_GROUPS.flatMap((group) =>
   group.fields.map((f) => f.prop),
 ).join(",");
+
+/** What a user may change of their own account, and a UserManager of anyone's. */
+export const EDITABLE_USER_PROPS: ReadonlySet<string> = new Set([
+  "first_name",
+  "last_name",
+  "email",
+]);
+
+/** The groups of `USER_GROUPS`, the name and email marked editable. */
+export const EDITABLE_USER_GROUPS: DetailGroup<UserRow>[] = USER_GROUPS.map((group) => ({
+  ...group,
+  fields: group.fields.map((f) => (EDITABLE_USER_PROPS.has(f.prop) ? { ...f, editable: true } : f)),
+}));

@@ -720,7 +720,8 @@
         "identity": "Identité",
         "notifications": "Notifications",
         "restrictions": "Restrictions et quotas"
-      }
+      },
+      "editHint": "Chacun peut modifier son nom et son e-mail ; ceux d'un autre utilisateur demandent le privilège UserManager. L'e-mail est l'identifiant de connexion."
     },
     "create": {
       "open": "Nouvel utilisateur",

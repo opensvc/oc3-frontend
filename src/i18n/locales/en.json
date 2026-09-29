@@ -720,7 +720,8 @@
         "identity": "Identity",
         "notifications": "Notifications",
         "restrictions": "Restrictions and quotas"
-      }
+      },
+      "editHint": "A user may change their own name and email; changing another user's requires the UserManager privilege. The email is the sign-in name."
     },
     "create": {
       "open": "New user",

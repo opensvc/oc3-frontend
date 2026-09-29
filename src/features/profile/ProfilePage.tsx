@@ -1,11 +1,11 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
-import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
-import { setCredentials, useCredentials } from "@/lib/api/auth";
+import { DetailContent } from "@/components/opensvc/DetailPanel";
 import { problemText } from "@/lib/api/problem";
-import { USER_GROUPS, USER_PROPS_QUERY } from "@/features/users/user-fields";
+import { EDITABLE_USER_GROUPS, USER_GROUPS, USER_PROPS_QUERY } from "@/features/users/user-fields";
+import { useSaveUser } from "@/features/users/use-save-user";
 import {
   hasSavedViewPrefs,
   usePalettePref,
@@ -21,19 +21,8 @@ import { ProfileCard } from "./ProfileCard";
 
 type UserRow = components["schemas"]["UserRow"];
 
-/** What the signed-in user may change about themselves (`POST /users/{user_id}`). */
-const SELF_EDITABLE = new Set(["first_name", "last_name", "email"]);
-
 /** The identity of the account, its name and email editable, the rest read only. */
-const IDENTITY_GROUP: DetailGroup<UserRow> | undefined = (() => {
-  const group = USER_GROUPS.find((g) => g.key === "identity");
-  return group === undefined
-    ? undefined
-    : {
-        ...group,
-        fields: group.fields.map((f) => (SELF_EDITABLE.has(f.prop) ? { ...f, editable: true } : f)),
-      };
-})();
+const IDENTITY_GROUP = EDITABLE_USER_GROUPS.find((g) => g.key === "identity");
 
 /**
  * Profile of the signed-in user, opened from their name in the top bar.
@@ -50,8 +39,6 @@ const IDENTITY_GROUP: DetailGroup<UserRow> | undefined = (() => {
  */
 export function ProfilePage() {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const credentials = useCredentials();
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["user", "self"],
     queryFn: async () => {
@@ -67,30 +54,7 @@ export function ProfilePage() {
   const fullName = [data?.first_name, data?.last_name]
     .filter((part) => part !== undefined && part !== "")
     .join(" ");
-  /**
-   * Saves a change of the name or the email. The email being the sign-in name, the
-   * session goes on with the new one as soon as the server has stored it: the old
-   * one no longer authenticates.
-   */
-  async function saveIdentity(patch: Record<string, unknown>) {
-    const body: { first_name?: string; last_name?: string; email?: string } = {};
-    for (const key of SELF_EDITABLE) {
-      const value = patch[key];
-      if (typeof value === "string") body[key as keyof typeof body] = value;
-    }
-    const { data: saved, error: failure } = await api.POST("/users/{user_id}", {
-      params: { path: { user_id: "self" } },
-      body,
-    });
-    if (failure !== undefined) throw new Error(problemText(failure));
-    const row: UserRow | undefined = Array.isArray(saved.data) ? saved.data[0] : undefined;
-    const email = row?.email;
-    if (credentials !== null && email !== undefined && email !== "" && email !== credentials.user)
-      setCredentials({ ...credentials, user: email });
-    await queryClient.invalidateQueries({ queryKey: ["user", "self"] });
-    await queryClient.invalidateQueries({ queryKey: ["users"] });
-    await queryClient.invalidateQueries({ queryKey: ["user"] });
-  }
+  const saveIdentity = useSaveUser("self", true);
 
   /** A group of the account's properties, in a card of its own titled like it. */
   const detailCard = (key: string) => {
