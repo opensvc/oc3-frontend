@@ -732,6 +732,25 @@
       "pending": "Effacement…",
       "done": "Colonnes, tri, filtres et tailles de page oubliés. Chaque liste retrouve ses réglages par défaut.",
       "none": "Aucune vue n'a de colonnes, de tri, de filtres ou de taille de page enregistrés."
+    },
+    "password": {
+      "title": "Mot de passe",
+      "hint_one": "Au moins {{count}} caractère. Il vous connecte à cette interface et au collector historique.",
+      "hint_other": "Au moins {{count}} caractères. Il vous connecte à cette interface et au collector historique.",
+      "fields": {
+        "current": "Mot de passe actuel",
+        "next": "Nouveau mot de passe",
+        "confirm": "Nouveau mot de passe, à nouveau"
+      },
+      "required": "Saisissez votre mot de passe actuel.",
+      "tooShort_one": "Au moins {{count}} caractère.",
+      "tooShort_other": "Au moins {{count}} caractères.",
+      "same": "Le nouveau mot de passe doit différer de l'actuel.",
+      "mismatch": "Les deux nouveaux mots de passe diffèrent.",
+      "wrongCurrent": "Le mot de passe actuel est incorrect.",
+      "submit": "Changer le mot de passe",
+      "pending": "Changement…",
+      "done": "Mot de passe changé. Vous restez connecté avec le nouveau."
     }
   },
   "instances": {

@@ -3850,6 +3850,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/self/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Change the password of the signed-in user, who gives the current one. The new
+         *     password must be at least 8 characters long and differ from the current one;
+         *     it is stored as a web2py hash, accepted by both collectors. The change is
+         *     logged, without the password. Requires user authentication, no privilege.
+         */
+        post: operations["PostUserSelfPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/{user_id}": {
         parameters: {
             query?: never;
@@ -17265,6 +17287,40 @@ export interface operations {
             401: components["responses"]["401"];
             403: components["responses"]["403"];
             409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostUserSelfPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    current_password: string;
+                    /** @description At least 8 characters. */
+                    new_password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
             500: components["responses"]["500"];
         };
     };

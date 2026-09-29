@@ -17,6 +17,7 @@ import {
 import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { ResetIcon } from "@/components/ui/icons";
 import { PALETTES, THEMES } from "@/lib/theme";
+import { PasswordSection } from "./PasswordSection";
 
 type UserRow = components["schemas"]["UserRow"];
 
@@ -72,6 +73,8 @@ export function ProfilePage() {
         isPending={isPending}
         errorMessage={isError ? error.message : null}
       />
+
+      <PasswordSection email={data?.email} />
 
       <section className="mt-6">
         <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
