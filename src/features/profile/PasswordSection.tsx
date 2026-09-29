@@ -8,8 +8,11 @@ import { ProfileCard } from "./ProfileCard";
 
 const INPUT = "h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2";
 
-/** The shortest password the collector accepts, as at user creation. */
-const MIN_LENGTH = 8;
+/**
+ * The shortest password accepted when changing one's own, as the API requires
+ * (`POST /users/self/password`); stricter than at user creation.
+ */
+const MIN_LENGTH = 12;
 
 type Field = "current" | "next" | "confirm";
 
@@ -61,7 +64,8 @@ export function PasswordSection({ email }: { email: string | undefined }) {
 
   const problems: Partial<Record<Field, string>> = {};
   if (values.current === "") problems.current = t("profile.password.required");
-  if (values.next.length < MIN_LENGTH)
+  // Counted in characters, as the server does: an accented letter counts once.
+  if (Array.from(values.next).length < MIN_LENGTH)
     problems.next = t("profile.password.tooShort", { count: MIN_LENGTH });
   else if (values.next === values.current) problems.next = t("profile.password.same");
   if (values.confirm !== values.next) problems.confirm = t("profile.password.mismatch");

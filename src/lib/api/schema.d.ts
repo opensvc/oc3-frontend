@@ -3889,7 +3889,7 @@ export interface paths {
         put?: never;
         /**
          * @description Change the password of the signed-in user, who gives the current one. The new
-         *     password must be at least 8 characters long and differ from the current one;
+         *     password must be at least 12 characters long and differ from the current one;
          *     it is stored as a web2py hash, accepted by both collectors. The change is
          *     logged, without the password. Requires user authentication, no privilege.
          */
@@ -17458,7 +17458,7 @@ export interface operations {
             content: {
                 "application/json": {
                     current_password: string;
-                    /** @description At least 8 characters. */
+                    /** @description At least 12 characters. */
                     new_password: string;
                 };
             };
