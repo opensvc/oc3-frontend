@@ -1,12 +1,18 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { DateTime } from "@/components/ui/DateTime";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
+import { problemText } from "@/lib/api/problem";
 import { toPage } from "@/lib/api/page";
-import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
+import {
+  CollectorList,
+  type ColumnFilterSpec,
+  type ListColumn,
+} from "@/components/opensvc/CollectorList";
 import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -25,13 +31,8 @@ import { NetworkDetailPanel } from "./NetworkDetailPanel";
 
 type IpRow = components["schemas"]["IpRow"];
 
-/**
- * Empty: apicollector refuses any `orderby` on this endpoint. The `node_ip` mapping
- * describes its props by a SQL expression without a column reference, and
- * `buildOrderBy` requires that reference — "prop "addr" cannot be used in orderby (no
- * column reference)". The server then sorts by address, its default order.
- */
-const DEFAULT_SORT: string[] = [];
+/** By node then interface, the addresses of a node together. */
+const DEFAULT_SORT = ["nodename", "intf", "addr"];
 
 /**
  * Every property exposed by apicollector for an address, in the order of its
@@ -102,13 +103,27 @@ const FAMILY: Record<string, ColumnFamily> = {
   net_team_responsible: "team",
 };
 
+/** Columns holding a known set of values, filtered by picking among them. */
+const FILTERS: Partial<Record<string, ColumnFilterSpec>> = {
+  type: {
+    kind: "enum",
+    options: [{ value: "ipv4" }, { value: "ipv6" }],
+  },
+  flag_deprecated: {
+    kind: "enum",
+    options: [
+      { value: "1", labelKey: "detail.yes" },
+      { value: "0", labelKey: "detail.no" },
+    ],
+  },
+};
+
 const COLUMNS: ListColumn<IpRow>[] = IP_PROPS.map((prop) => ({
   prop,
   labelKey: `networks.fields.${prop}`,
   numeric: NUMERIC_PROPS.has(prop),
   family: FAMILY[prop] ?? "node",
-  // No column can be sorted as long as the endpoint refuses `orderby`.
-  sortable: false,
+  filter: FILTERS[prop],
   render: (row: IpRow, locale: string) => {
     const value = row[prop];
     if (prop === "nodename")
@@ -137,19 +152,29 @@ function queryProps(cols: string[] | undefined): string {
 
 function useIps(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["ips", search.offset, search.limit, search.cols],
+    queryKey: [
+      "ips",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       // One row more than the page: apicollector does not return the total of a selection.
       const { data, error } = await api.GET("/ips", {
         params: {
           query: {
             props: queryProps(search.cols),
+            orderby: search.sort.join(","),
             offset: search.offset,
             limit: search.limit + 1,
+            filter: filterQuery(search.filters),
           },
         },
       });
-      if (error !== undefined) throw new Error(JSON.stringify(error));
+      if (error !== undefined) throw new Error(problemText(error));
       const all: IpRow[] = Array.isArray(data.data) ? data.data : [];
       return toPage(all, data.meta, search.limit);
     },
@@ -169,9 +194,9 @@ export function NetworksPage() {
   /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/ips", {
-      params: { query: { props: "id", limit: 0 } },
+      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
     });
-    if (error !== undefined) throw new Error(JSON.stringify(error));
+    if (error !== undefined) throw new Error(problemText(error));
     const rows: IpRow[] = Array.isArray(data.data) ? data.data : [];
     return rows
       .map((row) => row.id)
@@ -248,6 +273,7 @@ export function NetworksPage() {
         hasMore={data?.hasMore ?? false}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <CreateNetworkPanel
