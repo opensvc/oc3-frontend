@@ -1556,7 +1556,6 @@
     "removeEntry": "Remove the bookmark {{name}}",
     "showAll_one": "Show 1 older bookmark",
     "showAll_other": "Show {{count}} older bookmarks",
-    "empty": "No bookmark yet. The Bookmark button of a record's panel adds it here.",
     "clearAll": "Clear all bookmarks",
     "clearQuestion_one": "Remove the bookmark?",
     "clearQuestion_other": "Remove all {{count}} bookmarks?"

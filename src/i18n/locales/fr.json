@@ -1556,7 +1556,6 @@
     "removeEntry": "Retirer le signet {{name}}",
     "showAll_one": "Afficher 1 signet plus ancien",
     "showAll_other": "Afficher {{count}} signets plus anciens",
-    "empty": "Aucun signet pour l'instant. Le bouton Marquer du panneau d'une fiche l'ajoute ici.",
     "clearAll": "Retirer tous les signets",
     "clearQuestion_one": "Retirer le signet ?",
     "clearQuestion_other": "Retirer les {{count}} signets ?"

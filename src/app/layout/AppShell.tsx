@@ -10,7 +10,6 @@ import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
 import { useAppearance } from "@/lib/user-prefs";
 import { BookmarksBar } from "./BookmarksBar";
-import { BookmarksMenu } from "./BookmarksMenu";
 import { BookmarksProvider } from "./BookmarksProvider";
 
 const SIDEBAR_KEY = "oc3.sidebar";
@@ -87,7 +86,6 @@ export function AppShell() {
             >
               {t("header.sessionFilter")}: {t("header.noFilter")}
             </button>
-            <BookmarksMenu />
             <ActionQueueLink />
             <input
               type="search"
