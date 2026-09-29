@@ -125,6 +125,13 @@ export function FiltersPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // Choosing a row ends a creation in progress: the row's detail takes the right
+
+    // edge, where the two drawers would otherwise overlap.
+
+    if (next.sel !== undefined) {
+      if (form === "create") setForm(null);
+    }
     // Columns, sort, filters and page size follow the account, the other states
     // stay in the URL.
     prefs.saveSearch(next);
