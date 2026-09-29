@@ -1593,5 +1593,48 @@
     "clearAll": "Clear all bookmarks",
     "clearQuestion_one": "Remove the bookmark?",
     "clearQuestion_other": "Remove all {{count}} bookmarks?"
+  },
+  "search": {
+    "title": "Search the collector",
+    "placeholder": "Nodes, services, addresses, users, request numbers…",
+    "close": "Close the search",
+    "scopes": "Search in",
+    "all": "All",
+    "results": "Results",
+    "hint": "Type at least 2 characters. Names, ids, addresses, e-mails and request numbers are searched.",
+    "searching": "Searching…",
+    "none": "Nothing matches “{{query}}”.",
+    "more": "Show more",
+    "openList": "Open in the list",
+    "opensList": "opens the list",
+    "refine": "More objects match: refine the search, or open the list.",
+    "kindError": "This kind could not be searched.",
+    "cluster": "cluster {{id}}",
+    "instanceLabel": "{{service}} on {{node}}",
+    "container": "container {{name}}",
+    "tagExclude": "excludes {{pattern}}",
+    "privilege": "privilege",
+    "public": "public",
+    "keys": {
+      "move": "to move",
+      "open": "to open",
+      "close": "to close"
+    },
+    "kinds": {
+      "node": "Nodes",
+      "service": "Services",
+      "instance": "Service instances",
+      "app": "Apps",
+      "network": "Addresses",
+      "disk": "Disks",
+      "tag": "Tags",
+      "user": "Users",
+      "group": "Teams",
+      "request": "Requests",
+      "moduleset": "Modulesets",
+      "ruleset": "Rulesets",
+      "filterset": "Filtersets",
+      "form": "Forms"
+    }
   }
 }

@@ -11,6 +11,7 @@ import { UserMenu } from "./UserMenu";
 import { useAppearance } from "@/lib/user-prefs";
 import { BookmarksBar } from "./BookmarksBar";
 import { BookmarksProvider } from "./BookmarksProvider";
+import { GlobalSearch } from "./search/GlobalSearch";
 
 const SIDEBAR_KEY = "oc3.sidebar";
 
@@ -26,8 +27,8 @@ function readSidebarOpen(): boolean {
 
 /**
  * Application shell. It mirrors the functional areas of the collector: navigation in
- * a side menu, session filter, action queue, global search. The last two are
- * placeholders: they are implemented in phases 3 and 4.
+ * a side menu, session filter, action queue, global search. The session filter is
+ * still a placeholder.
  */
 export function AppShell() {
   const { t } = useTranslation();
@@ -87,12 +88,7 @@ export function AppShell() {
               {t("header.sessionFilter")}: {t("header.noFilter")}
             </button>
             <ActionQueueLink />
-            <input
-              type="search"
-              placeholder={t("header.search")}
-              aria-label={t("header.search")}
-              className="h-7 w-64 rounded-(--radius-control) border border-line bg-surface px-2 placeholder:text-ink-muted"
-            />
+            <GlobalSearch />
             <UserMenu user={credentials.user} />
           </div>
         </header>

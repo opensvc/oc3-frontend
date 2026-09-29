@@ -8,6 +8,8 @@ import { NetworkDetailPanel } from "@/features/networks/NetworkDetailPanel";
 import { GroupDetailPanel } from "@/features/groups/GroupDetailPanel";
 import { UserDetailPanel } from "@/features/users/UserDetailPanel";
 import { TagDetailPanel } from "@/features/tags/TagDetailPanel";
+import { FiltersetDetailPanel } from "@/features/filtersets/FiltersetDetailPanel";
+import { FormDetailPanel } from "@/features/forms/FormDetailPanel";
 import { useTag } from "@/features/tags/use-tag";
 import { currentIndex, parseTrail } from "@/lib/peek-trail";
 
@@ -21,7 +23,8 @@ import { currentIndex, parseTrail } from "@/lib/peek-trail";
  *
  * The record lives in the URL (`peek`), like the row panel: a shared link reopens it,
  * and Escape or the cross closes it. The bookmarks (`BookmarksProvider`) open their
- * records here too, from any view, disks and network addresses included. The row panel and this one do not coexist: `toSearchParams` clears the record
+ * records here too, from any view, disks and network addresses included, and so does
+ * the global search, filtersets and forms included. The row panel and this one do not coexist: `toSearchParams` clears the record
  * as soon as a row is selected, and the row panel wins if the URL carries both.
  */
 export function PeekPanel() {
@@ -91,6 +94,23 @@ export function PeekPanel() {
         return <DiskDetailPanel diskId={id} label="" onClose={close} />;
       case "network":
         return <NetworkDetailPanel ipId={id} label="" onClose={close} />;
+      case "filterset":
+        return <FiltersetDetailPanel filtersetId={id} label="" onClose={close} />;
+      case "form":
+        return (
+          <FormDetailPanel
+            formId={id}
+            name=""
+            tab={tab}
+            onTabChange={onTabChange}
+            onClose={close}
+            // Editing a definition takes the room of the Forms view, where the
+            // record opens again to be edited.
+            onEdit={() => {
+              void navigate({ to: "/forms", search: { sel: id } });
+            }}
+          />
+        );
       case "tag":
         return <TagPeek tagId={id} onClose={close} />;
       default:

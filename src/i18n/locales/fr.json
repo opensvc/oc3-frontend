@@ -1593,5 +1593,48 @@
     "clearAll": "Retirer tous les signets",
     "clearQuestion_one": "Retirer le signet ?",
     "clearQuestion_other": "Retirer les {{count}} signets ?"
+  },
+  "search": {
+    "title": "Rechercher dans le collector",
+    "placeholder": "Nœuds, services, adresses, utilisateurs, numéros de demande…",
+    "close": "Fermer la recherche",
+    "scopes": "Rechercher dans",
+    "all": "Tout",
+    "results": "Résultats",
+    "hint": "Saisissez au moins 2 caractères. La recherche porte sur les noms, identifiants, adresses, e-mails et numéros de demande.",
+    "searching": "Recherche…",
+    "none": "Rien ne correspond à « {{query}} ».",
+    "more": "Voir plus",
+    "openList": "Ouvrir dans la liste",
+    "opensList": "ouvre la liste",
+    "refine": "D'autres objets correspondent : précisez la recherche, ou ouvrez la liste.",
+    "kindError": "Ce type d'objet n'a pas pu être recherché.",
+    "cluster": "cluster {{id}}",
+    "instanceLabel": "{{service}} sur {{node}}",
+    "container": "conteneur {{name}}",
+    "tagExclude": "exclut {{pattern}}",
+    "privilege": "privilège",
+    "public": "public",
+    "keys": {
+      "move": "pour se déplacer",
+      "open": "pour ouvrir",
+      "close": "pour fermer"
+    },
+    "kinds": {
+      "node": "Nœuds",
+      "service": "Services",
+      "instance": "Instances de service",
+      "app": "Applications",
+      "network": "Adresses",
+      "disk": "Disques",
+      "tag": "Tags",
+      "user": "Utilisateurs",
+      "group": "Équipes",
+      "request": "Demandes",
+      "moduleset": "Modulesets",
+      "ruleset": "Rulesets",
+      "filterset": "Filtersets",
+      "form": "Formulaires"
+    }
   }
 }
