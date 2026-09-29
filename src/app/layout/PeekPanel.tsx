@@ -1,16 +1,14 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
 import { NodeDetailPanel } from "@/features/nodes/NodeDetailPanel";
 import { ServiceDetailPanel } from "@/features/services/ServiceDetailPanel";
 import { InstanceDetailPanel } from "@/features/instances/InstanceDetailPanel";
 import { AppDetailPanel } from "@/features/apps/AppDetailPanel";
+import { DiskDetailPanel } from "@/features/disks/DiskDetailPanel";
+import { NetworkDetailPanel } from "@/features/networks/NetworkDetailPanel";
 import { GroupDetailPanel } from "@/features/groups/GroupDetailPanel";
 import { UserDetailPanel } from "@/features/users/UserDetailPanel";
 import { TagDetailPanel } from "@/features/tags/TagDetailPanel";
 import { useTag } from "@/features/tags/use-tag";
-import { ObjectIcon, type ObjectKind } from "@/components/opensvc/ObjectIcon";
-import { useObjectLabels } from "@/components/opensvc/object-label";
-import { TrailContext, type TrailStep } from "@/components/ui/trail";
 import { currentIndex, parseTrail } from "@/lib/peek-trail";
 
 /**
@@ -21,13 +19,12 @@ import { currentIndex, parseTrail } from "@/lib/peek-trail";
  * nor losing its sort, its page or its selection. Placed in the application shell:
  * every view benefits from it, and there is only one panel of this kind on screen.
  *
- * The path followed lives in the URL (`peek`), like the row panel: a shared link
- * reopens the same record with the same breadcrumb, and Escape or the cross closes
- * it. The row panel and this one do not coexist: `toSearchParams` clears the record
+ * The record lives in the URL (`peek`), like the row panel: a shared link reopens it,
+ * and Escape or the cross closes it. The bookmarks (`BookmarksProvider`) open their
+ * records here too, from any view, disks and network addresses included. The row panel and this one do not coexist: `toSearchParams` clears the record
  * as soon as a row is selected, and the row panel wins if the URL carries both.
  */
 export function PeekPanel() {
-  const { t } = useTranslation();
   const search = useSearch({ strict: false }) as Record<string, unknown>;
   const navigate = useNavigate();
 
@@ -38,7 +35,6 @@ export function PeekPanel() {
   const at = currentIndex(trail, search.peekat);
   const current = trail[at];
   const tab = typeof search.peektab === "string" ? search.peektab : undefined;
-  const labels = useObjectLabels(trail);
 
   function update(next: { peek?: string; peektab?: string; peekat?: number; sel?: string }) {
     void navigate({
@@ -59,27 +55,6 @@ export function PeekPanel() {
   const onTabChange = (next: string | undefined) => {
     update({ peektab: next });
   };
-
-  /**
-   * Moving to an entry of the history: only the cursor moves, so everything visited
-   * stays one click away, forward as well as back.
-   */
-  function goTo(index: number) {
-    if (trail[index] === undefined) return;
-    update({ peekat: index, peektab: undefined });
-  }
-
-  const steps: TrailStep[] = trail.map((step, index) => ({
-    key: `${step.kind}:${step.id}`,
-    label: labels[index] ?? step.id,
-    icon: <ObjectIcon kind={step.kind as ObjectKind} className="h-3.5 w-3.5 shrink-0" />,
-    onSelect:
-      index === at
-        ? undefined
-        : () => {
-            goTo(index);
-          },
-  }));
 
   const id = current?.id;
   const panel = (() => {
@@ -112,6 +87,10 @@ export function PeekPanel() {
         return <GroupDetailPanel groupId={id} label="" onClose={close} />;
       case "user":
         return <UserDetailPanel userId={id} label="" onClose={close} />;
+      case "disk":
+        return <DiskDetailPanel diskId={id} label="" onClose={close} />;
+      case "network":
+        return <NetworkDetailPanel ipId={id} label="" onClose={close} />;
       case "tag":
         return <TagPeek tagId={id} onClose={close} />;
       default:
@@ -119,13 +98,7 @@ export function PeekPanel() {
     }
   })();
 
-  if (panel === null) return null;
-  return (
-    <TrailContext.Provider value={steps}>
-      {panel}
-      <span className="sr-only">{t("trail.label")}</span>
-    </TrailContext.Provider>
-  );
+  return panel;
 }
 
 /** A tag opened from a badge: read by its id, then shown like a row of the Tags list. */

@@ -62,7 +62,24 @@ async function fetchLabel(step: PeekStep): Promise<string> {
       const row = rows.find((r) => readProp(r, "tag_id") === step.id);
       return text(readProp(row ?? {}, "tag_name")) || step.id;
     }
-    // An application code names itself: the id is the code.
+    case "user": {
+      // A user is named by an integer id: the email is what a reader recognises.
+      const { data } = await api.GET("/users/{user_id}", {
+        params: { path: { user_id: step.id }, query: { props: "email" } },
+      });
+      const rows = Array.isArray(data?.data) ? data.data : [];
+      return text(readProp(rows[0] ?? {}, "email")) || step.id;
+    }
+    case "network": {
+      // A network address is named by an integer id: the address is what one reads.
+      const { data } = await api.GET("/ips/{id}", {
+        params: { path: { id: step.id }, query: { props: "addr" } },
+      });
+      const rows = Array.isArray(data?.data) ? data.data : [];
+      return text(readProp(rows[0] ?? {}, "addr")) || step.id;
+    }
+    // An application code names itself, as a disk does: the id is what one reads.
+    case "disk":
     case "app":
     default:
       return step.id;

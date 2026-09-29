@@ -79,6 +79,7 @@ export function AppDetailPanel({
   return (
     <DetailPanel
       kind="app"
+      recordId={appId}
       open={appId !== undefined}
       title={app?.app ?? (label === "" ? t("apps.detail.title") : label)}
       onClose={onClose}

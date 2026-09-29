@@ -1,6 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { CloseIcon } from "./icons";
-import { TrailBar } from "./TrailBar";
 
 /**
  * Side panel sliding in from the right.
@@ -30,6 +29,7 @@ export function SlideOver({
   subheader,
   size = "default",
   closeOnOutsideClick = true,
+  actions,
   children,
 }: {
   open: boolean;
@@ -51,6 +51,8 @@ export function SlideOver({
    * on it like the others.
    */
   closeOnOutsideClick?: boolean;
+  /** Buttons of the header, before the close button: the history button, say. */
+  actions?: ReactNode;
   children: ReactNode;
 }) {
   const panel = useRef<HTMLDivElement>(null);
@@ -122,11 +124,12 @@ export function SlideOver({
       <div className="flex items-center gap-2 border-b border-line px-3 py-2">
         {leading}
         <h2 className="truncate text-title font-semibold">{title}</h2>
+        <div className="ml-auto flex items-center gap-2">{actions}</div>
         <button
           type="button"
           onClick={onClose}
           title={closeLabel}
-          className="ml-auto flex h-7 w-7 items-center justify-center rounded-(--radius-control) border border-line text-ink-muted hover:text-ink"
+          className="flex h-7 w-7 items-center justify-center rounded-(--radius-control) border border-line text-ink-muted hover:text-ink"
         >
           <CloseIcon />
           <span className="sr-only">{closeLabel}</span>
@@ -134,9 +137,6 @@ export function SlideOver({
       </div>
       {subheader}
       <div className="min-h-0 flex-1 overflow-y-auto p-3">{children}</div>
-      {/* The records visited, at the foot of the panel: outside the scrolling area, so
-          they stay in reach wherever one is in a long record. */}
-      <TrailBar />
     </div>
   );
 }

@@ -6,6 +6,8 @@ import { tabPanelProps, useTabsId } from "@/components/ui/tabs-ids";
 import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
 import { ObjectIcon, type ObjectKind } from "./ObjectIcon";
 import { RelatedCount } from "./RelatedCount";
+import { BookmarkButton } from "./BookmarkButton";
+import { BOOKMARK_KINDS } from "./bookmark-kinds";
 import { PROPERTIES_TAB, type RelatedTab } from "./related-tabs";
 
 /**
@@ -71,6 +73,11 @@ export function RelatedTabsPanel({
       onClose={onClose}
       closeLabel={t("detail.close")}
       leading={<ObjectIcon kind={kind} />}
+      actions={
+        objectId !== undefined && BOOKMARK_KINDS.has(kind) ? (
+          <BookmarkButton kind={kind} id={objectId} />
+        ) : undefined
+      }
       subheader={
         <TabList
           tabs={items}

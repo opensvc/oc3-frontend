@@ -39,6 +39,7 @@ export function UserDetailPanel({
   return (
     <DetailPanel
       kind="user"
+      recordId={userId}
       open={userId !== undefined}
       title={user?.email ?? (label === "" ? t("users.detail.title") : label)}
       onClose={onClose}

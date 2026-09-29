@@ -8,6 +8,8 @@ import { ObjectIcon, type ObjectKind } from "./ObjectIcon";
 import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
 import { readPropAsString } from "@/lib/row";
 import { problemText } from "@/lib/api/problem";
+import { BookmarkButton } from "./BookmarkButton";
+import { BOOKMARK_KINDS } from "./bookmark-kinds";
 
 export interface DetailField<T> {
   /** Name of the apicollector prop: serves as label key and React key. */
@@ -440,6 +442,7 @@ export function DetailPanel<T>({
   kind,
   isPending,
   before,
+  recordId,
   ...content
 }: DetailContentProps<T> & {
   open: boolean;
@@ -449,8 +452,11 @@ export function DetailPanel<T>({
   kind: ObjectKind;
   /** Content placed before the properties, such as the object's tags. */
   before?: ReactNode;
+  /** Id of the object, for the bookmark button when a bookmark can reopen it. */
+  recordId?: string;
 }) {
   const { t } = useTranslation();
+  const bookmarkable = recordId !== undefined && recordId !== "" && BOOKMARK_KINDS.has(kind);
   return (
     <SlideOver
       open={open}
@@ -458,6 +464,7 @@ export function DetailPanel<T>({
       onClose={onClose}
       closeLabel={t("detail.close")}
       leading={<ObjectIcon kind={kind} />}
+      actions={bookmarkable ? <BookmarkButton kind={kind} id={recordId} /> : undefined}
     >
       {before}
       {/* A disabled query stays "pending": panel closed, nothing to load. */}

@@ -151,6 +151,7 @@ export function InstanceDetailPanel({
   return (
     <DetailPanel
       kind="instance"
+      recordId={instanceId}
       open={instanceId !== undefined}
       title={title}
       onClose={onClose}

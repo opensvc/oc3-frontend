@@ -63,7 +63,18 @@ export interface UserPrefs {
    * expanded. The old interface does not fold its menu, so the key is ours alone.
    */
   nav?: { collapsed?: string[] };
+  /**
+   * The records the user bookmarked, oldest first, each named by its kind and its
+   * id. The old interface has no bookmarks: the key is ours alone.
+   */
+  bookmarks?: Bookmark[];
   [key: string]: unknown;
+}
+
+/** A bookmarked record: the kind of object and its id. */
+export interface Bookmark {
+  kind: string;
+  id: string;
 }
 
 const PREFS_KEY = ["user", "self", "prefs"];
@@ -407,6 +418,62 @@ export function useNavCollapsedPref() {
       save.mutate(
         collapsed.includes(key) ? collapsed.filter((k) => k !== key) : [...collapsed, key],
       );
+    },
+  };
+}
+
+/** Beyond this many records, adding one drops the oldest. */
+const BOOKMARKS_SIZE = 50;
+
+function storedBookmarks(prefs: UserPrefs | undefined): Bookmark[] {
+  const entries = prefs?.bookmarks;
+  return Array.isArray(entries)
+    ? entries.filter(
+        (e): e is Bookmark =>
+          typeof e === "object" &&
+          e !== null &&
+          typeof (e as Bookmark).kind === "string" &&
+          typeof (e as Bookmark).id === "string",
+      )
+    : [];
+}
+
+/**
+ * The bookmarked records, oldest first, and what adds, removes or clears them. Only
+ * an explicit request bookmarks a record. Saved with the account, so that the
+ * bookmarks follow the user from view to view and from one session to the next; a
+ * change shows at once and is saved in the background, the stored bookmarks read
+ * again if the save fails.
+ */
+export function useBookmarksPref() {
+  const queryClient = useQueryClient();
+  const prefs = useUserPrefs();
+  const entries = storedBookmarks(prefs.data);
+  const save = useMutation({
+    mutationFn: async (next: Bookmark[]) => {
+      queryClient.setQueryData<UserPrefs>(PREFS_KEY, (current) => ({
+        ...current,
+        bookmarks: next,
+      }));
+      await savePrefs(queryClient, (current) => ({ ...current, bookmarks: next }));
+    },
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: PREFS_KEY });
+    },
+  });
+  const same = (a: Bookmark, kind: string, id: string) => a.kind === kind && a.id === id;
+  return {
+    entries,
+    has: (kind: string, id: string) => entries.some((e) => same(e, kind, id)),
+    add: (kind: string, id: string) => {
+      if (entries.some((e) => same(e, kind, id))) return;
+      save.mutate([...entries, { kind, id }].slice(-BOOKMARKS_SIZE));
+    },
+    remove: (kind: string, id: string) => {
+      save.mutate(entries.filter((e) => !same(e, kind, id)));
+    },
+    clear: () => {
+      save.mutate([]);
     },
   };
 }

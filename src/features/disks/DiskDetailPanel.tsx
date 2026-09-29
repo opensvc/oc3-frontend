@@ -92,6 +92,7 @@ export function DiskDetailPanel({
   return (
     <DetailPanel
       kind="disk"
+      recordId={diskId}
       open={diskId !== undefined}
       title={disk?.disk_id ?? (label === "" ? t("disks.detail.title") : label)}
       onClose={onClose}

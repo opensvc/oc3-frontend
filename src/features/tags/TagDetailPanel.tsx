@@ -49,6 +49,7 @@ export function TagDetailPanel({
   return (
     <DetailPanel
       kind="tag"
+      recordId={tag?.tag_id}
       open={open}
       title={tag?.tag_name ?? t("tags.detail.title")}
       onClose={onClose}

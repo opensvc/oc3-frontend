@@ -208,6 +208,22 @@ export function CloseIcon(props: IconProps) {
   );
 }
 
+/** A record kept in the history: filled when kept, hollow otherwise. */
+export function BookmarkIcon({ filled = false, ...props }: IconProps & { filled?: boolean }) {
+  return (
+    <Svg {...props}>
+      {filled ? (
+        <path d="M6.5 3h11A1.5 1.5 0 0 1 19 4.5V21l-7-4.2L5 21V4.5A1.5 1.5 0 0 1 6.5 3Z" />
+      ) : (
+        <path
+          fillRule="evenodd"
+          d="M6.5 3h11A1.5 1.5 0 0 1 19 4.5V21l-7-4.2L5 21V4.5A1.5 1.5 0 0 1 6.5 3Zm.5 2v12.5l5-3 5 3V5H7Z"
+        />
+      )}
+    </Svg>
+  );
+}
+
 /** Deletion. */
 export function TrashIcon(props: IconProps) {
   return (

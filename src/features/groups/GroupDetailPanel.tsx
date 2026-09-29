@@ -70,6 +70,7 @@ export function GroupDetailPanel({
   return (
     <DetailPanel
       kind="group"
+      recordId={groupId}
       open={groupId !== undefined}
       title={group?.role ?? (label === "" ? t("groups.detail.title") : label)}
       onClose={onClose}

@@ -1,106 +1,103 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDownIcon } from "./icons";
+import { ConfirmButton } from "./ConfirmButton";
+import { CloseIcon } from "./icons";
 import { useTrail } from "./trail";
 
 const CHIP =
-  "inline-flex max-w-44 items-center gap-1 rounded-full border border-line px-1.5 text-data text-ink-muted hover:border-line-strong hover:text-ink";
+  "inline-flex max-w-44 items-center gap-1 rounded-full border border-line py-0.5 pr-1 pl-1.5 text-data";
 
-const ARROW =
-  "flex h-6 w-6 shrink-0 items-center justify-center rounded-(--radius-control) border border-line text-ink-muted hover:border-line-strong hover:text-ink disabled:opacity-40 disabled:hover:border-line disabled:hover:text-ink-muted";
-
-/** Beyond this, the oldest entries fold behind an ellipsis: the bar stays one line. */
-const SHOWN = 3;
+/** Beyond this, the oldest records fold behind an ellipsis: the bar stays short. */
+const SHOWN = 6;
 
 /**
- * History of the records looked at: one chip per object, the one on display plain
- * among them. Clicking a chip moves to that object, backwards or forwards, and the
- * arrows step one at a time. Nothing is ever dropped, so a record left behind stays
- * one click away.
- *
- * Nothing is shown when a single object has been visited: there is nowhere to go.
- *
- * At the foot of the panel and outside its scroll: a long record does not push it out
- * of sight, and coming back costs one click wherever one has read to.
+ * The bookmarks, at the foot of the application: one chip per record the user
+ * bookmarked, the one on display highlighted among them. Clicking a chip opens that
+ * record over the current view, and its cross removes that bookmark; `onClear`
+ * removes them all, once confirmed. Nothing is shown while there is no bookmark.
  */
-export function TrailBar() {
+export function TrailBar({ current, onClear }: { current?: string; onClear?: () => void }) {
   const { t } = useTranslation();
   const trail = useTrail();
   const [expanded, setExpanded] = useState(false);
 
-  if (trail.length < 2) return null;
-  const at = trail.findIndex((step) => step.onSelect === undefined);
-  const previous = at > 0 ? trail[at - 1] : undefined;
-  const next = at >= 0 && at < trail.length - 1 ? trail[at + 1] : undefined;
-  // The oldest entries fold away to keep one line, never the one on display.
-  const hidden = expanded ? 0 : Math.min(Math.max(0, trail.length - SHOWN - 1), Math.max(at, 0));
+  if (trail.length === 0) return null;
+  const hidden = expanded ? 0 : Math.max(0, trail.length - SHOWN);
   const shown = trail.slice(hidden);
 
   return (
     <nav
-      aria-label={t("trail.label")}
-      className="flex shrink-0 items-center gap-1 border-t border-line bg-surface-raised px-3 py-1.5"
+      aria-label={t("bookmarks.title")}
+      className="flex shrink-0 items-center gap-2 border-t border-line bg-surface-raised px-3 py-1.5"
     >
-      <button
-        type="button"
-        disabled={previous === undefined}
-        title={t("trail.back", { name: previous?.label ?? "" })}
-        onClick={previous?.onSelect}
-        className={ARROW}
-      >
-        <ChevronDownIcon className="h-3.5 w-3.5 rotate-90" />
-        <span className="sr-only">{t("trail.back", { name: previous?.label ?? "" })}</span>
-      </button>
-      <button
-        type="button"
-        disabled={next === undefined}
-        title={t("trail.forward", { name: next?.label ?? "" })}
-        onClick={next?.onSelect}
-        className={`${ARROW} mr-1`}
-      >
-        <ChevronDownIcon className="h-3.5 w-3.5 -rotate-90" />
-        <span className="sr-only">{t("trail.forward", { name: next?.label ?? "" })}</span>
-      </button>
-
+      <span className="shrink-0 text-data text-ink-muted">{t("bookmarks.title")}</span>
       <ol className="flex min-w-0 flex-wrap items-center gap-1">
         {hidden > 0 && (
           <li>
             <button
               type="button"
-              title={t("trail.showAll", { count: hidden })}
+              title={t("bookmarks.showAll", { count: hidden })}
               onClick={() => {
                 setExpanded(true);
               }}
-              className={CHIP}
+              className={`${CHIP} pr-1.5 text-ink-muted hover:border-line-strong hover:text-ink`}
             >
               …
             </button>
           </li>
         )}
-        {shown.map((step, index) => (
-          <li key={step.key} className="flex min-w-0 items-center gap-1">
-            {(index > 0 || hidden > 0) && (
-              <span aria-hidden="true" className="text-ink-muted/60">
-                ›
-              </span>
-            )}
-            {step.onSelect === undefined ? (
+        {shown.map((step) => {
+          const onDisplay = step.key === current;
+          return (
+            <li key={step.key} className="min-w-0">
               <span
-                aria-current="true"
-                className="inline-flex max-w-44 items-center gap-1 text-data"
+                className={`${CHIP} ${onDisplay ? "border-accent bg-accent-soft text-ink" : "text-ink-muted hover:border-line-strong"}`}
               >
-                {step.icon}
-                <span className="truncate font-medium">{step.label}</span>
+                {onDisplay ? (
+                  <span aria-current="true" className="inline-flex min-w-0 items-center gap-1">
+                    {step.icon}
+                    <span className="truncate font-medium">{step.label}</span>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={step.onSelect}
+                    title={t("bookmarks.open", { name: step.label })}
+                    className="inline-flex min-w-0 items-center gap-1 hover:text-ink"
+                  >
+                    {step.icon}
+                    <span className="truncate">{step.label}</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={step.onRemove}
+                  title={t("bookmarks.removeEntry", { name: step.label })}
+                  className="shrink-0 rounded-full p-0.5 text-ink-muted hover:bg-surface-sunken hover:text-ink"
+                >
+                  <CloseIcon className="h-3 w-3" />
+                  <span className="sr-only">
+                    {t("bookmarks.removeEntry", { name: step.label })}
+                  </span>
+                </button>
               </span>
-            ) : (
-              <button type="button" onClick={step.onSelect} className={CHIP}>
-                {step.icon}
-                <span className="truncate">{step.label}</span>
-              </button>
-            )}
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ol>
+      {onClear !== undefined && (
+        // Right after the bookmarks rather than at the far end, which an open panel covers.
+        <div className="shrink-0">
+          <ConfirmButton
+            label={t("bookmarks.clearAll")}
+            question={t("bookmarks.clearQuestion", { count: trail.length })}
+            confirmLabel={t("bookmarks.clearAll")}
+            cancelLabel={t("detail.cancel")}
+            pendingLabel={t("bookmarks.clearAll")}
+            onConfirm={onClear}
+          />
+        </div>
+      )}
     </nav>
   );
 }

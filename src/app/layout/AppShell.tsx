@@ -9,6 +9,9 @@ import { PeekPanel } from "./PeekPanel";
 import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
 import { useAppearance } from "@/lib/user-prefs";
+import { BookmarksBar } from "./BookmarksBar";
+import { BookmarksMenu } from "./BookmarksMenu";
+import { BookmarksProvider } from "./BookmarksProvider";
 
 const SIDEBAR_KEY = "oc3.sidebar";
 
@@ -55,54 +58,59 @@ export function AppShell() {
   }
 
   return (
-    <div className="grid min-h-dvh grid-rows-[auto_1fr] bg-surface text-ink">
-      <AccountAppearance />
-      <header className="flex h-11 items-center gap-4 border-b border-line bg-surface-raised px-3">
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          aria-expanded={sidebarOpen}
-          aria-controls="app-sidebar"
-          className="rounded-(--radius-control) border border-line px-2 py-1 text-ink-muted hover:text-ink"
-        >
-          <span aria-hidden="true">☰</span>
-          <span className="sr-only">{sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}</span>
-        </button>
-
-        <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          {/* Decorative: the title that follows already names the link. */}
-          <img src={opensvcLogo} alt="" width={24} height={24} className="h-6 w-6" />
-          OpenSVC Collector
-        </Link>
-
-        <div className="ml-auto flex items-center gap-3">
+    <BookmarksProvider>
+      <div className="grid min-h-dvh grid-rows-[auto_1fr_auto] bg-surface text-ink">
+        <AccountAppearance />
+        <header className="flex h-11 items-center gap-4 border-b border-line bg-surface-raised px-3">
           <button
             type="button"
-            className="rounded-(--radius-control) border border-line px-2 py-1 text-ink-muted"
-            title={t("header.sessionFilter")}
+            onClick={toggleSidebar}
+            aria-expanded={sidebarOpen}
+            aria-controls="app-sidebar"
+            className="rounded-(--radius-control) border border-line px-2 py-1 text-ink-muted hover:text-ink"
           >
-            {t("header.sessionFilter")}: {t("header.noFilter")}
+            <span aria-hidden="true">☰</span>
+            <span className="sr-only">{sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}</span>
           </button>
-          <ActionQueueLink />
-          <input
-            type="search"
-            placeholder={t("header.search")}
-            aria-label={t("header.search")}
-            className="h-7 w-64 rounded-(--radius-control) border border-line bg-surface px-2 placeholder:text-ink-muted"
-          />
-          <UserMenu user={credentials.user} />
-        </div>
-      </header>
 
-      <div className="grid min-h-0 grid-cols-[auto_1fr]">
-        <Sidebar open={sidebarOpen} />
-        <main className="min-w-0 p-4">
-          <Outlet />
-          {/* Record of an object opened from a badge, whatever the view. */}
-          <PeekPanel />
-        </main>
+          <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
+            {/* Decorative: the title that follows already names the link. */}
+            <img src={opensvcLogo} alt="" width={24} height={24} className="h-6 w-6" />
+            OpenSVC Collector
+          </Link>
+
+          <div className="ml-auto flex items-center gap-3">
+            <button
+              type="button"
+              className="rounded-(--radius-control) border border-line px-2 py-1 text-ink-muted"
+              title={t("header.sessionFilter")}
+            >
+              {t("header.sessionFilter")}: {t("header.noFilter")}
+            </button>
+            <BookmarksMenu />
+            <ActionQueueLink />
+            <input
+              type="search"
+              placeholder={t("header.search")}
+              aria-label={t("header.search")}
+              className="h-7 w-64 rounded-(--radius-control) border border-line bg-surface px-2 placeholder:text-ink-muted"
+            />
+            <UserMenu user={credentials.user} />
+          </div>
+        </header>
+
+        <div className="grid min-h-0 grid-cols-[auto_1fr]">
+          <Sidebar open={sidebarOpen} />
+          <main className="min-w-0 p-4">
+            <Outlet />
+            {/* Record of an object opened from a badge, whatever the view. */}
+            <PeekPanel />
+          </main>
+        </div>
+        {/* The records the user bookmarked, at the foot of every view. */}
+        <BookmarksBar />
       </div>
-    </div>
+    </BookmarksProvider>
   );
 }
 

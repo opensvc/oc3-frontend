@@ -107,6 +107,7 @@ export function NetworkDetailPanel({
   return (
     <DetailPanel
       kind="network"
+      recordId={ipId}
       open={ipId !== undefined}
       title={ip?.addr ?? (label === "" ? t("networks.detail.title") : label)}
       onClose={onClose}
