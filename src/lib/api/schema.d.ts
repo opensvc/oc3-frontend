@@ -3941,7 +3941,17 @@ export interface paths {
          */
         get: operations["GetUser"];
         put?: never;
-        post?: never;
+        /**
+         * @description Change the first name, last name or email of the signed-in user, as the
+         *     profile form of the historical collector: `user_id` must designate the caller
+         *     ("self", their id or their email), another user's account is refused with a
+         *     403. Only the keys given are changed; names are trimmed, at most 128
+         *     characters, and may be empty. The email must be a valid address, at most 512
+         *     characters, not used by another user (409): it is the sign-in name, so the
+         *     next requests must authenticate with it. The change is logged with the fields
+         *     changed. Requires user authentication, no privilege. Returns the user.
+         */
+        post: operations["PostUser"];
         delete?: never;
         options?: never;
         head?: never;
@@ -17687,6 +17697,43 @@ export interface operations {
                 };
             };
             404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The caller, as "self", their auth_user.id or their email. */
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email?: string;
+                    first_name?: string;
+                    last_name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
             500: components["responses"]["500"];
         };
     };

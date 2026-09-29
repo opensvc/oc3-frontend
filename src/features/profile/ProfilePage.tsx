@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
-import { DetailContent } from "@/components/opensvc/DetailPanel";
+import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { setCredentials, useCredentials } from "@/lib/api/auth";
 import { problemText } from "@/lib/api/problem";
 import { USER_GROUPS, USER_PROPS_QUERY } from "@/features/users/user-fields";
 import {
@@ -20,6 +21,20 @@ import { ProfileCard } from "./ProfileCard";
 
 type UserRow = components["schemas"]["UserRow"];
 
+/** What the signed-in user may change about themselves (`POST /users/{user_id}`). */
+const SELF_EDITABLE = new Set(["first_name", "last_name", "email"]);
+
+/** The identity of the account, its name and email editable, the rest read only. */
+const IDENTITY_GROUP: DetailGroup<UserRow> | undefined = (() => {
+  const group = USER_GROUPS.find((g) => g.key === "identity");
+  return group === undefined
+    ? undefined
+    : {
+        ...group,
+        fields: group.fields.map((f) => (SELF_EDITABLE.has(f.prop) ? { ...f, editable: true } : f)),
+      };
+})();
+
 /**
  * Profile of the signed-in user, opened from their name in the top bar.
  *
@@ -29,12 +44,14 @@ type UserRow = components["schemas"]["UserRow"];
  * not expose them per user yet, see notes.md.
  *
  * A header saying who is signed in, then cards of related settings, on two columns
- * where the screen allows: the account and its notifications, read only since the
- * API offers no way to change them; the password; the appearance; what the account
- * remembers of the lists and of the menu.
+ * where the screen allows: the account, whose name and email the user may change,
+ * and its notifications, read only since the API offers no way to change them; the
+ * password; the appearance; what the account remembers of the lists and of the menu.
  */
 export function ProfilePage() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const credentials = useCredentials();
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["user", "self"],
     queryFn: async () => {
@@ -50,6 +67,31 @@ export function ProfilePage() {
   const fullName = [data?.first_name, data?.last_name]
     .filter((part) => part !== undefined && part !== "")
     .join(" ");
+  /**
+   * Saves a change of the name or the email. The email being the sign-in name, the
+   * session goes on with the new one as soon as the server has stored it: the old
+   * one no longer authenticates.
+   */
+  async function saveIdentity(patch: Record<string, unknown>) {
+    const body: { first_name?: string; last_name?: string; email?: string } = {};
+    for (const key of SELF_EDITABLE) {
+      const value = patch[key];
+      if (typeof value === "string") body[key as keyof typeof body] = value;
+    }
+    const { data: saved, error: failure } = await api.POST("/users/{user_id}", {
+      params: { path: { user_id: "self" } },
+      body,
+    });
+    if (failure !== undefined) throw new Error(problemText(failure));
+    const row: UserRow | undefined = Array.isArray(saved.data) ? saved.data[0] : undefined;
+    const email = row?.email;
+    if (credentials !== null && email !== undefined && email !== "" && email !== credentials.user)
+      setCredentials({ ...credentials, user: email });
+    await queryClient.invalidateQueries({ queryKey: ["user", "self"] });
+    await queryClient.invalidateQueries({ queryKey: ["users"] });
+    await queryClient.invalidateQueries({ queryKey: ["user"] });
+  }
+
   /** A group of the account's properties, in a card of its own titled like it. */
   const detailCard = (key: string) => {
     const group = USER_GROUPS.find((g) => g.key === key);
@@ -100,7 +142,24 @@ export function ProfilePage() {
           share their height, and every row starts on the same line. The account's
           properties go left, what the user sets goes right. */}
       <div className="grid gap-4 lg:grid-cols-2">
-        {detailCard("identity")}
+        <ProfileCard
+          title={t("users.detail.groups.identity")}
+          family={IDENTITY_GROUP?.family}
+          hint={t("profile.identity.hint")}
+        >
+          <DetailContent
+            groups={IDENTITY_GROUP === undefined ? [] : [IDENTITY_GROUP]}
+            row={data}
+            labelPrefix="users.fields"
+            groupPrefix="users.detail.groups"
+            isPending={isPending}
+            errorMessage={isError ? error.message : null}
+            groupTitles={false}
+            labelWidth={LABEL_WIDTH}
+            onSave={saveIdentity}
+            editHint={t("profile.identity.editHint")}
+          />
+        </ProfileCard>
         <PasswordSection email={data?.email ?? undefined} />
         {detailCard("notifications")}
         <AppearanceCard />

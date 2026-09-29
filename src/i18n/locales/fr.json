@@ -796,6 +796,10 @@
     "saved": {
       "title": "Réglages enregistrés",
       "hint": "Ce que votre compte retient des listes."
+    },
+    "identity": {
+      "hint": "Votre nom et votre e-mail sont modifiables ; les autres propriétés sont gérées par un administrateur.",
+      "editHint": "Survolez un champ pour le modifier. L'e-mail est aussi votre identifiant : vous vous connectez désormais avec le nouveau."
     }
   },
   "instances": {

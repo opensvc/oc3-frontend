@@ -796,6 +796,10 @@
     "saved": {
       "title": "Saved settings",
       "hint": "What your account remembers of the lists."
+    },
+    "identity": {
+      "hint": "Your name and email are yours to change; the other properties are managed by an administrator.",
+      "editHint": "Hover a field to change it. The email is also your sign-in name: you sign in with the new one from now on."
     }
   },
   "instances": {
