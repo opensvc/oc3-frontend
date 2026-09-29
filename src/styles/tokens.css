@@ -42,6 +42,8 @@
   --icon-network: #2f7f8c;
   --icon-disk: #7d7a1e;
   --icon-app: #a32a72;
+  /* The collector's darkcyan tags. */
+  --icon-tag: #008b8b;
   --icon-group: #a55446;
   /* Forms: the pale violet red puzzle piece of the historical collector (wf16). */
   --icon-form: #b0456c;
@@ -100,6 +102,7 @@
   --icon-network: #5fb0bd;
   --icon-disk: #b8b45c;
   --icon-app: #d178ab;
+  --icon-tag: #4cc3c3;
   --icon-group: #d1907f;
   --icon-form: #e08aa8;
   --icon-package: #d4a574;
@@ -148,6 +151,7 @@
   --icon-network: #005f70;
   --icon-disk: #595700;
   --icon-app: #9c005d;
+  --icon-tag: #006464;
   --icon-group: #9a2c16;
   --icon-form: #8e1c46;
   --icon-package: #6b4212;
@@ -187,6 +191,7 @@
   --icon-network: #5cd9eb;
   --icon-disk: #e6e070;
   --icon-app: #ff8fcf;
+  --icon-tag: #5eeaea;
   --icon-group: #ffab94;
   --icon-form: #ff9ec3;
   --icon-package: #f2c28f;

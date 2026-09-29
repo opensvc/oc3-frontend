@@ -86,6 +86,31 @@ export function AsteriskIcon(props: IconProps) {
   );
 }
 
+/** A tag: the collector's label with its eyelet (fa-tag, `tag16`). */
+export function TagIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M3 4.5A1.5 1.5 0 0 1 4.5 3h6.4a1.5 1.5 0 0 1 1.06.44l8.6 8.6a1.5 1.5 0 0 1 0 2.12l-6.4 6.4a1.5 1.5 0 0 1-2.12 0l-8.6-8.6A1.5 1.5 0 0 1 3 10.9V4.5Zm4.5 1.25a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Z"
+      />
+    </Svg>
+  );
+}
+
+/** The tags, as a whole: the collector's pair of labels (fa-tags, Tags menu entry). */
+export function TagsIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M1.5 4.5A1.5 1.5 0 0 1 3 3h5.9a1.5 1.5 0 0 1 1.06.44l7.6 7.6a1.5 1.5 0 0 1 0 2.12l-5.9 5.9a1.5 1.5 0 0 1-2.12 0l-7.6-7.6A1.5 1.5 0 0 1 1.5 10.4V4.5ZM5.5 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"
+      />
+      <path d="M12.2 3h.9a1.5 1.5 0 0 1 1.06.44l7.6 7.6a1.5 1.5 0 0 1 0 2.12l-5.9 5.9a.9.9 0 0 1-1.27-1.27l5.54-5.54a.6.6 0 0 0 0-.85L12.2 3Z" />
+    </Svg>
+  );
+}
+
 /** Groups: the collector's silhouettes (fa-users). */
 /** Service instance: the collector's half-filled disc (fa-adjust, `svcinstance`). */
 export function InstanceIcon(props: IconProps) {

@@ -13,6 +13,8 @@ import {
   PuzzleIcon,
   ServerIcon,
   StackIcon,
+  TagIcon,
+  TagsIcon,
   UserIcon,
   UsersIcon,
 } from "@/components/ui/icons";
@@ -27,6 +29,7 @@ export type ObjectKind =
   | "disk"
   | "app"
   | "tag"
+  | "tags"
   | "group"
   | "user"
   | "obsolescence"
@@ -57,8 +60,9 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   network: { Icon: NetworkIcon, className: "text-icon-network" },
   disk: { Icon: DatabaseIcon, className: "text-icon-disk" },
   app: { Icon: AsteriskIcon, className: "text-icon-app" },
-  // Same mark as in the menu, where the Tags entry shares the application asterisk.
-  tag: { Icon: AsteriskIcon, className: "text-icon-app" },
+  // The collector's dark cyan label (`tag16`); the Tags menu entry and view show a pair.
+  tag: { Icon: TagIcon, className: "text-icon-tag" },
+  tags: { Icon: TagsIcon, className: "text-icon-tag" },
   group: { Icon: UsersIcon, className: "text-icon-group" },
   // Same tint as groups: the historical collector paints `guy16` and `guys16` in the
   // same salmon, both speak of people.

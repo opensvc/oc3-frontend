@@ -77,7 +77,7 @@ export const NAV_CATEGORIES: NavCategory[] = [
     labelKey: "nav.categories.dataManagement",
     entries: [
       { to: "/apps", labelKey: "nav.apps", icon: "app" },
-      { to: "/tags", labelKey: "nav.tags", icon: "app" },
+      { to: "/tags", labelKey: "nav.tags", icon: "tags" },
     ],
   },
   {

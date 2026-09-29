@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TagRow } from "@/features/tags/tag-row";
 import { Combobox } from "@/components/ui/Combobox";
 import { CloseIcon, PlusIcon } from "@/components/ui/icons";
-import { ColumnFamilyIcon } from "./ColumnFamily";
+import { ObjectIcon } from "./ObjectIcon";
 import { usePeek } from "./use-peek";
 
 /** Attaching and detaching, held by the caller (see `useTagEdit`). */
@@ -61,7 +61,7 @@ export function ObjectTags({
     <section ref={section} className="mb-4">
       <div className="mb-1 flex items-center gap-2">
         <h3 className="flex items-center gap-2 font-semibold text-ink-muted">
-          <ColumnFamilyIcon family="app" />
+          <ObjectIcon kind="tags" />
           {t("objectTags.title")}
           {tags !== undefined && <span className="font-normal tabular-nums">({tags.length})</span>}
         </h3>
