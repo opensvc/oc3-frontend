@@ -46,8 +46,9 @@ export function SlideOver({
    */
   size?: "default" | "wide" | "wider";
   /**
-   * False for a data-entry drawer: a click beside it would clear a form being filled
-   * in, whereas it only puts down a record one was reading.
+   * False for a drawer editing an existing object at length, a form definition for
+   * instance: a stray click beside it would drop the changes. Creation drawers close
+   * on it like the others.
    */
   closeOnOutsideClick?: boolean;
   children: ReactNode;

@@ -118,7 +118,9 @@ export function FormFormPanel({
   return (
     <SlideOver
       // Data-entry drawer: a click beside it must not clear what has been typed.
-      closeOnOutsideClick={false}
+      // Created like the other objects, closing on a click beside it; an existing one
+      // being edited is not dropped by a stray click.
+      closeOnOutsideClick={!editing}
       size="wide"
       open={open}
       title={editing ? t("forms.form.editTitle") : t("forms.form.createTitle")}

@@ -49,7 +49,6 @@ export function CreateGroupPanel({ open, onClose }: { open: boolean; onClose: ()
   return (
     <SlideOver
       // Data-entry drawer: a click beside it must not clear what has been typed.
-      closeOnOutsideClick={false}
       open={open}
       title={t("groups.create.title")}
       onClose={onClose}

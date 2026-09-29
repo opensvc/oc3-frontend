@@ -97,7 +97,9 @@ export function FilterFormPanel({
   return (
     <SlideOver
       // Data-entry drawer: a click beside it must not clear what has been typed.
-      closeOnOutsideClick={false}
+      // Created like the other objects, closing on a click beside it; an existing one
+      // being edited is not dropped by a stray click.
+      closeOnOutsideClick={!editing}
       open={open}
       title={editing ? t("filters.form.editTitle") : t("filters.form.createTitle")}
       onClose={onClose}
