@@ -708,7 +708,7 @@
     "title": "My profile",
     "palette": {
       "title": "Theme",
-      "hint": "High contrast uses black or white text, visible borders and saturated colours, in light as in dark mode. Saved with your account.",
+      "hint": "High contrast uses black or white text, visible borders and saturated colours, in light as in dark mode.",
       "options": {
         "standard": "Standard",
         "contrast": "High contrast"
@@ -750,7 +750,18 @@
       "wrongCurrent": "The current password is incorrect.",
       "submit": "Change the password",
       "pending": "Changing…",
-      "done": "Password changed. You stay signed in with the new one."
+      "done": "Password changed. You stay signed in with the new one.",
+      "open": "Change the password",
+      "show": "Show the passwords"
+    },
+    "readOnly": "Managed by an administrator.",
+    "appearance": {
+      "title": "Appearance",
+      "hint": "How the interface looks, saved with your account and applied wherever you sign in."
+    },
+    "saved": {
+      "title": "Saved settings",
+      "hint": "What your account remembers of the lists."
     }
   },
   "instances": {

@@ -708,7 +708,7 @@
     "title": "Mon profil",
     "palette": {
       "title": "Thème",
-      "hint": "Le contraste élevé emploie un texte noir ou blanc, des bordures marquées et des couleurs saturées, en mode clair comme en mode sombre. Enregistré avec votre compte.",
+      "hint": "Le contraste élevé emploie un texte noir ou blanc, des bordures marquées et des couleurs saturées, en mode clair comme en mode sombre.",
       "options": {
         "standard": "Standard",
         "contrast": "Contraste élevé"
@@ -750,7 +750,18 @@
       "wrongCurrent": "Le mot de passe actuel est incorrect.",
       "submit": "Changer le mot de passe",
       "pending": "Changement…",
-      "done": "Mot de passe changé. Vous restez connecté avec le nouveau."
+      "done": "Mot de passe changé. Vous restez connecté avec le nouveau.",
+      "open": "Changer le mot de passe",
+      "show": "Afficher les mots de passe"
+    },
+    "readOnly": "Géré par un administrateur.",
+    "appearance": {
+      "title": "Apparence",
+      "hint": "L'aspect de l'interface, enregistré avec votre compte et appliqué partout où vous vous connectez."
+    },
+    "saved": {
+      "title": "Réglages enregistrés",
+      "hint": "Ce que votre compte retient des listes."
     }
   },
   "instances": {

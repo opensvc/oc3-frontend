@@ -100,6 +100,16 @@ interface DetailContentProps<T> {
    * empty list leaves the input free.
    */
   options?: Record<string, string[]>;
+  /**
+   * False when the caller titles the groups itself, such as a card per group: the
+   * heading of each group is then left out. True by default.
+   */
+  groupTitles?: boolean;
+  /**
+   * Width of the label column, a CSS length, for lists placed side by side to line
+   * up; by default each list sizes it to its own labels.
+   */
+  labelWidth?: string;
 }
 
 /**
@@ -121,6 +131,8 @@ export function DetailContent<T>({
   onSave,
   editHint,
   options,
+  groupTitles = true,
+  labelWidth,
 }: DetailContentProps<T>) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
@@ -222,11 +234,20 @@ export function DetailContent<T>({
             if (entries.length === 0) return null;
             return (
               <section key={group.key}>
-                <h3 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
-                  <ColumnFamilyIcon family={group.family} />
-                  {t(`${groupPrefix}.${group.key}`)}
-                </h3>
-                <dl className="grid grid-cols-[minmax(8rem,auto)_1fr] gap-x-3 gap-y-1 text-data">
+                {groupTitles && (
+                  <h3 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
+                    <ColumnFamilyIcon family={group.family} />
+                    {t(`${groupPrefix}.${group.key}`)}
+                  </h3>
+                )}
+                <dl
+                  className="grid grid-cols-[minmax(8rem,auto)_1fr] gap-x-3 gap-y-1 text-data"
+                  style={
+                    labelWidth === undefined
+                      ? undefined
+                      : { gridTemplateColumns: `${labelWidth} minmax(0, 1fr)` }
+                  }
+                >
                   {entries.map(({ field, value: shown }) => {
                     const label = t(`${labelPrefix}.${field.prop}`);
                     const isEditing = editing === field.prop;

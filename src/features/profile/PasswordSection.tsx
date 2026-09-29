@@ -1,10 +1,10 @@
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { setCredentials, useCredentials } from "@/lib/api/auth";
-import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
+import { ProfileCard } from "./ProfileCard";
 
 const INPUT = "h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2";
 
@@ -13,22 +13,24 @@ const MIN_LENGTH = 8;
 
 type Field = "current" | "next" | "confirm";
 
+const EMPTY: Record<Field, string> = { current: "", next: "", confirm: "" };
+
 /**
- * Change of the signed-in user's password, who gives the current one. The checks
- * the server makes are made here first, field by field; the current password can
- * only be checked by the server. Once changed, the session carries on with the new
- * password: HTTP Basic sends it with every request.
+ * Change of the signed-in user's password, who gives the current one. Folded
+ * behind a button, an occasional action not to take the room of the page. The
+ * checks the server makes are made here first, field by field; the current
+ * password can only be checked by the server. Once changed, the session carries
+ * on with the new password: HTTP Basic sends it with every request.
  */
 export function PasswordSection({ email }: { email: string | undefined }) {
   const { t } = useTranslation();
   const credentials = useCredentials();
   const id = useId();
-  const [values, setValues] = useState<Record<Field, string>>({
-    current: "",
-    next: "",
-    confirm: "",
-  });
+  const [open, setOpen] = useState(false);
+  const [values, setValues] = useState<Record<Field, string>>(EMPTY);
   const [touched, setTouched] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const opener = useRef<HTMLButtonElement>(null);
 
   const change = useMutation({
     mutationFn: async ({ current, next }: { current: string; next: string }) => {
@@ -44,10 +46,18 @@ export function PasswordSection({ email }: { email: string | undefined }) {
     },
     onSuccess: (next) => {
       if (credentials !== null) setCredentials({ ...credentials, password: next });
-      setValues({ current: "", next: "", confirm: "" });
-      setTouched(false);
+      close();
     },
   });
+
+  function close() {
+    setOpen(false);
+    setValues(EMPTY);
+    setTouched(false);
+    setVisible(false);
+    // The focus goes back to the button that opened the form.
+    window.setTimeout(() => opener.current?.focus(), 0);
+  }
 
   const problems: Partial<Record<Field, string>> = {};
   if (values.current === "") problems.current = t("profile.password.required");
@@ -57,7 +67,7 @@ export function PasswordSection({ email }: { email: string | undefined }) {
   if (values.confirm !== values.next) problems.confirm = t("profile.password.mismatch");
   const valid = Object.keys(problems).length === 0;
 
-  const field = (name: Field, autoComplete: string) => {
+  const field = (name: Field, autoComplete: string, autoFocus = false) => {
     const problem = touched ? problems[name] : undefined;
     return (
       <div>
@@ -66,8 +76,9 @@ export function PasswordSection({ email }: { email: string | undefined }) {
         </label>
         <input
           id={`${id}-${name}`}
-          type="password"
+          type={visible ? "text" : "password"}
           autoComplete={autoComplete}
+          autoFocus={autoFocus}
           value={values[name]}
           aria-invalid={problem !== undefined}
           aria-describedby={problem === undefined ? undefined : `${id}-${name}-problem`}
@@ -87,45 +98,81 @@ export function PasswordSection({ email }: { email: string | undefined }) {
   };
 
   return (
-    <section className="mt-6">
-      <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
-        <ColumnFamilyIcon family="security" />
-        {t("profile.password.title")}
-      </h2>
-      <p className="mb-2 text-ink-muted">{t("profile.password.hint", { count: MIN_LENGTH })}</p>
-      <form
-        className="grid max-w-sm gap-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          setTouched(true);
-          if (valid) change.mutate({ current: values.current, next: values.next });
-        }}
-      >
-        {/* The account name, for password managers to file the new password under it. */}
-        <input type="text" autoComplete="username" value={email ?? ""} readOnly hidden />
-        {field("current", "current-password")}
-        {field("next", "new-password")}
-        {field("confirm", "new-password")}
-        <div>
+    <ProfileCard
+      title={t("profile.password.title")}
+      family="security"
+      hint={t("profile.password.hint", { count: MIN_LENGTH })}
+    >
+      {!open ? (
+        <div className="space-y-2">
           <button
-            type="submit"
-            disabled={change.isPending}
-            className="h-8 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink disabled:opacity-60"
+            ref={opener}
+            type="button"
+            aria-expanded={false}
+            onClick={() => {
+              setOpen(true);
+              change.reset();
+            }}
+            className="h-8 rounded-(--radius-control) border border-line bg-surface px-3 hover:border-line-strong"
           >
-            {change.isPending ? t("profile.password.pending") : t("profile.password.submit")}
+            {t("profile.password.open")}
           </button>
+          {change.isSuccess && (
+            <p role="status" className="text-state-up">
+              ● {t("profile.password.done")}
+            </p>
+          )}
         </div>
-        {change.isError && (
-          <p role="alert" className="text-state-down">
-            ■ {change.error.message}
-          </p>
-        )}
-        {change.isSuccess && (
-          <p role="status" className="text-state-up">
-            ● {t("profile.password.done")}
-          </p>
-        )}
-      </form>
-    </section>
+      ) : (
+        <form
+          className="grid gap-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setTouched(true);
+            if (valid) change.mutate({ current: values.current, next: values.next });
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") close();
+          }}
+        >
+          {/* The account name, for password managers to file the new password under it. */}
+          <input type="text" autoComplete="username" value={email ?? ""} readOnly hidden />
+          {field("current", "current-password", true)}
+          {field("next", "new-password")}
+          {field("confirm", "new-password")}
+          <label className="flex items-center gap-2 text-ink-muted">
+            <input
+              type="checkbox"
+              checked={visible}
+              onChange={(event) => {
+                setVisible(event.target.checked);
+              }}
+            />
+            {t("profile.password.show")}
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="submit"
+              disabled={change.isPending}
+              className="h-8 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink disabled:opacity-60"
+            >
+              {change.isPending ? t("profile.password.pending") : t("profile.password.submit")}
+            </button>
+            <button
+              type="button"
+              onClick={close}
+              className="h-8 rounded-(--radius-control) border border-line bg-surface px-3 hover:border-line-strong"
+            >
+              {t("detail.cancel")}
+            </button>
+          </div>
+          {change.isError && (
+            <p role="alert" className="text-state-down">
+              ■ {change.error.message}
+            </p>
+          )}
+        </form>
+      )}
+    </ProfileCard>
   );
 }

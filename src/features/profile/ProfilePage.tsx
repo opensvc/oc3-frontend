@@ -3,10 +3,8 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailContent } from "@/components/opensvc/DetailPanel";
-import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { problemText } from "@/lib/api/problem";
 import { USER_GROUPS, USER_PROPS_QUERY } from "@/features/users/user-fields";
-import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import {
   hasSavedViewPrefs,
   usePalettePref,
@@ -18,6 +16,7 @@ import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { ResetIcon } from "@/components/ui/icons";
 import { PALETTES, THEMES } from "@/lib/theme";
 import { PasswordSection } from "./PasswordSection";
+import { ProfileCard } from "./ProfileCard";
 
 type UserRow = components["schemas"]["UserRow"];
 
@@ -28,13 +27,14 @@ type UserRow = components["schemas"]["UserRow"];
  * page stays right if the sign-in email changes case. The historical collector also
  * showed the groups, the application codes and the default filterset; the API does
  * not expose them per user yet, see notes.md.
+ *
+ * A header saying who is signed in, then cards of related settings, on two columns
+ * where the screen allows: the account and its notifications, read only since the
+ * API offers no way to change them; the password; the appearance; what the account
+ * remembers of the lists and of the menu.
  */
 export function ProfilePage() {
   const { t } = useTranslation();
-  const theme = useThemePref();
-  const palette = usePalettePref();
-  const prefs = useUserPrefs();
-  const resetViews = useResetViewPrefs();
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["user", "self"],
     queryFn: async () => {
@@ -50,91 +50,154 @@ export function ProfilePage() {
   const fullName = [data?.first_name, data?.last_name]
     .filter((part) => part !== undefined && part !== "")
     .join(" ");
+  /** A group of the account's properties, in a card of its own titled like it. */
+  const detailCard = (key: string) => {
+    const group = USER_GROUPS.find((g) => g.key === key);
+    return (
+      <ProfileCard
+        title={t(`users.detail.groups.${key}`)}
+        family={group?.family}
+        hint={t("profile.readOnly")}
+      >
+        <DetailContent
+          groups={group === undefined ? [] : [group]}
+          row={data}
+          labelPrefix="users.fields"
+          groupPrefix="users.detail.groups"
+          isPending={isPending}
+          errorMessage={isError ? error.message : null}
+          groupTitles={false}
+          labelWidth={LABEL_WIDTH}
+        />
+      </ProfileCard>
+    );
+  };
 
   return (
-    <section className="max-w-2xl">
-      <div className="mb-4">
-        <h1 className="flex items-center gap-2 text-title font-semibold">
-          <ObjectIcon kind="user" className="h-5 w-5" />
-          {t("profile.title")}
-        </h1>
-        {data !== undefined && data !== null && (
-          <p className="mt-1 text-ink-muted">
-            {fullName === "" ? data.email : `${fullName} · ${data.email ?? ""}`}
+    <section className="max-w-5xl">
+      <h1 className="sr-only">{t("profile.title")}</h1>
+      <header className="mb-4 flex items-center gap-4 rounded-(--radius-panel) border border-line bg-surface-raised p-4">
+        <span
+          aria-hidden="true"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent-soft text-title font-semibold text-ink"
+        >
+          {initials(fullName, data?.email)}
+        </span>
+        <div className="min-w-0">
+          <p className="text-ink-muted">{t("profile.title")}</p>
+          <p className="truncate text-title font-semibold">
+            {fullName === "" ? (data?.email ?? "…") : fullName}
           </p>
-        )}
+          {data !== undefined && data !== null && (
+            <p className="truncate text-ink-muted">
+              {[data.email, data.username].filter((v) => v !== undefined && v !== "").join(" · ")}
+            </p>
+          )}
+        </div>
+      </header>
+
+      {/* Rows of two cards rather than two independent columns: the cards of a row
+          share their height, and every row starts on the same line. The account's
+          properties go left, what the user sets goes right. */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {detailCard("identity")}
+        <PasswordSection email={data?.email ?? undefined} />
+        {detailCard("notifications")}
+        <AppearanceCard />
+        {detailCard("restrictions")}
+        <SavedSettingsCard />
       </div>
-
-      <DetailContent
-        groups={USER_GROUPS}
-        row={data}
-        labelPrefix="users.fields"
-        groupPrefix="users.detail.groups"
-        isPending={isPending}
-        errorMessage={isError ? error.message : null}
-      />
-
-      <PasswordSection email={data?.email} />
-
-      <section className="mt-6">
-        <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
-          <ColumnFamilyIcon family="env" />
-          {t("profile.palette.title")}
-        </h2>
-        <p className="mb-2 text-ink-muted">{t("profile.palette.hint")}</p>
-        <ChoiceGroup
-          name="palette"
-          label={t("profile.palette.title")}
-          options={PALETTES}
-          optionLabel={(value) => t(`profile.palette.options.${value}`)}
-          choice={palette}
-        />
-      </section>
-
-      <section className="mt-6">
-        <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
-          <ColumnFamilyIcon family="env" />
-          {t("profile.theme.title")}
-        </h2>
-        <p className="mb-2 text-ink-muted">{t("profile.theme.hint")}</p>
-        <ChoiceGroup
-          name="theme"
-          label={t("profile.theme.title")}
-          options={THEMES}
-          optionLabel={(value) => t(`profile.theme.options.${value}`)}
-          choice={theme}
-        />
-      </section>
-
-      <section className="mt-6">
-        <h2 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
-          <ColumnFamilyIcon family="team" />
-          {t("profile.viewPrefs.title")}
-        </h2>
-        <p className="mb-2 text-ink-muted">{t("profile.viewPrefs.hint")}</p>
-        {hasSavedViewPrefs(prefs.data) ? (
-          <ConfirmButton
-            icon={<ResetIcon />}
-            label={t("profile.viewPrefs.reset")}
-            question={t("profile.viewPrefs.question")}
-            confirmLabel={t("profile.viewPrefs.confirm")}
-            cancelLabel={t("detail.cancel")}
-            pendingLabel={t("profile.viewPrefs.pending")}
-            pending={resetViews.isPending}
-            onConfirm={resetViews.reset}
-          />
-        ) : (
-          <p role="status" className="text-ink-muted">
-            {resetViews.isDone ? t("profile.viewPrefs.done") : t("profile.viewPrefs.none")}
-          </p>
-        )}
-        {resetViews.errorMessage !== null && (
-          <p role="alert" className="mt-2 text-state-down">
-            ■ {resetViews.errorMessage}
-          </p>
-        )}
-      </section>
     </section>
+  );
+}
+
+/** One label width for every list of the page, so that their values line up. */
+const LABEL_WIDTH = "11rem";
+
+/** Up to two letters naming the user: of their name, else of their email. */
+function initials(fullName: string, email: string | null | undefined): string {
+  const words = fullName.split(/\s+/).filter((w) => w !== "");
+  if (words.length > 0)
+    return words
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("");
+  return (email ?? "?").slice(0, 1).toUpperCase();
+}
+
+/** Theme and light or dark mode, the two sides of how the interface looks. */
+function AppearanceCard() {
+  const { t } = useTranslation();
+  const theme = useThemePref();
+  const palette = usePalettePref();
+  return (
+    <ProfileCard
+      title={t("profile.appearance.title")}
+      family="env"
+      hint={t("profile.appearance.hint")}
+    >
+      <div className="grid gap-3">
+        <div>
+          <p className="mb-1 font-medium">{t("profile.palette.title")}</p>
+          <ChoiceGroup
+            name="palette"
+            label={t("profile.palette.title")}
+            options={PALETTES}
+            optionLabel={(value) => t(`profile.palette.options.${value}`)}
+            choice={palette}
+          />
+          <p className="mt-1 text-ink-muted">{t("profile.palette.hint")}</p>
+        </div>
+        <div>
+          <p className="mb-1 font-medium">{t("profile.theme.title")}</p>
+          <ChoiceGroup
+            name="theme"
+            label={t("profile.theme.title")}
+            options={THEMES}
+            optionLabel={(value) => t(`profile.theme.options.${value}`)}
+            choice={theme}
+          />
+        </div>
+      </div>
+    </ProfileCard>
+  );
+}
+
+/** What the account remembers of the lists, and how to forget it. */
+function SavedSettingsCard() {
+  const { t } = useTranslation();
+  const prefs = useUserPrefs();
+  const resetViews = useResetViewPrefs();
+  return (
+    <ProfileCard title={t("profile.saved.title")} family="team" hint={t("profile.saved.hint")}>
+      <div className="grid gap-3">
+        <div>
+          <p className="mb-1 font-medium">{t("profile.viewPrefs.title")}</p>
+          <p className="mb-2 text-ink-muted">{t("profile.viewPrefs.hint")}</p>
+          {hasSavedViewPrefs(prefs.data) ? (
+            <ConfirmButton
+              icon={<ResetIcon />}
+              label={t("profile.viewPrefs.reset")}
+              question={t("profile.viewPrefs.question")}
+              confirmLabel={t("profile.viewPrefs.confirm")}
+              cancelLabel={t("detail.cancel")}
+              pendingLabel={t("profile.viewPrefs.pending")}
+              pending={resetViews.isPending}
+              onConfirm={resetViews.reset}
+            />
+          ) : (
+            <p role="status" className="text-ink-muted">
+              {resetViews.isDone ? t("profile.viewPrefs.done") : t("profile.viewPrefs.none")}
+            </p>
+          )}
+          {resetViews.errorMessage !== null && (
+            <p role="alert" className="mt-2 text-state-down">
+              ■ {resetViews.errorMessage}
+            </p>
+          )}
+        </div>
+      </div>
+    </ProfileCard>
   );
 }
 
@@ -154,7 +217,7 @@ function ChoiceGroup<V extends string>({
 }) {
   return (
     <>
-      <div role="radiogroup" aria-label={label} className="flex gap-2">
+      <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-2">
         {options.map((value) => (
           <label
             key={value}
