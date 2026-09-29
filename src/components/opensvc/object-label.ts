@@ -5,7 +5,7 @@ import type { PeekStep } from "@/lib/peek-trail";
 import { fromInstanceId, instanceName, pickInstanceRow } from "@/features/instances/instance-id";
 
 /**
- * Name of an object, for the panel breadcrumb.
+ * Name of an object, for the panel title and the bookmarks.
  *
  * The path carries ids only — a uuid says nothing to a reader — so each step is read
  * once and cached. The queries reuse the keys of the panels themselves where the
@@ -77,6 +77,22 @@ async function fetchLabel(step: PeekStep): Promise<string> {
       });
       const rows = Array.isArray(data?.data) ? data.data : [];
       return text(readProp(rows[0] ?? {}, "addr")) || step.id;
+    }
+    case "filterset": {
+      const { data } = await api.GET("/filtersets/{filterset_id}", {
+        params: { path: { filterset_id: step.id }, query: { props: "fset_name" } },
+      });
+      const rows = Array.isArray(data?.data) ? data.data : [];
+      return text(readProp(rows[0] ?? {}, "fset_name")) || step.id;
+    }
+    case "form": {
+      const formId = Number(step.id);
+      if (!Number.isInteger(formId)) return step.id;
+      const { data } = await api.GET("/forms/{form_id}", {
+        params: { path: { form_id: formId }, query: { props: "form_name" } },
+      });
+      const rows = Array.isArray(data?.data) ? data.data : [];
+      return text(readProp(rows[0] ?? {}, "form_name")) || step.id;
     }
     // An application code names itself, as a disk does: the id is what one reads.
     case "disk":

@@ -4,10 +4,12 @@ import { SlideOver } from "@/components/ui/SlideOver";
 import { TabList, type TabItem } from "@/components/ui/Tabs";
 import { tabPanelProps, useTabsId } from "@/components/ui/tabs-ids";
 import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
-import { ObjectIcon, type ObjectKind } from "./ObjectIcon";
+import type { ObjectKind } from "./ObjectIcon";
 import { RelatedCount } from "./RelatedCount";
 import { BookmarkButton } from "./BookmarkButton";
 import { BOOKMARK_KINDS } from "./bookmark-kinds";
+import { PanelTitle } from "./PanelTitle";
+import { PanelRecordContext } from "./panel-trail";
 import { PROPERTIES_TAB, type RelatedTab } from "./related-tabs";
 
 /**
@@ -72,7 +74,7 @@ export function RelatedTabsPanel({
       title={title}
       onClose={onClose}
       closeLabel={t("detail.close")}
-      leading={<ObjectIcon kind={kind} />}
+      heading={<PanelTitle kind={kind} title={title} recordId={objectId} open={open} />}
       actions={
         objectId !== undefined && BOOKMARK_KINDS.has(kind) ? (
           <BookmarkButton kind={kind} id={objectId} />
@@ -90,11 +92,14 @@ export function RelatedTabsPanel({
         />
       }
     >
-      <div {...tabPanelProps(tabsId, active)} className="outline-none">
-        {related === undefined || objectId === undefined
-          ? children
-          : related.render(objectId, i18n.language)}
-      </div>
+      {/* A badge of the record, in any tab, opens its object as a step further. */}
+      <PanelRecordContext.Provider value={objectId === undefined ? null : { kind, id: objectId }}>
+        <div {...tabPanelProps(tabsId, active)} className="outline-none">
+          {related === undefined || objectId === undefined
+            ? children
+            : related.render(objectId, i18n.language)}
+        </div>
+      </PanelRecordContext.Provider>
     </SlideOver>
   );
 }

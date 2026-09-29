@@ -30,6 +30,7 @@ export function SlideOver({
   size = "default",
   closeOnOutsideClick = true,
   actions,
+  heading,
   children,
 }: {
   open: boolean;
@@ -51,8 +52,14 @@ export function SlideOver({
    * on it like the others.
    */
   closeOnOutsideClick?: boolean;
-  /** Buttons of the header, before the close button: the history button, say. */
+  /** Buttons of the header, before the close button: the bookmark button, say. */
   actions?: ReactNode;
+  /**
+   * Content of the header in place of `leading` and the plain title, when the title
+   * says more than a name. It must hold the panel's heading; `title` still names
+   * the dialog.
+   */
+  heading?: ReactNode;
   children: ReactNode;
 }) {
   const panel = useRef<HTMLDivElement>(null);
@@ -122,8 +129,12 @@ export function SlideOver({
       }`}
     >
       <div className="flex items-center gap-2 border-b border-line px-3 py-2">
-        {leading}
-        <h2 className="truncate text-title font-semibold">{title}</h2>
+        {heading ?? (
+          <>
+            {leading}
+            <h2 className="truncate text-title font-semibold">{title}</h2>
+          </>
+        )}
         <div className="ml-auto flex items-center gap-2">{actions}</div>
         <button
           type="button"

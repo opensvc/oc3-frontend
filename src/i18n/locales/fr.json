@@ -1636,5 +1636,9 @@
       "filterset": "Filtersets",
       "form": "Formulaires"
     }
+  },
+  "panelTitle": {
+    "label": "Fiches ouvertes dans ce panneau",
+    "show": "Afficher {{name}}"
   }
 }

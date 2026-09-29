@@ -12,6 +12,8 @@ import { FiltersetDetailPanel } from "@/features/filtersets/FiltersetDetailPanel
 import { FormDetailPanel } from "@/features/forms/FormDetailPanel";
 import { useTag } from "@/features/tags/use-tag";
 import { currentIndex, parseTrail } from "@/lib/peek-trail";
+import { isPeekStep, PanelTrailContext } from "@/components/opensvc/panel-trail";
+import { useObjectLabels } from "@/components/opensvc/object-label";
 
 /**
  * Record of an object looked at from another view.
@@ -21,11 +23,13 @@ import { currentIndex, parseTrail } from "@/lib/peek-trail";
  * nor losing its sort, its page or its selection. Placed in the application shell:
  * every view benefits from it, and there is only one panel of this kind on screen.
  *
- * The record lives in the URL (`peek`), like the row panel: a shared link reopens it,
- * and Escape or the cross closes it. The bookmarks (`BookmarksProvider`) open their
- * records here too, from any view, disks and network addresses included, and so does
- * the global search, filtersets and forms included. The row panel and this one do not coexist: `toSearchParams` clears the record
- * as soon as a row is selected, and the row panel wins if the URL carries both.
+ * The records live in the URL (`peek`, `peekat`), like the row panel: a shared link
+ * reopens them, and Escape or the cross closes the panel. A badge inside the panel
+ * opens its object as a step further, listed in the panel title with the records
+ * opened before (`PanelTitle`); the bookmarks (`BookmarksProvider`) and the global
+ * search open theirs here too, alone, from any view. The row panel and this one do
+ * not coexist: `toSearchParams` clears the record as soon as a row is selected, and
+ * the row panel wins if the URL carries both.
  */
 export function PeekPanel() {
   const search = useSearch({ strict: false }) as Record<string, unknown>;
@@ -34,7 +38,7 @@ export function PeekPanel() {
   // The row panel wins: a hand-written URL may carry both, and two stacked drawers do
   // not close one another.
   const rowPanelOpen = typeof search.sel === "string" && search.sel !== "";
-  const trail = rowPanelOpen ? [] : parseTrail(search.peek);
+  const trail = rowPanelOpen ? [] : parseTrail(search.peek).filter(isPeekStep);
   const at = currentIndex(trail, search.peekat);
   const current = trail[at];
   const tab = typeof search.peektab === "string" ? search.peektab : undefined;
@@ -60,13 +64,20 @@ export function PeekPanel() {
   };
 
   const id = current?.id;
+  // The name the title pills show, known before the record itself has loaded: the
+  // panel uses it until its own title is read.
+  const labels = useObjectLabels(trail);
+  // Until it is read, a name falls back to the id, which only an application code
+  // or a disk WWN makes readable: the others keep the panel's own placeholder.
+  const readableId = current?.kind === "app" || current?.kind === "disk";
+  const label = labels[at] === id && !readableId ? "" : (labels[at] ?? "");
   const panel = (() => {
     switch (current?.kind) {
       case "node":
         return (
           <NodeDetailPanel
             nodeId={id}
-            nodename=""
+            nodename={label}
             tab={tab}
             onTabChange={onTabChange}
             onClose={close}
@@ -76,31 +87,31 @@ export function PeekPanel() {
         return (
           <ServiceDetailPanel
             svcId={id}
-            svcname=""
+            svcname={label}
             tab={tab}
             onTabChange={onTabChange}
             onClose={close}
           />
         );
       case "instance":
-        return <InstanceDetailPanel instanceId={id} label="" onClose={close} />;
+        return <InstanceDetailPanel instanceId={id} label={label} onClose={close} />;
       case "app":
-        return <AppDetailPanel appId={id} label="" onClose={close} />;
+        return <AppDetailPanel appId={id} label={label} onClose={close} />;
       case "group":
-        return <GroupDetailPanel groupId={id} label="" onClose={close} />;
+        return <GroupDetailPanel groupId={id} label={label} onClose={close} />;
       case "user":
-        return <UserDetailPanel userId={id} label="" onClose={close} />;
+        return <UserDetailPanel userId={id} label={label} onClose={close} />;
       case "disk":
-        return <DiskDetailPanel diskId={id} label="" onClose={close} />;
+        return <DiskDetailPanel diskId={id} label={label} onClose={close} />;
       case "network":
-        return <NetworkDetailPanel ipId={id} label="" onClose={close} />;
+        return <NetworkDetailPanel ipId={id} label={label} onClose={close} />;
       case "filterset":
-        return <FiltersetDetailPanel filtersetId={id} label="" onClose={close} />;
+        return <FiltersetDetailPanel filtersetId={id} label={label} onClose={close} />;
       case "form":
         return (
           <FormDetailPanel
             formId={id}
-            name=""
+            name={label}
             tab={tab}
             onTabChange={onTabChange}
             onClose={close}
@@ -118,7 +129,21 @@ export function PeekPanel() {
     }
   })();
 
-  return panel;
+  // The panel title lists the records opened here; showing an older one keeps
+  // the order, only the record on display changes.
+  return (
+    <PanelTrailContext.Provider
+      value={{
+        steps: trail,
+        at,
+        select: (index) => {
+          update({ peekat: index === 0 ? undefined : index, peektab: undefined });
+        },
+      }}
+    >
+      {panel}
+    </PanelTrailContext.Provider>
+  );
 }
 
 /** A tag opened from a badge: read by its id, then shown like a row of the Tags list. */

@@ -4,11 +4,13 @@ import { SlideOver } from "@/components/ui/SlideOver";
 import { CheckIcon, CloseIcon, PencilIcon } from "@/components/ui/icons";
 import { Switch } from "@/components/ui/Switch";
 import { Combobox } from "@/components/ui/Combobox";
-import { ObjectIcon, type ObjectKind } from "./ObjectIcon";
+import type { ObjectKind } from "./ObjectIcon";
 import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
 import { readPropAsString } from "@/lib/row";
 import { problemText } from "@/lib/api/problem";
 import { BookmarkButton } from "./BookmarkButton";
+import { PanelTitle } from "./PanelTitle";
+import { PanelRecordContext } from "./panel-trail";
 import { BOOKMARK_KINDS } from "./bookmark-kinds";
 
 export interface DetailField<T> {
@@ -457,18 +459,22 @@ export function DetailPanel<T>({
 }) {
   const { t } = useTranslation();
   const bookmarkable = recordId !== undefined && recordId !== "" && BOOKMARK_KINDS.has(kind);
+  const record = recordId === undefined || recordId === "" ? null : { kind, id: recordId };
   return (
     <SlideOver
       open={open}
       title={title}
       onClose={onClose}
       closeLabel={t("detail.close")}
-      leading={<ObjectIcon kind={kind} />}
+      heading={<PanelTitle kind={kind} title={title} recordId={recordId} open={open} />}
       actions={bookmarkable ? <BookmarkButton kind={kind} id={recordId} /> : undefined}
     >
-      {before}
-      {/* A disabled query stays "pending": panel closed, nothing to load. */}
-      <DetailContent {...content} isPending={open && isPending} />
+      {/* A badge of the record opens its object as a step further (usePeek). */}
+      <PanelRecordContext.Provider value={record}>
+        {before}
+        {/* A disabled query stays "pending": panel closed, nothing to load. */}
+        <DetailContent {...content} isPending={open && isPending} />
+      </PanelRecordContext.Provider>
     </SlideOver>
   );
 }

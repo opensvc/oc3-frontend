@@ -1636,5 +1636,9 @@
       "filterset": "Filtersets",
       "form": "Forms"
     }
+  },
+  "panelTitle": {
+    "label": "Records opened in this panel",
+    "show": "Show {{name}}"
   }
 }
