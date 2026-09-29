@@ -4,6 +4,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { linkedField } from "@/components/opensvc/linked-field";
+import { NodeNameLinks } from "@/components/opensvc/NodeNameLinks";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
@@ -70,7 +71,10 @@ const GROUPS: DetailGroup<ServiceRow>[] = [
     fields: [
       field("svc_topology"),
       field("svc_placement"),
-      field("svc_nodes"),
+      {
+        ...field("svc_nodes"),
+        render: (row) => <NodeNameLinks names={row.svc_nodes ?? ""} clusterId={row.cluster_id} />,
+      },
       flag("svc_ha"),
       field("svc_autostart"),
       field("svc_flex_min_nodes"),
