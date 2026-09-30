@@ -16,6 +16,7 @@ import {
   useNodeSysreport,
   useNodeSysreportChange,
   useNodeSysreportFile,
+  useNodeSysreportTimediff,
   useNodeSysreportTree,
   type SysreportChange,
   type SysreportEntry,
@@ -90,6 +91,7 @@ export function NodeSysreport({ nodeId, locale }: { nodeId: string; locale: stri
   const [period, setPeriod] = useState<Period>("month");
   const [kinds, setKinds] = useState<Record<Kind, boolean>>({ file: true, command: true });
   const [limit, setLimit] = useState(PAGE);
+  const [comparing, setComparing] = useState(false);
   // The revision the Files view shows: the latest report unless a change was chosen.
   const [at, setAt] = useState<{ cid: string; date: string } | null>(null);
   const [filesFilter, setFilesFilter] = useState("");
@@ -210,6 +212,16 @@ export function NodeSysreport({ nodeId, locale }: { nodeId: string; locale: stri
                 </label>
               ))}
             </div>
+            <button
+              type="button"
+              aria-pressed={comparing}
+              onClick={() => {
+                setComparing(!comparing);
+              }}
+              className="ml-auto h-8 rounded-(--radius-control) border border-line px-2 hover:bg-surface-sunken aria-pressed:border-accent aria-pressed:bg-accent-soft"
+            >
+              {t("nodes.sysreport.compare.toggle")}
+            </button>
           </div>
         ) : (
           <div className="flex flex-wrap items-center gap-3">
@@ -258,6 +270,7 @@ export function NodeSysreport({ nodeId, locale }: { nodeId: string; locale: stri
             kinds={kinds}
             needle={needle}
             filtered={needle !== "" || period !== "all"}
+            comparing={comparing}
             onMore={() => {
               setLimit(limit + PAGE);
             }}
@@ -320,6 +333,7 @@ function Changes({
   kinds,
   needle,
   filtered,
+  comparing,
   onMore,
   onBrowse,
 }: {
@@ -332,11 +346,15 @@ function Changes({
   kinds: Record<Kind, boolean>;
   needle: string;
   filtered: boolean;
+  /** True while two reports are being picked to compare the node between them. */
+  comparing: boolean;
   onMore: () => void;
   onBrowse: (change: SysreportChange) => void;
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
+  // The reports picked for a comparison, two at most: a third replaces the oldest pick.
+  const [picked, setPicked] = useState<SysreportChange[]>([]);
 
   if (isPending) return <p className="text-ink-muted">{t("detail.loading")}</p>;
   if (errorMessage !== null)
@@ -361,6 +379,7 @@ function Changes({
 
   const day = new Intl.DateTimeFormat(locale, { dateStyle: "full" });
   const time = new Intl.DateTimeFormat(locale, { timeStyle: "short" });
+  const moment = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const days: { label: string; entries: typeof shown }[] = [];
   for (const entry of shown) {
     const label = day.format(new Date(entry.change.date));
@@ -371,6 +390,18 @@ function Changes({
 
   return (
     <div className="flex flex-col gap-3">
+      {comparing && (
+        <Comparison
+          nodeId={nodeId}
+          locale={locale}
+          picked={picked}
+          kinds={kinds}
+          needle={needle}
+          onClear={() => {
+            setPicked([]);
+          }}
+        />
+      )}
       {days.map((group) => (
         <section key={group.label}>
           <h3 className="mb-1 font-semibold text-ink-muted">{group.label}</h3>
@@ -381,40 +412,59 @@ function Changes({
               const deleted = files.reduce((sum, file) => sum + file.deleted, 0);
               return (
                 <li key={change.cid}>
-                  <button
-                    type="button"
-                    aria-expanded={expanded}
-                    onClick={() => {
-                      const next = new Set(open);
-                      if (expanded) next.delete(change.cid);
-                      else next.add(change.cid);
-                      setOpen(next);
-                    }}
-                    className="flex w-full items-center gap-3 px-2 py-1.5 text-left hover:bg-surface-sunken"
-                  >
-                    <CaretRightIcon
-                      className={`h-3 w-3 shrink-0 text-ink-muted transition-transform ${expanded ? "rotate-90" : ""}`}
-                    />
-                    <span className="w-16 shrink-0 font-medium whitespace-nowrap tabular-nums">
-                      {time.format(new Date(change.date))}
-                    </span>
-                    <span className="shrink-0 text-ink-muted">
-                      {t("nodes.sysreport.change.files", { count: files.length })}
-                    </span>
-                    <Counts added={added} deleted={deleted} />
-                    {change.initial && (
-                      <span className="shrink-0 rounded-full border border-line px-1.5 text-data text-ink-muted">
-                        {t("nodes.sysreport.change.initial")}
-                      </span>
+                  <div className="flex items-center">
+                    {comparing && (
+                      <input
+                        type="checkbox"
+                        className="ml-2 shrink-0"
+                        aria-label={t("nodes.sysreport.compare.pick", {
+                          date: moment.format(new Date(change.date)),
+                        })}
+                        checked={picked.some((p) => p.cid === change.cid)}
+                        onChange={(event) => {
+                          setPicked(
+                            event.target.checked
+                              ? [...picked, change].slice(-2)
+                              : picked.filter((p) => p.cid !== change.cid),
+                          );
+                        }}
+                      />
                     )}
-                    {/* A glimpse of what changed, before unfolding. */}
-                    <span className="min-w-0 flex-1 truncate font-mono text-data text-ink-muted">
-                      {files
-                        .slice(0, 3)
-                        .map((file) => file.path)
-                        .join("   ")}
-                    </span>
-                  </button>
+                    <button
+                      type="button"
+                      aria-expanded={expanded}
+                      onClick={() => {
+                        const next = new Set(open);
+                        if (expanded) next.delete(change.cid);
+                        else next.add(change.cid);
+                        setOpen(next);
+                      }}
+                      className="flex min-w-0 flex-1 items-center gap-3 px-2 py-1.5 text-left hover:bg-surface-sunken"
+                    >
+                      <CaretRightIcon
+                        className={`h-3 w-3 shrink-0 text-ink-muted transition-transform ${expanded ? "rotate-90" : ""}`}
+                      />
+                      <span className="w-16 shrink-0 font-medium whitespace-nowrap tabular-nums">
+                        {time.format(new Date(change.date))}
+                      </span>
+                      <span className="shrink-0 text-ink-muted">
+                        {t("nodes.sysreport.change.files", { count: files.length })}
+                      </span>
+                      <Counts added={added} deleted={deleted} />
+                      {change.initial && (
+                        <span className="shrink-0 rounded-full border border-line px-1.5 text-data text-ink-muted">
+                          {t("nodes.sysreport.change.initial")}
+                        </span>
+                      )}
+                      {/* A glimpse of what changed, before unfolding. */}
+                      <span className="min-w-0 flex-1 truncate font-mono text-data text-ink-muted">
+                        {files
+                          .slice(0, 3)
+                          .map((file) => file.path)
+                          .join("   ")}
+                      </span>
+                    </button>
+                  </div>
                   {expanded && (
                     <ChangeDetail
                       nodeId={nodeId}
@@ -466,7 +516,6 @@ function ChangeDetail({
 }) {
   const { t } = useTranslation();
   const detail = useNodeSysreportChange(nodeId, change.cid, true);
-  const [toggled, setToggled] = useState<ReadonlySet<string>>(new Set());
 
   if (detail.isPending) return <p className="px-7 py-2 text-ink-muted">{t("detail.loading")}</p>;
   if (detail.isError)
@@ -480,9 +529,6 @@ function ChangeDetail({
   const files = detail.data.files.filter(
     (file) => kinds[file.kind] && (lower === "" || file.path.toLowerCase().includes(lower)),
   );
-  // Few files: unfolded, to read the change at once. Many: folded, to find one's way.
-  const foldedByDefault = files.length > FOLD_FROM;
-
   return (
     <div className="flex flex-col gap-2 border-t border-line bg-surface px-2 py-2 pl-7">
       <div className="flex flex-wrap items-center gap-3 text-ink-muted">
@@ -498,6 +544,20 @@ function ChangeDetail({
           {t("nodes.sysreport.change.browse")}
         </button>
       </div>
+      <FileDiffList files={files} />
+    </div>
+  );
+}
+
+/**
+ * The files of a change, one foldable block each. Few files: unfolded, to read the
+ * change at once. Many: folded, to find one's way.
+ */
+function FileDiffList({ files }: { files: SysreportFileDiff[] }) {
+  const [toggled, setToggled] = useState<ReadonlySet<string>>(new Set());
+  const foldedByDefault = files.length > FOLD_FROM;
+  return (
+    <>
       {files.map((file) => {
         const unfolded = toggled.has(file.path) ? foldedByDefault : !foldedByDefault;
         return (
@@ -514,7 +574,138 @@ function ChangeDetail({
           />
         );
       })}
-    </div>
+    </>
+  );
+}
+
+/**
+ * The node compared between two reports: what changed after the older one up to
+ * the newer one, as a single diff per file. One report picked compares with the
+ * latest report on request.
+ */
+function Comparison({
+  nodeId,
+  locale,
+  picked,
+  kinds,
+  needle,
+  onClear,
+}: {
+  nodeId: string;
+  locale: string;
+  picked: SysreportChange[];
+  kinds: Record<Kind, boolean>;
+  needle: string;
+  onClear: () => void;
+}) {
+  const { t } = useTranslation();
+  const [withLatest, setWithLatest] = useState(false);
+  const ordered = [...picked].sort((a, b) => a.date.localeCompare(b.date));
+  const begin = ordered[0];
+  const end = ordered[1];
+  const ready = begin !== undefined && (end !== undefined || withLatest);
+
+  return (
+    <section
+      aria-label={t("nodes.sysreport.compare.toggle")}
+      className="flex flex-col gap-2 rounded-(--radius-control) border border-accent bg-surface p-2"
+    >
+      {begin === undefined ? (
+        <p className="text-ink-muted">{t("nodes.sysreport.compare.none")}</p>
+      ) : !ready ? (
+        <p className="flex flex-wrap items-center gap-2 text-ink-muted">
+          {t("nodes.sysreport.compare.one", { date: formatMoment(begin.date, locale) })}
+          <button
+            type="button"
+            onClick={() => {
+              setWithLatest(true);
+            }}
+            className="text-accent hover:underline"
+          >
+            {t("nodes.sysreport.compare.withLatest")}
+          </button>
+        </p>
+      ) : (
+        <ComparisonResult
+          nodeId={nodeId}
+          locale={locale}
+          begin={begin}
+          end={end}
+          kinds={kinds}
+          needle={needle}
+          onClear={() => {
+            setWithLatest(false);
+            onClear();
+          }}
+        />
+      )}
+    </section>
+  );
+}
+
+function ComparisonResult({
+  nodeId,
+  locale,
+  begin,
+  end,
+  kinds,
+  needle,
+  onClear,
+}: {
+  nodeId: string;
+  locale: string;
+  begin: SysreportChange;
+  end: SysreportChange | undefined;
+  kinds: Record<Kind, boolean>;
+  needle: string;
+  onClear: () => void;
+}) {
+  const { t } = useTranslation();
+  const diff = useNodeSysreportTimediff(nodeId, begin.cid, end?.cid);
+
+  if (diff.isPending) return <p className="text-ink-muted">{t("detail.loading")}</p>;
+  if (diff.isError)
+    return (
+      <p role="alert" className="text-state-down">
+        ■ {t("detail.error", { message: diff.error.message })}
+      </p>
+    );
+
+  const lower = needle.toLowerCase();
+  const files = diff.data.files.filter(
+    (file) => kinds[file.kind] && (lower === "" || file.path.toLowerCase().includes(lower)),
+  );
+  const added = files.reduce((sum, file) => sum + file.added, 0);
+  const deleted = files.reduce((sum, file) => sum + file.deleted, 0);
+
+  return (
+    <>
+      <div className="flex flex-wrap items-center gap-3">
+        <h3 className="font-semibold">
+          {t("nodes.sysreport.compare.title", {
+            begin: formatMoment(diff.data.begin.date, locale),
+            end: formatMoment(diff.data.end.date, locale),
+          })}
+        </h3>
+        <span className="text-ink-muted">
+          {t("nodes.sysreport.change.files", { count: files.length })}
+        </span>
+        <Counts added={added} deleted={deleted} />
+        <button type="button" onClick={onClear} className="ml-auto text-accent hover:underline">
+          {t("nodes.sysreport.compare.clear")}
+        </button>
+      </div>
+      <p className="text-ink-muted">{t("nodes.sysreport.compare.explain")}</p>
+      {files.length === 0 ? (
+        <p className="text-ink-muted">
+          {diff.data.files.length === 0
+            ? t("nodes.sysreport.compare.identical")
+            : t("nodes.sysreport.emptyFiltered")}
+        </p>
+      ) : (
+        <FileDiffList files={files} />
+      )}
+    </>
   );
 }
 

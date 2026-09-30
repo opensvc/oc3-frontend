@@ -322,6 +322,17 @@
         "copied": "Copied",
         "emptyFile": "Empty.",
         "truncated": "Cut at 1 MiB."
+      },
+      "compare": {
+        "toggle": "Compare two reports",
+        "pick": "Select the report of {{date}} for the comparison",
+        "none": "Select two reports in the list to see what changed between them.",
+        "one": "Report of {{date}} selected. Select a second one, or",
+        "withLatest": "compare with the latest report",
+        "title": "From {{begin}} to {{end}}",
+        "explain": "What changed after the first report, up to and including the second.",
+        "identical": "Nothing changed between these two reports.",
+        "clear": "Clear the selection"
       }
     }
   },

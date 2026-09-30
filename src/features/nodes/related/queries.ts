@@ -278,3 +278,20 @@ export function useNodeSysreportFile(nodeId: string, cid: string, oid: string, e
     },
   });
 }
+
+/**
+ * What changed in each file between two reports of the node, the older first;
+ * without an end, up to the latest report.
+ */
+export function useNodeSysreportTimediff(nodeId: string, begin: string, end: string | undefined) {
+  return useQuery({
+    queryKey: ["node", nodeId, "sysreport", "timediff", begin, end ?? "latest"],
+    queryFn: async () => {
+      const { data, error } = await api.GET("/nodes/{node_id}/sysreport/timediff", {
+        params: { path: { node_id: nodeId }, query: { begin, end } },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return data.data;
+    },
+  });
+}

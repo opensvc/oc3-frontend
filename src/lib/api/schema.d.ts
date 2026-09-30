@@ -3088,6 +3088,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/nodes/{node_id}/sysreport/timediff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Show what changed in each file between two states of the node's sysreport, as
+         *     one unified diff per file. Each state is given as a date, which designates the
+         *     last report made at or before it, or as a revision of the timeline; the end
+         *     defaults to the latest report. A begin older than the first report compares
+         *     with nothing reported: every file is then added. Sensitive paths are withheld
+         *     as in a change.
+         */
+        get: operations["GetNodeSysreportTimediff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/nodes/{node_id}/sysreport/{cid}": {
         parameters: {
             query?: never;
@@ -5208,6 +5232,18 @@ export interface components {
             kind: "file" | "command";
             /** @description Absolute path of a tracked file, or command line of a tracked command. */
             path: string;
+        };
+        /** @description A state of the sysreport, the report it was left in; empty before the first report. */
+        SysreportPoint: {
+            cid: string;
+            date: string;
+        };
+        SysreportTimediffResponse: {
+            data: {
+                begin: components["schemas"]["SysreportPoint"];
+                end: components["schemas"]["SysreportPoint"];
+                files: components["schemas"]["SysreportFileDiff"][];
+            };
         };
         SysreportTimelineResponse: {
             data: components["schemas"]["SysreportChange"][];
@@ -15060,6 +15096,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SysreportTimelineResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetNodeSysreportTimediff: {
+        parameters: {
+            query: {
+                /** @description The state compared from, a date (2026-09-01T10:00:00Z) or a revision. */
+                begin: string;
+                /** @description The state compared to, a date or a revision; the latest report by default. */
+                end?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Node identifier (node_id UUID) */
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SysreportTimediffResponse"];
                 };
             };
             400: components["responses"]["400"];

@@ -322,6 +322,17 @@
         "copied": "Copié",
         "emptyFile": "Vide.",
         "truncated": "Coupé à 1 Mio."
+      },
+      "compare": {
+        "toggle": "Comparer deux rapports",
+        "pick": "Sélectionner le rapport du {{date}} pour la comparaison",
+        "none": "Sélectionnez deux rapports dans la liste pour voir ce qui a changé entre eux.",
+        "one": "Rapport du {{date}} sélectionné. Sélectionnez-en un second, ou",
+        "withLatest": "comparez avec le dernier rapport",
+        "title": "Du {{begin}} au {{end}}",
+        "explain": "Ce qui a changé après le premier rapport, jusqu'au second inclus.",
+        "identical": "Rien n'a changé entre ces deux rapports.",
+        "clear": "Effacer la sélection"
       }
     }
   },
