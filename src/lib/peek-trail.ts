@@ -2,7 +2,7 @@
  * The record opened in the panel over the current view, kept in the URL (`peek`) as
  * `kind:id` like the rest of the panel state: a reload or a shared link reopen it,
  * and the browser Back button returns to what was on display before. The records
- * shown before it are the panel history, kept with the account (`useHistoryPref`).
+ * shown before it are the panel history, kept by the browser tab (`useRecordHistory`).
  *
  * An older URL may carry several records, `kind:id,kind:id…`, with `peekat` giving
  * the one on display, the first by default: that record opens.

@@ -1,21 +1,23 @@
 import { useEffect, useRef } from "react";
 import type { PeekStep } from "@/lib/peek-trail";
-import { useHistoryPref } from "@/lib/user-prefs";
+import { useRecordHistory } from "@/lib/record-history";
 import { RAIL_FALLBACK, type SlideOverSize } from "@/components/ui/slide-over-layout";
 import { ObjectIcon, type ObjectKind } from "./ObjectIcon";
 import { PanelHistoryMenu } from "./PanelHistory";
-import { recordKey } from "./panel-history";
+import { openedFromHistory, recordKey } from "./panel-history";
+import { rememberLastRecord } from "./last-record";
 import { isPeekStep } from "./panel-trail";
 
 /**
  * Title of a record panel: the icon of its kind and its name, the header's alone.
- * The records shown before — the panel history, kept with the account — hang in a
- * rail beside the panel (`PanelHistoryRail`); where the window leaves it no room,
+ * The records shown before — the panel history, kept by the browser tab — stand in a
+ * side panel on its left (`PanelHistoryRail`); where the window leaves it no room,
  * a button next to the title opens them as a list.
  *
  * The title also records the record it shows in the history, whatever opened it —
- * a list row, a badge, the search, a bookmark: a new record enters in front, one
- * already listed keeps its place.
+ * a list row, a badge, the search, a bookmark: it enters, or comes back, in front,
+ * with the time it is. Only a record picked in the history itself stays where it
+ * stands.
  */
 export function PanelTitle({
   kind,
@@ -31,7 +33,7 @@ export function PanelTitle({
   /** Size of the panel: decides where the rail gives way to the list button. */
   size?: SlideOverSize;
 }) {
-  const history = useHistoryPref();
+  const history = useRecordHistory();
   const currentKey = recordKey(kind, recordId);
   const current: PeekStep | null =
     recordId === undefined || recordId === "" ? null : { kind, id: recordId };
@@ -40,7 +42,8 @@ export function PanelTitle({
   record.current = history.record;
   useEffect(() => {
     if (!open || current === null || !isPeekStep(current)) return;
-    record.current(current.kind, current.id);
+    record.current(current.kind, current.id, !openedFromHistory(currentKey));
+    rememberLastRecord(current);
     // current is derived from currentKey.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, currentKey]);

@@ -1773,14 +1773,20 @@
   },
   "panelHistory": {
     "label": "History of the records shown",
+    "title": "History",
+    "sections": {
+      "now": "Now",
+      "hour": "Last Hour",
+      "day": "Last Day",
+      "week": "Last Week"
+    },
     "show": "Show {{name}}",
     "remove": "Remove {{name}} from the history",
     "clear": "Clear the history",
-    "collapse": "Fold the history",
-    "expand_one": "Unfold the history, 1 record",
-    "expand_other": "Unfold the history, {{count}} records",
     "menu_one": "History, 1 record",
-    "menu_other": "History, {{count}} records"
+    "menu_other": "History, {{count}} records",
+    "reopen_one": "Reopen the panel on {{name}}",
+    "reopen_other": "Reopen the panel on {{name}} ({{count}} records in the history)"
   },
   "realtime": {
     "live": "Live",

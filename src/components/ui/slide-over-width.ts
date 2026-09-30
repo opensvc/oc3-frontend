@@ -16,8 +16,8 @@ const STORAGE_KEY = "oc3.panel-width";
 /** Narrowest a panel gets, in pixels: its header and a form still fit. */
 export const MIN_WIDTH = 320;
 
-/** Room kept on the left of a resized panel, in pixels: the history rail hangs there. */
-export const LEFT_ROOM = 96;
+/** Room kept on the left of the record zone of a resized panel, in pixels: its rail stands there. */
+export const LEFT_ROOM = 192;
 
 /** Width of each size before any resize, in pixels: what its `max-w-*` class gives. */
 export const DEFAULT_WIDTH: Record<SlideOverSize, number> = {
@@ -81,6 +81,18 @@ export function clampWidth(width: number, floor = MIN_WIDTH): number {
  * does, and counting them would forbid any narrowing.
  */
 export function contentFloor(panel: HTMLElement): number {
+  const fitting = widthBound(panel).filter((element) => element.scrollWidth <= element.clientWidth);
+  const before = panel.style.maxWidth;
+  panel.style.maxWidth = `${String(MIN_WIDTH)}px`;
+  let lacking = 0;
+  for (const element of fitting)
+    lacking = Math.max(lacking, element.scrollWidth - element.clientWidth);
+  panel.style.maxWidth = before;
+  return MIN_WIDTH + lacking;
+}
+
+/** What may not fit in the width of a panel: its parts, and the areas scrolling sideways inside. */
+function widthBound(panel: HTMLElement): HTMLElement[] {
   const parts = Array.from(panel.children).filter(
     (child): child is HTMLElement =>
       child instanceof HTMLElement && getComputedStyle(child).position !== "absolute",
@@ -89,16 +101,27 @@ export function contentFloor(panel: HTMLElement): number {
     const overflow = getComputedStyle(element).overflowX;
     return overflow === "auto" || overflow === "scroll";
   });
-  const fitting = [...new Set([...parts, ...scrollers])].filter(
-    (element) => element.scrollWidth <= element.clientWidth,
-  );
-  const before = panel.style.maxWidth;
-  panel.style.maxWidth = `${String(MIN_WIDTH)}px`;
-  let lacking = 0;
-  for (const element of fitting)
-    lacking = Math.max(lacking, element.scrollWidth - element.clientWidth);
-  panel.style.maxWidth = before;
-  return MIN_WIDTH + lacking;
+  return [...new Set([...parts, ...scrollers])];
+}
+
+/**
+ * The width a panel should take for its content to show without a horizontal
+ * scrollbar, or null when it fits already. What would not fit even in the widest
+ * panel the window allows — a long line of a file — is left out: it scrolls
+ * whatever the panel does, and is no reason to fill the window.
+ */
+export function widthToFit(panel: HTMLElement): number | null {
+  const current = panel.getBoundingClientRect().width;
+  const max = window.innerWidth - LEFT_ROOM;
+  let needed = 0;
+  for (const element of widthBound(panel)) {
+    const lacking = element.scrollWidth - element.clientWidth;
+    if (lacking <= 0) continue;
+    // One more pixel: both measures are rounded.
+    const width = Math.ceil(current + lacking) + 1;
+    if (width <= max) needed = Math.max(needed, width);
+  }
+  return needed > current ? needed : null;
 }
 
 /**

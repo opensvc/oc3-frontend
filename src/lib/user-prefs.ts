@@ -68,10 +68,6 @@ export interface UserPrefs {
    * id. The old interface has no bookmarks: the key is ours alone.
    */
   bookmarks?: Bookmark[];
-  /** Records last shown in a panel, the most recent first (`useHistoryPref`). */
-  history?: Bookmark[];
-  /** True once the user folded the history rail of the panels. */
-  historyCollapsed?: boolean;
   [key: string]: unknown;
 }
 
@@ -209,6 +205,20 @@ function schedule(queryClient: QueryClient, id: string, change: PrefsChange) {
 }
 
 /**
+ * Keys this interface once saved with the account and no longer reads: the panel
+ * history, now kept by the browser tab (`record-history.ts`), and whether its rail
+ * was folded. Each save drops them from the stored preferences.
+ */
+const OBSOLETE_KEYS = ["history", "historyCollapsed"];
+
+function withoutObsolete(prefs: UserPrefs): UserPrefs {
+  if (!OBSOLETE_KEYS.some((key) => key in prefs)) return prefs;
+  const kept = { ...prefs };
+  for (const key of OBSOLETE_KEYS) delete kept[key];
+  return kept;
+}
+
+/**
  * Applies a change to the preferences object and saves it.
  *
  * The object is read back before being written again: the server replaces the whole
@@ -220,7 +230,7 @@ export async function savePrefs(
   queryClient: QueryClient,
   change: (current: UserPrefs) => UserPrefs,
 ): Promise<void> {
-  const next = change(await fetchPrefs());
+  const next = withoutObsolete(change(await fetchPrefs()));
   const { error } = await api.POST("/users/{user_id}/prefs", {
     params: { path: { user_id: "self" } },
     body: { data: next },
@@ -478,81 +488,6 @@ export function useBookmarksPref() {
     },
     clear: () => {
       save.mutate([]);
-    },
-  };
-}
-
-/** Records kept in the panel history: what its rail shows without scrolling. */
-const HISTORY_SIZE = 8;
-
-/** A history saved when the limit was higher shows its most recent records only. */
-function storedHistory(prefs: UserPrefs | undefined): Bookmark[] {
-  return storedBookmarks({ bookmarks: prefs?.history }).slice(0, HISTORY_SIZE);
-}
-
-/**
- * The records last shown in a panel, the most recent first unless the user
- * rearranged them, and what records one, removes one, reorders or clears them. Saved with the account like the bookmarks, so
- * that closing the panel, opening another object, reloading or signing in elsewhere
- * keeps them; beyond `HISTORY_SIZE` the last ones are forgotten. A record enters
- * in front the first time it is shown, and keeps its place when shown again.
- * `collapsed` is whether the user folded the history rail.
- */
-export function useHistoryPref() {
-  const queryClient = useQueryClient();
-  const prefs = useUserPrefs();
-  const entries = storedHistory(prefs.data);
-  const save = useMutation({
-    // The change is computed from the prefs of the moment, not from this render's
-    // copy: two records shown in a row must both be kept.
-    mutationFn: async (change: (current: UserPrefs | undefined) => UserPrefs) => {
-      queryClient.setQueryData<UserPrefs>(PREFS_KEY, change);
-      await savePrefs(queryClient, change);
-    },
-    onError: () => {
-      void queryClient.invalidateQueries({ queryKey: PREFS_KEY });
-    },
-  });
-  const other = (kind: string, id: string) => (e: Bookmark) => e.kind !== kind || e.id !== id;
-  return {
-    entries,
-    collapsed: prefs.data?.historyCollapsed === true,
-    record: (kind: string, id: string) => {
-      // Already listed: it keeps the place it has, which the user may have chosen.
-      if (!entries.every(other(kind, id))) return;
-      save.mutate((current) => {
-        const stored = storedHistory(current);
-        return stored.every(other(kind, id))
-          ? { ...current, history: [{ kind, id }, ...stored].slice(0, HISTORY_SIZE) }
-          : { ...current };
-      });
-    },
-    remove: (kind: string, id: string) => {
-      save.mutate((current) => ({
-        ...current,
-        history: storedHistory(current).filter(other(kind, id)),
-      }));
-    },
-    clear: () => {
-      save.mutate((current) => ({ ...current, history: [] }));
-    },
-    /**
-     * Puts the records in the order given, as the user arranged them. A record the
-     * history gained meanwhile stays in front; one it lost is not brought back.
-     */
-    reorder: (order: Bookmark[]) => {
-      save.mutate((current) => {
-        const stored = storedHistory(current);
-        const known = (e: Bookmark) => stored.some((s) => s.kind === e.kind && s.id === e.id);
-        const listed = (e: Bookmark) => order.some((o) => o.kind === e.kind && o.id === e.id);
-        return {
-          ...current,
-          history: [...stored.filter((e) => !listed(e)), ...order.filter(known)],
-        };
-      });
-    },
-    setCollapsed: (collapsed: boolean) => {
-      save.mutate((current) => ({ ...current, historyCollapsed: collapsed }));
     },
   };
 }

@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import type { PeekStep } from "@/lib/peek-trail";
-import { useHistoryPref } from "@/lib/user-prefs";
+import { useRecordHistory } from "@/lib/record-history";
 import type { ObjectKind } from "./ObjectIcon";
 import { isPeekStep } from "./panel-trail";
 import { useObjectLabels } from "./object-label";
@@ -12,50 +13,100 @@ export function recordKey(kind: string, recordId: string | undefined): string {
   return recordId === undefined || recordId === "" ? "" : stepKey({ kind, id: recordId });
 }
 
-/** An entry of the history, as the rail and the menu show it. */
+/**
+ * The sections of the history, by how long ago a record was shown, and the age each
+ * ends at. A record older than the last one is no longer in the history.
+ */
+const SECTIONS = [
+  ["now", 5 * 60 * 1000],
+  ["hour", 60 * 60 * 1000],
+  ["day", 24 * 60 * 60 * 1000],
+  ["week", 7 * 24 * 60 * 60 * 1000],
+] as const;
+
+export type HistorySection = (typeof SECTIONS)[number][0];
+
+function sectionOf(age: number): HistorySection {
+  return SECTIONS.find(([, limit]) => age < limit)?.[0] ?? "week";
+}
+
+/** How often the sections are worked out again while the history is on screen. */
+const TICK_MS = 30 * 1000;
+
+/** The time it is, refreshed every `TICK_MS`: records age from a section to the next. */
+function useNow(): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, TICK_MS);
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, []);
+  return now;
+}
+
+/**
+ * The record last picked in the history itself. The panel title, which records
+ * every record shown, leaves that one where it stands (`openedFromHistory`): the
+ * list must not move under the pointer of who is going through it.
+ */
+let picked: { key: string; at: number } | null = null;
+
+/** Long enough for the panel to mount and record, too short for another gesture. */
+const PICK_MS = 2000;
+
+export function openedFromHistory(key: string): boolean {
+  return picked !== null && picked.key === key && performance.now() - picked.at < PICK_MS;
+}
+
+/** An entry of the history, as the side panel and the menu show it. */
 export interface HistoryEntry {
   key: string;
   step: PeekStep & { kind: ObjectKind };
   label: string;
   /** The record the panel displays. */
   current: boolean;
+  section: HistorySection;
 }
 
 /**
- * The panel history, ready to be shown: the records displayed before, the most
- * recent first unless the user rearranged them, named, and what opens one, moves
- * one, removes one or clears them all. Opening one leaves it where it stands.
+ * The panel history, ready to be shown: the records displayed in this browser tab
+ * during the last week, the most recently shown first, named, grouped by how long ago they were
+ * shown — only the groups that hold a record — and what opens one, removes one or
+ * clears them all. Opening one from here leaves it where it stands.
  */
 export function usePanelHistory(currentKey: string) {
-  const history = useHistoryPref();
+  const history = useRecordHistory();
   const peek = usePeek();
-  const steps = history.entries.filter(isPeekStep);
-  const labels = useObjectLabels(steps);
-  const entries: HistoryEntry[] = steps.map((step, index) => ({
-    key: stepKey(step),
-    step,
-    label: labels[index] ?? step.id,
-    current: stepKey(step) === currentKey,
+  const now = useNow();
+  const records = history.entries.filter((record): record is typeof record & { kind: ObjectKind } =>
+    isPeekStep(record),
+  );
+  const labels = useObjectLabels(records);
+  const entries: HistoryEntry[] = records.map((record, index) => ({
+    key: stepKey(record),
+    step: { kind: record.kind, id: record.id },
+    label: labels[index] ?? record.id,
+    current: stepKey(record) === currentKey,
+    // A clock set back would give a negative age: such a record is of now.
+    section: sectionOf(Math.max(0, now - record.at)),
   }));
+  const sections = SECTIONS.map(([key]) => ({
+    key,
+    entries: entries.filter((entry) => entry.section === key),
+  })).filter((section) => section.entries.length > 0);
   return {
     entries,
-    collapsed: history.collapsed,
-    setCollapsed: history.setCollapsed,
+    sections,
     open: (entry: HistoryEntry) => {
+      picked = { key: entry.key, at: performance.now() };
       peek(entry.step.kind, entry.step.id);
     },
     remove: (entry: HistoryEntry) => {
       history.remove(entry.step.kind, entry.step.id);
     },
     clear: history.clear,
-    /** Moves the entry of index `from` so that it stands at index `to`. */
-    move: (from: number, to: number) => {
-      if (from === to || from < 0 || from >= entries.length) return;
-      const order = entries.map((entry) => entry.step);
-      const [moved] = order.splice(from, 1);
-      if (moved === undefined) return;
-      order.splice(Math.min(Math.max(to, 0), order.length), 0, moved);
-      history.reorder(order);
-    },
   };
 }

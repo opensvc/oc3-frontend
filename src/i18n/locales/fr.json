@@ -1773,14 +1773,20 @@
   },
   "panelHistory": {
     "label": "Historique des fiches affichées",
+    "title": "Historique",
+    "sections": {
+      "now": "Maintenant",
+      "hour": "Dernière heure",
+      "day": "Dernier jour",
+      "week": "Dernière semaine"
+    },
     "show": "Afficher {{name}}",
     "remove": "Retirer {{name}} de l'historique",
     "clear": "Vider l'historique",
-    "collapse": "Replier l'historique",
-    "expand_one": "Déplier l'historique, 1 fiche",
-    "expand_other": "Déplier l'historique, {{count}} fiches",
     "menu_one": "Historique, 1 fiche",
-    "menu_other": "Historique, {{count}} fiches"
+    "menu_other": "Historique, {{count}} fiches",
+    "reopen_one": "Rouvrir le panneau sur {{name}}",
+    "reopen_other": "Rouvrir le panneau sur {{name}} ({{count}} fiches dans l'historique)"
   },
   "realtime": {
     "live": "En direct",

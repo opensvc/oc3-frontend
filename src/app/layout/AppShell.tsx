@@ -6,6 +6,7 @@ import { SignIn } from "@/features/auth/SignIn";
 import opensvcLogo from "@/assets/opensvc-logo.svg";
 import { Sidebar } from "./Sidebar";
 import { PeekPanel } from "./PeekPanel";
+import { PanelAnchor } from "./PanelAnchor";
 import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
 import { LiveIndicator } from "./LiveIndicator";
@@ -103,6 +104,8 @@ export function AppShell() {
             <Outlet />
             {/* Record of an object opened from a badge, whatever the view. */}
             <PeekPanel />
+            {/* What brings the panels back once they are closed. */}
+            <PanelAnchor />
           </main>
         </div>
         {/* The records the user bookmarked, at the foot of every view. */}
