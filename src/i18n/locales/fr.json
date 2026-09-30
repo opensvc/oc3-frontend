@@ -1139,6 +1139,28 @@
     "notApplicable": "n/a"
   },
   "storage": {
+    "san": {
+      "title": "Connexions SAN",
+      "loading": "Chargement des connexions SAN…",
+      "error": "Impossible de charger les connexions SAN : {{message}}",
+      "empty": "Aucune connexion SAN connue pour ce node : aucun de ses adaptateurs n'est branché sur un commutateur inventorié par le collector.",
+      "label": "Connexions SAN de {{name}}",
+      "speed": "{{speed}} Gb/s",
+      "speedOther": "Autre vitesse",
+      "speedUnknown": "vitesse inconnue",
+      "trunk": "{{count}} × {{speed}}",
+      "legend": "Vitesse des liens",
+      "port": "port {{port}}",
+      "unknownArray": "Baie inconnue",
+      "fabric": "Fabric {{name}}",
+      "openSwitch": "Voir les ports de {{name}} dans la vue Commutateurs SAN",
+      "link": "{{tail}} {{tailPort}} vers {{head}} {{headPort}}, {{speed}}",
+      "kinds": {
+        "server": "Node",
+        "switch": "Commutateur",
+        "array": "Baie"
+      }
+    },
     "hbas": {
       "title": "Adaptateurs de bus hôte",
       "empty": "Aucun adaptateur de bus hôte remonté.",

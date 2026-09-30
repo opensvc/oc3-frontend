@@ -60,6 +60,18 @@
   --tag-hover: #006b7a;
   --tag-ink: #ffffff;
 
+  /* Speed of a SAN link, in Gb/s: a ramp from amber to violet, the faster the
+     darker, after the yellow-to-red one of the historical collector's SAN diagram.
+     The speed is always written on the link too. */
+  --san-1: #b88a00;
+  --san-2: #c97612;
+  --san-4: #d65a1f;
+  --san-8: #cf3a2c;
+  --san-16: #a81e3b;
+  --san-32: #7a1f6b;
+  --san-64: #3f2a8c;
+  --san-other: #6f7a82;
+
   /* Typography */
   --font-sans: "IBM Plex Sans Variable", system-ui, sans-serif;
   --text-data: 0.8125rem; /* 13px: table cells */
@@ -112,6 +124,15 @@
   --tag: #3a9aa8;
   --tag-hover: #4fb0be;
   --tag-ink: #0c1417;
+
+  --san-1: #f1dc8a;
+  --san-2: #f4bd7a;
+  --san-4: #f59a6e;
+  --san-8: #f0766c;
+  --san-16: #e96a93;
+  --san-32: #cf86dc;
+  --san-64: #a9a3f5;
+  --san-other: #9aa5ac;
 }
 
 /*

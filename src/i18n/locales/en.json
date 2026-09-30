@@ -1139,6 +1139,28 @@
     "notApplicable": "n/a"
   },
   "storage": {
+    "san": {
+      "title": "SAN connections",
+      "loading": "Loading the SAN connections…",
+      "error": "Could not load the SAN connections: {{message}}",
+      "empty": "No SAN connection known for this node: none of its adapters is plugged in a switch the collector inventories.",
+      "label": "SAN connections of {{name}}",
+      "speed": "{{speed}} Gb/s",
+      "speedOther": "Other speed",
+      "speedUnknown": "speed unknown",
+      "trunk": "{{count}} × {{speed}}",
+      "legend": "Link speed",
+      "port": "port {{port}}",
+      "unknownArray": "Unknown array",
+      "fabric": "Fabric {{name}}",
+      "openSwitch": "Show the ports of {{name}} in the SAN Switches view",
+      "link": "{{tail}} {{tailPort}} to {{head}} {{headPort}}, {{speed}}",
+      "kinds": {
+        "server": "Node",
+        "switch": "Switch",
+        "array": "Array"
+      }
+    },
     "hbas": {
       "title": "Host bus adapters",
       "empty": "No host bus adapter reported.",

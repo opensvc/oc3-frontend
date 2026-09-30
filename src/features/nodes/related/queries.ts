@@ -129,6 +129,21 @@ export function useNodeHbas(nodeId: string | undefined) {
   });
 }
 
+/** The SAN wiring of the node, as a graph: adapters, switches, arrays and their links. */
+export function useNodeSan(nodeId: string | undefined) {
+  return useQuery({
+    queryKey: ["node", nodeId, "san"],
+    enabled: nodeId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/nodes/{node_id}/san", {
+        params: { path: { node_id: nodeId ?? "" } },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return data.data;
+    },
+  });
+}
+
 /** Tags attached to the node. `GET /…/tags` returns the generic `ListResponse`: read by `toTagRows`. */
 export function useNodeTags(nodeId: string | undefined) {
   return useQuery({

@@ -3009,6 +3009,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/nodes/{node_id}/san": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description The SAN wiring of a node, as a graph: the node and its host bus adapters, the
+         *     switches their ports are plugged in, the inter-switch links followed from
+         *     there, and the storage arrays owning the target ports zoned to the adapters.
+         *     A switch reached through an inter-switch link is kept only when it leads to
+         *     one of those target ports. The graph has no link for a node without a
+         *     fibre channel wiring known to the collector.
+         */
+        get: operations["GetNodeSan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/nodes/{node_id}/services": {
         parameters: {
             query?: never;
@@ -5133,6 +5157,45 @@ export interface components {
             var_name?: string;
             var_updated?: string;
             var_value?: string;
+        };
+        SanTopology: {
+            links: components["schemas"]["SanTopologyLink"][];
+            nodes: components["schemas"]["SanTopologyNode"][];
+        };
+        /**
+         * @description A link of a SAN wiring graph, from the device nearer to the node (`tail`) to
+         *     the one nearer to the arrays (`head`), each with the port it uses. `speeds`
+         *     holds the speed in Gb/s of each physical link: one, or one per member of a
+         *     trunk between two switches; 0 when the switch does not report it.
+         */
+        SanTopologyLink: {
+            head: string;
+            head_port: string;
+            speeds: number[];
+            tail: string;
+            tail_port: string;
+        };
+        /**
+         * @description A device of a SAN wiring graph. `rank` is its column from the node to the
+         *     arrays: 0 for the node, 1 for the switches its adapters are plugged in, one
+         *     more per inter-switch link followed, and the last one for the arrays.
+         *     `ports` are the ports the links of the graph use: adapter ports for the node,
+         *     target ports for an array, port indexes for a switch, several of them joined
+         *     by commas for the members of a trunk.
+         */
+        SanTopologyNode: {
+            /** @description Fabric of a switch. */
+            fabric?: string;
+            id: string;
+            /** @enum {string} */
+            kind: "server" | "switch" | "array";
+            /** @description Node name, switch name or array name; empty for an unknown array. */
+            label: string;
+            ports: string[];
+            rank: number;
+        };
+        SanTopologyResponse: {
+            data: components["schemas"]["SanTopology"];
         };
         /** @description The objects of one kind matching a search. */
         SearchGroup: {
@@ -15142,6 +15205,32 @@ export interface operations {
                     "application/json": components["schemas"]["IpListResponse"];
                 };
             };
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetNodeSan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Node identifier (node_id UUID or nodename) */
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SanTopologyResponse"];
+                };
+            };
+            401: components["responses"]["401"];
             404: components["responses"]["404"];
             500: components["responses"]["500"];
         };
