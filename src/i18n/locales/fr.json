@@ -166,7 +166,8 @@
       "alerts": "Alertes",
       "networks": "Réseaux",
       "packages": "Paquets",
-      "inventory": "Inventaire"
+      "inventory": "Inventaire",
+      "sysreport": "Sysreport"
     },
     "actions": {
       "open": "Actions",
@@ -249,6 +250,78 @@
         "count_other": "{{count}} entrées",
         "pending": "chargement",
         "error": "n'a pas pu être chargé"
+      }
+    },
+    "sysreport": {
+      "modesLabel": "Vues du sysreport",
+      "modes": {
+        "changes": "Changements",
+        "files": "Fichiers"
+      },
+      "chip": {
+        "changes_one": "{{count}} changement",
+        "changes_other": "{{count}} changements",
+        "files_one": "{{count}} fichier ou commande",
+        "files_other": "{{count}} fichiers et commandes",
+        "pending": "chargement",
+        "error": "n'a pas pu être chargé"
+      },
+      "search": "Filtrer par chemin ou commande…",
+      "period": {
+        "label": "Période",
+        "options": {
+          "day": "Dernières 24 heures",
+          "week": "7 derniers jours",
+          "month": "30 derniers jours",
+          "all": "Tout"
+        }
+      },
+      "kindsLabel": "Types affichés",
+      "kinds": {
+        "file": "Fichiers",
+        "command": "Commandes"
+      },
+      "kind": {
+        "file": "Fichier",
+        "command": "Commande"
+      },
+      "empty": "Aucun changement remonté sur cette période.",
+      "emptyFiltered": "Aucun changement ne correspond à ces filtres.",
+      "shown": "{{shown}} changements sur {{total}}",
+      "older": "Afficher les changements plus anciens",
+      "change": {
+        "files_one": "{{count}} fichier",
+        "files_other": "{{count}} fichiers",
+        "initial": "Premier rapport",
+        "partial": "{{shown}} des {{total}} fichiers de ce changement correspondent aux filtres.",
+        "browse": "Parcourir les fichiers à cette date"
+      },
+      "file": {
+        "secure": "Sensible",
+        "restricted": "Vous n'êtes pas autorisé à lire ce contenu.",
+        "binary": "Contenu binaire, non affiché.",
+        "noDiff": "Aucune ligne modifiée.",
+        "truncated": "Ce changement est plus long que ce qui est affiché."
+      },
+      "diff": {
+        "added": "ajoutée",
+        "removed": "supprimée",
+        "showAll": "Afficher les {{count}} lignes"
+      },
+      "files": {
+        "search": "Filtrer les fichiers et commandes…",
+        "latest": "Au dernier rapport",
+        "at": "Au {{date}}",
+        "backToLatest": "Revenir au dernier rapport",
+        "commands_one": "{{count}} commande",
+        "commands_other": "{{count}} commandes",
+        "none": "Ce nœud n'a encore rien remonté.",
+        "noMatch": "Rien ne correspond à ce filtre.",
+        "history": "Changements de ce fichier",
+        "copy": "Copier",
+        "copied": "Copié",
+        "emptyFile": "Vide.",
+        "truncated": "Coupé à 1 Mio."
       }
     }
   },

@@ -4,7 +4,9 @@ import { SEVERITY_LEVELS, severityLevel } from "@/components/opensvc/severity";
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import { NodeAlerts } from "./NodeAlerts";
 import { NodeInventory } from "./NodeInventory";
-import { useNodeAlerts } from "./queries";
+import { NodeSysreport } from "./NodeSysreport";
+import { useNodeAlerts, useNodeSysreport } from "./queries";
+import { periodBegin } from "./sysreport-period";
 
 /**
  * Data attached to a node, one tab each, in display order.
@@ -22,6 +24,17 @@ export const NODE_RELATED_TABS: RelatedTab[] = [
     // No count of its own: each category of the tab carries its count on its chip.
     useSummary: () => ({ count: undefined }),
     render: (nodeId, locale) => <NodeInventory nodeId={nodeId} locale={locale} />,
+  },
+  {
+    key: "sysreport",
+    labelKey: "nodes.related.sysreport",
+    icon: <ColumnFamilyIcon family="time" />,
+    // The changes of the last seven days: whether the node moved lately.
+    useSummary: (nodeId) => ({
+      count: useNodeSysreport(nodeId, { path: "", begin: periodBegin("week"), limit: 1 }).data
+        ?.total,
+    }),
+    render: (nodeId, locale) => <NodeSysreport nodeId={nodeId} locale={locale} />,
   },
   {
     key: "alerts",

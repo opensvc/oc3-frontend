@@ -3065,6 +3065,95 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/nodes/{node_id}/sysreport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the changes of the files and command outputs the node reports
+         *     (sysreport), newest first, as the historical collector's timeline: one entry
+         *     per report that changed something, with the files it changed and their added
+         *     and deleted line counts. Requires responsibility for the node. A node that
+         *     never reported has no change.
+         */
+        get: operations["GetNodeSysreport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{node_id}/sysreport/{cid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Show the change a report made to each file, as a unified diff starting at its
+         *     first hunk. The paths matching a secure pattern are sensitive: their diff is
+         *     given only to managers, to the node's responsible team and to the groups an
+         *     authorization names for the path and a filterset holding the node; for the
+         *     others the file is listed with `restricted` set and no diff. Without any secure
+         *     pattern every path is sensitive.
+         */
+        get: operations["GetNodeSysreportChange"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{node_id}/sysreport/{cid}/tree": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the files and command outputs of the node's sysreport at a revision, with
+         *     the object id each content is read by, and whether the caller may read it.
+         */
+        get: operations["GetNodeSysreportTree"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/nodes/{node_id}/sysreport/{cid}/tree/{oid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Show the content of a file or command output of the node's sysreport at a
+         *     revision. The object must belong to that revision. A sensitive path the caller
+         *     may not read is refused with a 403. A content larger than 1 MiB is cut
+         *     (`truncated`), a binary one is not returned (`binary`).
+         */
+        get: operations["GetNodeSysreportFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/nodes/{node_id}/tags": {
         parameters: {
             query?: never;
@@ -5054,6 +5143,83 @@ export interface components {
             svc_wave?: number;
             svcname?: string;
             updated?: string;
+        };
+        /** @description A report that changed something. */
+        SysreportChange: {
+            cid: string;
+            /** @description Date of the report, ISO 8601 with its offset. */
+            date: string;
+            files: components["schemas"]["SysreportFileStat"][];
+            /** @description The first report of the node, which adds every file. */
+            initial: boolean;
+        };
+        SysreportChangeResponse: {
+            data: {
+                cid: string;
+                date: string;
+                files: components["schemas"]["SysreportFileDiff"][];
+            };
+        };
+        SysreportEntry: {
+            /** @enum {string} */
+            kind: "file" | "command";
+            oid: string;
+            path: string;
+            restricted: boolean;
+            secure: boolean;
+            size: number;
+        };
+        SysreportFileDiff: {
+            added: number;
+            binary: boolean;
+            deleted: number;
+            /** @description Unified diff from its first hunk; absent when restricted or binary. */
+            diff?: string;
+            /** @enum {string} */
+            kind: "file" | "command";
+            path: string;
+            /** @description The caller may not read this sensitive path, the diff is withheld. */
+            restricted: boolean;
+            /** @description The path matches a secure pattern. */
+            secure: boolean;
+            /** @description The diff was cut at the size limit. */
+            truncated: boolean;
+        };
+        SysreportFileResponse: {
+            data: {
+                binary: boolean;
+                /** @description Absent for a binary content. */
+                content?: string;
+                /** @enum {string} */
+                kind: "file" | "command";
+                oid: string;
+                path: string;
+                secure: boolean;
+                size: number;
+                truncated: boolean;
+            };
+        };
+        /** @description A file or command output changed by a report. */
+        SysreportFileStat: {
+            added: number;
+            binary: boolean;
+            deleted: number;
+            /** @enum {string} */
+            kind: "file" | "command";
+            /** @description Absolute path of a tracked file, or command line of a tracked command. */
+            path: string;
+        };
+        SysreportTimelineResponse: {
+            data: components["schemas"]["SysreportChange"][];
+            meta: {
+                count: number;
+                limit: number;
+                offset: number;
+                total: number;
+            };
+        };
+        SysreportTreeResponse: {
+            data: components["schemas"]["SysreportEntry"][];
         };
         UserListResponse: {
             data: components["schemas"]["UserRow"][] | {
@@ -14855,6 +15021,137 @@ export interface operations {
                     "application/json": {
                         info?: string;
                     };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetNodeSysreport: {
+        parameters: {
+            query?: {
+                /** @description Keep the files whose path or command line contains this text, and the changes touching one. */
+                path?: string;
+                /** @description Keep the changes made since this date, for example 2026-09-01 or 2026-09-01T10:00:00. */
+                begin?: string;
+                /** @description Keep the changes made until this date. */
+                end?: string;
+                /** @description The maximum number of changes to return, 50 by default. 0 means no limit. */
+                limit?: number;
+                /** @description Skip the first changes. */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Node identifier (node_id UUID) */
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SysreportTimelineResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetNodeSysreportChange: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Node identifier (node_id UUID) */
+                node_id: string;
+                /** @description Revision of the sysreport, a commit id of the timeline or HEAD for the latest. */
+                cid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SysreportChangeResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetNodeSysreportTree: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Node identifier (node_id UUID) */
+                node_id: string;
+                /** @description Revision of the sysreport, a commit id of the timeline or HEAD for the latest. */
+                cid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SysreportTreeResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetNodeSysreportFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Node identifier (node_id UUID) */
+                node_id: string;
+                /** @description Revision of the sysreport, a commit id of the timeline or HEAD for the latest. */
+                cid: string;
+                /** @description Object id of the file, as the tree lists it. */
+                oid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SysreportFileResponse"];
                 };
             };
             400: components["responses"]["400"];

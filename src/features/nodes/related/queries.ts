@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
@@ -190,6 +190,91 @@ export function useNodePackages(nodeId: string | undefined) {
       if (error !== undefined) throw new Error(problemText(error));
       const rows: PackageRow[] = Array.isArray(data.data) ? data.data : [];
       return rows;
+    },
+  });
+}
+
+export type SysreportChange = components["schemas"]["SysreportChange"];
+export type SysreportFileDiff = components["schemas"]["SysreportFileDiff"];
+export type SysreportEntry = components["schemas"]["SysreportEntry"];
+
+/**
+ * Changes of the files and command outputs the node reports (sysreport), newest
+ * first: the first `limit` of those made since `begin` whose paths contain `path`.
+ * The previous list stays on display while a filter or a longer list loads.
+ */
+export function useNodeSysreport(
+  nodeId: string | undefined,
+  filter: { path: string; begin: string | undefined; limit: number },
+) {
+  return useQuery({
+    queryKey: ["node", nodeId, "sysreport", filter.path, filter.begin, filter.limit],
+    enabled: nodeId !== undefined,
+    placeholderData: keepPreviousData,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/nodes/{node_id}/sysreport", {
+        params: {
+          path: { node_id: nodeId ?? "" },
+          query: {
+            path: filter.path === "" ? undefined : filter.path,
+            begin: filter.begin,
+            limit: filter.limit,
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return { changes: data.data, total: data.meta.total };
+    },
+  });
+}
+
+/** What a report changed, file by file, as unified diffs; loaded when it is opened. */
+export function useNodeSysreportChange(nodeId: string, cid: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["node", nodeId, "sysreport", "change", cid],
+    enabled,
+    // A report does not change once made.
+    staleTime: Infinity,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/nodes/{node_id}/sysreport/{cid}", {
+        params: { path: { node_id: nodeId, cid } },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return data.data;
+    },
+  });
+}
+
+/** The files and command outputs of the node's sysreport at a revision, HEAD for the latest. */
+export function useNodeSysreportTree(nodeId: string | undefined, cid: string, enabled = true) {
+  return useQuery({
+    queryKey: ["node", nodeId, "sysreport", "tree", cid],
+    enabled: enabled && nodeId !== undefined,
+    queryFn: async () => {
+      const { data, error, response } = await api.GET("/nodes/{node_id}/sysreport/{cid}/tree", {
+        params: { path: { node_id: nodeId ?? "", cid } },
+      });
+      // A node that never reported has no tree: nothing to list, not an error.
+      if (error !== undefined && response.status === 404) return [];
+      if (error !== undefined) throw new Error(problemText(error));
+      return data.data;
+    },
+  });
+}
+
+/** The content of a file of the sysreport; loaded when it is opened. */
+export function useNodeSysreportFile(nodeId: string, cid: string, oid: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["node", nodeId, "sysreport", "file", oid],
+    enabled,
+    // An object id names one content for ever.
+    staleTime: Infinity,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/nodes/{node_id}/sysreport/{cid}/tree/{oid}", {
+        params: { path: { node_id: nodeId, cid, oid } },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return data.data;
     },
   });
 }
