@@ -714,7 +714,9 @@ export function CollectorList<T>({
                   {table.getVisibleLeafColumns().map((column) => {
                     const meta = getMeta(column.columnDef).column;
                     return (
-                      <td key={column.id} className="px-2 pb-1.5">
+                      // The same padding above and below: the control sits in the
+                      // middle of its row, clear of the line under the headers.
+                      <td key={column.id} className="px-2 py-1">
                         <ColumnFilterControl
                           column={meta}
                           value={search.filters[meta.prop]}
