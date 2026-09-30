@@ -89,6 +89,7 @@ export function CreateNodePanel({ open, onClose }: { open: boolean; onClose: () 
       title={t("nodes.create.title")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="node" />}
     >
       <p className="mb-3 text-ink-muted">{t("nodes.create.intro")}</p>

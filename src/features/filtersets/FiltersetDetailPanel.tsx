@@ -110,6 +110,7 @@ export function FiltersetDetailPanel({
       title={row?.fset_name ?? (label === "" ? t("filtersets.detail.title") : label)}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       heading={
         <PanelTitle
           kind="filterset"

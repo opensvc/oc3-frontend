@@ -401,6 +401,7 @@
   },
   "detail": {
     "close": "Fermer",
+    "resize": "Faire glisser pour redimensionner le panneau. Double-clic pour rétablir sa largeur.",
     "loading": "Chargement du détail…",
     "error": "Impossible de charger le détail : {{message}}",
     "missing": "Cet objet n'existe plus.",

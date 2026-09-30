@@ -101,6 +101,7 @@ export function TagCreatePanel({
       title={t("tags.create.title")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="tag" />}
     >
       <p className="mb-3 text-ink-muted">{t("tags.create.intro")}</p>

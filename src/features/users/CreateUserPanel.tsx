@@ -109,6 +109,7 @@ export function CreateUserPanel({
       title={t("users.create.title")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="user" />}
     >
       <p className="mb-3 text-ink-muted">{t("users.create.intro")}</p>

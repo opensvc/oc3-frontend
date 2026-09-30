@@ -468,6 +468,7 @@ export function DetailPanel<T>({
       title={title}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       heading={<PanelTitle kind={kind} title={title} recordId={recordId} open={open} />}
       rail={<PanelHistoryRail currentKey={recordKey(kind, recordId)} />}
       actions={bookmarkable ? <BookmarkButton kind={kind} id={recordId} /> : undefined}

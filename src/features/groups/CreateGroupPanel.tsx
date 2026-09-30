@@ -53,6 +53,7 @@ export function CreateGroupPanel({ open, onClose }: { open: boolean; onClose: ()
       title={t("groups.create.title")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="group" />}
     >
       <p className="mb-3 text-ink-muted">{t("groups.create.intro")}</p>

@@ -52,6 +52,7 @@ export function CreateAppPanel({ open, onClose }: { open: boolean; onClose: () =
       title={t("apps.create.title")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="app" />}
     >
       <form onSubmit={onSubmit}>

@@ -60,6 +60,7 @@ export function CreateFiltersetPanel({
       title={t("filtersets.create.title")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="filterset" />}
     >
       <p className="mb-3 text-ink-muted">{t("filtersets.create.intro")}</p>

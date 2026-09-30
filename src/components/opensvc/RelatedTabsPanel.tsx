@@ -76,6 +76,7 @@ export function RelatedTabsPanel({
       title={title}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       heading={
         <PanelTitle kind={kind} title={title} recordId={objectId} open={open} size="wider" />
       }

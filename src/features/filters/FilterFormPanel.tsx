@@ -103,6 +103,7 @@ export function FilterFormPanel({
       title={editing ? t("filters.form.editTitle") : t("filters.form.createTitle")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="filter" />}
     >
       <p className="mb-3 text-ink-muted">

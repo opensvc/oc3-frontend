@@ -125,6 +125,7 @@ export function FormFormPanel({
       title={editing ? t("forms.form.editTitle") : t("forms.form.createTitle")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="form" />}
     >
       <p className="mb-3 text-ink-muted">

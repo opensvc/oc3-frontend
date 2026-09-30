@@ -20,3 +20,24 @@ export const RAIL_FALLBACK: Record<SlideOverSize, string> = {
   wide: "lg:hidden",
   wider: "lg:hidden",
 };
+
+/**
+ * Where a panel can be resized by its left edge: the same windows as the rail, a
+ * narrower one being filled by the panel anyway. The handle shows there only.
+ */
+export const RESIZE_VISIBLE: Record<SlideOverSize, string> = {
+  default: "hidden md:block",
+  wide: "hidden lg:block",
+  wider: "hidden lg:block",
+};
+
+/**
+ * Width of a resized panel, read from `--panel-width`, in those same windows. It
+ * never takes the room of the rail on its left, whatever the window became since
+ * the width was chosen.
+ */
+export const RESIZED_WIDTH: Record<SlideOverSize, string> = {
+  default: "md:max-w-[min(var(--panel-width),calc(100vw_-_6rem))]",
+  wide: "lg:max-w-[min(var(--panel-width),calc(100vw_-_6rem))]",
+  wider: "lg:max-w-[min(var(--panel-width),calc(100vw_-_6rem))]",
+};

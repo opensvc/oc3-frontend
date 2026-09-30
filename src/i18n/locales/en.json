@@ -401,6 +401,7 @@
   },
   "detail": {
     "close": "Close",
+    "resize": "Drag to resize the panel. Double-click to restore its width.",
     "loading": "Loading details…",
     "error": "Could not load the details: {{message}}",
     "missing": "This object no longer exists.",

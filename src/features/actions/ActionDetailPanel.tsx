@@ -66,6 +66,7 @@ export function ActionDetailPanel({
       title={row === null || row === undefined ? t("actions.detail.title") : row.command}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="log" />}
       size="wide"
     >

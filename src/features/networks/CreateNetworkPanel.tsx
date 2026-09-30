@@ -110,6 +110,7 @@ export function CreateNetworkPanel({
       title={t("networks.create.title")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="network" />}
     >
       <p className="mb-3 text-ink-muted">{t("networks.create.intro")}</p>

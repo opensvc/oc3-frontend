@@ -1,7 +1,22 @@
-import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
 import { CloseIcon } from "./icons";
-import { RAIL_VISIBLE } from "./slide-over-layout";
+import { RAIL_VISIBLE, RESIZE_VISIBLE, RESIZED_WIDTH } from "./slide-over-layout";
 import { leaveWidth, takeOverWidth } from "./slide-over-resize";
+import {
+  contentFloor,
+  DEFAULT_WIDTH,
+  MIN_WIDTH,
+  setPanelWidth,
+  usePanelWidth,
+} from "./slide-over-width";
 
 /**
  * Side panel sliding in from the right.
@@ -19,6 +34,9 @@ import { leaveWidth, takeOverWidth } from "./slide-over-resize";
 const INTERACTIVE =
   'a, button, input, select, textarea, label, summary, details, table, [role="dialog"], [role="button"], [role="menu"], [role="menuitem"], [role="tab"], [role="listbox"], [role="option"], [role="combobox"], [tabindex]';
 
+/** Pixels an arrow key moves the left edge by. */
+const KEY_STEP = 32;
+
 /** Maximum widths, written out in full: Tailwind does not see names built at runtime. */
 const SIZES = { default: "max-w-xl", wide: "max-w-3xl", wider: "max-w-4xl" } as const;
 
@@ -34,6 +52,7 @@ export function SlideOver({
   actions,
   heading,
   rail,
+  resizeLabel,
   children,
 }: {
   open: boolean;
@@ -71,11 +90,64 @@ export function SlideOver({
    * the panel: it does not close it.
    */
   rail?: ReactNode;
+  /**
+   * Name of the handle on the left edge, which makes the panel resizable: dragged
+   * with the mouse, or moved with the arrow keys once focused; a double-click, or
+   * Enter, gives the default width back. It does not get narrower than its content
+   * allows without a horizontal scrollbar (`contentFloor`). The width is kept for every panel of the
+   * same `size` (`slide-over-width.ts`). Without a name, no handle.
+   */
+  resizeLabel?: string;
   children: ReactNode;
 }) {
   const panel = useRef<HTMLDivElement>(null);
   const opener = useRef<Element | null>(null);
   const mounted = useRef(false);
+  const width = usePanelWidth(size);
+  // While the edge is dragged: the narrowest the content allows, measured once as
+  // the drag starts.
+  const dragFloor = useRef<number | null>(null);
+
+  /** The edge follows the pointer: the panel is anchored to the right of the window. */
+  function onHandlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (dragFloor.current === null) return;
+    setPanelWidth(size, window.innerWidth - event.clientX, false, dragFloor.current);
+  }
+
+  function onHandlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.button !== 0) return;
+    // No text selection in the page under the pointer while dragging.
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragFloor.current = panel.current === null ? MIN_WIDTH : contentFloor(panel.current);
+  }
+
+  function onHandlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    if (dragFloor.current === null) return;
+    dragFloor.current = null;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+    // Kept only if the pointer moved: a plain click on the edge changes nothing.
+    if (width !== undefined) setPanelWidth(size, width);
+  }
+
+  function onHandleKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      setPanelWidth(size, undefined);
+      return;
+    }
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const element = panel.current;
+    if (element === null) return;
+    const current = element.getBoundingClientRect().width;
+    setPanelWidth(
+      size,
+      current + (event.key === "ArrowLeft" ? KEY_STEP : -KEY_STEP),
+      true,
+      contentFloor(element),
+    );
+  }
 
   // A panel mounted open in place of another of a different width eases from that
   // width to its own (`slide-over-resize.ts`); a panel that closes leaves its width.
@@ -149,7 +221,14 @@ export function SlideOver({
       aria-modal="false"
       tabIndex={-1}
       inert={!open}
-      className={`fixed inset-y-0 right-0 z-10 flex w-full ${SIZES[size]} flex-col border-l border-line bg-surface-raised shadow-lg transition-transform duration-200 ease-out ${
+      style={
+        width === undefined
+          ? undefined
+          : ({ "--panel-width": `${String(width)}px` } as CSSProperties)
+      }
+      className={`fixed inset-y-0 right-0 z-10 flex w-full ${SIZES[size]} ${
+        width === undefined ? "" : RESIZED_WIDTH[size]
+      } flex-col border-l border-line bg-surface-raised shadow-lg transition-transform duration-200 ease-out ${
         open ? "translate-x-0" : "translate-x-full"
       }`}
     >
@@ -173,6 +252,26 @@ export function SlideOver({
       </div>
       {subheader}
       <div className="min-h-0 flex-1 overflow-y-auto p-3">{children}</div>
+      {open && resizeLabel !== undefined && (
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-label={resizeLabel}
+          aria-valuenow={width ?? DEFAULT_WIDTH[size]}
+          aria-valuemin={MIN_WIDTH}
+          title={resizeLabel}
+          tabIndex={0}
+          onPointerDown={onHandlePointerDown}
+          onPointerMove={onHandlePointerMove}
+          onPointerUp={onHandlePointerUp}
+          onPointerCancel={onHandlePointerUp}
+          onDoubleClick={() => {
+            setPanelWidth(size, undefined);
+          }}
+          onKeyDown={onHandleKeyDown}
+          className={`absolute inset-y-0 left-0 z-10 w-2 -translate-x-1/2 cursor-col-resize touch-none outline-none hover:bg-accent/40 focus-visible:bg-accent/40 active:bg-accent/60 ${RESIZE_VISIBLE[size]}`}
+        />
+      )}
       {open && rail !== undefined && (
         <div className={`absolute top-12 right-full flex-col ${RAIL_VISIBLE[size]}`}>{rail}</div>
       )}

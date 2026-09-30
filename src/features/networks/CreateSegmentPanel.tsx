@@ -154,6 +154,7 @@ export function CreateSegmentPanel({
       title={t("networks.segment.title")}
       onClose={onClose}
       closeLabel={t("detail.close")}
+      resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="network" />}
     >
       <p className="mb-3 text-ink-muted">{t("networks.segment.intro")}</p>
