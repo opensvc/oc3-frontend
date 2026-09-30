@@ -21,6 +21,7 @@ import {
   SEARCH_KINDS,
   listOfMatches,
   toHit,
+  type ListTarget,
   type SearchHit,
   type SearchKind,
 } from "./search-kinds";
@@ -38,6 +39,8 @@ type Scope = SearchKind | "all";
 interface Group {
   kind: SearchKind;
   hits: SearchHit[];
+  /** The list view filtered on the column the text was found in, when the kind has one. */
+  list: ListTarget | undefined;
   more: boolean;
   error: boolean;
 }
@@ -95,6 +98,7 @@ function useGlobalSearch(query: string, scope: Scope) {
             return hit === null ? [] : [hit];
           }),
         ),
+        list: listOfMatches(group.kind, q, group.items),
         more: group.more,
         error: group.error !== undefined,
       }));
@@ -388,7 +392,7 @@ function SearchPalette({ onClose }: { onClose: (restoreFocus: boolean) => void }
           ) : (
             groups.map((group) => {
               const headingId = `${id}-${group.kind}`;
-              const inList = listOfMatches(group.kind, trimmed);
+              const inList = group.list;
               return (
                 <div key={group.kind} role="group" aria-labelledby={headingId} className="py-1">
                   <div className="flex items-center gap-2 px-3 py-1 text-data text-ink-muted">

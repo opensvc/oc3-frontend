@@ -302,32 +302,61 @@ export function toHit(
 }
 
 /**
- * The list view showing every match of a kind, for the kinds whose view filters
- * by column; the search text is a "contains" filter there, as here.
+ * The list view of a kind and the columns the search looks into, in the order of
+ * `GET /search`: what identifies the object first, then its context. Only the kinds
+ * whose view filters by column.
  */
-export function listOfMatches(kind: SearchKind, query: string): ListTarget | undefined {
-  const target = (to: ListRoute, prop: string): ListTarget => ({
-    to,
-    search: { [filterKey(prop)]: query },
-  });
-  switch (kind) {
-    case "node":
-      return target("/nodes", "nodename");
-    case "service":
-      return target("/services", "svcname");
-    case "instance":
-      return target("/instances", "services.svcname");
-    case "network":
-      return target("/networks", "addr");
-    case "request":
-      return target("/requests/all", "form_name");
-    case "moduleset":
-      return target("/compliance/modulesets", "modset_name");
-    case "ruleset":
-      return target("/compliance/rulesets", "ruleset_name");
-    case "form":
-      return target("/forms", "form_name");
-    default:
-      return undefined;
+const LIST_COLUMNS: Partial<Record<SearchKind, { to: ListRoute; props: string[] }>> = {
+  node: {
+    to: "/nodes",
+    props: ["nodename", "fqdn", "node_id", "app", "node_env", "os_name"],
+  },
+  service: {
+    to: "/services",
+    props: ["svcname", "svc_id", "svc_app", "svc_env", "svc_topology", "cluster_id"],
+  },
+  instance: {
+    to: "/instances",
+    props: ["services.svcname", "mon_vmname", "nodes.nodename", "svc_id"],
+  },
+  network: { to: "/networks", props: ["addr", "mac", "nodename", "intf", "net_name"] },
+  request: {
+    to: "/requests/all",
+    props: ["form_name", "last_form_name", "status", "creator"],
+  },
+  moduleset: { to: "/compliance/modulesets", props: ["modset_name", "modset_author"] },
+  ruleset: { to: "/compliance/rulesets", props: ["ruleset_name", "ruleset_type"] },
+  form: { to: "/forms", props: ["form_name", "form_folder", "form_type"] },
+};
+
+/**
+ * The list view showing the matches of a kind, for the kinds whose view filters by
+ * column; the search text is a "contains" filter there, as here.
+ *
+ * The filter goes on the column the text was found in. The search looks into
+ * several columns and a list combines its filters with "and", so one column has to
+ * be chosen: the one in which the most results on display hold the text, the
+ * earlier one in the order above when several do — the name rather than the
+ * context. A text found in the interface of five addresses filters the interface,
+ * not the address. When the results do not tell (a request found by its number),
+ * the first column is used.
+ */
+export function listOfMatches(
+  kind: SearchKind,
+  query: string,
+  items: readonly Item[],
+): ListTarget | undefined {
+  const list = LIST_COLUMNS[kind];
+  if (list === undefined) return undefined;
+  const needle = query.toLowerCase();
+  let best = list.props[0] ?? "";
+  let bestCount = 0;
+  for (const prop of list.props) {
+    const count = items.filter((item) => text(item, prop).toLowerCase().includes(needle)).length;
+    if (count > bestCount) {
+      best = prop;
+      bestCount = count;
+    }
   }
+  return { to: list.to, search: { [filterKey(best)]: query } };
 }
