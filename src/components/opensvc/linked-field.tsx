@@ -3,7 +3,7 @@ import type { DetailField } from "./DetailPanel";
 
 /**
  * Attribute whose value names an object from another view: shown as a badge, which
- * displays its record on a double-click as in the lists.
+ * displays its record on a click as in the lists.
  */
 export function linkedField<T>(
   prop: string,

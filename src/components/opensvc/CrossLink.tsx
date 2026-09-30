@@ -10,13 +10,12 @@ export type CrossKind = "node" | "service" | "instance" | "app" | "group" | "tag
  * Value of a cell that names an object from another view: the node of an instance,
  * the service of a disk…
  *
- * A double-click shows its record in place of the row panel, without leaving the
- * list (`peek` in the URL, see `PeekPanel`): this is the gesture by which the old
- * collector opened the record of an object. A single click does nothing here, it
- * belongs to the row, whose own panel it opens.
+ * A click shows its record in place of the row panel, without leaving the list
+ * (`peek` in the URL, see `PeekPanel`). The click stops at the badge: the row under
+ * it, whose own panel a click elsewhere on the row opens, does not receive it.
  *
  * From the keyboard, the badge is a button like any other: Enter or Space shows the
- * record, and the tooltip says what the double-click does.
+ * record, and the tooltip says what the click does.
  */
 export function CrossLink({
   kind,
@@ -50,11 +49,7 @@ export function CrossLink({
       type="button"
       title={t("crossLink.hint", { kind: t(`crossLink.kinds.${kind}`) })}
       onClick={(event) => {
-        // The single click belongs to the row; without this, opening the badge would
-        // also open the panel of the row under the pointer.
-        event.stopPropagation();
-      }}
-      onDoubleClick={(event) => {
+        // Not for the row: it would open its own panel under the record.
         event.stopPropagation();
         peek();
       }}

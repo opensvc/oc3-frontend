@@ -31,7 +31,7 @@ export interface TagEditControl {
 
 /**
  * Tags of an object (node, service), at the head of its properties: a few words that
- * say what the object is for or what is promised about it. A double-click on a tag
+ * say what the object is for or what is promised about it. A click on a tag
  * shows its record in this panel, like any badge naming an object, and adds it to
  * the panel history; its data and its exclusion pattern are in the tooltip.
  *
@@ -99,17 +99,12 @@ export function ObjectTags({
                 key={tag.tag_id || tag.tag_name}
                 className={`inline-flex items-stretch overflow-hidden rounded-full bg-tag text-data font-medium text-tag-ink ${detaching ? "opacity-60" : ""}`}
               >
-                {/* Like any badge naming an object: a double-click, or Enter, shows
-                    the tag in this panel and adds it to the history. */}
+                {/* Like any badge naming an object: a click, or Enter, shows the tag
+                    in this panel and adds it to the history. */}
                 <button
                   type="button"
                   title={[t("objectTags.open"), ...details].join("\n")}
-                  onDoubleClick={() => {
-                    openRecord("tag", tag.tag_id);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key !== "Enter" && event.key !== " ") return;
-                    event.preventDefault();
+                  onClick={() => {
                     openRecord("tag", tag.tag_id);
                   }}
                   className={`inline-flex items-center py-0.5 hover:bg-tag-hover ${editable ? "pr-1.5 pl-2" : "px-2"}`}

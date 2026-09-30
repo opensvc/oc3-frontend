@@ -1165,7 +1165,7 @@
   "objectTags": {
     "title": "Tags",
     "none": "No tag.",
-    "open": "Double-click to show this tag",
+    "open": "Show this tag",
     "data": "Data: {{data}}",
     "exclude": "Excludes tags matching {{pattern}}",
     "attach": {
@@ -1185,7 +1185,7 @@
     }
   },
   "crossLink": {
-    "hint": "Double-click to show this {{kind}}",
+    "hint": "Show this {{kind}}",
     "kinds": {
       "node": "node",
       "service": "service",
