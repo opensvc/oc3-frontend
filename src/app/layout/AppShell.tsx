@@ -7,6 +7,8 @@ import opensvcLogo from "@/assets/opensvc-logo.svg";
 import { Sidebar } from "./Sidebar";
 import { PeekPanel } from "./PeekPanel";
 import { PanelAnchor } from "./PanelAnchor";
+import { ShortcutsHelp } from "./ShortcutsHelp";
+import { useShortcut } from "@/lib/shortcuts";
 import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
 import { LiveIndicator } from "./LiveIndicator";
@@ -50,6 +52,20 @@ export function AppShell() {
     });
   }
 
+  // "m" moves the focus to the menu, on the entry of the view on display, unfolding
+  // the menu first when it is folded: the focus waits for it to leave `inert`.
+  useShortcut("m", () => {
+    if (!sidebarOpen) toggleSidebar();
+    window.requestAnimationFrame(() => {
+      const menu = document.getElementById("app-sidebar");
+      const entry =
+        menu?.querySelector<HTMLElement>('a[aria-current="page"]') ??
+        menu?.querySelector<HTMLElement>("a, button");
+      entry?.focus();
+    });
+    return true;
+  });
+
   // As long as nobody is signed in, no view has data to show: the sign-in screen is
   // displayed instead, without the tools of the interface.
   if (credentials === null) {
@@ -70,7 +86,7 @@ export function AppShell() {
             onClick={toggleSidebar}
             aria-expanded={sidebarOpen}
             aria-controls="app-sidebar"
-            title={sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}
+            title={`${sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}\n${t("nav.menuShortcut")}`}
             className="flex h-7 w-7 items-center justify-center rounded-(--radius-control) text-ink-muted hover:bg-surface-sunken hover:text-ink"
           >
             <SidebarIcon open={sidebarOpen} className="h-4.5 w-4.5" />
@@ -106,6 +122,7 @@ export function AppShell() {
             <PeekPanel />
             {/* What brings the panels back once they are closed. */}
             <PanelAnchor />
+            <ShortcutsHelp />
           </main>
         </div>
         {/* The records the user bookmarked, at the foot of every view. */}

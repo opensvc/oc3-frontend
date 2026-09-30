@@ -10,6 +10,7 @@ import {
 } from "react";
 import { CloseIcon } from "./icons";
 import { RAIL_VISIBLE, RESIZE_VISIBLE, RESIZED_WIDTH } from "./slide-over-layout";
+import { useShortcut } from "@/lib/shortcuts";
 import { panelOpened } from "./slide-over-open";
 import { leaveWidth, takeOverWidth } from "./slide-over-resize";
 import {
@@ -230,6 +231,15 @@ export function SlideOver({
       leaveWidth(element);
     };
   }, [open]);
+
+  // "p" opens the record panel from the keyboard (`PanelAnchor`) and puts it away
+  // again. Only a panel with a rail — a record, with its history — answers it: a
+  // form being filled is not closed by a stray key.
+  useShortcut("p", () => {
+    if (!open || rail === undefined) return false;
+    onClose();
+    return true;
+  });
 
   // Counted among the open panels, for what only shows when none is.
   useEffect(() => (open ? panelOpened() : undefined), [open]);

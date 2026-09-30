@@ -6,11 +6,14 @@ import { useObjectLabels } from "@/components/opensvc/object-label";
 import { isPeekStep } from "@/components/opensvc/panel-trail";
 import { usePeek } from "@/components/opensvc/use-peek";
 import { useRecordHistory } from "@/lib/record-history";
+import { useShortcut } from "@/lib/shortcuts";
 
 /**
  * Anchor on the right edge of the window while no side panel is open: it brings
  * back the detail panel and its history, on the record shown last, or on the first
  * of the history when that one is no longer listed. Nothing to reopen, no anchor.
+ * The "p" key does the same from the keyboard; with a record panel open, it closes
+ * it (`SlideOver`).
  */
 export function PanelAnchor() {
   const { t } = useTranslation();
@@ -23,13 +26,20 @@ export function PanelAnchor() {
   // Named only when it shows: a closed anchor asks nothing of the API.
   const [name] = useObjectLabels(target === undefined || anyOpen ? [] : [target]);
 
+  useShortcut("p", () => {
+    if (anyOpen || target === undefined) return false;
+    peek(target.kind, target.id);
+    return true;
+  });
+
   if (anyOpen || target === undefined) return null;
-  const label = t("panelHistory.reopen", { name: name ?? target.id, count: steps.length });
+  const label = `${t("panelHistory.reopen", { name: name ?? target.id, count: steps.length })} (p)`;
 
   return (
     <button
       type="button"
       title={label}
+      aria-keyshortcuts="p"
       onClick={() => {
         peek(target.kind, target.id);
       }}

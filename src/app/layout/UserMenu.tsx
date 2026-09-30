@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { ChevronDownIcon, SignOutIcon } from "@/components/ui/icons";
 import { signOut } from "@/lib/session";
+import { setShortcutsHelp } from "@/lib/shortcuts";
 
 const ITEM =
   "flex w-full items-center gap-2 rounded-(--radius-control) px-2 py-1.5 text-left text-ink hover:bg-surface focus:bg-surface focus:outline-none";
@@ -146,6 +147,25 @@ export function UserMenu({ user }: { user: string }) {
             <ObjectIcon kind="user" />
             {t("profile.title")}
           </Link>
+          <button
+            type="button"
+            role="menuitem"
+            tabIndex={-1}
+            aria-keyshortcuts="?"
+            onClick={() => {
+              close(false);
+              setShortcutsHelp(true);
+            }}
+            className={ITEM}
+          >
+            <kbd
+              aria-hidden="true"
+              className="flex h-4 w-4 items-center justify-center rounded-sm border border-line font-mono text-data text-ink-muted"
+            >
+              ?
+            </kbd>
+            {t("shortcuts.title")}
+          </button>
           <div role="separator" className="my-1 border-t border-line" />
           <button type="button" role="menuitem" tabIndex={-1} onClick={signOut} className={ITEM}>
             <SignOutIcon className="text-ink-muted" />

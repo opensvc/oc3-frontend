@@ -6,6 +6,7 @@
     "main": "Main",
     "hideMenu": "Hide the menu",
     "showMenu": "Show the menu",
+    "menuShortcut": "Press m to move to the menu",
     "categories": {
       "infrastructure": "Infrastructure",
       "dataManagement": "Data Management",
@@ -36,6 +37,17 @@
     "rulesets": "Rulesets",
     "complianceLogs": "Logs",
     "designer": "Designer"
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "or": "or",
+    "search": "Search the collector",
+    "panel": "Open the detail panel on the record shown last, or close it",
+    "menu": "Move to the left-hand menu",
+    "menuMove": "In the menu: move between entries, Enter opens",
+    "escape": "Close the panel, a list or this help; leave the menu",
+    "help": "Show this list",
+    "hint": "Single keys act when no field has the focus."
   },
   "header": {
     "search": "Search the collector",

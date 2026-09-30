@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { typing } from "@/lib/shortcuts";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api/client";
@@ -131,14 +132,6 @@ function Highlight({ text, query }: { text: string; query: string }) {
 
 function isMac(): boolean {
   return typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
-}
-
-/** Whether a key press happens while typing, where "/" is a character, not a shortcut. */
-function typing(target: EventTarget | null): boolean {
-  return (
-    target instanceof HTMLElement &&
-    (target.isContentEditable || target.matches("input, textarea, select"))
-  );
 }
 
 /**

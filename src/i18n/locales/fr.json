@@ -6,6 +6,7 @@
     "main": "Principal",
     "hideMenu": "Masquer le menu",
     "showMenu": "Afficher le menu",
+    "menuShortcut": "Touche m pour aller au menu",
     "categories": {
       "infrastructure": "Infrastructure",
       "dataManagement": "Gestion des données",
@@ -36,6 +37,17 @@
     "rulesets": "Rulesets",
     "complianceLogs": "Journaux",
     "designer": "Concepteur"
+  },
+  "shortcuts": {
+    "title": "Raccourcis clavier",
+    "or": "ou",
+    "search": "Chercher dans le collector",
+    "panel": "Ouvrir le panneau de détail sur la dernière fiche affichée, ou le fermer",
+    "menu": "Aller au menu de gauche",
+    "menuMove": "Dans le menu : passer d'une entrée à l'autre, Entrée ouvre",
+    "escape": "Fermer le panneau, une liste ou cette aide ; quitter le menu",
+    "help": "Afficher cette liste",
+    "hint": "Les touches simples agissent quand aucun champ n'a le focus."
   },
   "header": {
     "search": "Rechercher dans le collector",

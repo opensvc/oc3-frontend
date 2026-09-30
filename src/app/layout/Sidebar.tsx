@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { CaretRightIcon } from "@/components/ui/icons";
+import type { KeyboardEvent } from "react";
 import { useNavCollapsedPref } from "@/lib/user-prefs";
 import { NAV_CATEGORIES, NAV_TOP, type NavEntry } from "./navigation";
 
@@ -33,10 +34,40 @@ function NavLink({ entry }: { entry: NavEntry }) {
  * Folded, it keeps its place in the grid but not its width, and `inert` takes it out
  * of the keyboard path. Each section folds too, and the account keeps which ones
  * are folded; all are open by default.
+ *
+ * From the keyboard, "m" brings the focus here (`AppShell`); the arrows then move
+ * from one entry or section title to the next, Home and End go to the ends, and
+ * Escape gives the focus back to the page.
  */
 export function Sidebar({ open }: { open: boolean }) {
   const { t } = useTranslation();
   const sections = useNavCollapsedPref();
+
+  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.key === "Escape") {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      return;
+    }
+    // The entries of a folded section are hidden: they are not stops.
+    const stops = [...event.currentTarget.querySelectorAll<HTMLElement>("a, button")].filter(
+      (element) => element.closest("[hidden]") === null,
+    );
+    const at = stops.findIndex((element) => element === document.activeElement);
+    const next =
+      event.key === "ArrowDown"
+        ? stops[Math.min(at + 1, stops.length - 1)]
+        : event.key === "ArrowUp"
+          ? stops[Math.max(at - 1, 0)]
+          : event.key === "Home"
+            ? stops[0]
+            : event.key === "End"
+              ? stops[stops.length - 1]
+              : undefined;
+    if (next === undefined) return;
+    event.preventDefault();
+    next.focus();
+  }
 
   return (
     <aside
@@ -46,7 +77,12 @@ export function Sidebar({ open }: { open: boolean }) {
         open ? "w-52" : "w-0 border-r-0"
       }`}
     >
-      <nav aria-label={t("nav.main")} className="w-52 p-2">
+      <nav
+        aria-label={t("nav.main")}
+        aria-keyshortcuts="m"
+        onKeyDown={onKeyDown}
+        className="w-52 p-2"
+      >
         <ul>
           {NAV_TOP.map((entry) => (
             <NavLink key={entry.to} entry={entry} />
