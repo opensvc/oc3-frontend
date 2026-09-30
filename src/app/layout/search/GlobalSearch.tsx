@@ -179,11 +179,14 @@ export function GlobalSearch() {
         onClick={() => {
           setOpen(true);
         }}
-        className="flex h-7 w-64 items-center gap-2 rounded-(--radius-control) border border-line bg-surface px-2 text-ink-muted hover:border-line-strong"
+        // Wide enough for the longest label, the French one; the shortcut never wraps.
+        className="flex h-7 w-72 items-center gap-2 rounded-(--radius-control) border border-line bg-surface px-2 text-ink-muted hover:border-line-strong"
       >
         <SearchIcon className="h-4 w-4 shrink-0" />
         <span className="truncate">{t("header.search")}</span>
-        <kbd className="ml-auto rounded-sm border border-line px-1 text-data">{shortcut}</kbd>
+        <kbd className="ml-auto shrink-0 rounded-sm border border-line px-1 text-data whitespace-nowrap">
+          {shortcut}
+        </kbd>
       </button>
       {open && (
         <SearchPalette
