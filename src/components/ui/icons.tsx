@@ -617,3 +617,19 @@ export function TerminalIcon(props: IconProps) {
     </Svg>
   );
 }
+
+/**
+ * A window with its side panel: the control that folds or unfolds a sidebar. The
+ * panel is filled while it is open, outlined once folded.
+ */
+export function SidebarIcon({ open = true, ...props }: IconProps & { open?: boolean }) {
+  return (
+    <Svg {...props}>
+      <path
+        fillRule="evenodd"
+        d="M5 4h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm5 2v12h9a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-9ZM8 6H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3V6Z"
+      />
+      {open && <path d="M5 8.25h2v1.5H5v-1.5Zm0 3h2v1.5H5v-1.5Z" />}
+    </Svg>
+  );
+}

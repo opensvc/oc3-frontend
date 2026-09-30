@@ -8,6 +8,7 @@ import { Sidebar } from "./Sidebar";
 import { PeekPanel } from "./PeekPanel";
 import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
+import { SidebarIcon } from "@/components/ui/icons";
 import { useAppearance } from "@/lib/user-prefs";
 import { BookmarksBar } from "./BookmarksBar";
 import { BookmarksProvider } from "./BookmarksProvider";
@@ -67,9 +68,10 @@ export function AppShell() {
             onClick={toggleSidebar}
             aria-expanded={sidebarOpen}
             aria-controls="app-sidebar"
-            className="rounded-(--radius-control) border border-line px-2 py-1 text-ink-muted hover:text-ink"
+            title={sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}
+            className="flex h-7 w-7 items-center justify-center rounded-(--radius-control) text-ink-muted hover:bg-surface-sunken hover:text-ink"
           >
-            <span aria-hidden="true">☰</span>
+            <SidebarIcon open={sidebarOpen} className="h-4.5 w-4.5" />
             <span className="sr-only">{sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}</span>
           </button>
 
