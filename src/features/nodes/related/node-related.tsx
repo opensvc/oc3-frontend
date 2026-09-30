@@ -3,54 +3,25 @@ import type { RelatedTab } from "@/components/opensvc/related-tabs";
 import { SEVERITY_LEVELS, severityLevel } from "@/components/opensvc/severity";
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import { NodeAlerts } from "./NodeAlerts";
-import { NodeHardware } from "./NodeHardware";
-import { NodeNetworks } from "./NodeNetworks";
-import { NodePackages } from "./NodePackages";
-import { NodeStorage } from "./NodeStorage";
-import {
-  useNodeAlerts,
-  useNodeDisks,
-  useNodeHardware,
-  useNodeIps,
-  useNodePackageCount,
-} from "./queries";
+import { NodeInventory } from "./NodeInventory";
+import { useNodeAlerts } from "./queries";
 
 /**
  * Data attached to a node, one tab each, in display order.
  *
- * Adding a kind of data — disks, addresses, services, tags, checks… — amounts to
- * writing its component and adding it here. The summary reuses the component's
- * query: opening the tab reloads nothing.
+ * Adding a kind of data — addresses, services, tags, checks… — amounts to writing
+ * its component and adding it here. The summary reuses the component's query:
+ * opening the tab reloads nothing. What the agent inventories — hardware, network
+ * addresses, storage, packages — shares the Inventory tab, one category at a time.
  */
 export const NODE_RELATED_TABS: RelatedTab[] = [
   {
-    key: "hardware",
-    labelKey: "nodes.related.hardware",
+    key: "inventory",
+    labelKey: "nodes.related.inventory",
     icon: <ColumnFamilyIcon family="cpu" />,
-    useSummary: (nodeId) => ({ count: useNodeHardware(nodeId).data?.length }),
-    render: (nodeId, locale) => <NodeHardware nodeId={nodeId} locale={locale} />,
-  },
-  {
-    key: "networks",
-    labelKey: "nodes.related.networks",
-    icon: <ColumnFamilyIcon family="network" />,
-    useSummary: (nodeId) => ({ count: useNodeIps(nodeId).data?.length }),
-    render: (nodeId) => <NodeNetworks nodeId={nodeId} />,
-  },
-  {
-    key: "storage",
-    labelKey: "nodes.related.storage",
-    icon: <ColumnFamilyIcon family="disk" />,
-    useSummary: (nodeId) => ({ count: useNodeDisks(nodeId).data?.length }),
-    render: (nodeId, locale) => <NodeStorage nodeId={nodeId} locale={locale} />,
-  },
-  {
-    key: "packages",
-    labelKey: "nodes.related.packages",
-    icon: <ColumnFamilyIcon family="package" />,
-    // Counted apart: the list itself, a couple of thousand rows, loads with the tab.
-    useSummary: (nodeId) => ({ count: useNodePackageCount(nodeId).data }),
-    render: (nodeId, locale) => <NodePackages nodeId={nodeId} locale={locale} />,
+    // No count of its own: each category of the tab carries its count on its chip.
+    useSummary: () => ({ count: undefined }),
+    render: (nodeId, locale) => <NodeInventory nodeId={nodeId} locale={locale} />,
   },
   {
     key: "alerts",

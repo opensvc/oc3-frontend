@@ -15,7 +15,14 @@ function compareIps(a: IpRow, b: IpRow): number {
   return family(a) - family(b) || collator.compare(a.addr ?? "", b.addr ?? "");
 }
 
-export function NodeNetworks({ nodeId }: { nodeId: string }) {
+export function NodeNetworks({
+  nodeId,
+  headerTop,
+}: {
+  nodeId: string;
+  /** Where the table header sticks, see `RelatedTable`. */
+  headerTop?: string;
+}) {
   const { t } = useTranslation();
   const ips = useNodeIps(nodeId);
   const rows = ips.data ?? [];
@@ -97,6 +104,7 @@ export function NodeNetworks({ nodeId }: { nodeId: string }) {
       errorMessage={ips.isError ? ips.error.message : null}
       empty={t("nodes.networks.empty")}
       caption={t("nodes.related.networks")}
+      headerTop={headerTop}
     />
   );
 }

@@ -2,7 +2,16 @@ import { useTranslation } from "react-i18next";
 import { StorageSections } from "@/components/opensvc/StorageSections";
 import { useNodeDisks, useNodeHbas } from "./queries";
 
-export function NodeStorage({ nodeId, locale }: { nodeId: string; locale: string }) {
+export function NodeStorage({
+  nodeId,
+  locale,
+  headerTop,
+}: {
+  nodeId: string;
+  locale: string;
+  /** Where the table headers stick, see `RelatedTable`. */
+  headerTop?: string;
+}) {
   const { t } = useTranslation();
   const disks = useNodeDisks(nodeId);
   const hbas = useNodeHbas(nodeId);
@@ -16,6 +25,7 @@ export function NodeStorage({ nodeId, locale }: { nodeId: string; locale: string
   return (
     <StorageSections
       locale={locale}
+      headerTop={headerTop}
       hbas={{
         groups: [{ key: "all", label: "", rows: hbas.data ?? [] }],
         isPending: hbas.isPending,

@@ -16,7 +16,16 @@ type PackageRow = components["schemas"]["PackageRow"];
  * name and the version, and a link opens the Packages view on this node for the
  * column filters and sorts.
  */
-export function NodePackages({ nodeId, locale }: { nodeId: string; locale: string }) {
+export function NodePackages({
+  nodeId,
+  locale,
+  headerTop,
+}: {
+  nodeId: string;
+  locale: string;
+  /** Where the table header sticks, see `RelatedTable`. */
+  headerTop?: string;
+}) {
   const { t } = useTranslation();
   const packages = useNodePackages(nodeId);
   const [query, setQuery] = useState("");
@@ -122,6 +131,7 @@ export function NodePackages({ nodeId, locale }: { nodeId: string; locale: strin
         errorMessage={packages.isError ? packages.error.message : null}
         empty={needle === "" ? t("nodes.packages.empty") : t("nodes.packages.noMatch")}
         caption={t("nodes.related.packages")}
+        headerTop={headerTop}
       />
     </div>
   );

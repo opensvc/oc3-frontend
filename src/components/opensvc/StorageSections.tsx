@@ -38,10 +38,13 @@ export function StorageSections({
   hbas,
   disks,
   locale,
+  headerTop,
 }: {
   hbas: Loaded<HbaRow>;
   disks: Loaded<DiskRow>;
   locale: string;
+  /** Where the table headers stick, see `RelatedTable`. */
+  headerTop?: string;
 }) {
   const { t } = useTranslation();
   const hbaCount = count(hbas);
@@ -123,6 +126,7 @@ export function StorageSections({
           {hbaCount !== undefined && <span className="font-normal tabular-nums">({hbaCount})</span>}
         </h3>
         <RelatedTable
+          headerTop={headerTop}
           columns={hbaColumns}
           groups={hbas.groups}
           rowKey={(row) => `${row.node_id ?? ""}:${row.hba_id ?? ""}`}
@@ -150,6 +154,7 @@ export function StorageSections({
           </p>
         )}
         <RelatedTable
+          headerTop={headerTop}
           columns={diskColumns}
           groups={disks.groups}
           rowKey={(row) => `${row.disk_id ?? ""}:${row.node_id ?? ""}:${row.svc_id ?? ""}`}

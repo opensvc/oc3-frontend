@@ -165,8 +165,8 @@
       "hardware": "Inventaire matériel",
       "alerts": "Alertes",
       "networks": "Réseaux",
-      "storage": "Stockage",
-      "packages": "Paquets"
+      "packages": "Paquets",
+      "inventory": "Inventaire"
     },
     "actions": {
       "open": "Actions",
@@ -235,6 +235,21 @@
       "reported": "Remonté par l'agent",
       "empty": "Aucun paquet : l'agent n'en a pas remonté pour ce node.",
       "noMatch": "Aucun paquet ne correspond à la recherche."
+    },
+    "inventory": {
+      "categoriesLabel": "Catégories de l'inventaire",
+      "categories": {
+        "hardware": "Matériel",
+        "networks": "Réseaux",
+        "storage": "Stockage",
+        "packages": "Paquets"
+      },
+      "chip": {
+        "count_one": "{{count}} entrée",
+        "count_other": "{{count}} entrées",
+        "pending": "chargement",
+        "error": "n'a pas pu être chargé"
+      }
     }
   },
   "auth": {

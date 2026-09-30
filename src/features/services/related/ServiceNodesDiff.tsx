@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { TFunction } from "i18next";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { RelatedTable, type RelatedColumn } from "@/components/opensvc/RelatedTable";
+import { CategoryCount, CategoryTabs, type CategoryTab } from "@/components/ui/CategoryTabs";
 import { StatusBadge, type ObjectState } from "@/components/opensvc/StatusBadge";
 import {
   CheckIcon,
@@ -361,25 +363,6 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
     });
   }
 
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const index = categories.findIndex((c) => c.key === active?.key);
-    const target =
-      event.key === "ArrowRight" || event.key === "ArrowDown"
-        ? (index + 1) % categories.length
-        : event.key === "ArrowLeft" || event.key === "ArrowUp"
-          ? (index - 1 + categories.length) % categories.length
-          : event.key === "Home"
-            ? 0
-            : event.key === "End"
-              ? categories.length - 1
-              : -1;
-    const next = categories[target];
-    if (next === undefined) return;
-    event.preventDefault();
-    select(next.key);
-    strip.current?.querySelector<HTMLElement>(`#nodediff-tab-${next.key}`)?.focus();
-  }
-
   const limit = expanded === `${active.key}\u0000${needle}` ? Infinity : ROW_LIMIT;
   const table = active.table(limit);
 
@@ -390,25 +373,13 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
         // Covers the panel padding, so that the rows scrolling under it stay hidden.
         className="sticky -top-3 z-10 -mx-3 -mt-3 flex flex-col gap-2 border-b border-line bg-surface-raised px-3 pt-3 pb-2"
       >
-        <div
-          role="tablist"
-          aria-label={t("services.nodediff.categoriesLabel")}
-          onKeyDown={onKeyDown}
-          // One line: it scrolls sideways rather than wrap, should the chips outgrow it.
-          className="flex gap-1.5 overflow-x-auto"
-        >
-          {categories.map((c) => (
-            <CategoryChip
-              key={c.key}
-              category={c}
-              label={title(c.key)}
-              selected={c.key === active.key}
-              onSelect={() => {
-                select(c.key);
-              }}
-            />
-          ))}
-        </div>
+        <CategoryTabs
+          label={t("services.nodediff.categoriesLabel")}
+          idPrefix="nodediff"
+          tabs={categories.map((c) => chip(c, title(c.key), t))}
+          active={active.key}
+          onSelect={select}
+        />
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex h-8 w-64 items-center gap-1.5 rounded-(--radius-control) border border-line bg-surface px-2 text-ink-muted">
             <SearchIcon />
@@ -471,22 +442,11 @@ export function ServiceNodesDiff({ svcId }: { svcId: string }) {
 }
 
 /**
- * A category chip: its icon and name, then its count when it holds differences, a
- * check when identical (✓), an ellipsis while it loads, a square on error. The mark
- * and the words, not the tint alone, tell the states apart.
+ * What the chip of a category shows: its icon and name, then its count when it
+ * holds differences, a check when identical (✓), an ellipsis while it loads, a
+ * square on error. The mark and the words, not the tint alone, tell the states apart.
  */
-function CategoryChip({
-  category,
-  label,
-  selected,
-  onSelect,
-}: {
-  category: Category;
-  label: string;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  const { t } = useTranslation();
+function chip(category: Category, label: string, t: TFunction): CategoryTab<CategoryKey> {
   const { count, error, notice } = category;
   const state =
     error !== null
@@ -498,7 +458,7 @@ function CategoryChip({
           : notice !== undefined
             ? "none"
             : "identical";
-  const described =
+  const description =
     state === "error"
       ? t("services.nodediff.chip.error")
       : state === "pending"
@@ -508,42 +468,19 @@ function CategoryChip({
           : state === "none"
             ? t("services.nodediff.chip.none")
             : t("services.nodediff.chip.identical");
-  const tone =
-    state === "differs"
-      ? "border-line-strong font-medium text-ink"
-      : state === "error"
-        ? "border-line text-state-down"
-        : "border-line text-ink-muted";
-  return (
-    <button
-      id={`nodediff-tab-${category.key}`}
-      type="button"
-      role="tab"
-      aria-selected={selected}
-      aria-controls={`nodediff-panel-${category.key}`}
-      aria-label={`${label}, ${described}`}
-      tabIndex={selected ? 0 : -1}
-      onClick={onSelect}
-      className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 whitespace-nowrap ${
-        selected
-          ? "border-accent bg-accent-soft text-ink"
-          : `bg-surface ${tone} hover:bg-surface-sunken`
-      }`}
-    >
-      {CATEGORY_ICONS[category.key]}
-      {label}
-      {state === "differs" ? (
-        <span
-          aria-hidden="true"
-          className="rounded-full bg-surface-sunken px-1.5 text-data font-medium tabular-nums"
-        >
-          {count}
-        </span>
+  return {
+    key: category.key,
+    label,
+    icon: CATEGORY_ICONS[category.key],
+    description,
+    tone: state === "differs" ? "strong" : state === "error" ? "error" : "muted",
+    mark:
+      state === "differs" && count !== undefined ? (
+        <CategoryCount count={count} />
       ) : (
         <span aria-hidden="true" className={state === "identical" ? "text-state-up" : undefined}>
           {state === "identical" ? "✓" : state === "error" ? "■" : state === "pending" ? "…" : "–"}
         </span>
-      )}
-    </button>
-  );
+      ),
+  };
 }

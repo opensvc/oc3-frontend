@@ -165,8 +165,8 @@
       "hardware": "Hardware inventory",
       "alerts": "Alerts",
       "networks": "Networks",
-      "storage": "Storage",
-      "packages": "Packages"
+      "packages": "Packages",
+      "inventory": "Inventory"
     },
     "actions": {
       "open": "Actions",
@@ -235,6 +235,21 @@
       "reported": "Reported by the agent",
       "empty": "No package: the agent has not reported any for this node.",
       "noMatch": "No package matches the search."
+    },
+    "inventory": {
+      "categoriesLabel": "Inventory categories",
+      "categories": {
+        "hardware": "Hardware",
+        "networks": "Networks",
+        "storage": "Storage",
+        "packages": "Packages"
+      },
+      "chip": {
+        "count_one": "{{count}} entry",
+        "count_other": "{{count}} entries",
+        "pending": "loading",
+        "error": "could not be loaded"
+      }
     }
   },
   "auth": {

@@ -10,7 +10,16 @@ type NodeHardwareRow = components["schemas"]["NodeHardwareRow"];
 /** Families in display order: memory, which is short, before the long PCI list. */
 const TYPE_ORDER = ["mem", "cpu", "pci", "usb", "disk"];
 
-export function NodeHardware({ nodeId, locale }: { nodeId: string; locale: string }) {
+export function NodeHardware({
+  nodeId,
+  locale,
+  headerTop,
+}: {
+  nodeId: string;
+  locale: string;
+  /** Where the table header sticks, see `RelatedTable`. */
+  headerTop?: string;
+}) {
   const { t, i18n } = useTranslation();
   const hardware = useNodeHardware(nodeId);
   const rows = hardware.data ?? [];
@@ -88,6 +97,7 @@ export function NodeHardware({ nodeId, locale }: { nodeId: string; locale: strin
         errorMessage={hardware.isError ? hardware.error.message : null}
         empty={t("nodes.hardware.empty")}
         caption={t("nodes.related.hardware")}
+        headerTop={headerTop}
       />
     </div>
   );
