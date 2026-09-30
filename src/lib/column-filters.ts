@@ -3,10 +3,12 @@
  *
  * A filter is kept as the expression apicollector receives in its `filter` query
  * parameter, without the prop: `dev` (substring), `~^dev` (regular expression),
- * `in:up,warn`, `gte:8`, `empty`… The URL, the user preferences and the request all
+ * `in:up,warn`, `gte:8`, `empty`… A leading `!` inverts any of them: `!dev` keeps
+ * the rows `dev` leaves out. The URL, the user preferences and the request all
  * carry that same expression, so that a link, a saved view and the query never
  * disagree. Only the controls translate it into something easier to type: the `.*`
- * toggle stands for the `~` prefix, `>=8` for `gte:8`.
+ * toggle stands for the `~` prefix, the `≠` toggle for the `!` one, `>=8` for
+ * `gte:8`.
  */
 
 /** Prop → filter expression, for the active filters only. */
@@ -61,6 +63,24 @@ export function withFilter(
   return next;
 }
 
+/** Prefix inverting a filter expression. A `!` alone is the text "!", as for the API. */
+const NOT = "!";
+
+/** Whether the expression is an inverted one: `!dev`, `!in:a,b`, `!empty`. */
+export function isInverted(expr: string | undefined): boolean {
+  return expr !== undefined && expr.startsWith(NOT) && expr.length > NOT.length;
+}
+
+/** The expression without its inversion. */
+function positive(expr: string): string {
+  return isInverted(expr) ? expr.slice(NOT.length) : expr;
+}
+
+/** The same filter, keeping the rows it left out: `dev` ⇄ `!dev`. */
+export function invertFilter(expr: string): string {
+  return isInverted(expr) ? expr.slice(NOT.length) : NOT + expr;
+}
+
 /**
  * Comparison operators typed in a text filter, and the prefix apicollector expects.
  * Two-character operators first, so that `>=` is not read as `>` followed by `=`.
@@ -74,32 +94,47 @@ const OPERATORS = [
   ["=", "eq:"],
 ] as const;
 
-/** What a text filter shows: the text typed and the state of the regex toggle. */
+/** What a text filter shows: the text typed and the state of its two toggles. */
 export interface TextDraft {
   text: string;
   regex: boolean;
+  /** Inverted: the rows that do not match. */
+  inverted: boolean;
 }
 
 /** From the stored expression to what the text control shows. */
 export function toTextDraft(expr: string | undefined): TextDraft {
-  if (expr === undefined) return { text: "", regex: false };
-  if (expr.startsWith("~")) return { text: expr.slice(1), regex: true };
+  if (expr === undefined) return { text: "", regex: false, inverted: false };
+  const inverted = isInverted(expr);
+  const inner = positive(expr);
+  if (inner.startsWith("~")) return { text: inner.slice(1), regex: true, inverted };
   for (const [operator, prefix] of OPERATORS) {
-    if (expr.startsWith(prefix))
-      return { text: operator + expr.slice(prefix.length), regex: false };
+    if (inner.startsWith(prefix))
+      return { text: operator + inner.slice(prefix.length), regex: false, inverted };
   }
-  return { text: expr, regex: false };
+  return { text: inner, regex: false, inverted };
 }
 
 /**
  * From what was typed to the stored expression; undefined clears the filter.
  *
- * With the toggle on, the text is a regular expression. Otherwise a leading `~`
- * means the same thing, a leading comparison operator becomes its prefix, and
- * anything else is a substring. `empty` and `!empty` pass as they are.
+ * With the regex toggle on, the text is a regular expression. Otherwise a leading
+ * `~` means the same thing, a leading comparison operator becomes its prefix, and
+ * anything else is a substring. `empty` passes as it is. A typed leading `!` flips
+ * the inversion, as the `≠` toggle does; `!=` is the "not equal" operator.
  */
-export function fromTextDraft({ text, regex }: TextDraft): string | undefined {
-  const value = text.trim();
+export function fromTextDraft({ text, regex, inverted }: TextDraft): string | undefined {
+  let value = text.trim();
+  let not = inverted;
+  if (!regex && value.startsWith(NOT) && !value.startsWith("!=") && value.length > NOT.length) {
+    value = value.slice(NOT.length).trim();
+    not = !not;
+  }
+  const expr = textExpr(value, regex);
+  return expr === undefined ? undefined : not ? NOT + expr : expr;
+}
+
+function textExpr(value: string, regex: boolean): string | undefined {
   if (value === "") return undefined;
   if (regex) return `~${value}`;
   if (value.startsWith("~")) return value.length > 1 ? value : undefined;
@@ -121,23 +156,29 @@ export function fromTextDraft({ text, regex }: TextDraft): string | undefined {
  * common typing mistakes before any request.
  */
 export function regexError(expr: string | undefined): string | null {
-  if (expr?.startsWith("~") !== true) return null;
+  const inner = expr === undefined ? undefined : positive(expr);
+  if (inner?.startsWith("~") !== true) return null;
   try {
-    new RegExp(expr.slice(1));
+    new RegExp(inner.slice(1));
     return null;
   } catch (error) {
     return error instanceof Error ? error.message : String(error);
   }
 }
 
-/** Values chosen in an enumerated filter: `in:a,b`, or a single `eq:a`. */
+/**
+ * Values chosen in an enumerated filter: `in:a,b`, or a single `eq:a`; the values
+ * left out when the filter is inverted (`!in:a,b`, see `isInverted`).
+ */
 export function toEnumValues(expr: string | undefined): string[] {
   if (expr === undefined) return [];
-  if (expr.startsWith("in:")) return expr.slice(3).split(",").filter(Boolean);
-  if (expr.startsWith("eq:")) return [expr.slice(3)];
+  const inner = positive(expr);
+  if (inner.startsWith("in:")) return inner.slice(3).split(",").filter(Boolean);
+  if (inner.startsWith("eq:")) return [inner.slice(3)];
   return [];
 }
 
-export function fromEnumValues(values: string[]): string | undefined {
-  return values.length === 0 ? undefined : `in:${values.join(",")}`;
+export function fromEnumValues(values: string[], inverted = false): string | undefined {
+  if (values.length === 0) return undefined;
+  return `${inverted ? NOT : ""}in:${values.join(",")}`;
 }

@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { fromEnumValues, toEnumValues } from "@/lib/column-filters";
+import { fromEnumValues, isInverted, toEnumValues } from "@/lib/column-filters";
 import { ChevronDownIcon } from "./icons";
 
 export interface EnumFilterOption {
@@ -14,7 +14,9 @@ export interface EnumFilterOption {
 /**
  * Filter of a column holding a known set of values: a button summarising the choice,
  * opening a list of checkboxes. Each ticked value widens the filter (`in:a,b`);
- * nothing ticked clears it. Every change applies at once.
+ * nothing ticked clears it. Every change applies at once. The switch at the top of
+ * the list inverts the filter (`!in:a,b`): every value but the ticked ones. It needs
+ * at least one ticked value, since an inverted empty choice would be no filter.
  *
  * The list closes on a click outside it, on Escape, which does not reach the side
  * panel listening at the document level, and when the focus leaves it.
@@ -31,6 +33,8 @@ export function EnumFilter({
   options,
   label,
   allLabel,
+  invertLabel,
+  exceptLabel,
 }: {
   value: string | undefined;
   onChange: (expr: string | undefined) => void;
@@ -39,6 +43,10 @@ export function EnumFilter({
   label: string;
   /** Summary when nothing is ticked. */
   allLabel: string;
+  /** Name of the switch keeping every value but the ticked ones. */
+  invertLabel: string;
+  /** Summary of an inverted choice; receives the ticked values. */
+  exceptLabel: (values: string) => string;
 }) {
   const listId = useId();
   const [open, setOpen] = useState(false);
@@ -46,6 +54,7 @@ export function EnumFilter({
   const button = useRef<HTMLButtonElement>(null);
   const list = useRef<HTMLFieldSetElement>(null);
   const chosen = toEnumValues(value);
+  const inverted = isInverted(value);
 
   /** Inside the filter: the button, or the list, which lives elsewhere in the DOM. */
   function inside(node: Node) {
@@ -101,13 +110,14 @@ export function EnumFilter({
   const labels = options.filter((option) => chosen.includes(option.value)).map((o) => o.label);
   // Values the list does not know, from a hand-made link: shown as they are.
   const unknown = chosen.filter((item) => !options.some((option) => option.value === item));
-  const summary = [...labels, ...unknown].join(", ");
+  const names = [...labels, ...unknown].join(", ");
+  const summary = inverted && names !== "" ? exceptLabel(names) : names;
 
   function toggle(item: string) {
     const next = chosen.includes(item)
       ? chosen.filter((other) => other !== item)
       : [...chosen, item];
-    onChange(fromEnumValues(next));
+    onChange(fromEnumValues(next, inverted));
   }
 
   return (
@@ -154,6 +164,24 @@ export function EnumFilter({
             className="fixed z-30 min-w-40 overflow-y-auto rounded-(--radius-panel) border border-line bg-surface-raised p-1 text-data shadow-lg outline-none"
           >
             <legend className="sr-only">{label}</legend>
+            <label
+              className={`mb-1 flex items-center gap-2 border-b border-line px-2 py-1 font-normal ${
+                chosen.length === 0 ? "text-ink-muted" : "cursor-pointer text-ink"
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={inverted}
+                disabled={chosen.length === 0}
+                onChange={() => {
+                  onChange(fromEnumValues(chosen, !inverted));
+                }}
+              />
+              <span aria-hidden="true" className="font-mono">
+                ≠
+              </span>
+              {invertLabel}
+            </label>
             {options.map((option) => (
               <label
                 key={option.value}

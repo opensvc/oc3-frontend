@@ -1,5 +1,11 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { fromTextDraft, regexError, toTextDraft, type TextDraft } from "@/lib/column-filters";
+import {
+  fromTextDraft,
+  isInverted,
+  regexError,
+  toTextDraft,
+  type TextDraft,
+} from "@/lib/column-filters";
 import { AlertTriangleIcon, CloseIcon } from "./icons";
 
 /** Pause in the typing after which the filter applies. */
@@ -7,11 +13,11 @@ const TYPING_DELAY = 400;
 
 /**
  * Text filter of a column: a substring by default, a regular expression with the
- * `.*` toggle on.
+ * `.*` toggle on, and the rows that do not match with the `≠` toggle on.
  *
- * `value` is the stored expression (`dev`, `~^dev`, `gte:8`…), `onChange` receives
- * the new one, or undefined to clear the filter. What is typed applies after a short
- * pause, or at once with Enter; the toggle and the clear button apply at once. A
+ * `value` is the stored expression (`dev`, `~^dev`, `gte:8`, `!dev`…), `onChange`
+ * receives the new one, or undefined to clear the filter. What is typed applies after
+ * a short pause, or at once with Enter; the toggles and the clear button apply at once. A
  * regular expression the browser cannot compile is not sent: the field is marked
  * invalid, with an icon and a message beside the red border.
  */
@@ -20,6 +26,7 @@ export function TextFilter({
   onChange,
   label,
   regexLabel,
+  invertLabel,
   clearLabel,
   invalidLabel,
   placeholder,
@@ -30,6 +37,8 @@ export function TextFilter({
   label: string;
   /** Name of the regular expression toggle. */
   regexLabel: string;
+  /** Name of the toggle keeping the rows that do not match. */
+  invertLabel: string;
   clearLabel: string;
   /** Message for an invalid regular expression; receives the engine's reason. */
   invalidLabel: (reason: string) => string;
@@ -62,7 +71,11 @@ export function TextFilter({
   function commit(next: TextDraft) {
     clearTimeout(timer.current);
     const nextExpr = fromTextDraft(next);
-    if (regexError(nextExpr) !== null || nextExpr === value) return;
+    if (regexError(nextExpr) !== null) return;
+    // A typed "!" has flipped the inversion: it moves from the text to the toggle.
+    if (nextExpr !== undefined && next.inverted !== isInverted(nextExpr))
+      setDraft(toTextDraft(nextExpr));
+    if (nextExpr === value) return;
     setSent(nextExpr);
     onChange(nextExpr);
   }
@@ -81,7 +94,7 @@ export function TextFilter({
 
   return (
     <div
-      className={`flex h-6 min-w-24 items-center rounded-(--radius-control) border bg-surface font-normal focus-within:border-accent ${
+      className={`flex h-6 min-w-28 items-center rounded-(--radius-control) border bg-surface font-normal focus-within:border-accent ${
         error === null ? "border-line" : "border-state-down"
       }`}
     >
@@ -128,6 +141,18 @@ export function TextFilter({
           <CloseIcon className="h-3 w-3" />
         </button>
       )}
+      <button
+        type="button"
+        aria-pressed={draft.inverted}
+        onClick={() => {
+          edit({ ...draft, inverted: !draft.inverted }, 0);
+        }}
+        aria-label={invertLabel}
+        title={invertLabel}
+        className="h-full border-l border-line px-1 font-mono text-ink-muted hover:text-ink aria-pressed:bg-accent-soft aria-pressed:text-ink"
+      >
+        ≠
+      </button>
       <button
         type="button"
         aria-pressed={draft.regex}

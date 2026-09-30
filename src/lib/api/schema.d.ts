@@ -5448,7 +5448,10 @@ export interface components {
          *       - `in:a,b,c`: one of the listed values;
          *       - `eq:v`, `ne:v`: equal, not equal;
          *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-         *       - `empty`, `!empty`: no value, any value.
+         *       - `empty`: no value;
+         *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+         *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+         *         `!empty` (any value).
          *     An unknown property, a property without a column, or an invalid regular
          *     expression is answered with 400.
          */
@@ -5508,7 +5511,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -5976,7 +5982,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -6831,7 +6840,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -6918,7 +6930,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -7221,7 +7236,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -7285,7 +7303,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -7374,7 +7395,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -7639,7 +7663,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -7701,7 +7728,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -7825,7 +7855,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -8013,7 +8046,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -8109,7 +8145,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -8460,7 +8499,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -8771,7 +8813,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -8835,7 +8880,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -8986,7 +9034,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -9048,7 +9099,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -9172,7 +9226,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -9362,7 +9419,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -9452,7 +9512,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -9993,7 +10056,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -10087,7 +10153,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -10238,7 +10307,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -10671,7 +10743,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -11165,7 +11240,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -11224,7 +11302,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -11535,7 +11616,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -11658,7 +11742,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -11875,7 +11962,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -11996,7 +12086,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -12333,7 +12426,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -12390,7 +12486,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -12450,7 +12549,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -12507,7 +12609,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -12636,7 +12741,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -13247,7 +13355,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -13532,7 +13643,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -13677,7 +13791,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -13870,7 +13987,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -15634,7 +15754,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -15783,7 +15906,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -17107,7 +17233,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -17985,7 +18114,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */
@@ -18289,7 +18421,10 @@ export interface operations {
                  *       - `in:a,b,c`: one of the listed values;
                  *       - `eq:v`, `ne:v`: equal, not equal;
                  *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
-                 *       - `empty`, `!empty`: no value, any value.
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
                  *     An unknown property, a property without a column, or an invalid regular
                  *     expression is answered with 400.
                  */

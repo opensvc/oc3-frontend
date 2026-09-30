@@ -16,7 +16,13 @@ import { CloseIcon, ColumnsIcon, FilterIcon, ResetIcon, SearchIcon } from "@/com
 import { EnumFilter } from "@/components/ui/EnumFilter";
 import { TextFilter } from "@/components/ui/TextFilter";
 import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
-import { toEnumValues, toTextDraft, withFilter } from "@/lib/column-filters";
+import {
+  invertFilter,
+  isInverted,
+  toEnumValues,
+  toTextDraft,
+  withFilter,
+} from "@/lib/column-filters";
 import { PAGE_SIZES, visibleProps, type ResolvedListSearch } from "@/lib/list-search";
 import { readProp } from "@/lib/row";
 import { FlashCell, FlashScope } from "./Flash";
@@ -628,6 +634,9 @@ export function CollectorList<T>({
                 >
                   {column !== undefined && <ColumnFamilyIcon family={column.family} />}
                   <span className="text-ink-muted">{label}</span>
+                  {isInverted(expr) && (
+                    <span className="font-medium text-ink">{t("list.filters.not")}</span>
+                  )}
                   {column?.filter?.kind === "enum" ? (
                     <span className="text-ink">{describeFilter(column, expr, t)}</span>
                   ) : (
@@ -638,6 +647,18 @@ export function CollectorList<T>({
                       {column === undefined ? t("list.filters.unknown") : t("list.filters.hidden")}
                     </span>
                   )}
+                  <button
+                    type="button"
+                    aria-pressed={isInverted(expr)}
+                    onClick={() => {
+                      setFilter(prop, invertFilter(expr));
+                    }}
+                    aria-label={t("list.filters.invertOne", { column: label })}
+                    title={t("list.filters.invertOne", { column: label })}
+                    className="flex h-full items-center border-l border-line px-1 font-mono text-ink-muted hover:text-ink aria-pressed:bg-accent-soft aria-pressed:text-ink"
+                  >
+                    ≠
+                  </button>
                   <button
                     type="button"
                     onClick={() => {
@@ -920,6 +941,8 @@ function ColumnFilterControl<T>({
         }))}
         label={label}
         allLabel={t("list.filters.all")}
+        invertLabel={t("list.filters.invertEnum")}
+        exceptLabel={(values) => t("list.filters.except", { values })}
       />
     );
   return (
@@ -928,6 +951,7 @@ function ColumnFilterControl<T>({
       onChange={onChange}
       label={label}
       regexLabel={t("list.filters.regex")}
+      invertLabel={t("list.filters.invert")}
       clearLabel={t("list.filters.clearOne", { column: t(column.labelKey) })}
       invalidLabel={(reason) => t("list.filters.invalidRegex", { reason })}
       placeholder={column.numeric === true ? t("list.filters.numberHint") : undefined}
@@ -939,7 +963,10 @@ function optionLabel(option: ColumnFilterOption, t: TFunction): string {
   return option.labelKey === undefined ? option.value : t(option.labelKey);
 }
 
-/** A filter as the bar of active filters shows it: as it was typed or chosen. */
+/**
+ * A filter as the bar of active filters shows it: as it was typed or chosen. The
+ * inversion is not part of it: the bar says it in words before the value.
+ */
 function describeFilter<T>(column: ListColumn<T> | undefined, expr: string, t: TFunction): string {
   if (column === undefined) return expr;
   const spec = column.filter;
