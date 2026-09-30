@@ -188,6 +188,30 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set(["svc_id", "svc_frozen", ...shown])].join(",");
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchServices(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const query = {
+    props: queryProps(search.cols),
+    orderby: search.sort.join(","),
+    offset: search.offset,
+    limit: search.limit + 1,
+    filter: filterQuery(search.filters),
+  };
+  const response =
+    search.fset === ""
+      ? await api.GET("/services", { params: { query } })
+      : await api.GET("/filtersets/{filterset_id}/services", {
+          params: { path: { filterset_id: search.fset }, query },
+        });
+  if (response.error !== undefined) throw new Error(problemText(response.error));
+  const all: ServiceRow[] = Array.isArray(response.data.data) ? response.data.data : [];
+  return toPage(all, response.data.meta, search.limit);
+}
+
 function useServices(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -202,25 +226,7 @@ function useServices(search: ResolvedListSearch) {
     // The rows on display stay while the next ones load: typing a filter must not
     // empty the table under the field.
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const query = {
-        props: queryProps(search.cols),
-        orderby: search.sort.join(","),
-        offset: search.offset,
-        limit: search.limit + 1,
-        filter: filterQuery(search.filters),
-      };
-      const response =
-        search.fset === ""
-          ? await api.GET("/services", { params: { query } })
-          : await api.GET("/filtersets/{filterset_id}/services", {
-              params: { path: { filterset_id: search.fset }, query },
-            });
-      if (response.error !== undefined) throw new Error(problemText(response.error));
-      const all: ServiceRow[] = Array.isArray(response.data.data) ? response.data.data : [];
-      return toPage(all, response.data.meta, search.limit);
-    },
+    queryFn: () => fetchServices(search),
   });
 }
 
@@ -291,6 +297,7 @@ export function ServicesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchServices({ ...search, ...page })}
         total={data?.total}
         rowLead={(row) => <FrozenMark frozen={row.svc_frozen === "frozen"} />}
         onSelectionChange={setSelectedIds}

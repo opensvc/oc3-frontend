@@ -179,6 +179,30 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...shown, ...extra])].join(",");
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchComplianceLogs(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const { data, error } = await api.GET("/compliance/logs", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+        filter: filterQuery(search.filters),
+        ...(search.fset === "" ? {} : { fset_id: search.fset }),
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  // `data` holds the rows, or the counts when `stats` is asked for.
+  const all: ComplianceLogRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useComplianceLogs(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -193,25 +217,7 @@ function useComplianceLogs(search: ResolvedListSearch) {
     // The rows on display stay while the next ones load: typing a filter must not
     // empty the table under the field.
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const { data, error } = await api.GET("/compliance/logs", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-            filter: filterQuery(search.filters),
-            ...(search.fset === "" ? {} : { fset_id: search.fset }),
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      // `data` holds the rows, or the counts when `stats` is asked for.
-      const all: ComplianceLogRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchComplianceLogs(search),
   });
 }
 
@@ -277,6 +283,7 @@ export function ComplianceLogsPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchComplianceLogs({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
         filterable

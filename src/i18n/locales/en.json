@@ -360,6 +360,20 @@
     "empty": "Nothing to show.",
     "sortHint": "Click a column to sort. Shift-click to add a secondary key.",
     "columns": "Columns ({{shown}}/{{total}})",
+    "export": {
+      "label": "Export",
+      "running_one": "Exporting… 1 row",
+      "running_other": "Exporting… {{count}} rows",
+      "formats": {
+        "xlsx": "Excel workbook (.xlsx)",
+        "csv": "CSV file (.csv)"
+      },
+      "hint": "Every row matching the filters, in the current sort, with every column: those on display first, then the hidden ones.",
+      "done_one": "1 row exported.",
+      "done_other": "{{count}} rows exported.",
+      "truncated": "Export stopped at {{count}} rows: narrow the list with filters to export the rest.",
+      "error": "Could not export the list: {{message}}"
+    },
     "filterColumns": "Filter columns",
     "resetColumns": "Reset to default columns",
     "selected": "{{count}} selected",

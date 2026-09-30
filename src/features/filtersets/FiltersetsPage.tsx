@@ -48,26 +48,32 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchFiltersetList(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const { data, error } = await api.GET("/filtersets", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(JSON.stringify(error));
+  const all: FiltersetRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useFiltersetList(search: ResolvedListSearch) {
   return useQuery({
     // Under "filtersets": an edit also invalidates the dropdown of the views.
     queryKey: ["filtersets", "list", search.sort, search.offset, search.limit, search.cols],
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const { data, error } = await api.GET("/filtersets", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(JSON.stringify(error));
-      const all: FiltersetRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchFiltersetList(search),
   });
 }
 
@@ -162,6 +168,7 @@ export function FiltersetsPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchFiltersetList({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
       />

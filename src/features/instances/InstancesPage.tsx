@@ -187,6 +187,28 @@ function queryProps(cols: string[] | undefined): string {
   );
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchInstances(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const { data, error } = await api.GET("/services_instances", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+        filter: filterQuery(search.filters),
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  const all: InstanceRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useInstances(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -200,23 +222,7 @@ function useInstances(search: ResolvedListSearch) {
     // The rows on display stay while the next ones load: typing a filter must not
     // empty the table under the field.
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const { data, error } = await api.GET("/services_instances", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-            filter: filterQuery(search.filters),
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      const all: InstanceRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchInstances(search),
   });
 }
 
@@ -300,6 +306,7 @@ export function InstancesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchInstances({ ...search, ...page })}
         total={data?.total}
         rowLead={(row) => <FrozenMark frozen={row.mon_frozen === "1"} />}
         onSelectionChange={setSelectedIds}

@@ -126,6 +126,28 @@ function queryProps(cols: string[] | undefined): string {
 /** Which requests a list shows: all, or the historical team views. */
 type Assigned = "team" | "tiers" | undefined;
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchRequests(search: ResolvedListSearch, assigned: Assigned) {
+  const { data, error } = await api.GET("/workflows", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+        filter: filterQuery(search.filters),
+        assigned,
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  const all: WorkflowRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useRequests(search: ResolvedListSearch, assigned: Assigned) {
   return useQuery({
     queryKey: [
@@ -140,23 +162,7 @@ function useRequests(search: ResolvedListSearch, assigned: Assigned) {
     // The rows on display stay while the next ones load: typing a filter must not
     // empty the table under the field.
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      const { data, error } = await api.GET("/workflows", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-            filter: filterQuery(search.filters),
-            assigned,
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      const all: WorkflowRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchRequests(search, assigned),
   });
 }
 
@@ -222,6 +228,7 @@ function RequestsList({
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchRequests({ ...search, ...page }, assigned)}
         total={data?.total}
         selectAllMatching={allIds}
         filterable

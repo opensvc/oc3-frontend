@@ -224,6 +224,15 @@ export function SearchIcon(props: IconProps) {
   );
 }
 
+/** Saving to a file: an arrow down into a tray (fa-download). */
+export function DownloadIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 3c.7 0 1.2.5 1.2 1.2v7.9l2.4-2.4a1.2 1.2 0 1 1 1.7 1.7l-4.5 4.4a1.2 1.2 0 0 1-1.6 0l-4.5-4.4a1.2 1.2 0 1 1 1.7-1.7l2.4 2.4V4.2c0-.7.5-1.2 1.2-1.2ZM4.2 15.5c.7 0 1.2.5 1.2 1.2v1.9h13.2v-1.9a1.2 1.2 0 1 1 2.4 0v2.5c0 1-.8 1.8-1.8 1.8H4.8C3.8 21 3 20.2 3 19.2v-2.5c0-.7.5-1.2 1.2-1.2Z" />
+    </Svg>
+  );
+}
+
 /** Back to the default values. */
 export function ResetIcon(props: IconProps) {
   return (

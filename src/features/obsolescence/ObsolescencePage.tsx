@@ -77,24 +77,30 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchSettings(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const { data, error } = await api.GET("/obsolescence/settings", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        offset: search.offset,
+        limit: search.limit + 1,
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(JSON.stringify(error));
+  const all: ObsolescenceSettingRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useSettings(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["obsolescence", search.offset, search.limit, search.cols],
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const { data, error } = await api.GET("/obsolescence/settings", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            offset: search.offset,
-            limit: search.limit + 1,
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(JSON.stringify(error));
-      const all: ObsolescenceSettingRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchSettings(search),
   });
 }
 
@@ -212,6 +218,7 @@ export function ObsolescencePage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchSettings({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
       />

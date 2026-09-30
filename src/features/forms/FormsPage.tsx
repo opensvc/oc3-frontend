@@ -82,6 +82,27 @@ function queryProps(cols: string[] | undefined): string {
   );
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchForms(search: ResolvedListSearch) {
+  const { data, error } = await api.GET("/forms", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+        filter: filterQuery(search.filters),
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  const all: FormRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useForms(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -93,22 +114,7 @@ function useForms(search: ResolvedListSearch) {
       filtersKey(search.filters),
     ],
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      const { data, error } = await api.GET("/forms", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-            filter: filterQuery(search.filters),
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      const all: FormRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchForms(search),
   });
 }
 
@@ -194,6 +200,7 @@ export function FormsPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchForms({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
         filterable

@@ -108,25 +108,31 @@ function queryProps(cols: string[] | undefined): string {
  * UserManager sees everyone, the others see only themselves and the members of their
  * organisation groups.
  */
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchUsers(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const { data, error } = await api.GET("/users", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(JSON.stringify(error));
+  const all: UserRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useUsers(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["users", search.sort, search.offset, search.limit, search.cols],
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const { data, error } = await api.GET("/users", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(JSON.stringify(error));
-      const all: UserRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchUsers(search),
   });
 }
 
@@ -202,6 +208,7 @@ export function UsersPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchUsers({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
       />

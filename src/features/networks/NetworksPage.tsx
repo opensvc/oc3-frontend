@@ -150,6 +150,28 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...shown, ...extra])].join(",");
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchIps(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const { data, error } = await api.GET("/ips", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+        filter: filterQuery(search.filters),
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  const all: IpRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useIps(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -161,23 +183,7 @@ function useIps(search: ResolvedListSearch) {
       filtersKey(search.filters),
     ],
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const { data, error } = await api.GET("/ips", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-            filter: filterQuery(search.filters),
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      const all: IpRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchIps(search),
   });
 }
 
@@ -271,6 +277,7 @@ export function NetworksPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchIps({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
         filterable

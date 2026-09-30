@@ -121,6 +121,28 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", "status", "ret", "node_id", "svc_id", ...shown])].join(",");
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchActions(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const { data, error } = await api.GET("/actions", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+        filter: filterQuery(search.filters),
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  const all = toActionRows(data.data);
+  return toPage(all, data.meta, search.limit);
+}
+
 function useActions(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -134,23 +156,7 @@ function useActions(search: ResolvedListSearch) {
     // The rows on display stay while the next ones load: typing a filter must not
     // empty the table under the field.
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const { data, error } = await api.GET("/actions", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-            filter: filterQuery(search.filters),
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      const all = toActionRows(data.data);
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchActions(search),
   });
 }
 
@@ -208,6 +214,7 @@ export function ActionsPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchActions({ ...search, ...page })}
         total={data?.total}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}

@@ -12,7 +12,17 @@ import {
 } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { CloseIcon, ColumnsIcon, FilterIcon, ResetIcon, SearchIcon } from "@/components/ui/icons";
+import { useLocation } from "@tanstack/react-router";
+import {
+  CloseIcon,
+  ColumnsIcon,
+  DownloadIcon,
+  FilterIcon,
+  ResetIcon,
+  SearchIcon,
+} from "@/components/ui/icons";
+import type { ListPage } from "@/lib/api/page";
+import { download, toCsv, toXlsx, type ExportFormat } from "@/lib/export/table";
 import { EnumFilter } from "@/components/ui/EnumFilter";
 import { TextFilter } from "@/components/ui/TextFilter";
 import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
@@ -61,6 +71,11 @@ export interface ColumnFilterOption {
   /** Rendering in the list, as the cells show the value. */
   render?: ReactNode;
 }
+
+/** Rows asked of the server at a time while exporting. */
+const EXPORT_CHUNK = 1000;
+/** Rows an export stops at: beyond, the browser would hold too much in memory. */
+const EXPORT_MAX = 200_000;
 
 const PAGE_BUTTON = "h-7 rounded-(--radius-control) border border-line px-2 disabled:opacity-40";
 
@@ -122,6 +137,7 @@ export function CollectorList<T>({
   onSelectionChange,
   rowLead,
   selectAllMatching,
+  exportPage,
   filterable = false,
 }: {
   columns: ListColumn<T>[];
@@ -156,6 +172,13 @@ export function CollectorList<T>({
    */
   selectAllMatching?: () => Promise<string[]>;
   /**
+   * Reads a page of the list with the sort and the filters of the moment, and the
+   * columns asked: what the view itself reads, at another offset and with other
+   * columns. With it, the list offers to export every row of the selection — not
+   * only the page on display — with every column, as a CSV file or an XLSX workbook.
+   */
+  exportPage?: (page: { offset: number; limit: number; cols: string[] }) => Promise<ListPage<T>>;
+  /**
    * Offers a filter row under the headers. Only for views whose endpoint accepts
    * `filter` and whose page forwards `search.filters` to it.
    */
@@ -170,6 +193,11 @@ export function CollectorList<T>({
   const [selectingAll, setSelectingAll] = useState(false);
   const [selectionError, setSelectionError] = useState<string | null>(null);
   const picker = useRef<HTMLDetailsElement>(null);
+  const exportMenu = useRef<HTMLDetailsElement>(null);
+  const { pathname } = useLocation();
+  // Rows read so far by the export under way, or null when none is.
+  const [exported, setExported] = useState<number | null>(null);
+  const [exportNotice, setExportNotice] = useState<{ error: boolean; text: string } | null>(null);
 
   /**
    * Escape closes the column picker and gives the focus back to its button.
@@ -180,8 +208,8 @@ export function CollectorList<T>({
    * document level, does not close at the same time.
    */
   function onPickerKeyDown(event: KeyboardEvent<HTMLDetailsElement>) {
-    const element = picker.current;
-    if (event.key !== "Escape" || element === null || !element.open) return;
+    const element = event.currentTarget;
+    if (event.key !== "Escape" || !element.open) return;
     event.stopPropagation();
     element.open = false;
     element.querySelector<HTMLElement>("summary")?.focus();
@@ -193,10 +221,11 @@ export function CollectorList<T>({
    */
   useEffect(() => {
     function onPointerDown(event: PointerEvent) {
-      const element = picker.current;
-      if (element === null || !element.open) return;
-      if (event.target instanceof Node && element.contains(event.target)) return;
-      element.open = false;
+      for (const element of [picker.current, exportMenu.current]) {
+        if (element === null || !element.open) continue;
+        if (event.target instanceof Node && element.contains(event.target)) continue;
+        element.open = false;
+      }
     }
     document.addEventListener("pointerdown", onPointerDown);
     return () => {
@@ -321,6 +350,66 @@ export function CollectorList<T>({
     expr,
     column: columns.find((column) => column.prop === prop),
   }));
+
+  /**
+   * Exports the whole selection — every page, with the sort and the filters of the
+   * moment — with every column the view offers: those on display first, in their
+   * order, then the hidden ones in the order of the column picker. The values are
+   * those of the API, not their rendering: see `lib/export/table.ts`.
+   */
+  async function runExport(format: ExportFormat) {
+    if (exportPage === undefined || exported !== null) return;
+    if (exportMenu.current !== null) exportMenu.current.open = false;
+    setExportNotice(null);
+    setExported(0);
+    try {
+      const exportedProps = [...shown, ...allProps.filter((prop) => !shown.includes(prop))];
+      const all: T[] = [];
+      let truncated = false;
+      for (let offset = 0; ; offset += EXPORT_CHUNK) {
+        const page = await exportPage({ offset, limit: EXPORT_CHUNK, cols: exportedProps });
+        all.push(...page.rows);
+        setExported(all.length);
+        if (!page.hasMore || page.rows.length === 0) break;
+        if (all.length >= EXPORT_MAX) {
+          truncated = true;
+          break;
+        }
+      }
+      const exportedColumns = exportedProps.flatMap((prop) => {
+        const column = columns.find((candidate) => candidate.prop === prop);
+        return column === undefined ? [] : [column];
+      });
+      const content = {
+        headers: exportedColumns.map((column) => t(column.labelKey)),
+        rows: all.map((row) =>
+          exportedColumns.map((column) => (row as Record<string, unknown>)[column.prop]),
+        ),
+      };
+      // Named after the view and the moment: nodes-20260930-1712.xlsx.
+      const view = pathname.replace(/^\/+|\/+$/g, "").replaceAll("/", "-") || "export";
+      const now = new Date();
+      const two = (n: number) => String(n).padStart(2, "0");
+      const stamp = `${String(now.getFullYear())}${two(now.getMonth() + 1)}${two(now.getDate())}-${two(now.getHours())}${two(now.getMinutes())}`;
+      const blob = format === "csv" ? toCsv(content) : await toXlsx(content, view);
+      download(blob, `${view}-${stamp}.${format}`);
+      setExportNotice({
+        error: false,
+        text: truncated
+          ? t("list.export.truncated", { count: all.length })
+          : t("list.export.done", { count: all.length }),
+      });
+    } catch (error) {
+      setExportNotice({
+        error: true,
+        text: t("list.export.error", {
+          message: error instanceof Error ? error.message : String(error),
+        }),
+      });
+    } finally {
+      setExported(null);
+    }
+  }
 
   const onColumnVisibilityChange: OnChangeFn<VisibilityState> = (updater) => {
     const next = resolveUpdater(updater, columnVisibility);
@@ -525,6 +614,38 @@ export function CollectorList<T>({
           </div>
         </details>
 
+        {exportPage !== undefined && (
+          <details ref={exportMenu} onKeyDown={onPickerKeyDown} className="relative">
+            <summary
+              aria-busy={exported !== null}
+              className="flex h-7 cursor-pointer list-none items-center gap-1.5 rounded-(--radius-control) border border-line px-2 text-ink-muted hover:text-ink"
+            >
+              <DownloadIcon />
+              {exported === null
+                ? t("list.export.label")
+                : t("list.export.running", { count: exported })}
+            </summary>
+            <div className="absolute z-20 mt-1 w-64 rounded-(--radius-panel) border border-line bg-surface-raised p-1 shadow-lg">
+              {(["xlsx", "csv"] as const).map((format) => (
+                <button
+                  key={format}
+                  type="button"
+                  disabled={exported !== null}
+                  onClick={() => {
+                    void runExport(format);
+                  }}
+                  className="flex w-full items-center rounded-(--radius-control) px-2 py-1 text-left hover:bg-surface-sunken disabled:opacity-40"
+                >
+                  {t(`list.export.formats.${format}`)}
+                </button>
+              ))}
+              <p className="border-t border-line px-2 pt-1.5 pb-1 text-data text-ink-muted">
+                {t("list.export.hint")}
+              </p>
+            </div>
+          </details>
+        )}
+
         {selectedCount > 0 && (
           <span className="flex items-center gap-2 text-ink">
             {allMatching
@@ -688,6 +809,15 @@ export function CollectorList<T>({
         </div>
       )}
 
+      {exportNotice !== null && (
+        <p
+          role={exportNotice.error ? "alert" : "status"}
+          className={`mb-2 ${exportNotice.error ? "text-state-down" : "text-ink-muted"}`}
+        >
+          {exportNotice.error ? "■ " : ""}
+          {exportNotice.text}
+        </p>
+      )}
       {selectionError !== null && (
         <p role="alert" className="mb-2 text-state-down">
           ■ {selectionError}

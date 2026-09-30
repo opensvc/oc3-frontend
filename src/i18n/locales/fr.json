@@ -360,6 +360,20 @@
     "empty": "Rien à afficher.",
     "sortHint": "Cliquez une colonne pour trier. Maj+clic pour ajouter une clé secondaire.",
     "columns": "Colonnes ({{shown}}/{{total}})",
+    "export": {
+      "label": "Exporter",
+      "running_one": "Export… 1 ligne",
+      "running_other": "Export… {{count}} lignes",
+      "formats": {
+        "xlsx": "Classeur Excel (.xlsx)",
+        "csv": "Fichier CSV (.csv)"
+      },
+      "hint": "Toutes les lignes correspondant aux filtres, dans le tri courant, avec toutes les colonnes : celles affichées d'abord, puis les masquées.",
+      "done_one": "1 ligne exportée.",
+      "done_other": "{{count}} lignes exportées.",
+      "truncated": "Export arrêté à {{count}} lignes : resserrer la liste avec des filtres pour exporter le reste.",
+      "error": "Impossible d'exporter la liste : {{message}}"
+    },
     "filterColumns": "Filtrer les colonnes",
     "resetColumns": "Revenir aux colonnes par défaut",
     "selected": "{{count}} sélectionnée",

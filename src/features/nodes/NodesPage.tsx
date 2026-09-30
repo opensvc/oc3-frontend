@@ -203,6 +203,31 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set(["node_id", "node_frozen", ...shown])].join(",");
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchNodes(search: ResolvedListSearch) {
+  // apicollector does not return the total of a selection: one row more than the
+  // page is requested, to know whether any remain after it.
+  const query = {
+    props: queryProps(search.cols),
+    orderby: search.sort.join(","),
+    offset: search.offset,
+    limit: search.limit + 1,
+    filter: filterQuery(search.filters),
+  };
+  const response =
+    search.fset === ""
+      ? await api.GET("/nodes", { params: { query } })
+      : await api.GET("/filtersets/{filterset_id}/nodes", {
+          params: { path: { filterset_id: search.fset }, query },
+        });
+  if (response.error !== undefined) throw new Error(problemText(response.error));
+  const all: NodeRow[] = Array.isArray(response.data.data) ? response.data.data : [];
+  return toPage(all, response.data.meta, search.limit);
+}
+
 function useNodes(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -217,26 +242,7 @@ function useNodes(search: ResolvedListSearch) {
     // The rows on display stay while the next ones load: typing a filter must not
     // empty the table under the field.
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      // apicollector does not return the total of a selection: one row more than the
-      // page is requested, to know whether any remain after it.
-      const query = {
-        props: queryProps(search.cols),
-        orderby: search.sort.join(","),
-        offset: search.offset,
-        limit: search.limit + 1,
-        filter: filterQuery(search.filters),
-      };
-      const response =
-        search.fset === ""
-          ? await api.GET("/nodes", { params: { query } })
-          : await api.GET("/filtersets/{filterset_id}/nodes", {
-              params: { path: { filterset_id: search.fset }, query },
-            });
-      if (response.error !== undefined) throw new Error(problemText(response.error));
-      const all: NodeRow[] = Array.isArray(response.data.data) ? response.data.data : [];
-      return toPage(all, response.data.meta, search.limit);
-    },
+    queryFn: () => fetchNodes(search),
   });
 }
 
@@ -322,6 +328,7 @@ export function NodesPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchNodes({ ...search, ...page })}
         total={data?.total}
         rowLead={(row) => <FrozenMark frozen={row.node_frozen === "T"} />}
         onSelectionChange={setSelectedIds}

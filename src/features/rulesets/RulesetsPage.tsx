@@ -145,6 +145,29 @@ function rowKey(row: RulesetRow): string | undefined {
   return `${String(row.ruleset_id)}:${String(row.encap_rset_id ?? 0)}:${String(row.id)}`;
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchRulesets(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const { data, error } = await api.GET("/compliance/rulesets_variables", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+        filter: filterQuery(search.filters),
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  // `data` holds the rows, or the counts when `stats` is asked for.
+  const all: RulesetRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useRulesets(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -158,24 +181,7 @@ function useRulesets(search: ResolvedListSearch) {
     // The rows on display stay while the next ones load: typing a filter must not
     // empty the table under the field.
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const { data, error } = await api.GET("/compliance/rulesets_variables", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-            filter: filterQuery(search.filters),
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      // `data` holds the rows, or the counts when `stats` is asked for.
-      const all: RulesetRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchRulesets(search),
   });
 }
 
@@ -198,7 +204,9 @@ export function RulesetsPage() {
   /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/compliance/rulesets_variables", {
-      params: { query: { props: KEY_PROPS.join(","), limit: 0, filter: filterQuery(search.filters) } },
+      params: {
+        query: { props: KEY_PROPS.join(","), limit: 0, filter: filterQuery(search.filters) },
+      },
     });
     if (error !== undefined) throw new Error(problemText(error));
     const rows: RulesetRow[] = Array.isArray(data.data) ? data.data : [];
@@ -238,6 +246,7 @@ export function RulesetsPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchRulesets({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
         filterable

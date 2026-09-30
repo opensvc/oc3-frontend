@@ -53,25 +53,31 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set(["tag_id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchTags(search: ResolvedListSearch) {
+  // One row more than the page: apicollector does not return the total of a selection.
+  const { data, error } = await api.GET("/tags", {
+    params: {
+      query: {
+        props: queryProps(search.cols),
+        orderby: search.sort.join(","),
+        offset: search.offset,
+        limit: search.limit + 1,
+      },
+    },
+  });
+  if (error !== undefined) throw new Error(JSON.stringify(error));
+  const all = toTagRows(data.data);
+  return toPage(all, data.meta, search.limit);
+}
+
 function useTags(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["tags", search.sort, search.offset, search.limit, search.cols],
-    queryFn: async () => {
-      // One row more than the page: apicollector does not return the total of a selection.
-      const { data, error } = await api.GET("/tags", {
-        params: {
-          query: {
-            props: queryProps(search.cols),
-            orderby: search.sort.join(","),
-            offset: search.offset,
-            limit: search.limit + 1,
-          },
-        },
-      });
-      if (error !== undefined) throw new Error(JSON.stringify(error));
-      const all = toTagRows(data.data);
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchTags(search),
   });
 }
 
@@ -147,6 +153,7 @@ export function TagsPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchTags({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
       />

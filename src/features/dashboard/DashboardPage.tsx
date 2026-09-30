@@ -100,21 +100,27 @@ function queryProps(cols: string[] | undefined): string {
   return ["id", ...shown, ...extra].join(",");
 }
 
+/**
+ * One page of the list, read with the sort, the filters and the columns of `search`.
+ * The view reads the page on display with it, and the export every page in turn.
+ */
+async function fetchAlerts(search: ResolvedListSearch) {
+  const query = {
+    props: queryProps(search.cols),
+    orderby: search.sort.join(","),
+    offset: search.offset,
+    limit: search.limit + 1,
+  };
+  const { data, error } = await api.GET("/alerts", { params: { query } });
+  if (error !== undefined) throw new Error(JSON.stringify(error));
+  const all: AlertRow[] = Array.isArray(data.data) ? data.data : [];
+  return toPage(all, data.meta, search.limit);
+}
+
 function useAlerts(search: ResolvedListSearch) {
   return useQuery({
     queryKey: ["alerts", search.sort, search.offset, search.limit, search.fset, search.cols],
-    queryFn: async () => {
-      const query = {
-        props: queryProps(search.cols),
-        orderby: search.sort.join(","),
-        offset: search.offset,
-        limit: search.limit + 1,
-      };
-      const { data, error } = await api.GET("/alerts", { params: { query } });
-      if (error !== undefined) throw new Error(JSON.stringify(error));
-      const all: AlertRow[] = Array.isArray(data.data) ? data.data : [];
-      return toPage(all, data.meta, search.limit);
-    },
+    queryFn: () => fetchAlerts(search),
   });
 }
 
@@ -198,6 +204,7 @@ export function DashboardPage() {
         isFetching={isFetching}
         errorMessage={isError ? error.message : null}
         hasMore={data?.hasMore ?? false}
+        exportPage={(page) => fetchAlerts({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
       />
