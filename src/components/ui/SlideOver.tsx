@@ -1,6 +1,7 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { CloseIcon } from "./icons";
 import { RAIL_VISIBLE } from "./slide-over-layout";
+import { leaveWidth, takeOverWidth } from "./slide-over-resize";
 
 /**
  * Side panel sliding in from the right.
@@ -74,6 +75,20 @@ export function SlideOver({
 }) {
   const panel = useRef<HTMLDivElement>(null);
   const opener = useRef<Element | null>(null);
+  const mounted = useRef(false);
+
+  // A panel mounted open in place of another of a different width eases from that
+  // width to its own (`slide-over-resize.ts`); a panel that closes leaves its width.
+  useLayoutEffect(() => {
+    const element = panel.current;
+    const onMount = !mounted.current;
+    mounted.current = true;
+    if (!open || element === null) return;
+    if (onMount) takeOverWidth(element);
+    return () => {
+      leaveWidth(element);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (open) {
