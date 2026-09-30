@@ -245,7 +245,8 @@
     "signIn": "Se connecter",
     "signingIn": "Connexion…",
     "signOut": "Se déconnecter",
-    "rejected": "Le collector a refusé ces identifiants."
+    "rejected": "Le collector a refusé ces identifiants.",
+    "unavailable": "Le collector ne peut pas vérifier vos identifiants pour le moment, réessayez plus tard : {{reason}}"
   },
   "list": {
     "filterset": "Filterset",

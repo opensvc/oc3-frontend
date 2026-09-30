@@ -1,34 +1,50 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api/client";
-import { setCredentials } from "@/lib/api/auth";
+import { basicHeader, setCredentials } from "@/lib/api/auth";
+import { problemText } from "@/lib/api/problem";
 import opensvcLogo from "@/assets/opensvc-logo.svg";
 
 /**
  * Temporary sign-in screen, while waiting for OIDC.
  *
- * apicollector exposes no identity endpoint: to check credentials, a protected
- * endpoint is called and its answer looked at. When OIDC arrives, this component and
- * the credentials store disappear together.
+ * The credentials are checked on `GET /users/self` with their own header, and only
+ * kept once accepted: kept first, the whole interface would render at once, its
+ * requests would be refused, and the sign-out that follows would remount this form
+ * empty, the reason of the failure lost. When OIDC arrives, this component and the
+ * credentials store disappear together.
  */
 export function SignIn() {
   const { t } = useTranslation();
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
-  const [rejected, setRejected] = useState(false);
+  // Why the sign-in failed: the credentials refused (401), or the collector unable
+  // to check them — a database down answers 503 — with the server's message.
+  const [failure, setFailure] = useState<{ rejected: true } | { unavailable: string } | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
-    setRejected(false);
-    setCredentials({ user, password });
-    const { error } = await api.GET("/nodes", { params: { query: { limit: 1 } } });
-    if (error !== undefined) {
-      setCredentials(null);
-      setRejected(true);
+    setFailure(null);
+    try {
+      const { error, response } = await api.GET("/users/{user_id}", {
+        params: { path: { user_id: "self" }, query: { props: "id" } },
+        headers: { Authorization: basicHeader({ user, password }) },
+      });
+      if (error === undefined) {
+        setCredentials({ user, password });
+        return;
+      }
+      setFailure(
+        response.status === 401 ? { rejected: true } : { unavailable: problemText(error) },
+      );
+    } catch (caught) {
+      // The collector did not answer at all.
+      setFailure({ unavailable: caught instanceof Error ? caught.message : String(caught) });
+    } finally {
+      setPending(false);
     }
-    setPending(false);
   }
 
   return (
@@ -79,9 +95,12 @@ export function SignIn() {
           className="mb-3 h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2"
         />
 
-        {rejected && (
+        {failure !== null && (
           <p role="alert" className="mb-3 text-state-down">
-            ■ {t("auth.rejected")}
+            ■{" "}
+            {"rejected" in failure
+              ? t("auth.rejected")
+              : t("auth.unavailable", { reason: failure.unavailable })}
           </p>
         )}
 

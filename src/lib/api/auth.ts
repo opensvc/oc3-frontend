@@ -67,10 +67,14 @@ export function useCredentials(): Credentials | null {
   return useSyncExternalStore(subscribe, snapshot);
 }
 
+/** The Basic Authorization header carrying these credentials. */
+export function basicHeader(credentials: Credentials): string {
+  // btoa only accepts latin-1: go through the UTF-8 encoding of the bytes.
+  const bytes = new TextEncoder().encode(`${credentials.user}:${credentials.password}`);
+  return `Basic ${btoa(String.fromCharCode(...bytes))}`;
+}
+
 /** Authorization header of the current request, or null when nobody is signed in. */
 export function authorizationHeader(): string | null {
-  if (current === null) return null;
-  // btoa only accepts latin-1: go through the UTF-8 encoding of the bytes.
-  const bytes = new TextEncoder().encode(`${current.user}:${current.password}`);
-  return `Basic ${btoa(String.fromCharCode(...bytes))}`;
+  return current === null ? null : basicHeader(current);
 }

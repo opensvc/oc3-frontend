@@ -245,7 +245,8 @@
     "signIn": "Sign in",
     "signingIn": "Signing in…",
     "signOut": "Sign out",
-    "rejected": "The collector refused these credentials."
+    "rejected": "The collector refused these credentials.",
+    "unavailable": "The collector cannot check your credentials right now, please retry later: {{reason}}"
   },
   "list": {
     "filterset": "Filterset",
