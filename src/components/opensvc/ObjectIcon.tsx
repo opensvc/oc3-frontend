@@ -13,6 +13,7 @@ import {
   PuzzleIcon,
   ServerIcon,
   StackIcon,
+  SwitchIcon,
   TagIcon,
   TagsIcon,
   UserIcon,
@@ -39,6 +40,7 @@ export type ObjectKind =
   | "form"
   | "package"
   | "hardware"
+  | "switch"
   | "moduleset"
   | "ruleset"
   | "complianceLog"
@@ -79,6 +81,9 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   package: { Icon: CubeIcon, className: "text-icon-package" },
   // Cornflower blue in the historical collector (`hw16`): the tint of nodes.
   hardware: { Icon: CpuIcon, className: "text-icon-node" },
+  // Network tint: the historical menu gives the SAN switches the network icon; the
+  // glyph differs so that the two menu entries do not look alike.
+  switch: { Icon: SwitchIcon, className: "text-icon-network" },
   // The cogs of the historical collector (`modset16`), in its compliance crimson.
   moduleset: { Icon: GearIcon, className: "text-icon-compliance" },
   // The cube of the historical collector (`rset16`), in its compliance crimson.

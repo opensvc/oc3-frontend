@@ -68,6 +68,15 @@ export function NetworkIcon(props: IconProps) {
   );
 }
 
+/** Switches: the front of a switch, a box with a row of ports. */
+export function SwitchIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3.5 7h17c.8 0 1.5.7 1.5 1.5v7c0 .8-.7 1.5-1.5 1.5h-17c-.8 0-1.5-.7-1.5-1.5v-7C2 7.7 2.7 7 3.5 7Zm1.3 3.5v3h2.4v-3H4.8Zm4.2 0v3h2.4v-3H9Zm4.2 0v3h2.4v-3h-2.4Zm4.2 0v3h2.4v-3h-2.4Z" />
+    </Svg>
+  );
+}
+
 /** Disks: the database cylinder (fa-database). */
 export function DatabaseIcon(props: IconProps) {
   return (

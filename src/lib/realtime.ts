@@ -64,6 +64,7 @@ const TABLE_KEYS: Record<string, readonly string[]> = {
   diskinfo: ["disks", "disk", "node", "service"],
   svcdisks: ["disks", "disk", "node", "service"],
   stor_array: ["disks", "disk"],
+  switches: ["switches"],
   node_ip: ["ips", "ip", "node", "networks"],
   node_hba: ["node", "service"],
   packages: ["packages", "node"],

@@ -28,6 +28,7 @@
     "newRequest": "Nouvelle demande",
     "packages": "Paquets",
     "hardware": "Matériel des nodes",
+    "switches": "Commutateurs SAN",
     "allRequests": "Toutes les demandes",
     "teamRequests": "Assignées à mon équipe",
     "tiersRequests": "En attente d'action de tiers",
@@ -1354,6 +1355,27 @@
       "pkg_updated": "Mis à jour",
       "nodes.app": "App du node",
       "nodes.os_name": "OS"
+    }
+  },
+  "switches": {
+    "title": "Commutateurs SAN",
+    "intro": "Une ligne par port de commutateur, avec ce qui est branché à l'autre bout : un node, une baie de stockage ou un autre commutateur.",
+    "fields": {
+      "sw_fabric": "Fabric",
+      "sw_name": "Commutateur",
+      "sw_index": "Index du port",
+      "sw_slot": "Slot",
+      "sw_port": "Port",
+      "sw_portspeed": "Vitesse du port",
+      "sw_portnego": "Vitesse négociée",
+      "sw_porttype": "Type de port",
+      "sw_portstate": "État du port",
+      "sw_portname": "Nom du port",
+      "sw_rportname": "Nom du port distant",
+      "sw_rname": "Nom distant",
+      "sw_updated": "Mis à jour",
+      "node_id": "Id du node distant",
+      "id": "Id de l'enregistrement"
     }
   },
   "hardware": {

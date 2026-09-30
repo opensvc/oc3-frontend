@@ -28,6 +28,7 @@
     "newRequest": "New request",
     "packages": "Packages",
     "hardware": "Nodes Hardware",
+    "switches": "SAN Switches",
     "allRequests": "All requests",
     "teamRequests": "Assigned to my team",
     "tiersRequests": "Pending tiers action",
@@ -1354,6 +1355,27 @@
       "pkg_updated": "Updated",
       "nodes.app": "Node app",
       "nodes.os_name": "OS"
+    }
+  },
+  "switches": {
+    "title": "SAN Switches",
+    "intro": "One row per switch port, with what is plugged on its other end: a node, a storage array or another switch.",
+    "fields": {
+      "sw_fabric": "Fabric",
+      "sw_name": "Switch",
+      "sw_index": "Port index",
+      "sw_slot": "Slot",
+      "sw_port": "Port",
+      "sw_portspeed": "Port speed",
+      "sw_portnego": "Speed negotiated",
+      "sw_porttype": "Port type",
+      "sw_portstate": "Port state",
+      "sw_portname": "Port name",
+      "sw_rportname": "Remote port name",
+      "sw_rname": "Remote name",
+      "sw_updated": "Updated",
+      "node_id": "Remote node id",
+      "id": "Record id"
     }
   },
   "hardware": {

@@ -7,6 +7,7 @@ import { DesignerPage } from "@/features/designer/DesignerPage";
 import { DisksPage } from "@/features/disks/DisksPage";
 import { PackagesPage } from "@/features/packages/PackagesPage";
 import { HardwarePage } from "@/features/hardware/HardwarePage";
+import { SwitchesPage } from "@/features/switches/SwitchesPage";
 import { FiltersPage } from "@/features/filters/FiltersPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
 import { FormsPage } from "@/features/forms/FormsPage";
@@ -81,6 +82,13 @@ const disksRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/disks",
   component: DisksPage,
+  validateSearch: parseListSearch,
+});
+
+const switchesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/san-switches",
+  component: SwitchesPage,
   validateSearch: parseListSearch,
 });
 
@@ -250,6 +258,7 @@ const routeTree = rootRoute.addChildren([
   instancesRoute,
   networksRoute,
   disksRoute,
+  switchesRoute,
   packagesRoute,
   hardwareRoute,
   groupsRoute,
