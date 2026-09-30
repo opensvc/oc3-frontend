@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { CaretRightIcon, CloseIcon, HistoryIcon, TrashIcon } from "@/components/ui/icons";
 import { ObjectIcon } from "./ObjectIcon";
@@ -16,12 +22,62 @@ const RAIL_BUTTON =
  * bin clears them all. A record newly shown comes in on top, the others sliding
  * down (`history-motion.ts`). The handle folds the rail to a tab, a choice kept with
  * the account. Nothing is rendered while the history is empty.
+ *
+ * The entries are rearranged by dragging one to its new place with the mouse — a
+ * line shows where it would land — or, from the keyboard, with Alt+Up and Alt+Down
+ * on a focused entry. The drag follows the pointer events rather than the HTML
+ * drag and drop, which does not start on a button in every browser.
  */
 export function PanelHistoryRail({ currentKey }: { currentKey: string }) {
   const { t } = useTranslation();
   const history = usePanelHistory(currentKey);
   const list = useRef<HTMLOListElement>(null);
   const signature = history.entries.map((entry) => entry.key).join(",");
+  // The entry being dragged and the index it would take among the others.
+  const [drag, setDrag] = useState<{ from: number; to: number } | null>(null);
+  const press = useRef<{ from: number; y: number; pointer: number } | null>(null);
+  // Set when a drag ends: the click the release produces must not open the entry.
+  const dragged = useRef(false);
+
+  /** The index the dragged entry would take if released at this height. */
+  function indexAt(y: number): number {
+    const items = list.current?.querySelectorAll<HTMLElement>("[data-entry]") ?? [];
+    let index = 0;
+    for (const item of items) {
+      const box = item.getBoundingClientRect();
+      if (y > box.top + box.height / 2) index++;
+    }
+    return index;
+  }
+
+  function onPointerDown(event: ReactPointerEvent<HTMLLIElement>, from: number) {
+    if (event.button !== 0) return;
+    press.current = { from, y: event.clientY, pointer: event.pointerId };
+  }
+
+  function onPointerMove(event: ReactPointerEvent<HTMLOListElement>) {
+    const pressed = press.current;
+    if (pressed === null || pressed.pointer !== event.pointerId) return;
+    // A few pixels of tolerance: a click that trembles is not a drag.
+    if (drag === null && Math.abs(event.clientY - pressed.y) < 5) return;
+    if (drag === null) event.currentTarget.setPointerCapture(event.pointerId);
+    setDrag({ from: pressed.from, to: indexAt(event.clientY) });
+  }
+
+  function onPointerEnd(event: ReactPointerEvent<HTMLOListElement>, drop: boolean) {
+    const pressed = press.current;
+    press.current = null;
+    if (pressed === null || drag === null) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    dragged.current = true;
+    window.setTimeout(() => {
+      dragged.current = false;
+    }, 0);
+    setDrag(null);
+    // Released below itself, the entry leaves a gap above: one index less.
+    if (drop) history.move(drag.from, drag.to > drag.from ? drag.to - 1 : drag.to);
+  }
 
   useLayoutEffect(() => {
     if (list.current !== null) moveHistoryEntries(list.current, signature);
@@ -68,9 +124,52 @@ export function PanelHistoryRail({ currentKey }: { currentKey: string }) {
         <CaretRightIcon className="h-3 w-3" />
         <span className="sr-only">{t("panelHistory.collapse")}</span>
       </button>
-      <ol ref={list} className="relative flex flex-col gap-1">
-        {history.entries.map((entry) => (
-          <li key={entry.key} data-entry={entry.key} className="group relative">
+      <ol
+        ref={list}
+        onPointerMove={onPointerMove}
+        onPointerUp={(event) => {
+          onPointerEnd(event, true);
+        }}
+        onPointerCancel={(event) => {
+          onPointerEnd(event, false);
+        }}
+        onClickCapture={(event) => {
+          if (!dragged.current) return;
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        className={`relative flex flex-col gap-1 select-none ${drag === null ? "" : "cursor-grabbing"}`}
+      >
+        {history.entries.map((entry, index) => (
+          <li
+            key={entry.key}
+            data-entry={entry.key}
+            onPointerDown={(event) => {
+              onPointerDown(event, index);
+            }}
+            onKeyDown={(event) => {
+              // The keyboard way to rearrange: Alt+Up and Alt+Down move the entry.
+              if (!event.altKey || (event.key !== "ArrowUp" && event.key !== "ArrowDown")) return;
+              event.preventDefault();
+              history.move(index, event.key === "ArrowUp" ? index - 1 : index + 1);
+            }}
+            className={`group relative touch-none ${drag === null ? "cursor-grab" : ""} ${
+              drag?.from === index ? "opacity-40" : ""
+            }`}
+          >
+            {drag !== null &&
+              drag.to !== drag.from &&
+              drag.to !== drag.from + 1 &&
+              (drag.to === index ||
+                (drag.to === history.entries.length && index === history.entries.length - 1)) && (
+                // Where the dragged entry would land: above this one, or under the last.
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute inset-x-0 h-0.5 rounded-full bg-accent ${
+                    drag.to === index ? "-top-[3px]" : "-bottom-[3px]"
+                  }`}
+                />
+              )}
             <EntryButton
               entry={entry}
               onOpen={() => {

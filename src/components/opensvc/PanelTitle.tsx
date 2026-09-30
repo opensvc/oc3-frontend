@@ -4,7 +4,7 @@ import { useHistoryPref } from "@/lib/user-prefs";
 import { RAIL_FALLBACK, type SlideOverSize } from "@/components/ui/slide-over-layout";
 import { ObjectIcon, type ObjectKind } from "./ObjectIcon";
 import { PanelHistoryMenu } from "./PanelHistory";
-import { recordKey, shownFromHistory } from "./panel-history";
+import { recordKey } from "./panel-history";
 import { isPeekStep } from "./panel-trail";
 
 /**
@@ -14,8 +14,8 @@ import { isPeekStep } from "./panel-trail";
  * a button next to the title opens them as a list.
  *
  * The title also records the record it shows in the history, whatever opened it —
- * a list row, a badge, the search, a bookmark — except from the history itself,
- * which keeps its order.
+ * a list row, a badge, the search, a bookmark: a new record enters in front, one
+ * already listed keeps its place.
  */
 export function PanelTitle({
   kind,
@@ -40,7 +40,6 @@ export function PanelTitle({
   record.current = history.record;
   useEffect(() => {
     if (!open || current === null || !isPeekStep(current)) return;
-    if (shownFromHistory(currentKey)) return;
     record.current(current.kind, current.id);
     // current is derived from currentKey.
     // eslint-disable-next-line react-hooks/exhaustive-deps

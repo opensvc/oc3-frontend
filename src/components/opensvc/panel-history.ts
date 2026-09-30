@@ -12,20 +12,6 @@ export function recordKey(kind: string, recordId: string | undefined): string {
   return recordId === undefined || recordId === "" ? "" : stepKey({ kind, id: recordId });
 }
 
-/**
- * The record shown from the history: it is displayed without being recorded again,
- * so that the history keeps its order. Kept until another record is shown, the
- * effect that records may run twice for one display.
- */
-let selected: string | null = null;
-
-/** True when the record on display was opened from the history; forgets it otherwise. */
-export function shownFromHistory(key: string): boolean {
-  if (selected === key) return true;
-  selected = null;
-  return false;
-}
-
 /** An entry of the history, as the rail and the menu show it. */
 export interface HistoryEntry {
   key: string;
@@ -37,8 +23,8 @@ export interface HistoryEntry {
 
 /**
  * The panel history, ready to be shown: the records displayed before, the most
- * recent first, named, and what opens one, removes one or clears them all.
- * Opening one shows it without moving it in the history.
+ * recent first unless the user rearranged them, named, and what opens one, moves
+ * one, removes one or clears them all. Opening one leaves it where it stands.
  */
 export function usePanelHistory(currentKey: string) {
   const history = useHistoryPref();
@@ -56,12 +42,20 @@ export function usePanelHistory(currentKey: string) {
     collapsed: history.collapsed,
     setCollapsed: history.setCollapsed,
     open: (entry: HistoryEntry) => {
-      selected = entry.key;
       peek(entry.step.kind, entry.step.id);
     },
     remove: (entry: HistoryEntry) => {
       history.remove(entry.step.kind, entry.step.id);
     },
     clear: history.clear,
+    /** Moves the entry of index `from` so that it stands at index `to`. */
+    move: (from: number, to: number) => {
+      if (from === to || from < 0 || from >= entries.length) return;
+      const order = entries.map((entry) => entry.step);
+      const [moved] = order.splice(from, 1);
+      if (moved === undefined) return;
+      order.splice(Math.min(Math.max(to, 0), order.length), 0, moved);
+      history.reorder(order);
+    },
   };
 }
