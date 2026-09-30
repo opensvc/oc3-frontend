@@ -3335,6 +3335,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/realtime/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Get a one-time token for the websocket of the messenger, which broadcasts a
+         *     "<table>_change" event each time a table of the collector changes. The client
+         *     connects to `/realtime/<group>/<token>` on the messenger. When the messenger
+         *     requires tokens, only those registered here are let in: only signed-in users
+         *     listen. The token is single use: a new one is asked for each connection.
+         *     Answers 503 when no messenger is configured or reachable.
+         */
+        post: operations["PostRealtimeToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/search": {
         parameters: {
             query?: never;
@@ -5391,6 +5415,15 @@ export interface components {
         };
         /** @description Internal Server Error */
         500: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description Service Unavailable */
+        503: {
             headers: {
                 [name: string]: unknown;
             };
@@ -15656,6 +15689,35 @@ export interface operations {
             400: components["responses"]["400"];
             401: components["responses"]["401"];
             500: components["responses"]["500"];
+        };
+    };
+    PostRealtimeToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @description The messenger group the change events are published to. */
+                            group: string;
+                            token: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+            503: components["responses"]["503"];
         };
     };
     GetSearch: {

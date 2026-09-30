@@ -1752,5 +1752,11 @@
     "expand_other": "Déplier l'historique, {{count}} fiches",
     "menu_one": "Historique, 1 fiche",
     "menu_other": "Historique, {{count}} fiches"
+  },
+  "realtime": {
+    "live": "En direct",
+    "offline": "Hors ligne",
+    "liveHint": "Les vues suivent le collector : les changements apparaissent au fil de l'eau.",
+    "offlineHint": "Les mises à jour en direct sont interrompues. Reconnexion en cours ; les vues sont rafraîchies au retour."
   }
 }

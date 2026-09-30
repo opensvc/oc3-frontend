@@ -8,6 +8,7 @@ import { Sidebar } from "./Sidebar";
 import { PeekPanel } from "./PeekPanel";
 import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
+import { LiveIndicator } from "./LiveIndicator";
 import { SidebarIcon } from "@/components/ui/icons";
 import { useAppearance } from "@/lib/user-prefs";
 import { BookmarksBar } from "./BookmarksBar";
@@ -91,6 +92,7 @@ export function AppShell() {
             </button>
             <ActionQueueLink />
             <GlobalSearch />
+            <LiveIndicator />
             <UserMenu user={credentials.user} />
           </div>
         </header>

@@ -6,6 +6,9 @@ import { defineConfig, loadEnv } from "vite";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const target = env.OC3_API_TARGET ?? "http://localhost:8080";
+  // The messenger listens next to the api, on its own port.
+  const realtimeTarget =
+    env.OC3_REALTIME_TARGET ?? `${new URL(target).protocol}//${new URL(target).hostname}:8889`;
 
   // Public host name when the dev server is exposed behind a TLS gateway (HAProxy).
   // Empty in local dev: the server is then reached by its IP.
@@ -24,12 +27,13 @@ export default defineConfig(({ mode }) => {
       allowedHosts: publicHost ? [publicHost] : undefined,
       // The gateway terminates TLS on 443: the HMR client must aim at that port,
       // not at the container's 5173.
-      hmr: publicHost
-        ? { host: publicHost, protocol: "wss", clientPort: 443 }
-        : undefined,
+      hmr: publicHost ? { host: publicHost, protocol: "wss", clientPort: 443 } : undefined,
       // In dev, the frontend talks to apicollector through this proxy: no CORS to handle.
       proxy: {
         "/api": { target, changeOrigin: true, secure: false },
+        // The websocket of the oc3 messenger, which announces the changes: on the
+        // same origin as the rest, so that the page needs no other address.
+        "/realtime": { target: realtimeTarget, ws: true, changeOrigin: true, secure: false },
       },
     },
   };
