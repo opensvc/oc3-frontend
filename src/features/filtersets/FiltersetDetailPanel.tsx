@@ -6,7 +6,9 @@ import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
+import { PanelHistoryRail } from "@/components/opensvc/PanelHistory";
 import { PanelTitle } from "@/components/opensvc/PanelTitle";
+import { recordKey } from "@/components/opensvc/panel-history";
 import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { TrashIcon } from "@/components/ui/icons";
@@ -116,6 +118,7 @@ export function FiltersetDetailPanel({
           open={open}
         />
       }
+      rail={<PanelHistoryRail currentKey={recordKey("filterset", filtersetId)} />}
     >
       <div className="flex flex-col gap-5">
         <DetailContent

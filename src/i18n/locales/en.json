@@ -1658,8 +1658,15 @@
       "form": "Forms"
     }
   },
-  "panelTitle": {
-    "label": "Records shown in the panel, the most recent first",
-    "show": "Show {{name}}"
+  "panelHistory": {
+    "label": "History of the records shown",
+    "show": "Show {{name}}",
+    "remove": "Remove {{name}} from the history",
+    "clear": "Clear the history",
+    "collapse": "Fold the history",
+    "expand_one": "Unfold the history, 1 record",
+    "expand_other": "Unfold the history, {{count}} records",
+    "menu_one": "History, 1 record",
+    "menu_other": "History, {{count}} records"
   }
 }

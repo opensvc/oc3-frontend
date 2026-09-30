@@ -1658,8 +1658,15 @@
       "form": "Formulaires"
     }
   },
-  "panelTitle": {
-    "label": "Fiches affichées dans le panneau, la plus récente d'abord",
-    "show": "Afficher {{name}}"
+  "panelHistory": {
+    "label": "Historique des fiches affichées",
+    "show": "Afficher {{name}}",
+    "remove": "Retirer {{name}} de l'historique",
+    "clear": "Vider l'historique",
+    "collapse": "Replier l'historique",
+    "expand_one": "Déplier l'historique, 1 fiche",
+    "expand_other": "Déplier l'historique, {{count}} fiches",
+    "menu_one": "Historique, 1 fiche",
+    "menu_other": "Historique, {{count}} fiches"
   }
 }

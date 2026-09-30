@@ -70,6 +70,8 @@ export interface UserPrefs {
   bookmarks?: Bookmark[];
   /** Records last shown in a panel, the most recent first (`useHistoryPref`). */
   history?: Bookmark[];
+  /** True once the user folded the history rail of the panels. */
+  historyCollapsed?: boolean;
   [key: string]: unknown;
 }
 
@@ -480,8 +482,8 @@ export function useBookmarksPref() {
   };
 }
 
-/** Records kept in the panel history, for now: the most recent only. */
-const HISTORY_SIZE = 4;
+/** Records kept in the panel history: what its rail shows without scrolling. */
+const HISTORY_SIZE = 8;
 
 /** A history saved when the limit was higher shows its most recent records only. */
 function storedHistory(prefs: UserPrefs | undefined): Bookmark[] {
@@ -489,39 +491,53 @@ function storedHistory(prefs: UserPrefs | undefined): Bookmark[] {
 }
 
 /**
- * The records last shown in a panel, the most recent first, and what records one.
- * Saved with the account like the bookmarks, so that closing the panel, opening
- * another object, reloading or signing in elsewhere keeps them; beyond
- * `HISTORY_SIZE` the oldest are forgotten. A record shown again moves to the front.
+ * The records last shown in a panel, the most recent first, and what records one,
+ * removes one or clears them all. Saved with the account like the bookmarks, so
+ * that closing the panel, opening another object, reloading or signing in elsewhere
+ * keeps them; beyond `HISTORY_SIZE` the oldest are forgotten. A record shown again
+ * moves to the front. `collapsed` is whether the user folded the history rail.
  */
 export function useHistoryPref() {
   const queryClient = useQueryClient();
   const prefs = useUserPrefs();
   const entries = storedHistory(prefs.data);
   const save = useMutation({
-    mutationFn: async (step: Bookmark) => {
-      // Computed from the prefs of the moment, not from this render's copy: two
-      // records shown in a row must both be kept.
-      const update = (current: UserPrefs | undefined): UserPrefs => ({
-        ...current,
-        history: [
-          step,
-          ...storedHistory(current).filter((e) => e.kind !== step.kind || e.id !== step.id),
-        ].slice(0, HISTORY_SIZE),
-      });
-      queryClient.setQueryData<UserPrefs>(PREFS_KEY, update);
-      await savePrefs(queryClient, update);
+    // The change is computed from the prefs of the moment, not from this render's
+    // copy: two records shown in a row must both be kept.
+    mutationFn: async (change: (current: UserPrefs | undefined) => UserPrefs) => {
+      queryClient.setQueryData<UserPrefs>(PREFS_KEY, change);
+      await savePrefs(queryClient, change);
     },
     onError: () => {
       void queryClient.invalidateQueries({ queryKey: PREFS_KEY });
     },
   });
+  const other = (kind: string, id: string) => (e: Bookmark) => e.kind !== kind || e.id !== id;
   return {
     entries,
+    collapsed: prefs.data?.historyCollapsed === true,
     record: (kind: string, id: string) => {
       const first = entries[0];
       if (first !== undefined && first.kind === kind && first.id === id) return;
-      save.mutate({ kind, id });
+      save.mutate((current) => ({
+        ...current,
+        history: [{ kind, id }, ...storedHistory(current).filter(other(kind, id))].slice(
+          0,
+          HISTORY_SIZE,
+        ),
+      }));
+    },
+    remove: (kind: string, id: string) => {
+      save.mutate((current) => ({
+        ...current,
+        history: storedHistory(current).filter(other(kind, id)),
+      }));
+    },
+    clear: () => {
+      save.mutate((current) => ({ ...current, history: [] }));
+    },
+    setCollapsed: (collapsed: boolean) => {
+      save.mutate((current) => ({ ...current, historyCollapsed: collapsed }));
     },
   };
 }

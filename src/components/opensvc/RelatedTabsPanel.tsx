@@ -8,7 +8,9 @@ import type { ObjectKind } from "./ObjectIcon";
 import { RelatedCount } from "./RelatedCount";
 import { BookmarkButton } from "./BookmarkButton";
 import { BOOKMARK_KINDS } from "./bookmark-kinds";
+import { PanelHistoryRail } from "./PanelHistory";
 import { PanelTitle } from "./PanelTitle";
+import { recordKey } from "./panel-history";
 import { PROPERTIES_TAB, type RelatedTab } from "./related-tabs";
 
 /**
@@ -73,7 +75,10 @@ export function RelatedTabsPanel({
       title={title}
       onClose={onClose}
       closeLabel={t("detail.close")}
-      heading={<PanelTitle kind={kind} title={title} recordId={objectId} open={open} />}
+      heading={
+        <PanelTitle kind={kind} title={title} recordId={objectId} open={open} size="wider" />
+      }
+      rail={<PanelHistoryRail currentKey={recordKey(kind, objectId)} />}
       actions={
         objectId !== undefined && BOOKMARK_KINDS.has(kind) ? (
           <BookmarkButton kind={kind} id={objectId} />

@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { CloseIcon } from "./icons";
+import { RAIL_VISIBLE } from "./slide-over-layout";
 
 /**
  * Side panel sliding in from the right.
@@ -31,6 +32,7 @@ export function SlideOver({
   closeOnOutsideClick = true,
   actions,
   heading,
+  rail,
   children,
 }: {
   open: boolean;
@@ -60,6 +62,14 @@ export function SlideOver({
    * the dialog.
    */
   heading?: ReactNode;
+  /**
+   * Something hanging outside the left edge of the panel, level with its content:
+   * a history of what it showed, say. Shown only while the panel is open, and only
+   * where the window is wider than the panel (`RAIL_VISIBLE`); the caller places a
+   * fallback in the header for the narrower windows. A click in it is a click in
+   * the panel: it does not close it.
+   */
+  rail?: ReactNode;
   children: ReactNode;
 }) {
   const panel = useRef<HTMLDivElement>(null);
@@ -148,6 +158,9 @@ export function SlideOver({
       </div>
       {subheader}
       <div className="min-h-0 flex-1 overflow-y-auto p-3">{children}</div>
+      {open && rail !== undefined && (
+        <div className={`absolute top-12 right-full flex-col ${RAIL_VISIBLE[size]}`}>{rail}</div>
+      )}
     </div>
   );
 }

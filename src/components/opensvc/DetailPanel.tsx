@@ -9,7 +9,9 @@ import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
 import { readPropAsString } from "@/lib/row";
 import { problemText } from "@/lib/api/problem";
 import { BookmarkButton } from "./BookmarkButton";
+import { PanelHistoryRail } from "./PanelHistory";
 import { PanelTitle } from "./PanelTitle";
+import { recordKey } from "./panel-history";
 import { BOOKMARK_KINDS } from "./bookmark-kinds";
 
 export interface DetailField<T> {
@@ -465,6 +467,7 @@ export function DetailPanel<T>({
       onClose={onClose}
       closeLabel={t("detail.close")}
       heading={<PanelTitle kind={kind} title={title} recordId={recordId} open={open} />}
+      rail={<PanelHistoryRail currentKey={recordKey(kind, recordId)} />}
       actions={bookmarkable ? <BookmarkButton kind={kind} id={recordId} /> : undefined}
     >
       {before}
