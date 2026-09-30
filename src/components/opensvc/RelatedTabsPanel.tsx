@@ -9,6 +9,7 @@ import { RelatedCount } from "./RelatedCount";
 import { BookmarkButton } from "./BookmarkButton";
 import { BOOKMARK_KINDS } from "./bookmark-kinds";
 import { PanelHistoryRail } from "./PanelHistory";
+import { FlashScope } from "./Flash";
 import { PanelTitle } from "./PanelTitle";
 import { recordKey } from "./panel-history";
 import { PROPERTIES_TAB, type RelatedTab } from "./related-tabs";
@@ -96,11 +97,14 @@ export function RelatedTabsPanel({
         />
       }
     >
-      <div {...tabPanelProps(tabsId, active)} className="outline-none">
-        {related === undefined || objectId === undefined
-          ? children
-          : related.render(objectId, i18n.language)}
-      </div>
+      {/* Another record or another tab brings other data, which is not an update to flash. */}
+      <FlashScope subject={`${kind}:${objectId ?? ""}:${active}`}>
+        <div {...tabPanelProps(tabsId, active)} className="outline-none">
+          {related === undefined || objectId === undefined
+            ? children
+            : related.render(objectId, i18n.language)}
+        </div>
+      </FlashScope>
     </SlideOver>
   );
 }

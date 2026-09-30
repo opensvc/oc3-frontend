@@ -9,6 +9,7 @@ import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
 import { readPropAsString } from "@/lib/row";
 import { problemText } from "@/lib/api/problem";
 import { BookmarkButton } from "./BookmarkButton";
+import { FlashScope, FlashValue } from "./Flash";
 import { PanelHistoryRail } from "./PanelHistory";
 import { PanelTitle } from "./PanelTitle";
 import { recordKey } from "./panel-history";
@@ -381,7 +382,8 @@ export function DetailContent<T>({
                             </>
                           ) : (
                             <>
-                              <span className="min-w-0 flex-1">
+                              {/* A live update changing the value flashes it. */}
+                              <FlashValue signature={shown ?? ""} className="min-w-0 flex-1">
                                 {shown === undefined || shown === "" ? (
                                   <span className="text-ink-muted">—</span>
                                 ) : field.render !== undefined ? (
@@ -389,7 +391,7 @@ export function DetailContent<T>({
                                 ) : (
                                   shown
                                 )}
-                              </span>
+                              </FlashValue>
                               {canEdit && field.editable === true && (
                                 // Invisible at rest but present and focusable: the
                                 // pencil stays reachable from the keyboard.
@@ -470,9 +472,12 @@ export function DetailPanel<T>({
       rail={<PanelHistoryRail currentKey={recordKey(kind, recordId)} />}
       actions={bookmarkable ? <BookmarkButton kind={kind} id={recordId} /> : undefined}
     >
-      {before}
-      {/* A disabled query stays "pending": panel closed, nothing to load. */}
-      <DetailContent {...content} isPending={open && isPending} />
+      {/* Another record brings other values, which are not updates to flash. */}
+      <FlashScope subject={`${kind}:${recordId ?? title}`}>
+        {before}
+        {/* A disabled query stays "pending": panel closed, nothing to load. */}
+        <DetailContent {...content} isPending={open && isPending} />
+      </FlashScope>
     </SlideOver>
   );
 }

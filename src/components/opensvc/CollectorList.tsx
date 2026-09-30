@@ -19,6 +19,7 @@ import { ColumnFamilyIcon, type ColumnFamily } from "./ColumnFamily";
 import { toEnumValues, toTextDraft, withFilter } from "@/lib/column-filters";
 import { PAGE_SIZES, visibleProps, type ResolvedListSearch } from "@/lib/list-search";
 import { readProp } from "@/lib/row";
+import { FlashCell, FlashScope } from "./Flash";
 
 export interface ListColumn<T> {
   /** Name of the apicollector prop: used for sorting and for picking the requested columns. */
@@ -302,6 +303,23 @@ export function CollectorList<T>({
       offset: 0,
     });
   };
+
+  // The page, sort, filters, filterset and columns on display, for the flashes.
+  const viewSubject = JSON.stringify([
+    search.sort,
+    search.offset,
+    search.limit,
+    search.cols,
+    search.filters,
+    search.fset,
+  ]);
+
+  // True once the list has shown its rows: a row mounted afterwards is one the
+  // collector gained, not the first display.
+  const shownOnce = useRef(false);
+  useEffect(() => {
+    if (!isPending) shownOnce.current = true;
+  }, [isPending]);
 
   const table = useReactTable({
     data: rows,
@@ -644,168 +662,195 @@ export function CollectorList<T>({
           where the filter that emptied it gets changed. */}
       {(rows.length > 0 || (filterable && !isPending)) && (
         <div className="overflow-x-auto rounded-(--radius-panel) border border-line bg-surface-raised">
-          <table className="w-full border-collapse text-data">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="border-b border-line text-left text-ink-muted">
-                  <th scope="col" className="w-8 px-2">
-                    <input
-                      type="checkbox"
-                      checked={table.getIsAllPageRowsSelected()}
-                      ref={(element) => {
-                        if (element !== null) {
-                          element.indeterminate = table.getIsSomePageRowsSelected();
+          {/* What the list shows: changing it brings other rows, which are not updates. */}
+          <FlashScope subject={viewSubject}>
+            <table className="w-full border-collapse text-data">
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr
+                    key={headerGroup.id}
+                    className="border-b border-line text-left text-ink-muted"
+                  >
+                    <th scope="col" className="w-8 px-2">
+                      <input
+                        type="checkbox"
+                        checked={table.getIsAllPageRowsSelected()}
+                        ref={(element) => {
+                          if (element !== null) {
+                            element.indeterminate = table.getIsSomePageRowsSelected();
+                          }
+                        }}
+                        aria-label={
+                          canSelectEverything ? t("list.selectEverything") : t("list.selectAll")
                         }
-                      }}
-                      aria-label={
-                        canSelectEverything ? t("list.selectEverything") : t("list.selectAll")
+                        title={
+                          canSelectEverything ? t("list.selectEverything") : t("list.selectAll")
+                        }
+                        onChange={onToggleAll}
+                      />
+                    </th>
+                    {headerGroup.headers.map((header) => {
+                      const meta = getMeta(header.column.columnDef).column;
+                      const sorted = header.column.getIsSorted();
+                      const label = flexRender(header.column.columnDef.header, header.getContext());
+                      if (!header.column.getCanSort()) {
+                        return (
+                          <th
+                            key={header.id}
+                            scope="col"
+                            className={`px-2 py-1.5 font-medium ${meta.numeric === true ? "text-right" : ""}`}
+                          >
+                            {label}
+                          </th>
+                        );
                       }
-                      title={canSelectEverything ? t("list.selectEverything") : t("list.selectAll")}
-                      onChange={onToggleAll}
-                    />
-                  </th>
-                  {headerGroup.headers.map((header) => {
-                    const meta = getMeta(header.column.columnDef).column;
-                    const sorted = header.column.getIsSorted();
-                    const label = flexRender(header.column.columnDef.header, header.getContext());
-                    if (!header.column.getCanSort()) {
                       return (
                         <th
                           key={header.id}
                           scope="col"
-                          className={`px-2 py-1.5 font-medium ${meta.numeric === true ? "text-right" : ""}`}
+                          aria-sort={
+                            sorted === false
+                              ? "none"
+                              : sorted === "asc"
+                                ? "ascending"
+                                : "descending"
+                          }
+                          className={meta.numeric === true ? "text-right" : undefined}
                         >
-                          {label}
+                          <button
+                            type="button"
+                            onClick={header.column.getToggleSortingHandler()}
+                            className="w-full px-2 py-1.5 text-left font-medium hover:text-ink"
+                          >
+                            {label}
+                            {sorted !== false && (
+                              <span aria-hidden="true">
+                                {sorted === "asc" ? " ▲" : " ▼"}
+                                {sorting.length > 1 && header.column.getSortIndex() + 1}
+                              </span>
+                            )}
+                          </button>
                         </th>
                       );
-                    }
-                    return (
-                      <th
-                        key={header.id}
-                        scope="col"
-                        aria-sort={
-                          sorted === false ? "none" : sorted === "asc" ? "ascending" : "descending"
-                        }
-                        className={meta.numeric === true ? "text-right" : undefined}
-                      >
-                        <button
-                          type="button"
-                          onClick={header.column.getToggleSortingHandler()}
-                          className="w-full px-2 py-1.5 text-left font-medium hover:text-ink"
-                        >
-                          {label}
-                          {sorted !== false && (
-                            <span aria-hidden="true">
-                              {sorted === "asc" ? " ▲" : " ▼"}
-                              {sorting.length > 1 && header.column.getSortIndex() + 1}
-                            </span>
-                          )}
-                        </button>
-                      </th>
-                    );
-                  })}
-                </tr>
-              ))}
-              {filterable && (
-                <tr className="border-b border-line text-left">
-                  <td className="w-8 px-2">
-                    <span className="sr-only">{t("list.filters.title")}</span>
-                  </td>
-                  {table.getVisibleLeafColumns().map((column) => {
-                    const meta = getMeta(column.columnDef).column;
-                    return (
-                      // The same padding above and below: the control sits in the
-                      // middle of its row, clear of the line under the headers.
-                      <td key={column.id} className="px-2 py-1">
-                        <ColumnFilterControl
-                          column={meta}
-                          value={search.filters[meta.prop]}
-                          onChange={(expr) => {
-                            setFilter(meta.prop, expr);
-                          }}
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              )}
-            </thead>
-            <tbody>
-              {rows.length === 0 && errorMessage === null && (
-                <tr>
-                  <td colSpan={shown.length + 1} className="px-2 py-3 text-ink-muted">
-                    {activeFilters.length > 0 ? t("list.filters.noMatch") : t("list.empty")}
-                  </td>
-                </tr>
-              )}
-              {table.getRowModel().rows.map((row) => {
-                const id = rowId(row.original);
-                const selected = id !== undefined && id === search.sel;
-                return (
-                  <tr
-                    key={row.id}
-                    // The row carries the opening of the panel, by click as by keyboard:
-                    // a cell may hold its own buttons, and a button inside a button
-                    // would be neither valid nor usable from the keyboard.
-                    tabIndex={0}
-                    aria-haspopup="dialog"
-                    onClick={() => {
-                      onChange({ sel: id });
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.target !== event.currentTarget) return;
-                      if (event.key !== "Enter" && event.key !== " ") return;
-                      event.preventDefault();
-                      onChange({ sel: id });
-                    }}
-                    aria-current={selected ? "true" : undefined}
-                    className={`h-(--row-height) cursor-pointer border-b border-line last:border-b-0 hover:bg-surface-sunken focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--focus-ring) ${
-                      selected ? "bg-accent-soft" : ""
-                    }`}
-                  >
-                    <td
-                      className="w-8 px-2"
-                      // Ticking must not open the detail panel.
-                      onClick={(event) => {
-                        event.stopPropagation();
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={row.getIsSelected()}
-                        disabled={!row.getCanSelect()}
-                        aria-label={t("list.selectRow")}
-                        onChange={row.getToggleSelectedHandler()}
-                      />
+                    })}
+                  </tr>
+                ))}
+                {filterable && (
+                  <tr className="border-b border-line text-left">
+                    <td className="w-8 px-2">
+                      <span className="sr-only">{t("list.filters.title")}</span>
                     </td>
-                    {row.getVisibleCells().map((cell, index) => {
-                      const meta = getMeta(cell.column.columnDef).column;
-                      const content = flexRender(cell.column.columnDef.cell, cell.getContext());
-                      return index === 0 ? (
-                        <th key={cell.id} scope="row" className="px-2 text-left font-medium">
-                          <span className="inline-flex items-center gap-1.5">
-                            {rowLead?.(row.original)}
-                            {content}
-                          </span>
-                        </th>
-                      ) : (
-                        <td
-                          key={cell.id}
-                          className={meta.numeric === true ? "px-2 text-right" : "px-2"}
-                        >
-                          {content}
+                    {table.getVisibleLeafColumns().map((column) => {
+                      const meta = getMeta(column.columnDef).column;
+                      return (
+                        // The same padding above and below: the control sits in the
+                        // middle of its row, clear of the line under the headers.
+                        <td key={column.id} className="px-2 py-1">
+                          <ColumnFilterControl
+                            column={meta}
+                            value={search.filters[meta.prop]}
+                            onChange={(expr) => {
+                              setFilter(meta.prop, expr);
+                            }}
+                          />
                         </td>
                       );
                     })}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                )}
+              </thead>
+              <tbody>
+                {rows.length === 0 && errorMessage === null && (
+                  <tr>
+                    <td colSpan={shown.length + 1} className="px-2 py-3 text-ink-muted">
+                      {activeFilters.length > 0 ? t("list.filters.noMatch") : t("list.empty")}
+                    </td>
+                  </tr>
+                )}
+                {table.getRowModel().rows.map((row) => {
+                  const id = rowId(row.original);
+                  const selected = id !== undefined && id === search.sel;
+                  return (
+                    <tr
+                      key={row.id}
+                      // The row carries the opening of the panel, by click as by keyboard:
+                      // a cell may hold its own buttons, and a button inside a button
+                      // would be neither valid nor usable from the keyboard.
+                      tabIndex={0}
+                      aria-haspopup="dialog"
+                      onClick={() => {
+                        onChange({ sel: id });
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.target !== event.currentTarget) return;
+                        if (event.key !== "Enter" && event.key !== " ") return;
+                        event.preventDefault();
+                        onChange({ sel: id });
+                      }}
+                      aria-current={selected ? "true" : undefined}
+                      className={`h-(--row-height) cursor-pointer border-b border-line last:border-b-0 hover:bg-surface-sunken focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--focus-ring) ${
+                        selected ? "bg-accent-soft" : ""
+                      }`}
+                    >
+                      <td
+                        className="w-8 px-2"
+                        // Ticking must not open the detail panel.
+                        onClick={(event) => {
+                          event.stopPropagation();
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={row.getIsSelected()}
+                          disabled={!row.getCanSelect()}
+                          aria-label={t("list.selectRow")}
+                          onChange={row.getToggleSelectedHandler()}
+                        />
+                      </td>
+                      {row.getVisibleCells().map((cell, index) => {
+                        const meta = getMeta(cell.column.columnDef).column;
+                        const content = flexRender(cell.column.columnDef.cell, cell.getContext());
+                        // The raw value stands for the cell: a live update changing it
+                        // flashes the cell, and a row it brings flashes whole.
+                        const signature = signatureOf(cell.getValue());
+                        return index === 0 ? (
+                          <FlashCell
+                            key={cell.id}
+                            header
+                            signature={signature}
+                            appear={shownOnce.current}
+                            className="px-2 text-left font-medium"
+                          >
+                            <span className="inline-flex items-center gap-1.5">
+                              {rowLead?.(row.original)}
+                              {content}
+                            </span>
+                          </FlashCell>
+                        ) : (
+                          <FlashCell
+                            key={cell.id}
+                            signature={signature}
+                            className={meta.numeric === true ? "px-2 text-right" : "px-2"}
+                          >
+                            {content}
+                          </FlashCell>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </FlashScope>
         </div>
       )}
     </>
   );
+}
+
+/** A value as a string, to tell whether it changed from one render to the next. */
+function signatureOf(value: unknown): string {
+  return typeof value === "string" ? value : (JSON.stringify(value) ?? "");
 }
 
 /** Reads the metadata of a column, which TanStack types as `unknown`. */

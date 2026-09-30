@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { FlashRow } from "./Flash";
 
 export interface RelatedColumn<T> {
   key: string;
@@ -49,6 +50,12 @@ export function RelatedTable<T>({
   headerTop?: string;
 }) {
   const { t } = useTranslation();
+  // True once the table has shown its rows: a row mounted afterwards is one the
+  // collector gained, not the first display.
+  const shownOnce = useRef(false);
+  useEffect(() => {
+    if (!isPending) shownOnce.current = true;
+  }, [isPending]);
   if (isPending) return <p className="text-ink-muted">{t("detail.loading")}</p>;
   if (errorMessage !== null)
     return (
@@ -95,7 +102,13 @@ export function RelatedTable<T>({
               </tr>
             )}
             {group.rows.map((row) => (
-              <tr key={rowKey(row)} className="border-b border-line/60 align-top last:border-b-0">
+              // A live update changing the row, or bringing it, flashes it.
+              <FlashRow
+                key={rowKey(row)}
+                signature={JSON.stringify(row)}
+                appear={shownOnce.current}
+                className="border-b border-line/60 align-top last:border-b-0"
+              >
                 {columns.map((column) => (
                   <td
                     key={column.key}
@@ -104,7 +117,7 @@ export function RelatedTable<T>({
                     {column.render(row)}
                   </td>
                 ))}
-              </tr>
+              </FlashRow>
             ))}
           </tbody>
         ),
