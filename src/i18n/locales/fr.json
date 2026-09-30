@@ -366,6 +366,7 @@
     "clearSelection": "Effacer",
     "selectAll": "Sélectionner toutes les lignes de la page",
     "selectRow": "Sélectionner cette ligne",
+    "selectRangeHint": "Maj+Clic sélectionne toutes les lignes depuis la dernière cochée jusqu'à celle-ci.",
     "selectEverything": "Sélectionner toutes les lignes",
     "selectingEverything": "Sélection…",
     "selectedEverywhere": "{{count}} sélectionnée, toutes pages",

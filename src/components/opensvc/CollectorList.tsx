@@ -254,6 +254,35 @@ export function CollectorList<T>({
     onSelectionChange?.(Object.keys(next).filter((id) => next[id]));
   };
 
+  // The row last ticked or unticked: where a Shift+Click range starts.
+  const anchor = useRef<string | null>(null);
+
+  /**
+   * Ticks or unticks a row. With Shift held, every row from the one last ticked
+   * to this one takes the same state, as in a file manager: a contiguous range of
+   * the page on display. Without an anchor on this page, only the row changes.
+   */
+  function tick(id: string, checked: boolean, native: Event) {
+    const rows = table.getRowModel().rows;
+    const to = rows.findIndex((row) => row.id === id);
+    const from = rows.findIndex((row) => row.id === anchor.current);
+    const range =
+      native instanceof MouseEvent && native.shiftKey && from !== -1 && to !== -1 && from !== to;
+    const touched = range
+      ? rows.slice(Math.min(from, to), Math.max(from, to) + 1)
+      : rows.slice(to, to + 1);
+    onRowSelectionChange((previous) => {
+      const next = { ...previous };
+      for (const row of touched) {
+        if (!row.getCanSelect()) continue;
+        if (checked) next[row.id] = true;
+        else delete next[row.id];
+      }
+      return next;
+    });
+    anchor.current = id;
+  }
+
   /** Ticks every row of the selection, following pages included. */
   async function selectEverything() {
     if (selectAllMatching === undefined) return;
@@ -798,13 +827,20 @@ export function CollectorList<T>({
                         onClick={(event) => {
                           event.stopPropagation();
                         }}
+                        // Shift+Click extends a selection of rows, not of text.
+                        onMouseDown={(event) => {
+                          if (event.shiftKey) event.preventDefault();
+                        }}
                       >
                         <input
                           type="checkbox"
                           checked={row.getIsSelected()}
                           disabled={!row.getCanSelect()}
                           aria-label={t("list.selectRow")}
-                          onChange={row.getToggleSelectedHandler()}
+                          title={t("list.selectRangeHint")}
+                          onChange={(event) => {
+                            tick(row.id, event.target.checked, event.nativeEvent);
+                          }}
                         />
                       </td>
                       {row.getVisibleCells().map((cell, index) => {

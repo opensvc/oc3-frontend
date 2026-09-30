@@ -365,6 +365,7 @@
     "clearSelection": "Clear",
     "selectAll": "Select every row on this page",
     "selectRow": "Select this row",
+    "selectRangeHint": "Shift+Click selects every row from the last one ticked to this one.",
     "selected_other": "{{count}} selected",
     "selectEverything": "Select all matching rows",
     "selectingEverything": "Selecting…",
