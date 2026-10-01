@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DateTime } from "@/components/ui/DateTime";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
@@ -16,6 +16,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { AppDetailPanel } from "./AppDetailPanel";
 import { CreateAppPanel } from "./CreateAppPanel";
@@ -89,6 +90,7 @@ async function fetchApps(search: ResolvedListSearch) {
         orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
       },
     },
   });
@@ -99,7 +101,17 @@ async function fetchApps(search: ResolvedListSearch) {
 
 function useApps(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["apps", search.sort, search.offset, search.limit, search.cols],
+    queryKey: [
+      "apps",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: () => fetchApps(search),
   });
 }
@@ -115,10 +127,10 @@ export function AppsPage() {
   const { data, isPending, isError, error, isFetching } = useApps(search);
   const [creating, setCreating] = useState(false);
 
-  /** Ids of the whole selection, without pagination. */
+  /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/apps", {
-      params: { query: { props: "id", limit: 0 } },
+      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
     });
     if (error !== undefined) throw new Error(JSON.stringify(error));
     const rows: AppRow[] = Array.isArray(data.data) ? data.data : [];
@@ -186,6 +198,7 @@ export function AppsPage() {
         exportPage={(page) => fetchApps({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <AppDetailPanel

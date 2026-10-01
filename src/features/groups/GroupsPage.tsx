@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { toPage } from "@/lib/api/page";
-import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import {
+  CollectorList,
+  type ColumnFilterOption,
+  type ListColumn,
+} from "@/components/opensvc/CollectorList";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import {
@@ -15,6 +19,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateGroupPanel } from "./CreateGroupPanel";
 import { GroupDetailPanel } from "./GroupDetailPanel";
@@ -50,6 +55,12 @@ const FAMILY: Record<string, ColumnFamily> = {
 
 const ALL_PROPS = [...GROUP_PROPS];
 
+/** The flag of a group, named as the column shows it. */
+const PRIVILEGE_OPTIONS: ColumnFilterOption[] = ["T", "F"].map((value) => ({
+  value,
+  labelKey: `groups.privilege.${value}`,
+}));
+
 /** Ask only for the columns shown: apicollector pushes the selection down to the database. */
 function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
@@ -68,6 +79,7 @@ async function fetchGroups(search: ResolvedListSearch) {
         orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
       },
     },
   });
@@ -78,7 +90,17 @@ async function fetchGroups(search: ResolvedListSearch) {
 
 function useGroups(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["groups", search.sort, search.offset, search.limit, search.cols],
+    queryKey: [
+      "groups",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: () => fetchGroups(search),
   });
 }
@@ -94,10 +116,10 @@ export function GroupsPage() {
   const { data, isPending, isError, error, isFetching } = useGroups(search);
   const [creating, setCreating] = useState(false);
 
-  /** Ids of the whole selection, without pagination. */
+  /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/groups", {
-      params: { query: { props: "id", limit: 0 } },
+      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
     });
     if (error !== undefined) throw new Error(JSON.stringify(error));
     const rows: GroupRow[] = Array.isArray(data.data) ? data.data : [];
@@ -126,6 +148,8 @@ export function GroupsPage() {
     labelKey: `groups.fields.${prop}`,
     numeric: NUMERIC_PROPS.has(prop),
     family: FAMILY[prop] ?? "team",
+    filter:
+      prop === "privilege" ? { kind: "enum" as const, options: PRIVILEGE_OPTIONS } : undefined,
     render: (row: GroupRow) =>
       prop === "privilege" && row.privilege !== undefined
         ? t(`groups.privilege.${row.privilege}`)
@@ -170,6 +194,7 @@ export function GroupsPage() {
         exportPage={(page) => fetchGroups({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <GroupDetailPanel

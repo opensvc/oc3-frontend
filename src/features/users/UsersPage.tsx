@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { toPage } from "@/lib/api/page";
+import { FLAG_FILTER_OPTIONS } from "@/components/opensvc/filter-options";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -15,6 +16,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateUserPanel } from "./CreateUserPanel";
 import { UserDetailPanel } from "./UserDetailPanel";
@@ -88,11 +90,15 @@ const FAMILY: Record<string, ColumnFamily> = {
   quota_docker_registries: "service",
 };
 
+/** Columns holding a T/F flag of the collector. */
+const FLAG_PROPS = new Set<string>(["email_notifications", "im_notifications", "lock_filter"]);
+
 const COLUMNS: ListColumn<UserRow>[] = USER_PROPS.map((prop) => ({
   prop,
   labelKey: `users.fields.${prop}`,
   numeric: NUMERIC_PROPS.has(prop),
   family: FAMILY[prop] ?? "team",
+  filter: FLAG_PROPS.has(prop) ? { kind: "enum", options: FLAG_FILTER_OPTIONS } : undefined,
   render: (row: UserRow) => row[prop],
 }));
 
@@ -121,6 +127,7 @@ async function fetchUsers(search: ResolvedListSearch) {
         orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
       },
     },
   });
@@ -131,7 +138,17 @@ async function fetchUsers(search: ResolvedListSearch) {
 
 function useUsers(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["users", search.sort, search.offset, search.limit, search.cols],
+    queryKey: [
+      "users",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: () => fetchUsers(search),
   });
 }
@@ -146,10 +163,10 @@ export function UsersPage() {
   const navigate = useNavigate({ from: "/users" });
   const { data, isPending, isError, error, isFetching } = useUsers(search);
 
-  /** Ids of the whole selection, without pagination. */
+  /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/users", {
-      params: { query: { props: "id", limit: 0 } },
+      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
     });
     if (error !== undefined) throw new Error(JSON.stringify(error));
     const rows: UserRow[] = Array.isArray(data.data) ? data.data : [];
@@ -211,6 +228,7 @@ export function UsersPage() {
         exportPage={(page) => fetchUsers({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <CreateUserPanel

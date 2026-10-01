@@ -1,11 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { toPage } from "@/lib/api/page";
 import { problemText } from "@/lib/api/problem";
-import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import {
+  CollectorList,
+  type ColumnFilterOption,
+  type ListColumn,
+} from "@/components/opensvc/CollectorList";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { DateTime } from "@/components/ui/DateTime";
@@ -17,17 +21,14 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ObsolescenceDetailPanel } from "./ObsolescenceDetailPanel";
 
 type ObsolescenceSettingRow = components["schemas"]["ObsolescenceSettingRow"];
 
-/**
- * Empty: apicollector refuses any `orderby` on this endpoint. The `obsolescence`
- * mapping describes its props only by SQL expressions over the `v_obsolescence` view,
- * without the column reference `buildOrderBy` requires.
- */
-const DEFAULT_SORT: string[] = [];
+/** By kind (hardware, then OS), then by model or release name. */
+const DEFAULT_SORT: string[] = ["obs_type", "obs_name"];
 
 const OBSOLESCENCE_PROPS = [
   "id",
@@ -72,6 +73,12 @@ const FAMILY: Record<string, ColumnFamily> = {
 
 const ALL_PROPS = [...OBSOLESCENCE_PROPS];
 
+/** Hardware models and OS releases, named as the column shows them. */
+const TYPE_OPTIONS: ColumnFilterOption[] = ["hw", "os"].map((value) => ({
+  value,
+  labelKey: `obsolescence.type.${value}`,
+}));
+
 /** Columns shown, plus the id used by the detail. */
 function queryProps(cols: string[] | undefined): string {
   return [...new Set(["id", ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
@@ -87,8 +94,10 @@ async function fetchSettings(search: ResolvedListSearch) {
     params: {
       query: {
         props: queryProps(search.cols),
+        orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
       },
     },
   });
@@ -99,7 +108,17 @@ async function fetchSettings(search: ResolvedListSearch) {
 
 function useSettings(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["obsolescence", search.offset, search.limit, search.cols],
+    queryKey: [
+      "obsolescence",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: () => fetchSettings(search),
   });
 }
@@ -131,10 +150,10 @@ export function ObsolescencePage() {
     },
   });
 
-  /** Ids of the whole selection, without pagination. */
+  /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/obsolescence/settings", {
-      params: { query: { props: "id", limit: 0 } },
+      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
     });
     if (error !== undefined) throw new Error(JSON.stringify(error));
     const rows: ObsolescenceSettingRow[] = Array.isArray(data.data) ? data.data : [];
@@ -159,8 +178,7 @@ export function ObsolescencePage() {
     labelKey: `obsolescence.fields.${prop}`,
     numeric: NUMERIC_PROPS.has(prop),
     family: FAMILY[prop] ?? "node",
-    // No column can be sorted as long as the endpoint refuses `orderby`.
-    sortable: false,
+    filter: prop === "obs_type" ? { kind: "enum" as const, options: TYPE_OPTIONS } : undefined,
     render: (row: ObsolescenceSettingRow, locale: string) => {
       const value = row[prop];
       if (prop === "obs_type" && row.obs_type !== undefined)
@@ -221,6 +239,7 @@ export function ObsolescencePage() {
         exportPage={(page) => fetchSettings({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <ObsolescenceDetailPanel

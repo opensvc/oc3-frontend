@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { toPage } from "@/lib/api/page";
+import { FLAG_FILTER_OPTIONS } from "@/components/opensvc/filter-options";
 import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
@@ -16,6 +17,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateFiltersetPanel } from "./CreateFiltersetPanel";
 import { FiltersetDetailPanel } from "./FiltersetDetailPanel";
@@ -61,6 +63,7 @@ async function fetchFiltersetList(search: ResolvedListSearch) {
         orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
       },
     },
   });
@@ -72,7 +75,18 @@ async function fetchFiltersetList(search: ResolvedListSearch) {
 function useFiltersetList(search: ResolvedListSearch) {
   return useQuery({
     // Under "filtersets": an edit also invalidates the dropdown of the views.
-    queryKey: ["filtersets", "list", search.sort, search.offset, search.limit, search.cols],
+    queryKey: [
+      "filtersets",
+      "list",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: () => fetchFiltersetList(search),
   });
 }
@@ -90,7 +104,7 @@ export function FiltersetsPage() {
 
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/filtersets", {
-      params: { query: { props: "id", limit: 0 } },
+      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
     });
     if (error !== undefined) throw new Error(JSON.stringify(error));
     const rows: FiltersetRow[] = Array.isArray(data.data) ? data.data : [];
@@ -118,6 +132,8 @@ export function FiltersetsPage() {
     labelKey: `filtersets.fields.${prop}`,
     numeric: prop === "id",
     family: FAMILY[prop] ?? "state",
+    filter:
+      prop === "fset_stats" ? { kind: "enum" as const, options: FLAG_FILTER_OPTIONS } : undefined,
     render: (row: FiltersetRow, locale: string) => {
       if (prop === "fset_updated") return <DateTime value={row.fset_updated} locale={locale} />;
       if (prop === "fset_stats")
@@ -171,6 +187,7 @@ export function FiltersetsPage() {
         exportPage={(page) => fetchFiltersetList({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <FiltersetDetailPanel

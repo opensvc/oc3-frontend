@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { DateTime } from "@/components/ui/DateTime";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -17,6 +17,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { DiskDetailPanel } from "./DiskDetailPanel";
 
@@ -154,6 +155,7 @@ async function fetchDisks(search: ResolvedListSearch) {
         orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
       },
     },
   });
@@ -164,7 +166,17 @@ async function fetchDisks(search: ResolvedListSearch) {
 
 function useDisks(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["disks", search.sort, search.offset, search.limit, search.cols],
+    queryKey: [
+      "disks",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: () => fetchDisks(search),
   });
 }
@@ -179,10 +191,10 @@ export function DisksPage() {
   const navigate = useNavigate({ from: "/disks" });
   const { data, isPending, isError, error, isFetching } = useDisks(search);
 
-  /** Ids of the whole selection, without pagination. */
+  /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/disks", {
-      params: { query: { props: "disk_id", limit: 0 } },
+      params: { query: { props: "disk_id", limit: 0, filter: filterQuery(search.filters) } },
     });
     if (error !== undefined) throw new Error(JSON.stringify(error));
     const rows: DiskRow[] = Array.isArray(data.data) ? data.data : [];
@@ -224,6 +236,7 @@ export function DisksPage() {
         exportPage={(page) => fetchDisks({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <DiskDetailPanel

@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { toPage } from "@/lib/api/page";
-import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import {
+  CollectorList,
+  type ColumnFilterOption,
+  type ListColumn,
+} from "@/components/opensvc/CollectorList";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import type { ColumnFamily } from "@/components/opensvc/ColumnFamily";
 import { DateTime } from "@/components/ui/DateTime";
@@ -16,10 +20,12 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { FilterDetailPanel } from "./FilterDetailPanel";
 import { FilterFormPanel } from "./FilterFormPanel";
 import { useFilter } from "./use-filter";
+import { FILTER_OPERATORS } from "./filter-definition";
 
 type FilterRow = components["schemas"]["FilterRow"];
 
@@ -55,11 +61,15 @@ const FAMILY: Record<string, ColumnFamily> = {
   f_cksum: "state",
 };
 
+/** The operators a filter may use: the value is its own label. */
+const OPERATOR_OPTIONS: ColumnFilterOption[] = FILTER_OPERATORS.map((value) => ({ value }));
+
 const COLUMNS: ListColumn<FilterRow>[] = FILTER_PROPS.map((prop) => ({
   prop,
   labelKey: `filters.fields.${prop}`,
   numeric: NUMERIC_PROPS.has(prop),
   family: FAMILY[prop] ?? "state",
+  filter: prop === "f_op" ? { kind: "enum", options: OPERATOR_OPTIONS } : undefined,
   render: (row: FilterRow, locale: string) => {
     if (prop === "f_updated") return <DateTime value={row.f_updated} locale={locale} />;
     // The operator and the value read in a monospace font: a space or a LIKE "%" must
@@ -89,6 +99,7 @@ async function fetchFilters(search: ResolvedListSearch) {
         orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
       },
     },
   });
@@ -99,7 +110,17 @@ async function fetchFilters(search: ResolvedListSearch) {
 
 function useFilters(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["filters", search.sort, search.offset, search.limit, search.cols],
+    queryKey: [
+      "filters",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: () => fetchFilters(search),
   });
 }
@@ -117,10 +138,10 @@ export function FiltersPage() {
   const [form, setForm] = useState<"create" | "edit" | null>(null);
   const selectedFilter = useFilter(form === "edit" ? search.sel : undefined);
 
-  /** Ids of the whole selection, without pagination. */
+  /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/filters", {
-      params: { query: { props: "id", limit: 0 } },
+      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
     });
     if (error !== undefined) throw new Error(JSON.stringify(error));
     const rows: FilterRow[] = Array.isArray(data.data) ? data.data : [];
@@ -184,6 +205,7 @@ export function FiltersPage() {
         exportPage={(page) => fetchFilters({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <FilterDetailPanel
