@@ -2016,6 +2016,10 @@
     "reopen_other": "Reopen the panel on {{name}} ({{count}} records in the history)"
   },
   "realtime": {
+    "paused": "Paused",
+    "pausedHint": "Live updates are off: the views refresh when you navigate, sort or reload.",
+    "turnOff": "Click to turn live updates off.",
+    "turnOn": "Click to turn live updates back on.",
     "live": "Live",
     "offline": "Offline",
     "liveHint": "The views follow the collector: changes appear as they happen.",

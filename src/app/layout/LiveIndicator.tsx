@@ -1,37 +1,93 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { startRealtime, stopRealtime, useRealtimeStatus } from "@/lib/realtime";
 
+const LIVE_KEY = "oc3.live";
+
+/** Live mode is a comfort of the browser, as the folded menu: kept there, not with the account. */
+function readLiveEnabled(): boolean {
+  try {
+    return localStorage.getItem(LIVE_KEY) !== "off";
+  } catch {
+    // Storage refused: live mode stays on, as by default.
+    return true;
+  }
+}
+
 /**
- * Live updates of the signed-in session, and their state in the top bar: a filled
+ * Live updates of the signed-in session, and their switch in the top bar: a filled
  * dot and "Live" while the views follow the collector, a hollow one and "Offline"
- * while the connection is being made again. The dot and the word, not a tint
- * alone, tell the two apart. Rendered only once someone is signed in: the
- * connection starts with it and stops at sign-out.
+ * while the connection is being made again, two bars and "Paused" once turned off.
+ * The mark and the word, not a tint alone, tell the states apart. A click turns
+ * live mode off — the WebSocket closes, and the views refresh only when one
+ * navigates, sorts or reloads — or back on, which also refreshes what is on display
+ * to catch up. The choice is kept by the browser. Rendered only once someone is
+ * signed in: the connection starts with it and stops at sign-out.
  */
 export function LiveIndicator() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const status = useRealtimeStatus();
+  const [enabled, setEnabled] = useState(readLiveEnabled);
 
   useEffect(() => {
+    if (!enabled) return;
     startRealtime(queryClient);
     return stopRealtime;
-  }, [queryClient]);
+  }, [queryClient, enabled]);
 
-  const live = status === "live";
+  function toggle() {
+    const next = !enabled;
+    try {
+      localStorage.setItem(LIVE_KEY, next ? "on" : "off");
+    } catch {
+      // Not remembered: the choice holds until the page is reloaded.
+    }
+    setEnabled(next);
+    // Back on: what changed while paused is read again.
+    if (next) void queryClient.invalidateQueries();
+  }
+
+  const live = enabled && status === "live";
+  const state = !enabled ? "paused" : live ? "live" : "offline";
+  const hint = {
+    live: t("realtime.liveHint"),
+    offline: t("realtime.offlineHint"),
+    paused: t("realtime.pausedHint"),
+  }[state];
+  const action = enabled ? t("realtime.turnOff") : t("realtime.turnOn");
+
   return (
-    <span
-      role="status"
-      title={live ? t("realtime.liveHint") : t("realtime.offlineHint")}
-      className={`flex items-center gap-1.5 text-data ${live ? "text-ink-muted" : "text-state-warn"}`}
+    <button
+      type="button"
+      aria-pressed={enabled}
+      onClick={toggle}
+      title={`${hint}\n${action}`}
+      className={`flex items-center gap-1.5 rounded-(--radius-control) px-1 py-0.5 text-data hover:bg-surface-sunken ${
+        state === "offline" ? "text-state-warn" : "text-ink-muted"
+      }`}
     >
-      <span
-        aria-hidden="true"
-        className={`h-2 w-2 rounded-full border ${live ? "border-state-up bg-state-up" : "border-current"}`}
-      />
-      {live ? t("realtime.live") : t("realtime.offline")}
-    </span>
+      {state === "paused" ? (
+        // Two bars: the pause mark, whatever the colour.
+        <span aria-hidden="true" className="flex h-2 w-2 justify-between">
+          <span className="w-0.5 bg-current" />
+          <span className="w-0.5 bg-current" />
+        </span>
+      ) : (
+        <span
+          aria-hidden="true"
+          className={`h-2 w-2 rounded-full border ${live ? "border-state-up bg-state-up" : "border-current"}`}
+        />
+      )}
+      <span role="status">
+        {state === "live"
+          ? t("realtime.live")
+          : state === "offline"
+            ? t("realtime.offline")
+            : t("realtime.paused")}
+      </span>
+      <span className="sr-only">{action}</span>
+    </button>
   );
 }

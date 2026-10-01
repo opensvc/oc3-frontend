@@ -2016,6 +2016,10 @@
     "reopen_other": "Rouvrir le panneau sur {{name}} ({{count}} fiches dans l'historique)"
   },
   "realtime": {
+    "paused": "En pause",
+    "pausedHint": "Mises à jour en direct coupées : les vues se rafraîchissent quand vous naviguez, triez ou rechargez.",
+    "turnOff": "Cliquer pour couper les mises à jour en direct.",
+    "turnOn": "Cliquer pour rétablir les mises à jour en direct.",
     "live": "En direct",
     "offline": "Hors ligne",
     "liveHint": "Les vues suivent le collector : les changements apparaissent au fil de l'eau.",
