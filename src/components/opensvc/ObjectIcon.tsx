@@ -1,6 +1,7 @@
 import {
   AlertTriangleIcon,
   AsteriskIcon,
+  CodeIcon,
   CpuIcon,
   CubeIcon,
   DatabaseIcon,
@@ -41,6 +42,7 @@ export type ObjectKind =
   | "package"
   | "hardware"
   | "switch"
+  | "metric"
   | "moduleset"
   | "ruleset"
   | "complianceLog"
@@ -71,6 +73,7 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   user: { Icon: UserIcon, className: "text-icon-group" },
   // Cornflower blue in the historical collector: the tint of nodes, which it is about.
   obsolescence: { Icon: LifeRingIcon, className: "text-icon-node" },
+  metric: { Icon: CodeIcon, className: "text-icon-metric" },
   // `log16` has no colour of its own in the historical collector: neutral tint.
   log: { Icon: HistoryIcon, className: "text-icon-dashboard" },
   // `filter16` has no colour of its own either: neutral tint.

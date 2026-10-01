@@ -34,6 +34,7 @@
   --color-icon-group: var(--icon-group);
   --color-icon-form: var(--icon-form);
   --color-icon-package: var(--icon-package);
+  --color-icon-metric: var(--icon-metric);
   --color-icon-compliance: var(--icon-compliance);
 
   --color-tag: var(--tag);

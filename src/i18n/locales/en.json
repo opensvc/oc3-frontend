@@ -25,6 +25,7 @@
     "logs": "Logs",
     "filters": "Filters",
     "filtersets": "Filtersets",
+    "metrics": "Metrics",
     "forms": "Forms",
     "newRequest": "New request",
     "packages": "Packages",
@@ -1055,6 +1056,45 @@
         "object": "Object",
         "raw": "Record"
       }
+    }
+  },
+  "metrics": {
+    "title": "Metrics",
+    "intro": "SQL requests whose results feed the charts and the reports. A historized metric is computed every day and its values kept over time.",
+    "fields": {
+      "id": "Record id",
+      "metric_name": "Name",
+      "metric_historize": "Historized",
+      "metric_sql": "Request",
+      "metric_col_value_index": "Value column",
+      "metric_col_instance_index": "Instance column",
+      "metric_col_instance_label": "Instance label",
+      "metric_created": "Created",
+      "metric_author": "Author"
+    },
+    "detail": {
+      "title": "Metric",
+      "groups": {
+        "definition": "Definition",
+        "columns": "Result columns",
+        "record": "Record"
+      }
+    },
+    "form": {
+      "open": "New metric",
+      "edit": "Edit",
+      "createTitle": "New metric",
+      "editTitle": "Edit metric",
+      "createIntro": "The metric is published to your primary team, so that its members see it. Creating a metric requires the Manager privilege.",
+      "editIntro": "Charts and reports using the metric read it with the new definition. Editing requires the Manager privilege.",
+      "sqlPlaceholder": "SELECT os_name, COUNT(*) FROM nodes WHERE node_id IN (%%fset_node_ids%%) GROUP BY os_name",
+      "sqlHint": "%%fset_node_ids%% and %%fset_svc_ids%% stand for the nodes and services of the filterset of the session where the metric is read.",
+      "indexHint": "Columns of the result, counted from 0. Leave the instance column empty when the request returns a single value.",
+      "noInstance": "None",
+      "historizeHint": "The collector computes the metric every day and keeps its values for the charts.",
+      "saving": "Saving…",
+      "saveCreate": "Create",
+      "saveEdit": "Save"
     }
   },
   "filters": {

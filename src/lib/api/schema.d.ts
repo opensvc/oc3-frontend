@@ -2589,6 +2589,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the metrics: SQL requests whose results feed the charts and the
+         *     reports. A manager sees every metric; the others see the metrics published
+         *     to one of their teams.
+         */
+        get: operations["GetMetrics"];
+        put?: never;
+        /**
+         * @description Create a metric. Its name must be unique. The metric is published to the
+         *     primary team of its author, as in the historical collector. Requires the
+         *     Manager privilege.
+         */
+        post: operations["PostMetrics"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/{metric_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display a metric, if the caller may see it (see GET /metrics). */
+        get: operations["GetMetric"];
+        put?: never;
+        /**
+         * @description Modify a metric. Only the properties present in the body change; a null
+         *     `metric_col_instance_index` clears it. Requires the Manager privilege.
+         */
+        post: operations["PostMetric"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/networks": {
         parameters: {
             query?: never;
@@ -4751,6 +4798,30 @@ export interface components {
             "nodes.os_name"?: string | null;
             "services.svcname"?: string | null;
             svc_id?: string;
+        };
+        MetricListResponse: {
+            data: components["schemas"]["MetricRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A metric: an SQL request whose results feed the charts and the reports.
+         *     Every property is optional: the `props` query parameter selects which columns
+         *     the server returns.
+         */
+        MetricRow: {
+            id?: number;
+            metric_author?: string;
+            metric_col_instance_index?: number | null;
+            metric_col_instance_label?: string;
+            metric_col_value_index?: number | null;
+            metric_created?: string;
+            metric_historize?: string;
+            metric_name?: string;
+            metric_sql?: string;
         };
         ModulesetListResponse: {
             data: components["schemas"]["ModulesetRow"][] | {
@@ -13768,6 +13839,203 @@ export interface operations {
                 };
             };
             404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetMetrics: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostMetrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description Index of the result column naming the instance of each value,
+                     *     null when the request returns one value.
+                     */
+                    metric_col_instance_index?: number | null;
+                    /** @description How the instances are named, the column header say. */
+                    metric_col_instance_label?: string;
+                    /** @description Index of the result column holding the value. */
+                    metric_col_value_index?: number;
+                    /**
+                     * @description Whether the values are kept over time for the charts.
+                     * @enum {string}
+                     */
+                    metric_historize?: "T" | "F";
+                    /** @description Unique name of the metric. */
+                    metric_name: string;
+                    /**
+                     * @description The SQL request computing the metric. `%%fset_node_ids%%` and
+                     *     `%%fset_svc_ids%%` stand for the nodes and services of the
+                     *     filterset of the session where the metric is read.
+                     */
+                    metric_sql?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetMetric: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Metric identifier (metrics.id) */
+                metric_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostMetric: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Metric identifier (metrics.id) */
+                metric_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description Index of the result column naming the instance of each value,
+                     *     null when the request returns one value.
+                     */
+                    metric_col_instance_index?: number | null;
+                    /** @description How the instances are named, the column header say. */
+                    metric_col_instance_label?: string;
+                    /** @description Index of the result column holding the value. */
+                    metric_col_value_index?: number;
+                    /**
+                     * @description Whether the values are kept over time for the charts.
+                     * @enum {string}
+                     */
+                    metric_historize?: "T" | "F";
+                    /** @description Unique name of the metric. */
+                    metric_name?: string;
+                    /**
+                     * @description The SQL request computing the metric. `%%fset_node_ids%%` and
+                     *     `%%fset_svc_ids%%` stand for the nodes and services of the
+                     *     filterset of the session where the metric is read.
+                     */
+                    metric_sql?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
             500: components["responses"]["500"];
         };
     };

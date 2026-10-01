@@ -224,6 +224,15 @@ export function SearchIcon(props: IconProps) {
   );
 }
 
+/** Metrics: the code brackets of the historical collector (`metric16`, fa-code). */
+export function CodeIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M14.2 3.6a1.1 1.1 0 0 1 .8 1.3l-4 15a1.1 1.1 0 1 1-2.1-.6l4-15a1.1 1.1 0 0 1 1.3-.7ZM7.3 7.2a1.1 1.1 0 0 1 0 1.6L4.1 12l3.2 3.2a1.1 1.1 0 1 1-1.6 1.6l-4-4a1.1 1.1 0 0 1 0-1.6l4-4a1.1 1.1 0 0 1 1.6 0Zm9.4 0a1.1 1.1 0 0 1 1.6 0l4 4a1.1 1.1 0 0 1 0 1.6l-4 4a1.1 1.1 0 1 1-1.6-1.6l3.2-3.2-3.2-3.2a1.1 1.1 0 0 1 0-1.6Z" />
+    </Svg>
+  );
+}
+
 /** Saving to a file: an arrow down into a tray (fa-download). */
 export function DownloadIcon(props: IconProps) {
   return (

@@ -25,6 +25,7 @@
     "logs": "Journaux",
     "filters": "Filtres",
     "filtersets": "Filtersets",
+    "metrics": "Métriques",
     "forms": "Formulaires",
     "newRequest": "Nouvelle demande",
     "packages": "Paquets",
@@ -1055,6 +1056,45 @@
         "object": "Objet",
         "raw": "Enregistrement"
       }
+    }
+  },
+  "metrics": {
+    "title": "Métriques",
+    "intro": "Requêtes SQL dont les résultats alimentent les graphiques et les rapports. Une métrique historisée est calculée chaque jour et ses valeurs conservées dans le temps.",
+    "fields": {
+      "id": "Id de l'enregistrement",
+      "metric_name": "Nom",
+      "metric_historize": "Historisée",
+      "metric_sql": "Requête",
+      "metric_col_value_index": "Colonne de la valeur",
+      "metric_col_instance_index": "Colonne de l'instance",
+      "metric_col_instance_label": "Libellé des instances",
+      "metric_created": "Créée",
+      "metric_author": "Auteur"
+    },
+    "detail": {
+      "title": "Métrique",
+      "groups": {
+        "definition": "Définition",
+        "columns": "Colonnes du résultat",
+        "record": "Enregistrement"
+      }
+    },
+    "form": {
+      "open": "Nouvelle métrique",
+      "edit": "Modifier",
+      "createTitle": "Nouvelle métrique",
+      "editTitle": "Modifier la métrique",
+      "createIntro": "La métrique est publiée pour votre équipe principale, dont les membres la voient. Créer une métrique demande le privilège Manager.",
+      "editIntro": "Les graphiques et rapports qui l'utilisent la lisent avec la nouvelle définition. La modifier demande le privilège Manager.",
+      "sqlPlaceholder": "SELECT os_name, COUNT(*) FROM nodes WHERE node_id IN (%%fset_node_ids%%) GROUP BY os_name",
+      "sqlHint": "%%fset_node_ids%% et %%fset_svc_ids%% désignent les nodes et services du filterset de la session où la métrique est lue.",
+      "indexHint": "Colonnes du résultat, comptées à partir de 0. Laisser la colonne de l'instance vide quand la requête rend une seule valeur.",
+      "noInstance": "Aucune",
+      "historizeHint": "Le collector calcule la métrique chaque jour et garde ses valeurs pour les graphiques.",
+      "saving": "Enregistrement…",
+      "saveCreate": "Créer",
+      "saveEdit": "Enregistrer"
     }
   },
   "filters": {

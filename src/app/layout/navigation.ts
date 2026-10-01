@@ -27,6 +27,7 @@ export interface NavEntry {
     | "/obsolescence"
     | "/logs"
     | "/filters"
+    | "/metrics"
     | "/filtersets"
     | "/forms"
     | "/requests"
@@ -135,6 +136,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
       { to: "/filtersets", labelKey: "nav.filtersets", icon: "filterset" },
       // `adm-forms`.
       { to: "/forms", labelKey: "nav.forms", icon: "form" },
+      // `adm-metrics`: the SQL requests feeding the charts and the reports.
+      { to: "/metrics", labelKey: "nav.metrics", icon: "metric" },
     ],
   },
 ];

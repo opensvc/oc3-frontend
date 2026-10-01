@@ -49,6 +49,8 @@
   --icon-form: #b0456c;
   /* Packages: the tan cube of the historical collector (pkg16). */
   --icon-package: #95642f;
+  /* Metrics: the sandy brown of the historical collector (metric16). */
+  --icon-metric: #b5652a;
   /* Compliance: the crimson cogs of the historical collector (modset16), toned down
      like the others. */
   --icon-compliance: #a8243a;
@@ -118,6 +120,7 @@
   --icon-group: #d1907f;
   --icon-form: #e08aa8;
   --icon-package: #d4a574;
+  --icon-metric: #e8a46c;
   --icon-compliance: #e8798a;
 
   /* Lightened background, dark ink: contrast 5.6:1. */
@@ -176,6 +179,7 @@
   --icon-group: #9a2c16;
   --icon-form: #8e1c46;
   --icon-package: #6b4212;
+  --icon-metric: #7d3f10;
   --icon-compliance: #8a0f25;
 
   --tag: #006272;
@@ -216,6 +220,7 @@
   --icon-group: #ffab94;
   --icon-form: #ff9ec3;
   --icon-package: #f2c28f;
+  --icon-metric: #f5b98a;
   --icon-compliance: #ff8fa0;
 
   --tag: #3fd0e3;
