@@ -2024,5 +2024,17 @@
     "offline": "Offline",
     "liveHint": "The views follow the collector: changes appear as they happen.",
     "offlineHint": "Live updates are interrupted. Reconnecting; the views are refreshed once back."
+  },
+  "impersonation": {
+    "start": "Impersonate",
+    "hint": "Act as this user: the collector shows and does what they would, until you stop impersonating. Requires the Manager privilege.",
+    "actingAs": "Acting as",
+    "signedInAs": "signed in as {{user}}",
+    "stop": "Stop impersonating",
+    "noPassword": "The password of the user you are acting as cannot be changed: stop impersonating first.",
+    "menu": "Impersonate a user…",
+    "dialogTitle": "Impersonate a user",
+    "user": "User id or email",
+    "cancel": "Cancel"
   }
 }

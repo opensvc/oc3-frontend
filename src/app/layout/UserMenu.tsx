@@ -2,8 +2,11 @@ import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
-import { ChevronDownIcon, SignOutIcon } from "@/components/ui/icons";
-import { signOut } from "@/lib/session";
+import { ChevronDownIcon, SignOutIcon, UserIcon } from "@/components/ui/icons";
+import { signOut, stopImpersonating } from "@/lib/session";
+import { useImpersonation } from "@/lib/api/impersonation";
+import { ImpersonateDialog } from "@/features/users/ImpersonateDialog";
+import { useCanImpersonate } from "@/features/users/use-impersonate";
 import { setShortcutsHelp } from "@/lib/shortcuts";
 
 const ITEM =
@@ -21,6 +24,9 @@ const ITEM =
 export function UserMenu({ user }: { user: string }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const impersonation = useImpersonation();
+  const canImpersonate = useCanImpersonate();
+  const [impersonating, setImpersonating] = useState(false);
   const menuId = useId();
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -167,11 +173,49 @@ export function UserMenu({ user }: { user: string }) {
             {t("shortcuts.title")}
           </button>
           <div role="separator" className="my-1 border-t border-line" />
+          {impersonation === null && canImpersonate && (
+            <button
+              type="button"
+              role="menuitem"
+              tabIndex={-1}
+              aria-haspopup="dialog"
+              onClick={() => {
+                close(false);
+                setImpersonating(true);
+              }}
+              className={ITEM}
+            >
+              <UserIcon className="text-ink-muted" />
+              {t("impersonation.menu")}
+            </button>
+          )}
+          {impersonation !== null && (
+            <button
+              type="button"
+              role="menuitem"
+              tabIndex={-1}
+              onClick={() => {
+                close(false);
+                stopImpersonating();
+              }}
+              className={ITEM}
+            >
+              <UserIcon className="text-state-warn" />
+              {t("impersonation.stop")}
+            </button>
+          )}
           <button type="button" role="menuitem" tabIndex={-1} onClick={signOut} className={ITEM}>
             <SignOutIcon className="text-ink-muted" />
             {t("auth.signOut")}
           </button>
         </div>
+      )}
+      {impersonating && (
+        <ImpersonateDialog
+          onClose={() => {
+            setImpersonating(false);
+          }}
+        />
       )}
     </div>
   );

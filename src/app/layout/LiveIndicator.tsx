@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { startRealtime, stopRealtime, useRealtimeStatus } from "@/lib/realtime";
+import { useImpersonation } from "@/lib/api/impersonation";
 
 const LIVE_KEY = "oc3.live";
 
@@ -30,12 +31,15 @@ export function LiveIndicator() {
   const queryClient = useQueryClient();
   const status = useRealtimeStatus();
   const [enabled, setEnabled] = useState(readLiveEnabled);
+  // The token is given to the identity the requests are made as: a new one, and a
+  // new socket, when the administrator starts or stops acting as another user.
+  const actingAs = useImpersonation()?.userId;
 
   useEffect(() => {
     if (!enabled) return;
     startRealtime(queryClient);
     return stopRealtime;
-  }, [queryClient, enabled]);
+  }, [queryClient, enabled, actingAs]);
 
   function toggle() {
     const next = !enabled;

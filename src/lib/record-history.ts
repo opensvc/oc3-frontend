@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { useCredentials } from "@/lib/api/auth";
+import { useEffectiveUser } from "@/lib/api/impersonation";
 
 /**
  * The records last shown in a panel, kept for the lifetime of the browser tab: each
@@ -98,7 +98,7 @@ function current(user: string, now: number): HistoryRecord[] {
  * when `HISTORY_SIZE` more recent ones push it out.
  */
 export function useRecordHistory() {
-  const user = useCredentials()?.user ?? "";
+  const user = useEffectiveUser() ?? "";
   useSyncExternalStore(subscribe, () => stored);
   const entries = current(user, Date.now());
   const other = (kind: string, id: string) => (e: HistoryRecord) => e.kind !== kind || e.id !== id;

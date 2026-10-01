@@ -2569,6 +2569,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/impersonation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Tell whether the user who signed in may impersonate other users (the
+         *     Manager privilege), and which user the request is made as when it
+         *     carries the OC3-Impersonate header. Requires user authentication.
+         */
+        get: operations["GetImpersonation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ips": {
         parameters: {
             query?: never;
@@ -4373,6 +4394,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/{user_id}/impersonate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Start acting as another user, as the impersonation of the historical
+         *     collector does. Checks that the caller may impersonate that user and logs
+         *     the start ("User %(id)s is impersonating %(other_id)s"). The requests made
+         *     as that user then carry its id in the OC3-Impersonate header: the server
+         *     handles them with the identity, the groups and the visibility of that
+         *     user, checks the privilege again on every request, and answers with the
+         *     OC3-Impersonated-By header naming the user who signed in. A refusal due to
+         *     the impersonation itself carries OC3-Impersonation-Refused. Stopping is
+         *     dropping the header. Requires the Manager privilege, and a request not
+         *     already made as another user.
+         */
+        post: operations["PostUserImpersonate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/{user_id}/prefs": {
         parameters: {
             query?: never;
@@ -4872,6 +4921,21 @@ export interface components {
             id?: number;
             node_id?: string;
             updated?: string;
+        };
+        Impersonation: {
+            email: string;
+            /** @description The groups of the impersonated user. */
+            groups: string[];
+            /**
+             * Format: int64
+             * @description auth_user.id to send in the OC3-Impersonate header.
+             */
+            user_id: number;
+        };
+        ImpersonationStatus: {
+            /** @description Whether the user who signed in holds the Manager privilege, which impersonating requires. */
+            allowed: boolean;
+            impersonating?: components["schemas"]["Impersonation"];
         };
         /** @description Outcome message of a write that returns no record. */
         InfoResponse: {
@@ -13953,6 +14017,28 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
+    GetImpersonation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpersonationStatus"];
+                };
+            };
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
     GetIps: {
         parameters: {
             query?: {
@@ -19479,6 +19565,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostUserImpersonate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User identifier, auth_user.id or email. */
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Impersonation"];
                 };
             };
             400: components["responses"]["400"];

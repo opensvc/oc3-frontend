@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { setCredentials, useCredentials } from "@/lib/api/auth";
+import { useImpersonation } from "@/lib/api/impersonation";
 import { ProfileCard } from "./ProfileCard";
 
 const INPUT = "h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2";
@@ -28,6 +29,7 @@ const EMPTY: Record<Field, string> = { current: "", next: "", confirm: "" };
 export function PasswordSection({ email }: { email: string | undefined }) {
   const { t } = useTranslation();
   const credentials = useCredentials();
+  const impersonation = useImpersonation();
   const id = useId();
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<Record<Field, string>>(EMPTY);
@@ -107,7 +109,10 @@ export function PasswordSection({ email }: { email: string | undefined }) {
       family="security"
       hint={t("profile.password.hint", { count: MIN_LENGTH })}
     >
-      {!open ? (
+      {impersonation !== null ? (
+        // The server refuses it: a password is changed only by its owner.
+        <p className="text-ink-muted">{t("impersonation.noPassword")}</p>
+      ) : !open ? (
         <div className="space-y-2">
           <button
             ref={opener}

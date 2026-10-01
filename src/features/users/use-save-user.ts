@@ -3,6 +3,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { setCredentials, useCredentials } from "@/lib/api/auth";
+import { setImpersonation, useImpersonation } from "@/lib/api/impersonation";
 import { EDITABLE_USER_PROPS } from "./user-fields";
 
 type UserRow = components["schemas"]["UserRow"];
@@ -18,6 +19,7 @@ type UserChange = { first_name?: string; last_name?: string; email?: string };
 export function useSaveUser(userId: string | undefined, isSelf: boolean) {
   const queryClient = useQueryClient();
   const credentials = useCredentials();
+  const impersonation = useImpersonation();
   return async (patch: Record<string, unknown>) => {
     if (userId === undefined) return;
     const body: UserChange = {};
@@ -32,14 +34,14 @@ export function useSaveUser(userId: string | undefined, isSelf: boolean) {
     if (error !== undefined) throw new Error(problemText(error));
     const row: UserRow | undefined = Array.isArray(data.data) ? data.data[0] : undefined;
     const email = row?.email;
-    if (
-      isSelf &&
-      credentials !== null &&
-      email !== undefined &&
-      email !== "" &&
-      email !== credentials.user
-    )
-      setCredentials({ ...credentials, user: email });
+    if (isSelf && email !== undefined && email !== "") {
+      // Acting as another user: their sign-in name is not the session's.
+      if (impersonation !== null) {
+        if (email !== impersonation.email) setImpersonation({ ...impersonation, email });
+      } else if (credentials !== null && email !== credentials.user) {
+        setCredentials({ ...credentials, user: email });
+      }
+    }
     await queryClient.invalidateQueries({ queryKey: ["user"] });
     await queryClient.invalidateQueries({ queryKey: ["users"] });
   };

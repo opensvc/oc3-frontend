@@ -2024,5 +2024,17 @@
     "offline": "Hors ligne",
     "liveHint": "Les vues suivent le collector : les changements apparaissent au fil de l'eau.",
     "offlineHint": "Les mises à jour en direct sont interrompues. Reconnexion en cours ; les vues sont rafraîchies au retour."
+  },
+  "impersonation": {
+    "start": "Se faire passer pour",
+    "hint": "Agir en tant que cet utilisateur : le collecteur montre et fait ce qu'il verrait et ferait, jusqu'à ce que vous arrêtiez. Requiert le privilège Manager.",
+    "actingAs": "Vous agissez en tant que",
+    "signedInAs": "connecté en tant que {{user}}",
+    "stop": "Revenir à mon compte",
+    "noPassword": "Le mot de passe de l'utilisateur pour lequel vous vous faites passer ne peut pas être changé : revenez d'abord à votre compte.",
+    "menu": "Se faire passer pour un utilisateur…",
+    "dialogTitle": "Se faire passer pour un utilisateur",
+    "user": "Identifiant ou email de l'utilisateur",
+    "cancel": "Annuler"
   }
 }

@@ -1,7 +1,12 @@
 import createClient from "openapi-fetch";
 import type { paths } from "./schema";
 import { authorizationHeader } from "./auth";
-import { signOut } from "@/lib/session";
+import {
+  IMPERSONATE_HEADER,
+  IMPERSONATION_REFUSED_HEADER,
+  impersonationHeader,
+} from "./impersonation";
+import { signOut, stopImpersonating } from "@/lib/session";
 
 /**
  * HTTP client typed from the OpenAPI spec of the oc3 apicollector.
@@ -13,9 +18,13 @@ api.use({
   onRequest({ request }) {
     const header = authorizationHeader();
     if (header !== null) request.headers.set("Authorization", header);
+    const impersonate = impersonationHeader();
+    if (impersonate !== null) request.headers.set(IMPERSONATE_HEADER, impersonate);
     return request;
   },
   onResponse({ response }) {
+    // The privilege was withdrawn or the user removed: back to one's own identity.
+    if (response.headers.has(IMPERSONATION_REFUSED_HEADER)) stopImpersonating();
     // Credentials refused or expired: back to the sign-in screen rather than leaving
     // the views showing an error we know how to resolve.
     // Through signOut: the cache of the refused session must not survive.
@@ -47,9 +56,12 @@ export async function apiGetDynamic(
   const headers = new Headers({ Accept: "application/json" });
   const header = authorizationHeader();
   if (header !== null) headers.set("Authorization", header);
+  const impersonate = impersonationHeader();
+  if (impersonate !== null) headers.set(IMPERSONATE_HEADER, impersonate);
   const qs = params.toString();
   const response = await fetch(`/api${path}${qs === "" ? "" : `?${qs}`}`, { headers });
   if (response.status === 401) signOut();
+  if (response.headers.has(IMPERSONATION_REFUSED_HEADER)) stopImpersonating();
   const text = await response.text();
   let body: unknown = text;
   try {

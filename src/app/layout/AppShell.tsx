@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Outlet } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useCredentials } from "@/lib/api/auth";
+import { useEffectiveUser } from "@/lib/api/impersonation";
 import { SignIn } from "@/features/auth/SignIn";
 import opensvcLogo from "@/assets/opensvc-logo.svg";
 import { Sidebar } from "./Sidebar";
@@ -11,6 +12,7 @@ import { ShortcutsHelp } from "./ShortcutsHelp";
 import { useShortcut } from "@/lib/shortcuts";
 import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
+import { ImpersonationBanner } from "./ImpersonationBanner";
 import { LiveIndicator } from "./LiveIndicator";
 import { SidebarIcon } from "@/components/ui/icons";
 import { useAppearance } from "@/lib/user-prefs";
@@ -38,6 +40,7 @@ function readSidebarOpen(): boolean {
 export function AppShell() {
   const { t } = useTranslation();
   const credentials = useCredentials();
+  const user = useEffectiveUser();
   const [sidebarOpen, setSidebarOpen] = useState(readSidebarOpen);
 
   function toggleSidebar() {
@@ -80,39 +83,42 @@ export function AppShell() {
     <BookmarksProvider>
       <div className="grid min-h-dvh grid-rows-[auto_1fr_auto] bg-surface text-ink">
         <AccountAppearance />
-        <header className="flex h-11 items-center gap-4 border-b border-line bg-surface-raised px-3">
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            aria-expanded={sidebarOpen}
-            aria-controls="app-sidebar"
-            title={`${sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}\n${t("nav.menuShortcut")}`}
-            className="flex h-7 w-7 items-center justify-center rounded-(--radius-control) text-ink-muted hover:bg-surface-sunken hover:text-ink"
-          >
-            <SidebarIcon open={sidebarOpen} className="h-4.5 w-4.5" />
-            <span className="sr-only">{sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}</span>
-          </button>
-
-          <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-            {/* Decorative: the title that follows already names the link. */}
-            <img src={opensvcLogo} alt="" width={24} height={24} className="h-6 w-6" />
-            OpenSVC Collector
-          </Link>
-
-          <div className="ml-auto flex items-center gap-3">
+        <div>
+          <header className="flex h-11 items-center gap-4 border-b border-line bg-surface-raised px-3">
             <button
               type="button"
-              className="rounded-(--radius-control) border border-line px-2 py-1 text-ink-muted"
-              title={t("header.sessionFilter")}
+              onClick={toggleSidebar}
+              aria-expanded={sidebarOpen}
+              aria-controls="app-sidebar"
+              title={`${sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}\n${t("nav.menuShortcut")}`}
+              className="flex h-7 w-7 items-center justify-center rounded-(--radius-control) text-ink-muted hover:bg-surface-sunken hover:text-ink"
             >
-              {t("header.sessionFilter")}: {t("header.noFilter")}
+              <SidebarIcon open={sidebarOpen} className="h-4.5 w-4.5" />
+              <span className="sr-only">{sidebarOpen ? t("nav.hideMenu") : t("nav.showMenu")}</span>
             </button>
-            <ActionQueueLink />
-            <GlobalSearch />
-            <LiveIndicator />
-            <UserMenu user={credentials.user} />
-          </div>
-        </header>
+
+            <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
+              {/* Decorative: the title that follows already names the link. */}
+              <img src={opensvcLogo} alt="" width={24} height={24} className="h-6 w-6" />
+              OpenSVC Collector
+            </Link>
+
+            <div className="ml-auto flex items-center gap-3">
+              <button
+                type="button"
+                className="rounded-(--radius-control) border border-line px-2 py-1 text-ink-muted"
+                title={t("header.sessionFilter")}
+              >
+                {t("header.sessionFilter")}: {t("header.noFilter")}
+              </button>
+              <ActionQueueLink />
+              <GlobalSearch />
+              <LiveIndicator />
+              <UserMenu user={user ?? credentials.user} />
+            </div>
+          </header>
+          <ImpersonationBanner />
+        </div>
 
         <div className="grid min-h-0 grid-cols-[auto_1fr]">
           <Sidebar open={sidebarOpen} />
