@@ -10,6 +10,9 @@ import { UserDetailPanel } from "@/features/users/UserDetailPanel";
 import { TagDetailPanel } from "@/features/tags/TagDetailPanel";
 import { FiltersetDetailPanel } from "@/features/filtersets/FiltersetDetailPanel";
 import { FormDetailPanel } from "@/features/forms/FormDetailPanel";
+import { MetricDetailPanel } from "@/features/metrics/MetricDetailPanel";
+import { ChartDetailPanel } from "@/features/charts/ChartDetailPanel";
+import { ReportDetailPanel } from "@/features/reports/ReportDetailPanel";
 import { useTag } from "@/features/tags/use-tag";
 import { currentIndex, parseTrail } from "@/lib/peek-trail";
 import { isPeekStep } from "@/components/opensvc/panel-trail";
@@ -122,6 +125,30 @@ export function PeekPanel() {
         );
       case "tag":
         return <TagPeek tagId={id} onClose={close} />;
+      case "metric":
+        return (
+          <MetricDetailPanel
+            metricId={id}
+            label={label}
+            onClose={close}
+            // Editing takes the room of the Metrics view, where the record opens again.
+            onEdit={() => {
+              void navigate({ to: "/metrics", search: { sel: id } });
+            }}
+          />
+        );
+      case "chart":
+        return <ChartDetailPanel chartId={id} label={label} onClose={close} />;
+      case "report":
+        return (
+          <ReportDetailPanel
+            reportId={id}
+            label={label}
+            tab={tab}
+            onTabChange={onTabChange}
+            onClose={close}
+          />
+        );
       default:
         return null;
     }

@@ -80,6 +80,7 @@ export function MetricDetailPanel({
     <DetailPanel
       kind="metric"
       open={metricId !== undefined}
+      recordId={metricId}
       title={metric?.metric_name ?? (label === "" ? t("metrics.detail.title") : label)}
       onClose={onClose}
       groups={GROUPS}

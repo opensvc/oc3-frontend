@@ -14,6 +14,9 @@ const ROUTE_KINDS: Record<string, string> = {
   "/tags": "tag",
   "/disks": "disk",
   "/networks": "network",
+  "/metrics": "metric",
+  "/charts": "chart",
+  "/reports": "report",
 };
 
 /**

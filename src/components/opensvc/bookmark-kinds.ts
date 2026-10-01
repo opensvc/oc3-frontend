@@ -9,4 +9,7 @@ export const BOOKMARK_KINDS: ReadonlySet<string> = new Set([
   "tag",
   "disk",
   "network",
+  "metric",
+  "chart",
+  "report",
 ]);

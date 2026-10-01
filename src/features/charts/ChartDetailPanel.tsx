@@ -52,6 +52,7 @@ export function ChartDetailPanel({
     <DetailPanel
       kind="chart"
       open={chartId !== undefined}
+      recordId={chartId}
       title={chart?.chart_name ?? (label === "" ? t("charts.detail.title") : label)}
       onClose={onClose}
       groups={GROUPS}
