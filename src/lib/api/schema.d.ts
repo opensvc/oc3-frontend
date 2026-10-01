@@ -2636,6 +2636,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/metrics/{metric_id}/samples": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Run the request of a metric now and return its result, for a caller who may
+         *     see the metric (see GET /metrics): the columns in order, then the rows, 1000
+         *     at most. The request runs read-only, for 10 seconds at most, and must be a
+         *     SELECT. Its %%fset_node_ids%% and %%fset_svc_ids%% placeholders stand for the
+         *     nodes and services the caller may see. A request that fails returns 422 with
+         *     the database error.
+         */
+        get: operations["GetMetricSamples"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/networks": {
         parameters: {
             query?: never;
@@ -3465,6 +3489,27 @@ export interface paths {
         };
         /** @description Display a report, if the caller may see it (see GET /reports). */
         get: operations["GetReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{report_id}/definition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description The definition of a report, report_yaml parsed, for a caller who may see the
+         *     report: Title, Desc, and Sections, each with a Title, a Desc, Metrics (by
+         *     metric_id) and Charts (by chart_id). An empty definition is an empty object.
+         */
+        get: operations["GetReportDefinition"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4865,6 +4910,16 @@ export interface components {
             metric_historize?: string;
             metric_name?: string;
             metric_sql?: string;
+        };
+        /** @description The result of a metric request, its columns in order. */
+        MetricSamples: {
+            columns: string[];
+            rows: unknown[][];
+            /** @description More rows were returned than were kept. */
+            truncated?: boolean;
+        };
+        MetricSamplesResponse: {
+            data: components["schemas"]["MetricSamples"];
         };
         ModulesetListResponse: {
             data: components["schemas"]["ModulesetRow"][] | {
@@ -14100,6 +14155,41 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
+    GetMetricSamples: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Metric identifier (metrics.id) */
+                metric_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricSamplesResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            /** @description The request is not a SELECT, or it failed. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["500"];
+        };
+    };
     GetNetworks: {
         parameters: {
             query?: {
@@ -16492,6 +16582,45 @@ export interface operations {
             };
             401: components["responses"]["401"];
             404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetReportDefinition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Report identifier (reports.id) */
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            /** @description The definition is not valid YAML. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
             500: components["responses"]["500"];
         };
     };

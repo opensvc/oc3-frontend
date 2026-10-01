@@ -196,7 +196,11 @@ export function ReportsPage() {
         reportId={creating ? undefined : search.sel}
         label={selected?.report_name ?? ""}
         onClose={() => {
-          update({ sel: undefined });
+          update({ sel: undefined, tab: undefined });
+        }}
+        tab={search.tab}
+        onTabChange={(tab) => {
+          update({ tab });
         }}
       />
 

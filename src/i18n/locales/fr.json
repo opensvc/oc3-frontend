@@ -1062,6 +1062,18 @@
   "reports": {
     "title": "Rapports",
     "intro": "Pages de graphiques et de métriques, chacune définie en YAML. Un Manager voit tous les rapports ; les autres voient ceux publiés pour une de leurs équipes.",
+    "preview": {
+      "tab": "Aperçu",
+      "notice": "Aperçu du rapport : chaque métrique est exécutée maintenant. Ses paramètres désignent les nodes et services que vous voyez.",
+      "empty": "Le rapport n'a pas encore de définition : en écrire une pour l'aperçu.",
+      "untitled": "Section sans titre",
+      "emptySection": "Rien dans cette section.",
+      "metric": "Métrique n° {{id}}",
+      "chart": "Graphique n° {{id}}",
+      "chartPending": "Les graphiques ne sont pas encore dessinés dans cet aperçu.",
+      "noData": "Aucune donnée.",
+      "truncated": "{{count}} premières lignes."
+    },
     "definitionEmpty": "Pas encore de définition",
     "definitionMore_one": "1 ligne de plus",
     "definitionMore_other": "{{count}} lignes de plus",
@@ -1072,6 +1084,7 @@
     },
     "detail": {
       "title": "Rapport",
+      "tabs": "Onglets du rapport",
       "groups": {
         "definition": "Définition",
         "record": "Enregistrement"
