@@ -17,6 +17,7 @@ const PEEK_KINDS: ReadonlySet<string> = new Set<ObjectKind>([
   "metric",
   "chart",
   "report",
+  "moduleset",
 ]);
 
 export function isPeekStep(step: PeekStep): step is PeekStep & { kind: ObjectKind } {

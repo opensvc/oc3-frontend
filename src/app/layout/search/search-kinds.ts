@@ -260,17 +260,13 @@ export function toHit(
         target: list("/requests/all", "id", `eq:${id}`),
       };
     }
-    case "moduleset": {
-      const name = text(item, "modset_name");
-      return {
-        key: `${kind}:${text(item, "id")}`,
-        kind,
-        label: name,
-        context: facts(text(item, "modset_author")),
-        ref: undefined,
-        target: list("/compliance/modulesets", "modset_name", `eq:${name}`),
-      };
-    }
+    case "moduleset":
+      return peek(
+        text(item, "id"),
+        text(item, "modset_name"),
+        facts(text(item, "modset_author")),
+        undefined,
+      );
     case "ruleset": {
       const name = text(item, "ruleset_name");
       return {

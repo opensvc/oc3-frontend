@@ -115,6 +115,13 @@ async function fetchLabel(step: PeekStep): Promise<string> {
       const rows = Array.isArray(data?.data) ? data.data : [];
       return text(readProp(rows[0] ?? {}, "report_name")) || step.id;
     }
+    case "moduleset": {
+      const { data } = await api.GET("/compliance/modulesets/{modset_id}", {
+        params: { path: { modset_id: step.id }, query: { props: "modset_name" } },
+      });
+      const rows = Array.isArray(data?.data) ? data.data : [];
+      return text(readProp(rows[0] ?? {}, "modset_name")) || step.id;
+    }
     // An application code names itself, as a disk does: the id is what one reads.
     case "disk":
     case "app":

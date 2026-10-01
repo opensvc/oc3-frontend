@@ -1422,7 +1422,8 @@
       "app": "application",
       "group": "équipe",
       "tag": "tag",
-      "user": "utilisateur"
+      "user": "utilisateur",
+      "moduleset": "moduleset"
     }
   },
   "actions": {
@@ -1667,6 +1668,63 @@
       "modset_mod_updated": "Mis à jour",
       "teams_responsible": "Équipes responsables",
       "teams_publication": "Équipes de publication"
+    },
+    "detail": {
+      "title": "Moduleset",
+      "notFound": "Ce moduleset n'existe pas, ou n'est pas publié à vos groupes.",
+      "groups": {
+        "identity": "Identité",
+        "record": "Enregistrement"
+      },
+      "editHint": "Modifier un moduleset requiert le privilège CompManager et la responsabilité du moduleset. Chaque modification est écrite aussitôt dans le collecteur.",
+      "readOnly": "Lecture seule : aucun de vos groupes n'est responsable de ce moduleset.",
+      "renamed": "Moduleset renommé {{name}}.",
+      "modules": "Modules",
+      "modulesHint": "L'autofix laisse l'agent corriger un module sans qu'on le lui demande.",
+      "noModule": "Aucun module pour l'instant.",
+      "renameModule": "Renommer {{name}}",
+      "moduleRenamed": "Module renommé {{name}}.",
+      "autofixOf": "Autofix de {{name}}",
+      "autofixOn": "Autofix activé pour {{name}}.",
+      "autofixOff": "Autofix désactivé pour {{name}}.",
+      "removeModule": "Retirer {{name}}",
+      "moduleRemoved": "Module {{name}} retiré.",
+      "moduleName": "Nom du module",
+      "addModule": "Ajouter un module",
+      "moduleAdded": "Module {{name}} ajouté.",
+      "rulesets": "Rulesets attachés",
+      "noRuleset": "Aucun ruleset attaché.",
+      "attachRuleset": "Attacher un ruleset",
+      "detachRuleset": "Détacher {{name}}",
+      "rulesetAttached": "Ruleset {{name}} attaché.",
+      "rulesetDetached": "Ruleset {{name}} détaché.",
+      "modulesets": "Modulesets inclus",
+      "noModuleset": "Aucun moduleset inclus.",
+      "includeModuleset": "Inclure un moduleset",
+      "excludeModuleset": "Retirer {{name}} des modulesets inclus",
+      "modulesetIncluded": "Moduleset {{name}} inclus.",
+      "modulesetExcluded": "Moduleset {{name}} n'est plus inclus.",
+      "teams": "Équipes",
+      "responsibles": "Responsables",
+      "publications": "Publié à",
+      "noTeam": "Aucune équipe",
+      "addTeam": "Ajouter à {{list}}",
+      "removeTeam": "Retirer {{team}} de {{list}}",
+      "teamAdded": "{{team}} ajouté à {{list}}.",
+      "teamRemoved": "{{team}} retiré de {{list}}.",
+      "noMatch": "Aucune correspondance",
+      "usedBy": "Utilisé par",
+      "unused": "Aucun nœud ni service ne l'utilise.",
+      "nodes_one": "1 nœud",
+      "nodes_other": "{{count}} nœuds",
+      "services_one": "1 service",
+      "services_other": "{{count}} services",
+      "fields": {
+        "modset_name": "Nom",
+        "modset_author": "Auteur",
+        "modset_updated": "Mis à jour",
+        "id": "Id du moduleset"
+      }
     }
   },
   "rulesets": {

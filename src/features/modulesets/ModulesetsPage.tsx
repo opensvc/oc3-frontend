@@ -22,6 +22,7 @@ import {
 } from "@/lib/list-search";
 import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
+import { ModulesetDetailPanel } from "./ModulesetDetailPanel";
 
 /** A module of a moduleset, or a moduleset without module on a row of its own. */
 type ModulesetRow = components["schemas"]["ModulesetsModuleRow"];
@@ -158,10 +159,17 @@ function useModulesets(search: ResolvedListSearch) {
   });
 }
 
+/** The moduleset of a selected row, whose key is "<moduleset id>:<module id>". */
+function modsetOf(sel: string | undefined): string | undefined {
+  const id = sel?.split(":")[0];
+  return id === undefined || id === "" ? undefined : id;
+}
+
 /**
  * The modules of the compliance modulesets published to the user's groups, one row
  * per module with its moduleset and the moduleset's teams, as the collector's
- * modulesets view. Read-only; the rows are filtered and sorted by the server.
+ * modulesets view. The rows are filtered and sorted by the server; a row opens
+ * the panel of its moduleset, where it is read and edited.
  */
 export function ModulesetsPage() {
   const { t } = useTranslation();
@@ -172,6 +180,7 @@ export function ModulesetsPage() {
   );
   const navigate = useNavigate({ from: "/compliance/modulesets" });
   const { data, isPending, isError, error, isFetching } = useModulesets(search);
+  const selected = data?.rows.find((row) => rowKey(row) === search.sel);
 
   /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
@@ -222,6 +231,14 @@ export function ModulesetsPage() {
         total={data?.total}
         selectAllMatching={allIds}
         filterable
+      />
+
+      <ModulesetDetailPanel
+        modsetId={modsetOf(search.sel)}
+        label={selected?.modset_name ?? ""}
+        onClose={() => {
+          update({ sel: undefined });
+        }}
       />
     </section>
   );
