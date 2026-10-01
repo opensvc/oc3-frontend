@@ -35,6 +35,12 @@
   --color-icon-form: var(--icon-form);
   --color-icon-package: var(--icon-package);
   --color-icon-metric: var(--icon-metric);
+  --color-code-key: var(--code-key);
+  --color-code-string: var(--code-string);
+  --color-code-number: var(--code-number);
+  --color-code-keyword: var(--code-keyword);
+  --color-code-comment: var(--code-comment);
+  --color-code-punct: var(--code-punct);
   --color-icon-compliance: var(--icon-compliance);
 
   --color-tag: var(--tag);

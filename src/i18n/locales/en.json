@@ -26,6 +26,7 @@
     "filters": "Filters",
     "filtersets": "Filtersets",
     "metrics": "Metrics",
+    "reports": "Reports",
     "forms": "Forms",
     "newRequest": "New request",
     "packages": "Packages",
@@ -1056,6 +1057,34 @@
         "object": "Object",
         "raw": "Record"
       }
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "intro": "Pages of charts and metrics, each defined in YAML. A Manager sees every report; the others see the reports published to one of their teams.",
+    "definitionEmpty": "No definition yet",
+    "definitionMore_one": "1 more line",
+    "definitionMore_other": "{{count}} more lines",
+    "fields": {
+      "id": "Record id",
+      "report_name": "Name",
+      "report_yaml": "Definition"
+    },
+    "detail": {
+      "title": "Report",
+      "groups": {
+        "definition": "Definition",
+        "record": "Record"
+      }
+    },
+    "form": {
+      "open": "New report",
+      "title": "New report",
+      "intro": "The report is published to your primary team, which is also made responsible for it. Creating a report requires the ReportsManager privilege.",
+      "yamlPlaceholder": "sections:\n  - title: Capacity\n    charts:\n      - disk_usage",
+      "yamlHint": "Optional: the definition can be written later. It must be valid YAML.",
+      "saving": "Creating…",
+      "save": "Create"
     }
   },
   "metrics": {

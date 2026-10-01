@@ -26,6 +26,7 @@
     "filters": "Filtres",
     "filtersets": "Filtersets",
     "metrics": "Métriques",
+    "reports": "Rapports",
     "forms": "Formulaires",
     "newRequest": "Nouvelle demande",
     "packages": "Paquets",
@@ -1056,6 +1057,34 @@
         "object": "Objet",
         "raw": "Enregistrement"
       }
+    }
+  },
+  "reports": {
+    "title": "Rapports",
+    "intro": "Pages de graphiques et de métriques, chacune définie en YAML. Un Manager voit tous les rapports ; les autres voient ceux publiés pour une de leurs équipes.",
+    "definitionEmpty": "Pas encore de définition",
+    "definitionMore_one": "1 ligne de plus",
+    "definitionMore_other": "{{count}} lignes de plus",
+    "fields": {
+      "id": "Id de l'enregistrement",
+      "report_name": "Nom",
+      "report_yaml": "Définition"
+    },
+    "detail": {
+      "title": "Rapport",
+      "groups": {
+        "definition": "Définition",
+        "record": "Enregistrement"
+      }
+    },
+    "form": {
+      "open": "Nouveau rapport",
+      "title": "Nouveau rapport",
+      "intro": "Le rapport est publié pour votre équipe principale, qui en devient aussi responsable. Créer un rapport demande le privilège ReportsManager.",
+      "yamlPlaceholder": "sections:\n  - title: Capacité\n    charts:\n      - disk_usage",
+      "yamlHint": "Facultative : la définition peut être écrite plus tard. Elle doit être du YAML valide.",
+      "saving": "Création…",
+      "save": "Créer"
     }
   },
   "metrics": {

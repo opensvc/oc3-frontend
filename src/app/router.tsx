@@ -9,6 +9,7 @@ import { PackagesPage } from "@/features/packages/PackagesPage";
 import { HardwarePage } from "@/features/hardware/HardwarePage";
 import { SwitchesPage } from "@/features/switches/SwitchesPage";
 import { MetricsPage } from "@/features/metrics/MetricsPage";
+import { ReportsPage } from "@/features/reports/ReportsPage";
 import { FiltersPage } from "@/features/filters/FiltersPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
 import { FormsPage } from "@/features/forms/FormsPage";
@@ -83,6 +84,13 @@ const disksRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/disks",
   component: DisksPage,
+  validateSearch: parseListSearch,
+});
+
+const reportsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/reports",
+  component: ReportsPage,
   validateSearch: parseListSearch,
 });
 
@@ -268,6 +276,7 @@ const routeTree = rootRoute.addChildren([
   disksRoute,
   switchesRoute,
   metricsRoute,
+  reportsRoute,
   packagesRoute,
   hardwareRoute,
   groupsRoute,

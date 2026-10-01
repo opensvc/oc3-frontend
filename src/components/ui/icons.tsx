@@ -224,6 +224,15 @@ export function SearchIcon(props: IconProps) {
   );
 }
 
+/** Reports: the pie chart of the historical collector (`report16`, fa-pie-chart). */
+export function PieChartIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M11 3.1V13h9.9A9 9 0 1 1 11 3.1Zm2-.1a9 9 0 0 1 8 8h-8V3Z" />
+    </Svg>
+  );
+}
+
 /** Metrics: the code brackets of the historical collector (`metric16`, fa-code). */
 export function CodeIcon(props: IconProps) {
   return (

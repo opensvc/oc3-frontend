@@ -51,6 +51,13 @@
   --icon-package: #95642f;
   /* Metrics: the sandy brown of the historical collector (metric16). */
   --icon-metric: #b5652a;
+  /* YAML and other code: keys, strings, numbers, keywords, comments, punctuation. */
+  --code-key: #1f5f99;
+  --code-string: #2e7d4f;
+  --code-number: #a8590f;
+  --code-keyword: #7a3e9d;
+  --code-comment: #6f7a82;
+  --code-punct: #8a5a12;
   /* Compliance: the crimson cogs of the historical collector (modset16), toned down
      like the others. */
   --icon-compliance: #a8243a;
@@ -121,6 +128,12 @@
   --icon-form: #e08aa8;
   --icon-package: #d4a574;
   --icon-metric: #e8a46c;
+  --code-key: #7fb3e6;
+  --code-string: #7fcf9b;
+  --code-number: #e8a96b;
+  --code-keyword: #c79ae6;
+  --code-comment: #8b969c;
+  --code-punct: #d9b36a;
   --icon-compliance: #e8798a;
 
   /* Lightened background, dark ink: contrast 5.6:1. */
@@ -180,6 +193,12 @@
   --icon-form: #8e1c46;
   --icon-package: #6b4212;
   --icon-metric: #7d3f10;
+  --code-key: #0b3f73;
+  --code-string: #145a33;
+  --code-number: #7a3d00;
+  --code-keyword: #5a1f7d;
+  --code-comment: #3b454c;
+  --code-punct: #5c3a00;
   --icon-compliance: #8a0f25;
 
   --tag: #006272;
@@ -221,6 +240,12 @@
   --icon-form: #ff9ec3;
   --icon-package: #f2c28f;
   --icon-metric: #f5b98a;
+  --code-key: #a9d0ff;
+  --code-string: #9fe8b8;
+  --code-number: #ffc58a;
+  --code-keyword: #e0b8ff;
+  --code-comment: #b8c2c8;
+  --code-punct: #f0cf8a;
   --icon-compliance: #ff8fa0;
 
   --tag: #3fd0e3;
