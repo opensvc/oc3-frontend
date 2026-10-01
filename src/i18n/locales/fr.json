@@ -184,7 +184,8 @@
       "packages": "Paquets",
       "inventory": "Inventaire",
       "sysreport": "Sysreport",
-      "logs": "Journal"
+      "logs": "Journal",
+      "stats": "Statistiques"
     },
     "actions": {
       "open": "Actions",
@@ -229,6 +230,62 @@
     "alerts": {
       "open": "Ouvrir dans le dashboard",
       "empty": "Aucune alerte sur ce node."
+    },
+    "stats": {
+      "period": "Période",
+      "days_one": "Dernières 24 heures",
+      "days_other": "{{count}} derniers jours",
+      "empty": "Aucune statistique de performance enregistrée pour ce node sur la période.",
+      "chartLabel_one": "{{name}}, dernières 24 heures",
+      "chartLabel_other": "{{name}}, {{count}} derniers jours",
+      "charts": {
+        "cpu": "CPU",
+        "load": "Charge",
+        "mem": "Mémoire",
+        "swap": "Swap",
+        "iops": "Opérations d'E/S bloc",
+        "blockThroughput": "Débit d'E/S bloc",
+        "netBandwidth": "Bande passante réseau",
+        "netPackets": "Paquets réseau",
+        "netErrors": "Erreurs réseau",
+        "diskUtil": "Utilisation des disques",
+        "diskWait": "Attente des disques",
+        "diskOps": "Transferts des disques"
+      },
+      "metrics": {
+        "usr": "utilisateur",
+        "nice": "nice",
+        "sys": "système",
+        "iowait": "attente E/S",
+        "steal": "vol",
+        "irq": "irq",
+        "soft": "irq logicielles",
+        "guest": "invité",
+        "ldavg_1": "charge 1 min",
+        "ldavg_5": "charge 5 min",
+        "ldavg_15": "charge 15 min",
+        "runq_sz": "file d'exécution",
+        "pct_memused": "utilisée",
+        "pct_commit": "engagée",
+        "pct_swpused": "utilisé",
+        "pct_swpcad": "en cache",
+        "rtps": "lectures",
+        "wtps": "écritures",
+        "rbps": "lu",
+        "wbps": "écrit",
+        "rxkBps": "reçu",
+        "txkBps": "émis",
+        "rxpckps": "reçus",
+        "txpckps": "émis",
+        "rxerrps": "erreurs reçues",
+        "txerrps": "erreurs émises",
+        "collps": "collisions",
+        "rxdropps": "rejets reçus",
+        "txdropps": "rejets émis",
+        "pct_util": "utilisation",
+        "await": "attente",
+        "tps": "transferts"
+      }
     },
     "logs": {
       "empty": "Aucune entrée de journal pour ce node.",

@@ -5,6 +5,8 @@ import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import { NodeAlerts } from "./NodeAlerts";
 import { NodeInventory } from "./NodeInventory";
 import { NodeLogs } from "./NodeLogs";
+import { NodeStats } from "./NodeStats";
+import { LineChartIcon } from "@/components/ui/icons";
 import { NodeSysreport } from "./NodeSysreport";
 import { useNodeAlerts, useNodeLogs, useNodeSysreport } from "./queries";
 import { periodBegin } from "./sysreport-period";
@@ -36,6 +38,14 @@ export const NODE_RELATED_TABS: RelatedTab[] = [
         ?.total,
     }),
     render: (nodeId, locale) => <NodeSysreport nodeId={nodeId} locale={locale} />,
+  },
+  {
+    key: "stats",
+    labelKey: "nodes.related.stats",
+    icon: <LineChartIcon className="h-3.5 w-3.5 text-icon-node" />,
+    // No count: charts are not a list.
+    useSummary: () => ({ count: undefined }),
+    render: (nodeId, locale) => <NodeStats nodeId={nodeId} locale={locale} />,
   },
   {
     key: "alerts",

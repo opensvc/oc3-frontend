@@ -3227,6 +3227,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/nodes/{node_id}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description The performance statistics of a node for one group, over the last days: one
+         *     series per metric (and per device for netdev, netdev_err and blockdev), each
+         *     a list of [unix time, value] points, as the historical collector stored them
+         *     in whisper files under stats/nodes/<node_id> (cpu/all, mem_u, swap, proc,
+         *     block, netdev/<dev>, netdev_err/<dev>, blockdev/<dev>). The resolution is the
+         *     finest the files keep for the period: a minute over half an hour, ten minutes
+         *     over three days, an hour over ninety days, a day beyond. A node without
+         *     statistics returns an empty list.
+         */
+        get: operations["GetNodeStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/nodes/{node_id}/sysreport": {
         parameters: {
             query?: never;
@@ -5246,6 +5272,17 @@ export interface components {
             updated?: string;
             version?: string;
             warranty_end?: string;
+        };
+        NodeStatSeries: {
+            /** @description The network interface or block device, for the groups by device. */
+            device?: string;
+            /** @description The metric, as the agent names it (usr, pct_memused, rxkBps...). */
+            metric: string;
+            /** @description The points, oldest first, each [unix time, value]. */
+            points: number[][];
+        };
+        NodeStatsResponse: {
+            data: components["schemas"]["NodeStatSeries"][];
         };
         ObsolescenceSettingListResponse: {
             data: components["schemas"]["ObsolescenceSettingRow"][] | {
@@ -16080,6 +16117,37 @@ export interface operations {
             400: components["responses"]["400"];
             401: components["responses"]["401"];
             403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetNodeStats: {
+        parameters: {
+            query: {
+                group: "cpu" | "mem" | "swap" | "proc" | "block" | "netdev" | "netdev_err" | "blockdev";
+                /** @description Days of history, 1 by default, 1095 at most. */
+                days?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Node identifier (node_id UUID or nodename) */
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeStatsResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
             404: components["responses"]["404"];
             500: components["responses"]["500"];
         };

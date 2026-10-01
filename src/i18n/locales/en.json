@@ -184,7 +184,8 @@
       "packages": "Packages",
       "inventory": "Inventory",
       "sysreport": "Sysreport",
-      "logs": "Logs"
+      "logs": "Logs",
+      "stats": "Stats"
     },
     "actions": {
       "open": "Actions",
@@ -229,6 +230,62 @@
     "alerts": {
       "open": "Open in the dashboard",
       "empty": "No alert on this node."
+    },
+    "stats": {
+      "period": "Period",
+      "days_one": "Last 24 hours",
+      "days_other": "Last {{count}} days",
+      "empty": "No performance statistics recorded for this node over the period.",
+      "chartLabel_one": "{{name}}, last 24 hours",
+      "chartLabel_other": "{{name}}, last {{count}} days",
+      "charts": {
+        "cpu": "CPU",
+        "load": "Load",
+        "mem": "Memory",
+        "swap": "Swap",
+        "iops": "Block I/O operations",
+        "blockThroughput": "Block I/O throughput",
+        "netBandwidth": "Network bandwidth",
+        "netPackets": "Network packets",
+        "netErrors": "Network errors",
+        "diskUtil": "Disk utilization",
+        "diskWait": "Disk wait",
+        "diskOps": "Disk transfers"
+      },
+      "metrics": {
+        "usr": "user",
+        "nice": "nice",
+        "sys": "system",
+        "iowait": "I/O wait",
+        "steal": "steal",
+        "irq": "irq",
+        "soft": "soft irq",
+        "guest": "guest",
+        "ldavg_1": "load 1 min",
+        "ldavg_5": "load 5 min",
+        "ldavg_15": "load 15 min",
+        "runq_sz": "run queue",
+        "pct_memused": "used",
+        "pct_commit": "committed",
+        "pct_swpused": "used",
+        "pct_swpcad": "cached",
+        "rtps": "reads",
+        "wtps": "writes",
+        "rbps": "read",
+        "wbps": "written",
+        "rxkBps": "rx",
+        "txkBps": "tx",
+        "rxpckps": "rx",
+        "txpckps": "tx",
+        "rxerrps": "rx errors",
+        "txerrps": "tx errors",
+        "collps": "collisions",
+        "rxdropps": "rx drops",
+        "txdropps": "tx drops",
+        "pct_util": "utilization",
+        "await": "wait",
+        "tps": "transfers"
+      }
     },
     "logs": {
       "empty": "No log entry for this node.",

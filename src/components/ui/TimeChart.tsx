@@ -138,8 +138,19 @@ export function TimeChart({
   );
 
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
-  const dayFormat = new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" });
-  const fullDate = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+  // Points closer than a day carry their time: the axis and the tooltip show it.
+  const intraday = dates.some((t, i) => i > 0 && t - (dates[i - 1] ?? t) < 24 * 3600);
+  const shortSpan = (dates[dates.length - 1] ?? 0) - (dates[0] ?? 0) <= 2 * 24 * 3600;
+  const dayFormat = new Intl.DateTimeFormat(
+    locale,
+    shortSpan && intraday
+      ? { hour: "2-digit", minute: "2-digit" }
+      : { month: "short", day: "numeric" },
+  );
+  const fullDate = new Intl.DateTimeFormat(
+    locale,
+    intraday ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" },
+  );
 
   const innerWidth = width - PAD.left - PAD.right;
   const innerHeight = HEIGHT - PAD.top - PAD.bottom;
