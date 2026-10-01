@@ -3,8 +3,10 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { toTagRows } from "@/features/tags/tag-row";
+import { toPage } from "@/lib/api/page";
 
 type NodeHardwareRow = components["schemas"]["NodeHardwareRow"];
+type LogRow = components["schemas"]["LogRow"];
 type AlertRow = components["schemas"]["AlertRow"];
 type IpRow = components["schemas"]["IpRow"];
 type DiskRow = components["schemas"]["DiskRow"];
@@ -37,6 +39,37 @@ export function useNodeHardware(nodeId: string | undefined) {
 }
 
 /** Dashboard alerts aimed at the node, the most severe then the most recent first. */
+/** Log entries of a node shown in its tab: the most recent ones. */
+export const NODE_LOGS_LIMIT = 100;
+
+/**
+ * The latest log entries of the node, the most recent first, and how many there
+ * are in all: `GET /logs` filtered on the node, as the historical node logs tab.
+ */
+export function useNodeLogs(nodeId: string | undefined) {
+  return useQuery({
+    queryKey: ["node", nodeId, "logs"],
+    enabled: nodeId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/logs", {
+        params: {
+          query: {
+            props:
+              "id,log_date,log_level,svc_id,services.svcname,log_user,log_action,log_fmt,log_dict",
+            orderby: "-log_date,-id",
+            // One more than shown: whether older entries remain.
+            limit: NODE_LOGS_LIMIT + 1,
+            filter: [`node_id:eq:${nodeId ?? ""}`],
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      const rows: LogRow[] = Array.isArray(data.data) ? data.data : [];
+      return toPage(rows, data.meta, NODE_LOGS_LIMIT);
+    },
+  });
+}
+
 export function useNodeAlerts(nodeId: string | undefined) {
   return useQuery({
     queryKey: ["node", nodeId, "alerts"],

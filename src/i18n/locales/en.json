@@ -183,7 +183,8 @@
       "networks": "Networks",
       "packages": "Packages",
       "inventory": "Inventory",
-      "sysreport": "Sysreport"
+      "sysreport": "Sysreport",
+      "logs": "Logs"
     },
     "actions": {
       "open": "Actions",
@@ -228,6 +229,11 @@
     "alerts": {
       "open": "Open in the dashboard",
       "empty": "No alert on this node."
+    },
+    "logs": {
+      "empty": "No log entry for this node.",
+      "latest": "The latest {{count}} of {{total}} entries.",
+      "open": "Open in the Logs view"
     },
     "networks": {
       "empty": "No IP address reported for this node.",

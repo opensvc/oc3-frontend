@@ -4,8 +4,9 @@ import { SEVERITY_LEVELS, severityLevel } from "@/components/opensvc/severity";
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import { NodeAlerts } from "./NodeAlerts";
 import { NodeInventory } from "./NodeInventory";
+import { NodeLogs } from "./NodeLogs";
 import { NodeSysreport } from "./NodeSysreport";
-import { useNodeAlerts, useNodeSysreport } from "./queries";
+import { useNodeAlerts, useNodeLogs, useNodeSysreport } from "./queries";
 import { periodBegin } from "./sysreport-period";
 
 /**
@@ -59,5 +60,16 @@ export const NODE_RELATED_TABS: RelatedTab[] = [
       };
     },
     render: (nodeId, locale) => <NodeAlerts nodeId={nodeId} locale={locale} />,
+  },
+  {
+    key: "logs",
+    labelKey: "nodes.related.logs",
+    icon: <ColumnFamilyIcon family="time" />,
+    // All the entries of the node, not only those the tab shows.
+    useSummary: (nodeId) => {
+      const page = useNodeLogs(nodeId).data;
+      return { count: page === undefined ? undefined : (page.total ?? page.rows.length) };
+    },
+    render: (nodeId, locale) => <NodeLogs nodeId={nodeId} locale={locale} />,
   },
 ];

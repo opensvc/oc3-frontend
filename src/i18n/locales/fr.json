@@ -183,7 +183,8 @@
       "networks": "Réseaux",
       "packages": "Paquets",
       "inventory": "Inventaire",
-      "sysreport": "Sysreport"
+      "sysreport": "Sysreport",
+      "logs": "Journal"
     },
     "actions": {
       "open": "Actions",
@@ -228,6 +229,11 @@
     "alerts": {
       "open": "Ouvrir dans le dashboard",
       "empty": "Aucune alerte sur ce node."
+    },
+    "logs": {
+      "empty": "Aucune entrée de journal pour ce node.",
+      "latest": "Les {{count}} dernières entrées sur {{total}}.",
+      "open": "Ouvrir dans la vue Journal"
     },
     "networks": {
       "empty": "Aucune adresse IP remontée pour ce node.",
