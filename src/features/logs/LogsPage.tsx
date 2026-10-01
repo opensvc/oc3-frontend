@@ -1,11 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { toPage } from "@/lib/api/page";
 import { useFiltersets } from "@/lib/api/filtersets";
-import { CollectorList, type ListColumn } from "@/components/opensvc/CollectorList";
+import {
+  CollectorList,
+  type ColumnFilterOption,
+  type ListColumn,
+} from "@/components/opensvc/CollectorList";
 import { CrossLink } from "@/components/opensvc/CrossLink";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { StatusBadge } from "@/components/opensvc/StatusBadge";
@@ -18,6 +22,7 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { LogDetailPanel } from "./LogDetailPanel";
 import { formatLogMessage, logLevelState } from "./log-message";
@@ -62,6 +67,12 @@ const DEFAULT_COLS: string[] = [
   "log_action",
   "log_fmt",
 ];
+
+/** The levels the collector writes, as the badges of the column show them. */
+const LEVEL_OPTIONS: ColumnFilterOption[] = ["info", "warning", "error"].map((value) => ({
+  value,
+  render: <StatusBadge state={logLevelState(value)} label={value} />,
+}));
 
 const NUMERIC_PROPS = new Set<string>(["id", "log_entry_id", "log_gtalk_sent", "log_email_sent"]);
 
@@ -110,6 +121,7 @@ async function fetchLogs(search: ResolvedListSearch) {
         orderby: search.sort.join(","),
         offset: search.offset,
         limit: search.limit + 1,
+        filter: filterQuery(search.filters),
         ...(search.fset === "" ? {} : { fset_id: search.fset }),
       },
     },
@@ -121,7 +133,18 @@ async function fetchLogs(search: ResolvedListSearch) {
 
 function useLogs(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["logs", search.sort, search.offset, search.limit, search.fset, search.cols],
+    queryKey: [
+      "logs",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.fset,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: () => fetchLogs(search),
   });
 }
@@ -137,13 +160,14 @@ export function LogsPage() {
   const { data, isPending, isError, error, isFetching } = useLogs(search);
   const filtersets = useFiltersets();
 
-  /** Ids of the whole selection, filterset included, without pagination. */
+  /** Ids of the whole selection, filterset and filters included, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/logs", {
       params: {
         query: {
           props: "id",
           limit: 0,
+          filter: filterQuery(search.filters),
           ...(search.fset === "" ? {} : { fset_id: search.fset }),
         },
       },
@@ -171,6 +195,9 @@ export function LogsPage() {
     labelKey: `logs.fields.${prop}`,
     numeric: NUMERIC_PROPS.has(prop),
     family: FAMILY[prop] ?? "state",
+    // The message filters on the format and the values filling it together (the
+    // API compares both): a node or tag name typed there is among the values.
+    filter: prop === "log_level" ? { kind: "enum", options: LEVEL_OPTIONS } : undefined,
     render: (row: LogRow, locale: string) => {
       const value = row[prop];
       if (prop === "log_date") return <DateTime value={row.log_date} locale={locale} />;
@@ -230,6 +257,7 @@ export function LogsPage() {
         exportPage={(page) => fetchLogs({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <LogDetailPanel
