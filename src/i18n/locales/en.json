@@ -26,6 +26,7 @@
     "filters": "Filters",
     "filtersets": "Filtersets",
     "metrics": "Metrics",
+    "charts": "Charts",
     "reports": "Reports",
     "forms": "Forms",
     "newRequest": "New request",
@@ -1059,10 +1060,44 @@
       }
     }
   },
+  "charts": {
+    "title": "Charts",
+    "intro": "Time series of historized metrics, each defined in YAML, which reports show. A Manager sees every chart; the others see the charts published to one of their teams.",
+    "definitionEmpty": "No definition yet",
+    "definitionMore_one": "1 more line",
+    "definitionMore_other": "{{count}} more lines",
+    "fields": {
+      "id": "Record id",
+      "chart_name": "Name",
+      "chart_yaml": "Definition"
+    },
+    "detail": {
+      "title": "Chart",
+      "groups": {
+        "definition": "Definition",
+        "record": "Record"
+      }
+    },
+    "form": {
+      "open": "New chart",
+      "title": "New chart",
+      "intro": "The chart is published to your primary team, which is also made responsible for it. Creating a chart requires the ReportsManager privilege.",
+      "yamlPlaceholder": "Metrics:\n  - metric_id: 186\n    label: Nodes by OS\nOptions:\n  stack: true",
+      "yamlHint": "Optional: the definition can be written later. It must be valid YAML: the historized metrics drawn (metric_id) and the Options.",
+      "saving": "Creating…",
+      "save": "Create"
+    }
+  },
   "reports": {
     "title": "Reports",
     "intro": "Pages of charts and metrics, each defined in YAML. A Manager sees every report; the others see the reports published to one of their teams.",
     "preview": {
+      "noHistory": "No history yet: the collector records the metrics once a day.",
+      "chartLabel": "{{name}}, last {{days}} days",
+      "other": "Other",
+      "chartTable": "Show the values",
+      "date": "Date",
+      "total": "Total",
       "tab": "Preview",
       "notice": "Preview of the report: each metric is run now. Its placeholders stand for the nodes and services you can see.",
       "empty": "The report has no definition yet: write one to preview it.",
@@ -1070,7 +1105,6 @@
       "emptySection": "Nothing in this section.",
       "metric": "Metric #{{id}}",
       "chart": "Chart #{{id}}",
-      "chartPending": "Charts are not drawn in this preview yet.",
       "noData": "No data.",
       "truncated": "First {{count}} rows."
     },

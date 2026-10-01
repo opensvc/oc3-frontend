@@ -67,6 +67,7 @@ const TABLE_KEYS: Record<string, readonly string[]> = {
   switches: ["switches"],
   metrics: ["metrics", "metric"],
   reports: ["reports", "report"],
+  charts: ["charts", "chart"],
   node_ip: ["ips", "ip", "node", "networks"],
   node_hba: ["node", "service"],
   packages: ["packages", "node"],

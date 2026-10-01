@@ -3,6 +3,7 @@ import {
   AsteriskIcon,
   CodeIcon,
   PieChartIcon,
+  LineChartIcon,
   CpuIcon,
   CubeIcon,
   DatabaseIcon,
@@ -45,6 +46,7 @@ export type ObjectKind =
   | "switch"
   | "metric"
   | "report"
+  | "chart"
   | "moduleset"
   | "ruleset"
   | "complianceLog"
@@ -79,6 +81,7 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   // The same sandy brown as the metrics: the historical collector gives it to all
   // its statistics objects.
   report: { Icon: PieChartIcon, className: "text-icon-metric" },
+  chart: { Icon: LineChartIcon, className: "text-icon-metric" },
   // `log16` has no colour of its own in the historical collector: neutral tint.
   log: { Icon: HistoryIcon, className: "text-icon-dashboard" },
   // `filter16` has no colour of its own either: neutral tint.

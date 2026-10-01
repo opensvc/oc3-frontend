@@ -26,6 +26,7 @@
     "filters": "Filtres",
     "filtersets": "Filtersets",
     "metrics": "Métriques",
+    "charts": "Graphiques",
     "reports": "Rapports",
     "forms": "Formulaires",
     "newRequest": "Nouvelle demande",
@@ -1059,10 +1060,44 @@
       }
     }
   },
+  "charts": {
+    "title": "Graphiques",
+    "intro": "Séries temporelles de métriques historisées, chacune définie en YAML, que les rapports affichent. Un Manager voit tous les graphiques ; les autres voient ceux publiés pour une de leurs équipes.",
+    "definitionEmpty": "Pas encore de définition",
+    "definitionMore_one": "1 ligne de plus",
+    "definitionMore_other": "{{count}} lignes de plus",
+    "fields": {
+      "id": "Id de l'enregistrement",
+      "chart_name": "Nom",
+      "chart_yaml": "Définition"
+    },
+    "detail": {
+      "title": "Graphique",
+      "groups": {
+        "definition": "Définition",
+        "record": "Enregistrement"
+      }
+    },
+    "form": {
+      "open": "Nouveau graphique",
+      "title": "Nouveau graphique",
+      "intro": "Le graphique est publié pour votre équipe principale, qui en devient aussi responsable. Créer un graphique demande le privilège ReportsManager.",
+      "yamlPlaceholder": "Metrics:\n  - metric_id: 186\n    label: Nodes par OS\nOptions:\n  stack: true",
+      "yamlHint": "Facultative : la définition peut être écrite plus tard. Elle doit être du YAML valide : les métriques historisées tracées (metric_id) et les Options.",
+      "saving": "Création…",
+      "save": "Créer"
+    }
+  },
   "reports": {
     "title": "Rapports",
     "intro": "Pages de graphiques et de métriques, chacune définie en YAML. Un Manager voit tous les rapports ; les autres voient ceux publiés pour une de leurs équipes.",
     "preview": {
+      "noHistory": "Pas encore d'historique : le collector enregistre les métriques une fois par jour.",
+      "chartLabel": "{{name}}, {{days}} derniers jours",
+      "other": "Autres",
+      "chartTable": "Afficher les valeurs",
+      "date": "Date",
+      "total": "Total",
       "tab": "Aperçu",
       "notice": "Aperçu du rapport : chaque métrique est exécutée maintenant. Ses paramètres désignent les nodes et services que vous voyez.",
       "empty": "Le rapport n'a pas encore de définition : en écrire une pour l'aperçu.",
@@ -1070,7 +1105,6 @@
       "emptySection": "Rien dans cette section.",
       "metric": "Métrique n° {{id}}",
       "chart": "Graphique n° {{id}}",
-      "chartPending": "Les graphiques ne sont pas encore dessinés dans cet aperçu.",
       "noData": "Aucune donnée.",
       "truncated": "{{count}} premières lignes."
     },

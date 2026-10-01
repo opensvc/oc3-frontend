@@ -3,14 +3,15 @@ import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
+import { TimeChart, type TimeSeries } from "@/components/ui/TimeChart";
 import { reportLayout, type ReportItem } from "./report-layout";
 
 /**
  * The report as its readers see it: its title and description, then each section
- * with its metrics, each a table of the metric's result, run now. The charts, drawn
- * from the history of the metrics, are not rendered yet: they are named in their
- * place. Like the historical collector, a metric's placeholders take the nodes and
- * services the reader may see, the filterset of the session not existing here.
+ * with its charts — the history of its historized metrics over the last days — and
+ * its metrics, each a table of the metric's result, run now. A metric's placeholders
+ * take the nodes and services the reader may see, the filterset of the session not
+ * existing here.
  */
 export function ReportPreview({ reportId }: { reportId: string }) {
   const { t } = useTranslation();
@@ -63,7 +64,7 @@ export function ReportPreview({ reportId }: { reportId: string }) {
                 entry.kind === "metric" ? (
                   <MetricBlock key={at} item={entry} />
                 ) : (
-                  <ChartPlaceholder key={at} item={entry} />
+                  <ChartBlock key={at} item={entry} />
                 ),
               )}
             </div>
@@ -151,16 +152,81 @@ function MetricBlock({ item }: { item: Extract<ReportItem, { kind: "metric" }> }
   );
 }
 
-/** A chart of the report, named in its place: the charts are not drawn yet. */
-function ChartPlaceholder({ item }: { item: Extract<ReportItem, { kind: "chart" }> }) {
-  const { t } = useTranslation();
+/** Days of history a chart of the preview shows. */
+const CHART_DAYS = 90;
+
+/**
+ * A chart of the report: the series of the historized metrics it draws, over the
+ * last `CHART_DAYS` days. It takes the whole width of its section: a time axis
+ * needs room.
+ */
+function ChartBlock({ item }: { item: Extract<ReportItem, { kind: "chart" }> }) {
+  const { t, i18n } = useTranslation();
+  const samples = useQuery({
+    queryKey: ["chart", item.id, "samples", CHART_DAYS],
+    queryFn: async () => {
+      const { data, error } = await api.GET("/charts/{chart_id}/samples", {
+        params: { path: { chart_id: item.id }, query: { days: CHART_DAYS } },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return data.data;
+    },
+  });
+  const title = item.title === "" ? t("reports.preview.chart", { id: item.id }) : item.title;
+
+  // A series is named by its instance; with several metrics, by the metric's label too.
+  const metrics = new Set(samples.data?.series.map((s) => s.metric_id));
+  const series: TimeSeries[] = (samples.data?.series ?? []).map((s, index) => {
+    const label =
+      s.label === undefined || s.label === ""
+        ? t("reports.preview.metric", { id: s.metric_id })
+        : s.label;
+    const name =
+      s.instance === null || s.instance === undefined
+        ? label
+        : metrics.size > 1
+          ? `${label} · ${s.instance}`
+          : s.instance;
+    return {
+      key: `${String(s.metric_id)}:${s.instance ?? ""}:${String(index)}`,
+      name,
+      points: s.points.flatMap((p): [number, number][] =>
+        p[0] === undefined || p[1] === undefined ? [] : [[p[0], p[1]]],
+      ),
+    };
+  });
+  const units = new Set(samples.data?.series.map((s) => s.unit ?? "").filter((u) => u !== ""));
+
   return (
-    <div className={`${BLOCK} border-dashed`}>
+    <div className={`${BLOCK} col-span-full`}>
       <h4 className="flex items-center gap-1.5 font-medium">
-        <ObjectIcon kind="report" className="h-3.5 w-3.5 shrink-0" />
-        {item.title === "" ? t("reports.preview.chart", { id: item.id }) : item.title}
+        <ObjectIcon kind="chart" className="h-3.5 w-3.5 shrink-0" />
+        {title}
       </h4>
-      <p className="text-ink-muted">{t("reports.preview.chartPending")}</p>
+      {samples.isPending ? (
+        <p className="text-ink-muted">{t("list.loading")}</p>
+      ) : samples.isError ? (
+        <p role="alert" className="text-state-down">
+          ■ {samples.error.message}
+        </p>
+      ) : series.every((s) => s.points.length === 0) ? (
+        <p className="text-ink-muted">{t("reports.preview.noHistory")}</p>
+      ) : (
+        <TimeChart
+          series={series}
+          stack={samples.data.stack}
+          // One unit for the whole axis only: different units are not summed.
+          unit={units.size === 1 ? [...units][0] : undefined}
+          locale={i18n.language}
+          labels={{
+            title: t("reports.preview.chartLabel", { name: title, days: CHART_DAYS }),
+            other: t("reports.preview.other"),
+            table: t("reports.preview.chartTable"),
+            date: t("reports.preview.date"),
+            total: t("reports.preview.total"),
+          }}
+        />
+      )}
     </div>
   );
 }

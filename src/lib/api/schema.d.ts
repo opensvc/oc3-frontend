@@ -404,6 +404,73 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/charts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the charts: time series of historized metrics, defined in YAML. A manager sees
+         *     every chart; the others see the charts published to one of their teams.
+         */
+        get: operations["GetCharts"];
+        put?: never;
+        /**
+         * @description Create a chart. Its name must be unique, and its definition, when given,
+         *     must be valid YAML. The chart is published to the primary team of its author,
+         *     which is also made responsible for it, as in the historical collector.
+         *     Requires the ReportsManager or Manager privilege, as for the reports.
+         */
+        post: operations["PostCharts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/charts/{chart_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display a chart, if the caller may see it (see GET /charts). */
+        get: operations["GetChart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/charts/{chart_id}/samples": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description The series of the historized metrics a chart draws, for a caller who may see
+         *     the chart: one series per metric of its definition, or per instance of a
+         *     metric with instances, each a list of [unix time, value] points over the last
+         *     `days` days. `stack` is the chart's Options.stack. The series are those the
+         *     scheduler computes without a filterset (the historical collector read those of
+         *     the session's filterset, which oc3 does not have).
+         */
+        get: operations["GetChartSamples"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/compliance/import": {
         parameters: {
             query?: never;
@@ -4418,6 +4485,41 @@ export interface components {
             id?: number;
             updated?: string;
         };
+        ChartListResponse: {
+            data: components["schemas"]["ChartRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A chart: time series of historized metrics, defined in YAML. Every property is
+         *     optional: the `props` query parameter selects which columns the server
+         *     returns.
+         */
+        ChartRow: {
+            chart_name?: string;
+            chart_yaml?: string;
+            id?: number;
+        };
+        ChartSamples: {
+            series: components["schemas"]["ChartSeries"][];
+            stack: boolean;
+        };
+        ChartSamplesResponse: {
+            data: components["schemas"]["ChartSamples"];
+        };
+        ChartSeries: {
+            /** @description The instance of the metric, null for a metric without instances. */
+            instance?: string | null;
+            /** @description The label the chart definition gives the metric. */
+            label?: string;
+            metric_id: number;
+            /** @description The points, oldest first, each [unix time, value]. */
+            points: number[][];
+            unit?: string;
+        };
         CompExportModule: {
             autofix?: string;
             modset_mod_name?: string;
@@ -7082,6 +7184,167 @@ export interface operations {
             };
             403: components["responses"]["403"];
             409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetCharts: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChartListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostCharts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Unique name of the chart. */
+                    chart_name: string;
+                    /** @description Definition of the chart, in YAML. */
+                    chart_yaml?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChartListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetChart: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Chart identifier (charts.id) */
+                chart_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChartListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetChartSamples: {
+        parameters: {
+            query?: {
+                /** @description Days of history, 365 by default, 1825 at most. */
+                days?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Chart identifier (charts.id) */
+                chart_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChartSamplesResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            /** @description The chart definition is not valid YAML. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
             500: components["responses"]["500"];
         };
     };

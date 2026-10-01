@@ -224,6 +224,15 @@ export function SearchIcon(props: IconProps) {
   );
 }
 
+/** Charts: a line over two axes (`chart16`, fa-line-chart). */
+export function LineChartIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3.5 3c.6 0 1 .4 1 1v14.5H21a1 1 0 1 1 0 2H3.5a1 1 0 0 1-1-1V4c0-.6.4-1 1-1Zm16.2 3.3a1 1 0 0 1 0 1.4l-5 5a1 1 0 0 1-1.4 0L10.5 10l-3.3 3.3a1 1 0 0 1-1.4-1.4l4-4a1 1 0 0 1 1.4 0L14 10.6l4.3-4.3a1 1 0 0 1 1.4 0Z" />
+    </Svg>
+  );
+}
+
 /** Reports: the pie chart of the historical collector (`report16`, fa-pie-chart). */
 export function PieChartIcon(props: IconProps) {
   return (

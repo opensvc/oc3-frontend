@@ -58,6 +58,14 @@
   --code-keyword: #7a3e9d;
   --code-comment: #6f7a82;
   --code-punct: #8a5a12;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #4a3aa7;
+  --series-8: #e34948;
   /* Compliance: the crimson cogs of the historical collector (modset16), toned down
      like the others. */
   --icon-compliance: #a8243a;
@@ -134,6 +142,14 @@
   --code-keyword: #c79ae6;
   --code-comment: #8b969c;
   --code-punct: #d9b36a;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
   --icon-compliance: #e8798a;
 
   /* Lightened background, dark ink: contrast 5.6:1. */
@@ -199,6 +215,14 @@
   --code-keyword: #5a1f7d;
   --code-comment: #3b454c;
   --code-punct: #5c3a00;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #4a3aa7;
+  --series-8: #e34948;
   --icon-compliance: #8a0f25;
 
   --tag: #006272;
@@ -246,6 +270,14 @@
   --code-keyword: #e0b8ff;
   --code-comment: #b8c2c8;
   --code-punct: #f0cf8a;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
   --icon-compliance: #ff8fa0;
 
   --tag: #3fd0e3;
