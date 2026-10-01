@@ -6,7 +6,7 @@
     "main": "Main",
     "hideMenu": "Hide the menu",
     "showMenu": "Show the menu",
-    "menuShortcut": "Press m to move to the menu",
+    "menuShortcut": "Press n to move to the menu",
     "categories": {
       "infrastructure": "Infrastructure",
       "dataManagement": "Data Management",

@@ -52,9 +52,9 @@ export function AppShell() {
     });
   }
 
-  // "m" moves the focus to the menu, on the entry of the view on display, unfolding
+  // "n", for navigation, moves the focus to the menu, on the entry of the view on display, unfolding
   // the menu first when it is folded: the focus waits for it to leave `inert`.
-  useShortcut("m", () => {
+  useShortcut("n", () => {
     if (!sidebarOpen) toggleSidebar();
     window.requestAnimationFrame(() => {
       const menu = document.getElementById("app-sidebar");

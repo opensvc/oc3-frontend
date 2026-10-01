@@ -35,7 +35,7 @@ function NavLink({ entry }: { entry: NavEntry }) {
  * of the keyboard path. Each section folds too, and the account keeps which ones
  * are folded; all are open by default.
  *
- * From the keyboard, "m" brings the focus here (`AppShell`); the arrows then move
+ * From the keyboard, "n" brings the focus here (`AppShell`); the arrows then move
  * from one entry or section title to the next, Home and End go to the ends, and
  * Escape gives the focus back to the page.
  */
@@ -79,7 +79,7 @@ export function Sidebar({ open }: { open: boolean }) {
     >
       <nav
         aria-label={t("nav.main")}
-        aria-keyshortcuts="m"
+        aria-keyshortcuts="n"
         onKeyDown={onKeyDown}
         className="w-52 p-2"
       >

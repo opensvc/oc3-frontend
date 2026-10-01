@@ -6,7 +6,7 @@
     "main": "Principal",
     "hideMenu": "Masquer le menu",
     "showMenu": "Afficher le menu",
-    "menuShortcut": "Touche m pour aller au menu",
+    "menuShortcut": "Touche n pour aller au menu",
     "categories": {
       "infrastructure": "Infrastructure",
       "dataManagement": "Gestion des données",
