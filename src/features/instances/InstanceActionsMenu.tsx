@@ -1,8 +1,36 @@
-import { ActionsMenu, type ActionTarget } from "@/components/opensvc/ActionsMenu";
+import { ActionsMenu, type ActionEntry, type ActionTarget } from "@/components/opensvc/ActionsMenu";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
-import { SERVICE_ACTIONS } from "@/features/services/ServiceActionsMenu";
 import { fromInstanceId } from "./instance-id";
+
+/**
+ * Agent actions of an instance, the instance entries of the historical collector
+ * (`on_services_instances`): start, stop and restart at the top, then placement
+ * (switch, takeover, giveback), replication, freeze and thaw, and in submenus the
+ * maintenance of the instance, the compliance runs on the modules attached to the
+ * service, and the inventory pushes.
+ */
+const INSTANCE_ACTIONS: readonly ActionEntry[] = [
+  { action: "start" },
+  { action: "stop" },
+  { action: "restart" },
+  { action: "switch", group: "placement", separatorBefore: true },
+  { action: "takeover", group: "placement" },
+  { action: "giveback", group: "placement" },
+  { action: "syncall", group: "sync" },
+  { action: "syncnodes", group: "sync" },
+  { action: "syncdrp", group: "sync" },
+  { action: "freeze", separatorBefore: true },
+  { action: "thaw" },
+  { action: "enable", group: "maintenance", separatorBefore: true },
+  { action: "disable", group: "maintenance" },
+  { action: "abort", group: "maintenance" },
+  { action: "clear", group: "maintenance" },
+  { action: "compliance_check", group: "compliance" },
+  { action: "compliance_fix", group: "compliance" },
+  { action: "push config", group: "inventory" },
+  { action: "push resinfo", group: "inventory" },
+];
 
 /**
  * Agent actions of an instance: the same as for a service, but posted on its node and
@@ -33,7 +61,7 @@ export function InstanceActionsMenu({ instances }: { instances: ActionTarget[] }
   return (
     <ActionsMenu
       targets={targets}
-      actions={SERVICE_ACTIONS}
+      actions={INSTANCE_ACTIONS}
       prefix="instances.actions"
       queue={async (target, action) => {
         const key = fromInstanceId(target.id);

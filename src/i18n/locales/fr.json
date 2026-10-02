@@ -591,10 +591,20 @@
       "queued_other": "{{action}} en file sur {{count}} services.",
       "failure": "{{name}} : {{message}}",
       "items": {
-        "push resinfo": "Remonter les informations applicatives",
-        "push config": "Remonter la configuration",
+        "start": "Démarrer",
+        "stop": "Arrêter",
+        "switch": "Basculer",
+        "giveback": "Rendre",
         "freeze": "Geler",
-        "thaw": "Dégeler"
+        "thaw": "Dégeler",
+        "abort": "Abandonner l'action",
+        "clear": "Effacer l'état d'échec",
+        "push config": "Remonter la configuration du service",
+        "push resinfo": "Remonter les informations applicatives"
+      },
+      "groups": {
+        "recovery": "Reprise",
+        "inventory": "Inventaire"
       }
     },
     "pkgdiff": {
@@ -1085,10 +1095,33 @@
       "queued_other": "{{action}} en file sur {{count}} instances.",
       "failure": "{{name}} : {{message}}",
       "items": {
-        "push resinfo": "Remonter les informations applicatives",
-        "push config": "Remonter la configuration",
+        "start": "Démarrer",
+        "stop": "Arrêter",
+        "restart": "Redémarrer",
+        "switch": "Basculer",
+        "takeover": "Reprendre",
+        "giveback": "Rendre",
+        "syncall": "Synchroniser toutes les copies",
+        "syncnodes": "Synchroniser les copies des pairs",
+        "syncdrp": "Synchroniser les copies de secours",
         "freeze": "Geler",
-        "thaw": "Dégeler"
+        "thaw": "Dégeler",
+        "enable": "Activer",
+        "disable": "Désactiver",
+        "abort": "Abandonner l'action",
+        "clear": "Effacer l'état d'échec",
+        "compliance_check": "Vérifier la conformité",
+        "compliance_fix": "Corriger la conformité",
+        "push config": "Remonter la configuration du service",
+        "push resinfo": "Remonter les informations applicatives"
+      },
+      "groups": {
+        "recovery": "Reprise",
+        "inventory": "Inventaire",
+        "placement": "Placement",
+        "sync": "Synchronisation",
+        "maintenance": "Maintenance",
+        "compliance": "Conformité"
       }
     }
   },
