@@ -146,7 +146,6 @@ const GROUPS: DetailGroup<NodeRow>[] = [
       field("manufacturer"),
       field("model"),
       field("serial"),
-      field("type"),
       field("cpu_vendor"),
       field("cpu_model"),
       field("cpu_freq"),
