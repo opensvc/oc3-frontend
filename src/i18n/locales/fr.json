@@ -701,6 +701,17 @@
         "object": "Objet",
         "raw": "Entrée brute"
       }
+    },
+    "timeline": {
+      "title": "Chronologie",
+      "summary_one": "1 occurrence depuis le {{since}}, active {{total}} au total.",
+      "summary_other": "{{count}} occurrences depuis le {{since}}, actives {{total}} au total.",
+      "truncated": "Seules les plus récentes sont montrées.",
+      "ongoing": "En cours",
+      "start": "Début",
+      "end": "Fin",
+      "duration": "Durée",
+      "showTable": "Afficher les occurrences"
     }
   },
   "apps": {

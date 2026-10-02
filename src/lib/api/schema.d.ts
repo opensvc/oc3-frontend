@@ -27,13 +27,20 @@ export interface paths {
          *       Requires the NodeExec privilege and responsibility for the service.
          *     - svc_id alone: an action on the whole service, posted for a node of the
          *       service seen alive in the last 15 minutes. Same requirements.
-         *     - node_id alone: a node action. Requires the NodeExec privilege and
-         *       responsibility for the node.
+         *     - node_id alone: a node action. Requires the NodeExec privilege (CompExec
+         *       for compliance_check and compliance_fix) and responsibility for the node.
          *
-         *     Accepted actions: push resinfo, push config, freeze and thaw on a service
-         *     or an instance; pushasset, pushdisks, pushpkg, pushpatch, pushstats,
-         *     checks, sysreport, scanscsi, freeze and thaw on a node. Compliance actions
-         *     (module, moduleset, ruleset) and agent options are not supported.
+         *     Accepted actions: push resinfo, push config, start, stop, giveback,
+         *     switch, abort, clear, freeze and thaw on a service; the same, and restart,
+         *     takeover, syncall, syncnodes, syncdrp, enable, disable, compliance_check
+         *     and compliance_fix (CompExec privilege, on every module attached to the
+         *     service) on an instance or on its resources; pushasset, pushdisks, pushpkg, pushpatch, pushstats,
+         *     checks, sysreport, updatecomp, updatepkg, scanscsi,
+         *     reboot, schedule_reboot, unschedule_reboot, shutdown, drain,
+         *     compliance_check, compliance_fix (on every module attached to the node),
+         *     freeze and thaw on a node. Compliance actions on a given module, moduleset
+         *     or ruleset, Wake On LAN, the root password rotation and agent options are
+         *     not supported.
          *
          *     One entry answers with the queued action, as GET /actions/{id} does, or
          *     with a problem. A list always answers 200, with the queued actions in
@@ -149,6 +156,31 @@ export interface paths {
          *     change notification is emitted.
          */
         delete: operations["DeleteAlert"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/alerts/{id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description The past occurrences of an alert, as the timeline of the historical alert
+         *     properties shows them (alert_timeline): the dashboard_events of the same
+         *     dash_md5, node and service, oldest first, the last `limit` of them (1000
+         *     by default). The alert must be visible to the caller, by the dashboard rule.
+         *     An occurrence still open has no end. The current occurrence of an alert
+         *     the database did not record (no open event) is not listed: the alert
+         *     itself, active since dash_created, stands for it.
+         */
+        get: operations["GetAlertEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -4554,6 +4586,13 @@ export interface components {
             /** @description Target node by name, in place of node_id, for an encapsulated node */
             vmname?: string;
         };
+        AlertEvent: {
+            /** @description The start of the occurrence, "YYYY-MM-DD HH:MM:SS" in the collector time zone. */
+            begin: string;
+            /** @description Its end; null while it is open. */
+            end?: string | null;
+            id: number;
+        };
         AlertListResponse: {
             data: components["schemas"]["AlertRow"][] | {
                 [key: string]: {
@@ -6508,6 +6547,40 @@ export interface operations {
             };
             401: components["responses"]["401"];
             403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetAlertEvents: {
+        parameters: {
+            query?: {
+                /** @description The most recent occurrences to return, 1000 by default, 10000 at most. */
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Alert id (dashboard.id) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AlertEvent"][];
+                        /** @description Older occurrences were left out. */
+                        truncated?: boolean;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
             404: components["responses"]["404"];
             500: components["responses"]["500"];
         };

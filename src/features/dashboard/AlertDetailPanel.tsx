@@ -5,6 +5,7 @@ import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { linkedField } from "@/components/opensvc/linked-field";
 import { formatDateTime } from "@/lib/format";
+import { AlertTimeline } from "./AlertTimeline";
 
 type AlertRow = components["schemas"]["AlertRow"];
 
@@ -71,7 +72,7 @@ export function AlertDetailPanel({
   label: string;
   onClose: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     data: alert,
     isPending,
@@ -102,6 +103,14 @@ export function AlertDetailPanel({
       groupPrefix="dashboard.detail.groups"
       isPending={isPending}
       errorMessage={isError ? error.message : null}
+      actions={
+        alertId !== undefined && alert !== null && alert !== undefined ? (
+          <section>
+            <h3 className="mb-1 font-semibold text-ink-muted">{t("dashboard.timeline.title")}</h3>
+            <AlertTimeline alertId={alertId} created={alert.dash_created} locale={i18n.language} />
+          </section>
+        ) : undefined
+      }
     />
   );
 }

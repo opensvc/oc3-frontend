@@ -701,6 +701,17 @@
         "object": "Object",
         "raw": "Raw entry"
       }
+    },
+    "timeline": {
+      "title": "Timeline",
+      "summary_one": "1 occurrence since {{since}}, active {{total}} in all.",
+      "summary_other": "{{count}} occurrences since {{since}}, active {{total}} in all.",
+      "truncated": "Only the most recent ones are shown.",
+      "ongoing": "Ongoing",
+      "start": "Began",
+      "end": "Ended",
+      "duration": "Lasted",
+      "showTable": "Show the occurrences"
     }
   },
   "apps": {

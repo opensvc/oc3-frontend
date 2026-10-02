@@ -85,3 +85,26 @@ export function formatRelativeTime(
   }
   return "";
 }
+
+/** A duration in seconds, in its two largest units: "3 d 4 h", "12 min", "15 s". */
+export function formatDuration(seconds: number, locale: string): string {
+  const units: [number, Intl.NumberFormatOptions["unit"]][] = [
+    [86400, "day"],
+    [3600, "hour"],
+    [60, "minute"],
+    [1, "second"],
+  ];
+  const parts: string[] = [];
+  let rest = Math.max(0, Math.round(seconds));
+  for (const [size, unit] of units) {
+    const n = Math.floor(rest / size);
+    if (n > 0 || (parts.length === 0 && size === 1)) {
+      parts.push(
+        new Intl.NumberFormat(locale, { style: "unit", unit, unitDisplay: "narrow" }).format(n),
+      );
+      rest -= n * size;
+    }
+    if (parts.length === 2) break;
+  }
+  return parts.join(" ");
+}
