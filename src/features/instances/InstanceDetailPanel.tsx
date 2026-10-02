@@ -24,6 +24,15 @@ const text = (prop: keyof InstanceRow) => (row: InstanceRow) => {
 
 const field = (prop: keyof InstanceRow) => ({ prop, format: text(prop) });
 
+/** A size the agent reports as 0 when it does not apply: shown only when known. */
+const nonZero = (prop: keyof InstanceRow) => ({
+  prop,
+  format: (row: InstanceRow) => {
+    const value = row[prop];
+    return value === undefined || value === null || Number(value) === 0 ? undefined : String(value);
+  },
+});
+
 const date = (prop: keyof InstanceRow) => ({
   prop,
   format: (row: InstanceRow, locale: string) => {
@@ -82,18 +91,20 @@ const GROUPS: DetailGroup<InstanceRow>[] = [
       statusField<InstanceRow>("mon_containerstatus", (row) => row.mon_containerstatus),
       statusField<InstanceRow>("mon_appstatus", (row) => row.mon_appstatus),
       statusField<InstanceRow>("mon_syncstatus", (row) => row.mon_syncstatus),
-      statusField<InstanceRow>("mon_hbstatus", (row) => row.mon_hbstatus),
     ],
   },
   {
     key: "virtualization",
     family: "hypervisor",
+    // The agent reports 0 vcpus and 0 memory for an instance that is no virtual
+    // machine: not a value to show, so that the section is left out with nothing
+    // in it.
     fields: [
       field("mon_vmname"),
       field("mon_vmtype"),
       field("mon_guestos"),
-      field("mon_vcpus"),
-      field("mon_vmem"),
+      nonZero("mon_vcpus"),
+      nonZero("mon_vmem"),
     ],
   },
 ];
