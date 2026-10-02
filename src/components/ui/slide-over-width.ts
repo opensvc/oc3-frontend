@@ -91,7 +91,15 @@ export function contentFloor(panel: HTMLElement): number {
   return MIN_WIDTH + lacking;
 }
 
-/** What may not fit in the width of a panel: its parts, and the areas scrolling sideways inside. */
+/** Marks an area made to scroll sideways, whatever its width: no reason to widen the panel. */
+const SCROLLS_BY_DESIGN = "[data-panel-fit='scroll']";
+
+/**
+ * What may not fit in the width of a panel: its parts, and the areas scrolling
+ * sideways inside. Left out, what is not on display — the content of a closed
+ * `<details>` is laid out all the same — and the areas marked as scrolling by
+ * design (`data-panel-fit="scroll"`), such as the table of values of a chart.
+ */
 function widthBound(panel: HTMLElement): HTMLElement[] {
   const parts = Array.from(panel.children).filter(
     (child): child is HTMLElement =>
@@ -99,7 +107,11 @@ function widthBound(panel: HTMLElement): HTMLElement[] {
   );
   const scrollers = Array.from(panel.querySelectorAll<HTMLElement>("*")).filter((element) => {
     const overflow = getComputedStyle(element).overflowX;
-    return overflow === "auto" || overflow === "scroll";
+    return (
+      (overflow === "auto" || overflow === "scroll") &&
+      element.closest(SCROLLS_BY_DESIGN) === null &&
+      element.checkVisibility()
+    );
   });
   return [...new Set([...parts, ...scrollers])];
 }

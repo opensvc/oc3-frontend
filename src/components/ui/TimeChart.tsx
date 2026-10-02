@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent,
+} from "react";
 
 export interface TimeSeries {
   key: string;
@@ -151,9 +158,12 @@ export function TimeChart({
   const [width, setWidth] = useState(600);
   const [active, setActive] = useState<number | null>(null);
 
-  useEffect(() => {
+  // The width of the box, read before the first paint and then on every change: the
+  // chart follows the room it is given, and never asks its container for more.
+  useLayoutEffect(() => {
     const element = box.current;
     if (element === null) return;
+    setWidth(Math.max(240, element.clientWidth));
     const observer = new ResizeObserver(() => {
       setWidth(Math.max(240, element.clientWidth));
     });
@@ -289,7 +299,7 @@ export function TimeChart({
     `${number.format(v)}${unit === undefined || unit === "" ? "" : ` ${unit}`}`;
 
   return (
-    <figure className="m-0 flex flex-col gap-2">
+    <figure className="m-0 flex min-w-0 flex-col gap-2">
       <div
         ref={box}
         role="img"
@@ -445,7 +455,9 @@ export function TimeChart({
       )}
       <details className="text-data">
         <summary className="cursor-pointer text-ink-muted hover:text-ink">{labels.table}</summary>
-        <div className="mt-1 max-h-60 overflow-auto">
+        {/* One column per series: the table scrolls sideways rather than widen a
+            side panel around it (`slide-over-width.ts`). */}
+        <div data-panel-fit="scroll" className="mt-1 max-h-60 overflow-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-line text-left text-ink-muted">
