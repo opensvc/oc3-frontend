@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { severityField } from "@/components/opensvc/status-field";
 import { linkedField } from "@/components/opensvc/linked-field";
 import { formatDateTime } from "@/lib/format";
 import { AlertTimeline } from "./AlertTimeline";
@@ -31,7 +32,7 @@ const GROUPS: DetailGroup<AlertRow>[] = [
     family: "alert",
     fields: [
       field("dash_type"),
-      field("dash_severity"),
+      severityField<AlertRow>("dash_severity", (row) => row.dash_severity),
       field("alert"),
       field("dash_env"),
       field("dash_instance"),

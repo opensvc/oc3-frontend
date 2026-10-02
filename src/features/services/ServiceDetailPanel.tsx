@@ -4,6 +4,7 @@ import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { statusField } from "@/components/opensvc/status-field";
 import { linkedField } from "@/components/opensvc/linked-field";
 import { NodeNameLinks } from "@/components/opensvc/NodeNameLinks";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
@@ -58,8 +59,8 @@ const GROUPS: DetailGroup<ServiceRow>[] = [
     key: "state",
     family: "state",
     fields: [
-      field("svc_availstatus"),
-      field("svc_status"),
+      statusField<ServiceRow>("svc_availstatus", (row) => row.svc_availstatus),
+      statusField<ServiceRow>("svc_status", (row) => row.svc_status),
       field("svc_frozen"),
       field("svc_provisioned"),
       field("svc_status_updated", date("svc_status_updated")),

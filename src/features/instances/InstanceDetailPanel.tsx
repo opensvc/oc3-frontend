@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { statusField } from "@/components/opensvc/status-field";
 import { StatusTimeline } from "@/components/opensvc/StatusTimeline";
 import { linkedField } from "@/components/opensvc/linked-field";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
@@ -58,8 +59,8 @@ const GROUPS: DetailGroup<InstanceRow>[] = [
     key: "state",
     family: "state",
     fields: [
-      field("mon_availstatus"),
-      field("mon_overallstatus"),
+      statusField<InstanceRow>("mon_availstatus", (row) => row.mon_availstatus),
+      statusField<InstanceRow>("mon_overallstatus", (row) => row.mon_overallstatus),
       field("mon_smon_status"),
       field("mon_smon_global_expect"),
       // 0 / 1 in the database: a real boolean, unlike the service's `svc_frozen`.
@@ -74,14 +75,14 @@ const GROUPS: DetailGroup<InstanceRow>[] = [
     key: "resources",
     family: "disk",
     fields: [
-      field("mon_ipstatus"),
-      field("mon_fsstatus"),
-      field("mon_diskstatus"),
-      field("mon_sharestatus"),
-      field("mon_containerstatus"),
-      field("mon_appstatus"),
-      field("mon_syncstatus"),
-      field("mon_hbstatus"),
+      statusField<InstanceRow>("mon_ipstatus", (row) => row.mon_ipstatus),
+      statusField<InstanceRow>("mon_fsstatus", (row) => row.mon_fsstatus),
+      statusField<InstanceRow>("mon_diskstatus", (row) => row.mon_diskstatus),
+      statusField<InstanceRow>("mon_sharestatus", (row) => row.mon_sharestatus),
+      statusField<InstanceRow>("mon_containerstatus", (row) => row.mon_containerstatus),
+      statusField<InstanceRow>("mon_appstatus", (row) => row.mon_appstatus),
+      statusField<InstanceRow>("mon_syncstatus", (row) => row.mon_syncstatus),
+      statusField<InstanceRow>("mon_hbstatus", (row) => row.mon_hbstatus),
     ],
   },
   {
