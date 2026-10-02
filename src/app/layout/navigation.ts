@@ -29,6 +29,7 @@ export interface NavEntry {
     | "/filters"
     | "/metrics"
     | "/reports"
+    | "/stats/reports"
     | "/charts"
     | "/filtersets"
     | "/forms"
@@ -120,6 +121,16 @@ export const NAV_CATEGORIES: NavCategory[] = [
     ],
   },
   {
+    // The Statistics section of the historical menu, placed between Compliance and
+    // Administration as there: what is read, apart from what is administered.
+    key: "statistics",
+    labelKey: "nav.categories.statistics",
+    entries: [
+      // `stat-reports` of the historical menu: the reports, rendered, to read.
+      { to: "/stats/reports", labelKey: "nav.statReports", icon: "report" },
+    ],
+  },
+  {
     // The historical menu places users under Administration (`adm-usr`).
     key: "administration",
     labelKey: "nav.categories.administration",
@@ -142,7 +153,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
       { to: "/metrics", labelKey: "nav.metrics", icon: "metric" },
       // `adm-charts`: the time series of historized metrics.
       { to: "/charts", labelKey: "nav.charts", icon: "chart" },
-      // `adm-reports`: the pages of charts and metrics.
+      // `adm-reports`: the definitions of the pages of charts and metrics, read in
+      // Statistics.
       { to: "/reports", labelKey: "nav.reports", icon: "report" },
     ],
   },

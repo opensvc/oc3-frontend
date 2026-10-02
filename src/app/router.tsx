@@ -10,6 +10,8 @@ import { HardwarePage } from "@/features/hardware/HardwarePage";
 import { SwitchesPage } from "@/features/switches/SwitchesPage";
 import { MetricsPage } from "@/features/metrics/MetricsPage";
 import { ReportsPage } from "@/features/reports/ReportsPage";
+import { ReportReaderPage } from "@/features/report-reader/ReportReaderPage";
+import { parseReaderSearch } from "@/features/report-reader/reader-search";
 import { ChartsPage } from "@/features/charts/ChartsPage";
 import { FiltersPage } from "@/features/filters/FiltersPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
@@ -100,6 +102,22 @@ const reportsRoute = createRoute({
   path: "/reports",
   component: ReportsPage,
   validateSearch: parseListSearch,
+});
+
+// Statistics › Reports: the reports to read, apart from their administration above.
+// Without a report, the list alone; with one, the report rendered next to it.
+const statReportsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/stats/reports",
+  component: ReportReaderPage,
+  validateSearch: parseReaderSearch,
+});
+
+const statReportRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/stats/reports/$reportId",
+  component: ReportReaderPage,
+  validateSearch: parseReaderSearch,
 });
 
 const metricsRoute = createRoute({
@@ -285,6 +303,8 @@ const routeTree = rootRoute.addChildren([
   switchesRoute,
   metricsRoute,
   reportsRoute,
+  statReportsRoute,
+  statReportRoute,
   chartsRoute,
   packagesRoute,
   hardwareRoute,

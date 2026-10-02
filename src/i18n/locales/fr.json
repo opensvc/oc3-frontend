@@ -12,7 +12,8 @@
       "dataManagement": "Gestion des données",
       "requests": "Demandes",
       "compliance": "Conformité",
-      "administration": "Administration"
+      "administration": "Administration",
+      "statistics": "Statistiques"
     },
     "apps": "Codes application",
     "networks": "Réseaux",
@@ -27,7 +28,7 @@
     "filtersets": "Filtersets",
     "metrics": "Métriques",
     "charts": "Graphiques",
-    "reports": "Rapports",
+    "reports": "Définitions de rapports",
     "forms": "Formulaires",
     "newRequest": "Nouvelle demande",
     "packages": "Paquets",
@@ -39,7 +40,8 @@
     "modulesets": "Modulesets",
     "rulesets": "Rulesets",
     "complianceLogs": "Journaux",
-    "designer": "Concepteur"
+    "designer": "Concepteur",
+    "statReports": "Rapports"
   },
   "shortcuts": {
     "title": "Raccourcis clavier",
@@ -1232,8 +1234,8 @@
     }
   },
   "reports": {
-    "title": "Rapports",
-    "intro": "Pages de graphiques et de métriques, chacune définie en YAML. Un Manager voit tous les rapports ; les autres voient ceux publiés pour une de leurs équipes.",
+    "title": "Définitions de rapports",
+    "intro": "Pages de graphiques et de métriques, chacune définie en YAML. Un Manager voit tous les rapports ; les autres voient ceux publiés pour une de leurs équipes. Ils se lisent dans Statistiques › Rapports.",
     "preview": {
       "noHistory": "Pas encore d'historique : le collector enregistre les métriques une fois par jour.",
       "chartLabel": "{{name}}, {{days}} derniers jours",
@@ -2267,5 +2269,29 @@
     "ongoingNoJustify": "En cours : justifiable une fois terminée.",
     "availableNoJustify": "Disponible : rien à justifier.",
     "notJustified": "Non justifiée."
+  },
+  "reportView": {
+    "list": "Rapports à lire",
+    "search": "Filtrer les rapports",
+    "none": "Aucun rapport n'est publié pour vos équipes.",
+    "noMatch": "Aucun rapport ne correspond.",
+    "fold": "Replier la liste",
+    "unfold": "Déplier la liste",
+    "intro": "Choisir un rapport dans la liste pour le lire. Ses métriques sont exécutées à l'ouverture, sur les nodes et services que vous voyez ; ses graphiques montrent leur historique enregistré.",
+    "empty": "Ce rapport n'a pas encore de contenu.",
+    "period": "Période des graphiques",
+    "days_one": "{{count}} jour",
+    "days_other": "{{count}} jours",
+    "refresh": "Actualiser le rapport",
+    "contents": "Sur cette page",
+    "copyLink": "Copier le lien",
+    "copied": "Lien copié",
+    "copyFailed": "Échec de la copie",
+    "definition": "Définition",
+    "definitionHint": "Ouvrir la définition du rapport dans l'administration",
+    "csv": "Télécharger en CSV",
+    "csvOf": "Télécharger {{name}} en CSV",
+    "showAll": "Afficher les {{count}} lignes",
+    "showFewer": "Afficher moins de lignes"
   }
 }

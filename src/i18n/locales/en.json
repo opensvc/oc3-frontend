@@ -12,7 +12,8 @@
       "dataManagement": "Data Management",
       "requests": "Requests",
       "compliance": "Compliance",
-      "administration": "Administration"
+      "administration": "Administration",
+      "statistics": "Statistics"
     },
     "apps": "Apps",
     "networks": "Networks",
@@ -27,7 +28,7 @@
     "filtersets": "Filtersets",
     "metrics": "Metrics",
     "charts": "Charts",
-    "reports": "Reports",
+    "reports": "Report definitions",
     "forms": "Forms",
     "newRequest": "New request",
     "packages": "Packages",
@@ -39,7 +40,8 @@
     "modulesets": "Modulesets",
     "rulesets": "Rulesets",
     "complianceLogs": "Logs",
-    "designer": "Designer"
+    "designer": "Designer",
+    "statReports": "Reports"
   },
   "shortcuts": {
     "title": "Keyboard shortcuts",
@@ -1232,8 +1234,8 @@
     }
   },
   "reports": {
-    "title": "Reports",
-    "intro": "Pages of charts and metrics, each defined in YAML. A Manager sees every report; the others see the reports published to one of their teams.",
+    "title": "Report definitions",
+    "intro": "Pages of charts and metrics, each defined in YAML. A Manager sees every report; the others see the reports published to one of their teams. They are read in Statistics › Reports.",
     "preview": {
       "noHistory": "No history yet: the collector records the metrics once a day.",
       "chartLabel": "{{name}}, last {{days}} days",
@@ -2267,5 +2269,29 @@
     "ongoingNoJustify": "Ongoing: it can be justified once it has ended.",
     "availableNoJustify": "Available: nothing to justify.",
     "notJustified": "Not justified."
+  },
+  "reportView": {
+    "list": "Reports to read",
+    "search": "Filter the reports",
+    "none": "No report is published to your teams.",
+    "noMatch": "No report matches.",
+    "fold": "Fold the list",
+    "unfold": "Unfold the list",
+    "intro": "Choose a report in the list to read it. Its metrics are run when it opens, over the nodes and services you can see; its charts show their recorded history.",
+    "empty": "This report has no content yet.",
+    "period": "Period of the charts",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "refresh": "Refresh the report",
+    "contents": "On this page",
+    "copyLink": "Copy link",
+    "copied": "Link copied",
+    "copyFailed": "Copy failed",
+    "definition": "Definition",
+    "definitionHint": "Open the definition of the report in Administration",
+    "csv": "Download as CSV",
+    "csvOf": "Download {{name}} as CSV",
+    "showAll": "Show all {{count}} rows",
+    "showFewer": "Show fewer rows"
   }
 }
