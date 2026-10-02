@@ -2226,5 +2226,21 @@
       "service_one": "1 service",
       "service_other": "{{count}} services"
     }
+  },
+  "statusTimeline": {
+    "title": "Status history",
+    "period": "Period",
+    "days_one": "24 hours",
+    "days_other": "{{count}} days",
+    "avail": "Availability",
+    "overall": "Overall",
+    "empty": "No status recorded over the period.",
+    "ongoing": "Ongoing",
+    "start": "From",
+    "end": "To",
+    "duration": "Lasted",
+    "status": "Status",
+    "track": "Status of",
+    "showTable": "Show the periods"
   }
 }

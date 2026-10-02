@@ -116,6 +116,11 @@ interface DetailContentProps<T> {
    * up; by default each list sizes it to its own labels.
    */
   labelWidth?: string;
+  /**
+   * Content closing a group, by group key, such as the status history at the end
+   * of the state: shown even when the group has no attribute to show.
+   */
+  groupFooters?: Partial<Record<string, ReactNode>>;
 }
 
 /**
@@ -139,6 +144,7 @@ export function DetailContent<T>({
   options,
   groupTitles = true,
   labelWidth,
+  groupFooters,
 }: DetailContentProps<T>) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
@@ -237,7 +243,8 @@ export function DetailContent<T>({
                   (canEdit && entry.field.editable === true) ||
                   (entry.value !== undefined && entry.value !== ""),
               );
-            if (entries.length === 0) return null;
+            const footer = groupFooters?.[group.key];
+            if (entries.length === 0 && footer === undefined) return null;
             return (
               <section key={group.key}>
                 {groupTitles && (
@@ -418,6 +425,7 @@ export function DetailContent<T>({
                     );
                   })}
                 </dl>
+                {footer !== undefined && <div className="mt-2">{footer}</div>}
               </section>
             );
           })}

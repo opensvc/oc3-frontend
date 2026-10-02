@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { StatusTimeline } from "@/components/opensvc/StatusTimeline";
 import { linkedField } from "@/components/opensvc/linked-field";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { InstanceActionsMenu } from "./InstanceActionsMenu";
@@ -107,7 +108,7 @@ export function InstanceDetailPanel({
   label: string;
   onClose: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const key = instanceId === undefined ? null : fromInstanceId(instanceId);
   const {
     data: instance,
@@ -179,6 +180,41 @@ export function InstanceDetailPanel({
       }
       isPending={key !== null && isPending}
       errorMessage={isError ? error.message : null}
+      groupFooters={
+        key === null
+          ? undefined
+          : {
+              // Availability and overall status on two named tracks, at the end of
+              // the state: the instance history the service panel leaves out.
+              state: (
+                <StatusTimeline
+                  queryKey={["instance", key.svcId, key.nodeId, "status-log"]}
+                  locale={i18n.language}
+                  tracks={[
+                    { key: "avail", label: t("statusTimeline.avail") },
+                    { key: "overall", label: t("statusTimeline.overall") },
+                  ]}
+                  load={async (days) => {
+                    const { data, error: failure } = await api.GET(
+                      "/services/{svc_id}/instances/{node_id}/status_log",
+                      {
+                        params: {
+                          path: { svc_id: key.svcId, node_id: key.nodeId },
+                          query: { days },
+                        },
+                      },
+                    );
+                    if (failure !== undefined) throw new Error(problemText(failure));
+                    return data.data.map((p) => ({
+                      begin: p.begin,
+                      end: p.end,
+                      values: { avail: p.avail, overall: p.overall },
+                    }));
+                  }}
+                />
+              ),
+            }
+      }
     />
   );
 }

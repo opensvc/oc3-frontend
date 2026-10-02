@@ -76,7 +76,7 @@ export function AlertTimeline({
         </p>
       )}
       <Timeline
-        ranges={ranges}
+        tracks={[{ key: "alert", ranges }]}
         now={now}
         locale={locale}
         labels={{

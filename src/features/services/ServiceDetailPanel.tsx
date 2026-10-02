@@ -2,12 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
+import { problemText } from "@/lib/api/problem";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { linkedField } from "@/components/opensvc/linked-field";
 import { NodeNameLinks } from "@/components/opensvc/NodeNameLinks";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
+import { StatusTimeline } from "@/components/opensvc/StatusTimeline";
 import { ServiceActionsMenu } from "./ServiceActionsMenu";
 import { useServiceTags } from "./related/queries";
 import { SERVICE_RELATED_TABS } from "./related/service-related";
@@ -128,7 +130,7 @@ export function ServiceDetailPanel({
   tab: string | undefined;
   onTabChange: (tab: string | undefined) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     data: service,
     isPending,
@@ -184,6 +186,35 @@ export function ServiceDetailPanel({
         groupPrefix="services.detail.groups"
         isPending={open && isPending}
         errorMessage={isError ? error.message : null}
+        groupFooters={
+          svcId === undefined
+            ? undefined
+            : {
+                // The availability of the service only: the instance statuses are
+                // in the instance panels, the resources in their tab.
+                state: (
+                  <StatusTimeline
+                    queryKey={["service", svcId, "status-log"]}
+                    locale={i18n.language}
+                    tracks={[{ key: "avail", label: t("statusTimeline.avail") }]}
+                    load={async (days) => {
+                      const { data, error: failure } = await api.GET(
+                        "/services/{svc_id}/status_log",
+                        {
+                          params: { path: { svc_id: svcId }, query: { days } },
+                        },
+                      );
+                      if (failure !== undefined) throw new Error(problemText(failure));
+                      return data.data.map((p) => ({
+                        begin: p.begin,
+                        end: p.end,
+                        values: { avail: p.status },
+                      }));
+                    }}
+                  />
+                ),
+              }
+        }
       />
     </RelatedTabsPanel>
   );

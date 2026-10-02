@@ -3996,6 +3996,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/services/{svc_id}/instances/{node_id}/status_log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description The availability and overall status of an instance over the last days, as
+         *     periods of one pair of statuses: the closed ones of svcmon_log and the
+         *     current one of svcmon_log_last, oldest first, clipped to the period. The
+         *     service must be visible to the caller.
+         */
+        get: operations["GetServiceInstanceStatusLog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/services/{svc_id}/nodes": {
         parameters: {
             query?: never;
@@ -4107,6 +4129,28 @@ export interface paths {
         };
         /** @description List a service resources state changes on all nodes */
         get: operations["GetServiceResourceLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/services/{svc_id}/status_log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description The availability of a service over the last days, as periods of one status:
+         *     the closed ones of services_log and the current one of services_log_last,
+         *     oldest first, clipped to the period. The service must be visible to the
+         *     caller.
+         */
+        get: operations["GetServiceStatusLog"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5072,6 +5116,14 @@ export interface components {
             "services.svcname"?: string | null;
             svc_id?: string;
         };
+        InstanceStatusPeriod: {
+            avail: string;
+            /** @description "YYYY-MM-DD HH:MM:SS" in the collector time zone. */
+            begin: string;
+            /** @description Its end; for the current period, the last status received. */
+            end: string;
+            overall: string;
+        };
         IpListResponse: {
             data: components["schemas"]["IpRow"][] | {
                 [key: string]: {
@@ -5757,6 +5809,14 @@ export interface components {
             svc_wave?: number;
             svcname?: string;
             updated?: string;
+        };
+        ServiceStatusPeriod: {
+            /** @description "YYYY-MM-DD HH:MM:SS" in the collector time zone. */
+            begin: string;
+            /** @description Its end; for the current period, the last status received. */
+            end: string;
+            /** @description The availability status of the service. */
+            status: string;
         };
         SwitchPortListResponse: {
             data: components["schemas"]["SwitchPortRow"][] | {
@@ -18217,6 +18277,40 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
+    GetServiceInstanceStatusLog: {
+        parameters: {
+            query?: {
+                /** @description The days of history to return, 7 by default, 365 at most. */
+                days?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Service id or name */
+                svc_id: string;
+                /** @description Node id or name */
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["InstanceStatusPeriod"][];
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
     GetServiceNodes: {
         parameters: {
             query?: {
@@ -18534,6 +18628,38 @@ export interface operations {
                     "application/json": components["schemas"]["ListResponse"];
                 };
             };
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetServiceStatusLog: {
+        parameters: {
+            query?: {
+                /** @description The days of history to return, 7 by default, 365 at most. */
+                days?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Service id or name */
+                svc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceStatusPeriod"][];
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
             404: components["responses"]["404"];
             500: components["responses"]["500"];
         };
