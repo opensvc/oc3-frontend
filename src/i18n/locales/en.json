@@ -921,7 +921,23 @@
         "notifications": "Notifications",
         "restrictions": "Restrictions and quotas"
       },
-      "editHint": "A user may change their own name and email; changing another user's requires the UserManager privilege. The email is the sign-in name."
+      "editHint": "A user may change their own name and email; changing another user's requires the UserManager privilege. The email is the sign-in name.",
+      "memberships": {
+        "org": "Organizational groups",
+        "privilege": "Privilege groups",
+        "add": {
+          "org": "Add an organizational group",
+          "privilege": "Add a privilege group"
+        },
+        "none": {
+          "org": "No organizational group",
+          "privilege": "No privilege group"
+        },
+        "remove": "Remove from {{group}}",
+        "added": "Added to {{group}}.",
+        "removed": "Removed from {{group}}.",
+        "hint": "Changing the groups of a user requires the GroupManager privilege; unless you are a Manager, you can only add groups you are a member of."
+      }
     },
     "create": {
       "open": "New user",

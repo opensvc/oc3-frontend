@@ -9,6 +9,7 @@ import { AlertTriangleIcon, UserIcon } from "@/components/ui/icons";
 import { EDITABLE_USER_GROUPS, USER_PROPS_QUERY } from "./user-fields";
 import { useSaveUser } from "./use-save-user";
 import { useCanImpersonate, useImpersonate } from "./use-impersonate";
+import { UserGroupsParts } from "./UserGroupsParts";
 
 type UserRow = components["schemas"]["UserRow"];
 
@@ -20,6 +21,9 @@ type UserRow = components["schemas"]["UserRow"];
  * "Impersonate" acts as that user from then on, as in the historical collector,
  * for a Manager only. Not offered on oneself, nor while already acting as somebody
  * else.
+ *
+ * Under the properties, the organisational and privilege groups of the user,
+ * which a GroupManager changes in place.
  */
 export function UserDetailPanel({
   userId,
@@ -79,28 +83,31 @@ export function UserDetailPanel({
       onSave={save}
       editHint={t("users.detail.editHint")}
       actions={
-        canImpersonate ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              disabled={impersonate.isPending}
-              onClick={() => {
-                impersonate.mutate(userId ?? "");
-              }}
-              title={t("impersonation.hint")}
-              className="flex h-8 items-center gap-1.5 rounded-(--radius-control) border border-line px-3 text-ink hover:bg-surface-sunken disabled:opacity-60"
-            >
-              <UserIcon />
-              {t("impersonation.start")}
-            </button>
-            {impersonate.isError && (
-              <p role="alert" className="flex items-center gap-1 text-state-down">
-                <AlertTriangleIcon className="shrink-0" />
-                {impersonate.error.message}
-              </p>
-            )}
-          </div>
-        ) : undefined
+        <div className="space-y-3">
+          {userId !== undefined && <UserGroupsParts userId={userId} />}
+          {canImpersonate && (
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                disabled={impersonate.isPending}
+                onClick={() => {
+                  impersonate.mutate(userId ?? "");
+                }}
+                title={t("impersonation.hint")}
+                className="flex h-8 items-center gap-1.5 rounded-(--radius-control) border border-line px-3 text-ink hover:bg-surface-sunken disabled:opacity-60"
+              >
+                <UserIcon />
+                {t("impersonation.start")}
+              </button>
+              {impersonate.isError && (
+                <p role="alert" className="flex items-center gap-1 text-state-down">
+                  <AlertTriangleIcon className="shrink-0" />
+                  {impersonate.error.message}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       }
     />
   );

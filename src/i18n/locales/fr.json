@@ -921,7 +921,23 @@
         "notifications": "Notifications",
         "restrictions": "Restrictions et quotas"
       },
-      "editHint": "Chacun peut modifier son nom et son e-mail ; ceux d'un autre utilisateur demandent le privilège UserManager. L'e-mail est l'identifiant de connexion."
+      "editHint": "Chacun peut modifier son nom et son e-mail ; ceux d'un autre utilisateur demandent le privilège UserManager. L'e-mail est l'identifiant de connexion.",
+      "memberships": {
+        "org": "Groupes organisationnels",
+        "privilege": "Groupes de privilèges",
+        "add": {
+          "org": "Ajouter un groupe organisationnel",
+          "privilege": "Ajouter un groupe de privilèges"
+        },
+        "none": {
+          "org": "Aucun groupe organisationnel",
+          "privilege": "Aucun groupe de privilèges"
+        },
+        "remove": "Retirer de {{group}}",
+        "added": "Ajouté à {{group}}.",
+        "removed": "Retiré de {{group}}.",
+        "hint": "Modifier les groupes d'un utilisateur requiert le privilège GroupManager ; sauf pour un Manager, seuls les groupes dont vous êtes membre peuvent être ajoutés."
+      }
     },
     "create": {
       "open": "Nouvel utilisateur",

@@ -4394,6 +4394,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/{user_id}/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the groups the user is member of, organisational and privilege ones.
+         *     Managers and UserManager see every user's groups; other users only those
+         *     of the users sharing one of their organisational groups, and their own.
+         */
+        get: operations["GetUserGroups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{user_id}/groups/{group_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Make the user a member of the group, as rest_post_user_group does.
+         *     Requires the GroupManager privilege; a caller who is not a Manager can only
+         *     attach a group they are member of. Attaching a user already member is not
+         *     an error. The change is logged.
+         */
+        post: operations["PostUserGroup"];
+        /**
+         * @description Remove the user from the group, as rest_delete_user_group does, with the
+         *     same privilege rules as the attachment. Detaching a user who is not member
+         *     is not an error. The change is logged.
+         */
+        delete: operations["DeleteUserGroup"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/{user_id}/impersonate": {
         parameters: {
             query?: never;
@@ -19572,6 +19620,133 @@ export interface operations {
             403: components["responses"]["403"];
             404: components["responses"]["404"];
             409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetUserGroups: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description User identifier: auth_user.id, the user email when it contains an
+                 *     "@", or "self" for the authenticated user.
+                 */
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PostUserGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User identifier, auth_user.id or email. */
+                user_id: string;
+                /** @description Group identifier, auth_group.id or role. */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteUserGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User identifier, auth_user.id or email. */
+                user_id: string;
+                /** @description Group identifier, auth_group.id or role. */
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
             500: components["responses"]["500"];
         };
     };
