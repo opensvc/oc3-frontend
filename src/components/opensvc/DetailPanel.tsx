@@ -382,8 +382,10 @@ export function DetailContent<T>({
                             </>
                           ) : (
                             <>
-                              {/* A live update changing the value flashes it. */}
-                              <FlashValue signature={shown ?? ""} className="min-w-0 flex-1">
+                              {/* A live update changing the value flashes it. The
+                                  value takes its own width only, for the pencil to
+                                  sit right after it rather than at the far end. */}
+                              <FlashValue signature={shown ?? ""} className="min-w-0">
                                 {shown === undefined || shown === "" ? (
                                   <span className="text-ink-muted">—</span>
                                 ) : field.render !== undefined ? (
@@ -401,7 +403,7 @@ export function DetailContent<T>({
                                   onClick={() => {
                                     startEditing(field);
                                   }}
-                                  className="text-ink-muted opacity-0 group-hover:opacity-100 hover:text-ink focus-visible:opacity-100"
+                                  className="shrink-0 text-ink-muted opacity-0 group-hover:opacity-100 hover:text-ink focus-visible:opacity-100"
                                 >
                                   <PencilIcon />
                                   <span className="sr-only">
