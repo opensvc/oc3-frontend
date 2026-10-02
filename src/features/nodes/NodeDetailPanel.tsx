@@ -10,6 +10,7 @@ import { NodeActionsMenu } from "./NodeActionsMenu";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
 import { OsLogo } from "@/components/opensvc/OsLogo";
 import { useTeams } from "@/features/groups/use-teams";
+import { useAppCodes } from "@/features/apps/use-app-codes";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
 import { useNodeTags } from "./related/queries";
@@ -121,7 +122,13 @@ const GROUPS: DetailGroup<NodeRow>[] = [
       // reads, the id is what the API joins on.
       field("clusters.cluster_name"),
       field("cluster_id"),
-      linkedField<NodeRow>("app", "app", (row) => row.app, text("app")),
+      {
+        ...linkedField<NodeRow>("app", "app", (row) => row.app, text("app")),
+        // Chosen among the apps the user is responsible for: the server would give
+        // any other one back as their default app.
+        editable: EDITABLE.has("app"),
+        optionsKey: "apps",
+      },
       field("node_env"),
       field("status"),
       field("role"),
@@ -290,6 +297,7 @@ export function NodeDetailPanel({
   const open = nodeId !== undefined;
   const tags = useNodeTags(nodeId);
   const teams = useTeams();
+  const appCodes = useAppCodes();
   const tagEdit = useTagEdit("node", nodeId);
 
   return (
@@ -320,7 +328,7 @@ export function NodeDetailPanel({
       />
       <DetailContent
         groups={GROUPS}
-        options={{ teams: teams.data ?? [] }}
+        options={{ teams: teams.data ?? [], apps: appCodes.data ?? [] }}
         row={node}
         onSave={(changes) => save.mutateAsync(changes)}
         labelPrefix="nodes.fields"

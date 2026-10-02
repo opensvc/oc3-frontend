@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import { useAppCodes } from "@/features/apps/use-app-codes";
 import { SlideOver } from "@/components/ui/SlideOver";
 
 const FIELDS = ["nodename", "node_env", "team_responsible", "fqdn", "loc_city"] as const;
@@ -16,21 +17,6 @@ const EMPTY: Record<Field, string> = {
   fqdn: "",
   loc_city: "",
 };
-
-/** Application codes, to offer a choice rather than free input. */
-function useAppCodes() {
-  return useQuery({
-    queryKey: ["apps", "codes"],
-    queryFn: async () => {
-      const { data, error } = await api.GET("/apps", {
-        params: { query: { props: "app", orderby: "app", limit: 500 } },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      const rows = Array.isArray(data.data) ? data.data : [];
-      return rows.map((row) => row.app).filter((app): app is string => typeof app === "string");
-    },
-  });
-}
 
 /**
  * Creating a node by hand, like the "add node" entry of the historical collector's
