@@ -85,6 +85,54 @@ function niceStep(max: number, count: number): number {
  * the values are also in a table under the chart, so that nothing depends on the
  * colours or on hovering.
  */
+/**
+ * The interval the samples are taken at: the most frequent one between two
+ * consecutive dates. A series read from a whisper archive has a fixed step, and
+ * a missing sample shows as a longer interval.
+ */
+function sampleStep(dates: number[]): number {
+  const counts = new Map<number, number>();
+  for (let i = 1; i < dates.length; i++) {
+    const d = (dates[i] ?? 0) - (dates[i - 1] ?? 0);
+    if (d > 0) counts.set(d, (counts.get(d) ?? 0) + 1);
+  }
+  let step = 0;
+  let best = 0;
+  for (const [d, n] of counts) {
+    if (n > best || (n === best && d < step)) {
+      step = d;
+      best = n;
+    }
+  }
+  return step;
+}
+
+/**
+ * Splits dates in runs without a missing sample: two dates further apart than one
+ * and a half steps start a new run. Drawn as separate lines, the runs leave a hole
+ * where the source did not report, rather than a straight line pretending it did.
+ */
+function runsOf(dates: number[], step: number): number[][] {
+  const runs: number[][] = [];
+  let run: number[] = [];
+  for (const t of dates) {
+    const previous = run[run.length - 1];
+    if (previous !== undefined && step > 0 && t - previous > 1.5 * step) {
+      runs.push(run);
+      run = [];
+    }
+    run.push(t);
+  }
+  if (run.length > 0) runs.push(run);
+  return runs;
+}
+
+/** A polyline through points; a lone point is drawn as a dot by the round line cap. */
+function polyline(points: string[]): string {
+  if (points.length === 0) return "";
+  return points.length === 1 ? `M${points[0] ?? ""}h0.01` : `M${points.join("L")}`;
+}
+
 export function TimeChart({
   series: input,
   stack,
@@ -162,12 +210,12 @@ export function TimeChart({
       ? tops.map((row) => row[row.length - 1] ?? 0)
       : values.flatMap((byDate) => [...byDate.values()])),
   );
-  const step = niceStep(max, 4);
-  const top = Math.ceil(max / step) * step;
+  const tick = niceStep(max, 4);
+  const top = Math.ceil(max / tick) * tick;
   const x = (t: number) =>
     PAD.left + (last === first ? innerWidth / 2 : ((t - first) / (last - first)) * innerWidth);
   const y = (v: number) => PAD.top + innerHeight - (v / top) * innerHeight;
-  const yTicks = Array.from({ length: Math.round(top / step) + 1 }, (_, i) => i * step);
+  const yTicks = Array.from({ length: Math.round(top / tick) + 1 }, (_, i) => i * tick);
   const xTickCount = Math.max(2, Math.min(6, Math.floor(innerWidth / 110)));
   const xTicks =
     dates.length === 0
@@ -177,19 +225,36 @@ export function TimeChart({
           (_, i) => first + ((last - first) * i) / (xTickCount - 1),
         );
 
+  const step = sampleStep(dates);
+  const at = new Map(dates.map((t, i) => [t, i]));
   const paths = series.map((s, index) => {
     if (stack) {
-      const upper = dates.map((t, at) => `${String(x(t))},${String(y(tops[at]?.[index] ?? 0))}`);
-      const lower = dates
-        .map(
-          (t, at) =>
-            `${String(x(t))},${String(y((tops[at]?.[index] ?? 0) - (values[index]?.get(t) ?? 0)))}`,
-        )
-        .reverse();
-      return { line: `M${upper.join("L")}`, area: `M${upper.join("L")}L${lower.join("L")}Z` };
+      // Each run of the shared dates is an area of its own.
+      const pieces = runsOf(dates, step).map((run) => {
+        const upper = run.map(
+          (t) => `${String(x(t))},${String(y(tops[at.get(t) ?? 0]?.[index] ?? 0))}`,
+        );
+        const lower = run
+          .map(
+            (t) =>
+              `${String(x(t))},${String(y((tops[at.get(t) ?? 0]?.[index] ?? 0) - (values[index]?.get(t) ?? 0)))}`,
+          )
+          .reverse();
+        return { line: polyline(upper), area: `M${upper.join("L")}L${lower.join("L")}Z` };
+      });
+      return {
+        line: pieces.map((p) => p.line).join(""),
+        area: pieces.map((p) => p.area).join(""),
+      };
     }
-    const line = s.points.map(([t, v]) => `${String(x(t))},${String(y(v))}`);
-    return { line: line.length === 0 ? "" : `M${line.join("L")}`, area: "" };
+    const byDate = values[index];
+    const line = runsOf(
+      s.points.map(([t]) => t),
+      step,
+    )
+      .map((run) => polyline(run.map((t) => `${String(x(t))},${String(y(byDate?.get(t) ?? 0))}`)))
+      .join("");
+    return { line, area: "" };
   });
 
   function nearest(clientX: number): number | null {
