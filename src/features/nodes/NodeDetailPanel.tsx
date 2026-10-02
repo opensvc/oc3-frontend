@@ -64,6 +64,20 @@ const EDITABLE = new Set<string>([
   "power_breaker2",
   "notifications",
   "snooze_till",
+  // Location and agent attributes the historical node properties let one change.
+  "tz",
+  "loc_country",
+  "loc_city",
+  "loc_zip",
+  "loc_addr",
+  "loc_building",
+  "loc_floor",
+  "loc_room",
+  "loc_rack",
+  "enclosure",
+  "enclosureslot",
+  "connect_to",
+  "action_type",
 ]);
 import { formatDateTime, formatSizeMiB } from "@/lib/format";
 
@@ -110,6 +124,11 @@ const field = (
         : ("text" as const),
 });
 
+/**
+ * The sections of the properties, in the order and with the content of the
+ * historical node properties (`node_properties.html`): identity, hardware,
+ * system, location, and the OpenSVC agent.
+ */
 const GROUPS: DetailGroup<NodeRow>[] = [
   {
     key: "identity",
@@ -129,14 +148,16 @@ const GROUPS: DetailGroup<NodeRow>[] = [
         editable: EDITABLE.has("app"),
         optionsKey: "apps",
       },
-      field("node_env"),
       field("status"),
       field("role"),
       field("assetname"),
       field("type"),
+      field("sec_zone"),
       team("team_responsible"),
       team("team_integ"),
       team("team_support"),
+      field("notifications"),
+      field("snooze_till", date("snooze_till")),
     ],
   },
   {
@@ -163,8 +184,8 @@ const GROUPS: DetailGroup<NodeRow>[] = [
       field("power_cabinet2"),
       field("power_breaker2"),
       field("blade_cabinet"),
-      field("enclosure"),
-      field("enclosureslot"),
+      field("warranty_end", date("warranty_end")),
+      field("maintenance_end", date("maintenance_end")),
     ],
   },
   {
@@ -187,7 +208,6 @@ const GROUPS: DetailGroup<NodeRow>[] = [
       field("os_arch"),
       field("os_kernel"),
       field("os_update"),
-      field("tz"),
       field("last_boot", date("last_boot")),
     ],
   },
@@ -195,34 +215,39 @@ const GROUPS: DetailGroup<NodeRow>[] = [
     key: "location",
     family: "location",
     fields: [
+      field("tz"),
       field("loc_country"),
       field("loc_city"),
-      field("loc_addr"),
       field("loc_zip"),
+      field("loc_addr"),
       field("loc_building"),
       field("loc_floor"),
       field("loc_room"),
       field("loc_rack"),
-      field("sec_zone"),
+      field("enclosure"),
+      field("enclosureslot"),
     ],
   },
   {
-    key: "collector",
+    key: "agent",
     family: "service",
     fields: [
+      field("node_frozen"),
       field("version"),
-      field("listener_port"),
+      field("collector"),
       field("connect_to"),
+      field("listener_port"),
+      field("node_env"),
+      // The agent either pushes its actions to the collector or pulls them.
+      { ...field("action_type"), optionsKey: "actionTypes" },
       field("last_comm", date("last_comm")),
       field("updated", date("updated")),
-      field("node_frozen"),
-      field("notifications"),
-      field("snooze_till", date("snooze_till")),
-      field("warranty_end", date("warranty_end")),
-      field("maintenance_end", date("maintenance_end")),
     ],
   },
 ];
+
+/** The values of action_type the API accepts. */
+const ACTION_TYPES = ["push", "pull"];
 
 // Ask the collector only for the properties actually shown.
 const PROPS = GROUPS.flatMap((group) => group.fields.map((f) => f.prop)).join(",");
@@ -327,7 +352,7 @@ export function NodeDetailPanel({
       />
       <DetailContent
         groups={GROUPS}
-        options={{ teams: teams.data ?? [], apps: appCodes.data ?? [] }}
+        options={{ teams: teams.data ?? [], apps: appCodes.data ?? [], actionTypes: ACTION_TYPES }}
         row={node}
         onSave={(changes) => save.mutateAsync(changes)}
         labelPrefix="nodes.fields"

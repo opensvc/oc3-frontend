@@ -161,7 +161,7 @@
         "hardware": "Hardware",
         "system": "System",
         "location": "Location",
-        "collector": "Collector"
+        "agent": "OpenSVC Agent"
       }
     },
     "create": {
