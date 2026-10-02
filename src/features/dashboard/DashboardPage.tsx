@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { DateTime } from "@/components/ui/DateTime";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -18,6 +18,8 @@ import {
   type ResolvedListSearch,
 } from "@/lib/list-search";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
+import { filterQuery, filtersKey } from "@/lib/column-filters";
+import type { ColumnFilterOption } from "@/components/opensvc/CollectorList";
 import { AlertDetailPanel } from "./AlertDetailPanel";
 
 type AlertRow = components["schemas"]["AlertRow"];
@@ -30,11 +32,23 @@ function objectName(row: AlertRow): string {
   return row["services.svcname"] ?? row["nodes.nodename"] ?? "";
 }
 
+/** The severities the collector raises, from the lowest, each with its badge. */
+const SEVERITY_OPTIONS: ColumnFilterOption[] = [0, 1, 2, 3, 4, 5].map((severity) => ({
+  value: String(severity),
+  render: <SeverityBadge severity={severity} />,
+}));
+
+/**
+ * The columns of the dashboard, each filtered by the server: the object on the
+ * service name, or the node name when the alert has none; the message on its
+ * format and values as stored, the text shown being built from them.
+ */
 const COLUMNS: ListColumn<AlertRow>[] = [
   {
     prop: "dash_severity",
     labelKey: "alerts.fields.dash_severity",
     family: "alert",
+    filter: { kind: "enum", options: SEVERITY_OPTIONS },
     render: (r) => <SeverityBadge severity={r.dash_severity ?? 0} />,
   },
   {
@@ -110,6 +124,7 @@ async function fetchAlerts(search: ResolvedListSearch) {
     orderby: search.sort.join(","),
     offset: search.offset,
     limit: search.limit + 1,
+    filter: filterQuery(search.filters),
   };
   const { data, error } = await api.GET("/alerts", { params: { query } });
   if (error !== undefined) throw new Error(JSON.stringify(error));
@@ -119,7 +134,18 @@ async function fetchAlerts(search: ResolvedListSearch) {
 
 function useAlerts(search: ResolvedListSearch) {
   return useQuery({
-    queryKey: ["alerts", search.sort, search.offset, search.limit, search.fset, search.cols],
+    queryKey: [
+      "alerts",
+      search.sort,
+      search.offset,
+      search.limit,
+      search.fset,
+      search.cols,
+      filtersKey(search.filters),
+    ],
+    // The rows on display stay while the next ones load: typing a filter must not
+    // empty the table under the field.
+    placeholderData: keepPreviousData,
     queryFn: () => fetchAlerts(search),
   });
 }
@@ -155,7 +181,7 @@ export function DashboardPage() {
   /** Ids of the whole selection, without pagination. */
   async function allIds(): Promise<string[]> {
     const { data, error } = await api.GET("/alerts", {
-      params: { query: { props: "id", limit: 0 } },
+      params: { query: { props: "id", limit: 0, filter: filterQuery(search.filters) } },
     });
     if (error !== undefined) throw new Error(JSON.stringify(error));
     const rows: AlertRow[] = Array.isArray(data.data) ? data.data : [];
@@ -207,6 +233,7 @@ export function DashboardPage() {
         exportPage={(page) => fetchAlerts({ ...search, ...page })}
         total={data?.total}
         selectAllMatching={allIds}
+        filterable
       />
 
       <AlertDetailPanel
