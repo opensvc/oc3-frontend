@@ -12,6 +12,7 @@ import { FiltersetDetailPanel } from "@/features/filtersets/FiltersetDetailPanel
 import { FormDetailPanel } from "@/features/forms/FormDetailPanel";
 import { MetricDetailPanel } from "@/features/metrics/MetricDetailPanel";
 import { ChartDetailPanel } from "@/features/charts/ChartDetailPanel";
+import { ClusterDetailPanel } from "@/features/clusters/ClusterDetailPanel";
 import { ReportDetailPanel } from "@/features/reports/ReportDetailPanel";
 import { ModulesetDetailPanel } from "@/features/modulesets/ModulesetDetailPanel";
 import { RulesetDetailPanel } from "@/features/rulesets/RulesetDetailPanel";
@@ -139,6 +140,8 @@ export function PeekPanel() {
             }}
           />
         );
+      case "cluster":
+        return <ClusterDetailPanel clusterId={id} label={label} onClose={close} />;
       case "chart":
         return <ChartDetailPanel chartId={id} label={label} onClose={close} />;
       case "report":

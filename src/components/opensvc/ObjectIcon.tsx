@@ -21,12 +21,14 @@ import {
   TagsIcon,
   UserIcon,
   UsersIcon,
+  ClusterIcon,
 } from "@/components/ui/icons";
 
 /** Collector object kinds that have a visual identity of their own. */
 export type ObjectKind =
   | "dashboard"
   | "node"
+  | "cluster"
   | "service"
   | "instance"
   | "network"
@@ -62,6 +64,8 @@ export type ObjectKind =
 const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> = {
   dashboard: { Icon: AlertTriangleIcon, className: "text-icon-dashboard" },
   node: { Icon: ServerIcon, className: "text-icon-node" },
+  // The tint of the nodes it groups, as the cluster column family.
+  cluster: { Icon: ClusterIcon, className: "text-icon-node" },
   service: { Icon: StackIcon, className: "text-icon-service" },
   // Service tint: an instance is a service seen from a node.
   instance: { Icon: InstanceIcon, className: "text-icon-service" },

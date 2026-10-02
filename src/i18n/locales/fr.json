@@ -41,7 +41,8 @@
     "rulesets": "Rulesets",
     "complianceLogs": "Journaux",
     "designer": "Concepteur",
-    "statReports": "Rapports"
+    "statReports": "Rapports",
+    "clusters": "Clusters"
   },
   "shortcuts": {
     "title": "Raccourcis clavier",
@@ -2293,5 +2294,33 @@
     "csvOf": "Télécharger {{name}} en CSV",
     "showAll": "Afficher les {{count}} lignes",
     "showFewer": "Afficher moins de lignes"
+  },
+  "clusters": {
+    "title": "Clusters",
+    "intro": "Les clusters dont le démon envoie son état au collector, avec les nodes et services qui les nomment. Un Manager voit tous les clusters ; les autres voient ceux qui contiennent un node ou un service d'une app dont leurs équipes sont responsables.",
+    "incompatible": "Incompatibles",
+    "fields": {
+      "cluster_name": "Nom",
+      "cluster_id": "ID du cluster",
+      "id": "ID d'enregistrement",
+      "node_count": "Nodes",
+      "svc_count": "Services",
+      "cluster_nodes": "Nodes configurés",
+      "agent_versions": "Versions de l'agent",
+      "frozen": "Gelé",
+      "quorum": "Quorum",
+      "compat": "Démons compatibles",
+      "listener_port": "Port d'écoute",
+      "cluster_updated": "État envoyé"
+    },
+    "detail": {
+      "title": "Cluster",
+      "groups": {
+        "identity": "Identité",
+        "members": "Membres",
+        "state": "État"
+      }
+    },
+    "nodeUnknown": "Absent des nodes que vous voyez dans le collector"
   }
 }

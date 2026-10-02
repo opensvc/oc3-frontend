@@ -503,6 +503,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the clusters the collector knows from their daemon status, with their
+         *     counts of nodes and services. A manager sees every cluster; the others see the
+         *     clusters holding a node or a service of an app their groups are responsible
+         *     for.
+         */
+        get: operations["GetClusters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clusters/{cluster_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display a cluster, if the caller may see it (see GET /clusters). */
+        get: operations["GetCluster"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/compliance/import": {
         parameters: {
             query?: never;
@@ -4758,6 +4797,40 @@ export interface components {
             points: number[][];
             unit?: string;
         };
+        ClusterListResponse: {
+            data: components["schemas"]["ClusterRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A cluster, as its daemon last pushed its status. Every property is optional:
+         *     the `props` query parameter selects which columns the server returns.
+         */
+        ClusterRow: {
+            /** @description Agent versions of its nodes, distinct, comma-separated. */
+            agent_versions?: string;
+            cluster_id?: string;
+            cluster_name?: string;
+            /** @description Node names of the cluster configuration, comma-separated. */
+            cluster_nodes?: string;
+            /** @description When the daemon status was produced, RFC 3339. */
+            cluster_updated?: string;
+            /** @description 1 when the daemons of its nodes are compatible. */
+            compat?: number;
+            /** @description 1 when the cluster is frozen. */
+            frozen?: number;
+            id?: number;
+            listener_port?: number;
+            /** @description Nodes of the collector naming the cluster. */
+            node_count?: number;
+            /** @description 1 when the cluster configuration requires a quorum. */
+            quorum?: number;
+            /** @description Services of the collector naming the cluster. */
+            svc_count?: number;
+        };
         CompExportModule: {
             autofix?: string;
             modset_mod_name?: string;
@@ -7713,6 +7786,95 @@ export interface operations {
                     "application/json": components["schemas"]["Problem"];
                 };
             };
+            500: components["responses"]["500"];
+        };
+    };
+    GetClusters: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClusterListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetCluster: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+                cluster_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClusterListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
             500: components["responses"]["500"];
         };
     };

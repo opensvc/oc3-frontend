@@ -4,6 +4,7 @@ import type { ObjectKind } from "./ObjectIcon";
 /** The kinds `PeekPanel` can open: a step of another kind, from a hand-written URL or an old history, is dropped. */
 const PEEK_KINDS: ReadonlySet<string> = new Set<ObjectKind>([
   "node",
+  "cluster",
   "service",
   "instance",
   "app",

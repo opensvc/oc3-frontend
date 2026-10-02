@@ -41,7 +41,8 @@
     "rulesets": "Rulesets",
     "complianceLogs": "Logs",
     "designer": "Designer",
-    "statReports": "Reports"
+    "statReports": "Reports",
+    "clusters": "Clusters"
   },
   "shortcuts": {
     "title": "Keyboard shortcuts",
@@ -2293,5 +2294,33 @@
     "csvOf": "Download {{name}} as CSV",
     "showAll": "Show all {{count}} rows",
     "showFewer": "Show fewer rows"
+  },
+  "clusters": {
+    "title": "Clusters",
+    "intro": "The clusters whose daemon pushes its status to the collector, with the nodes and services that name them. A Manager sees every cluster; the others see the clusters holding a node or a service of an app their teams are responsible for.",
+    "incompatible": "Incompatible",
+    "fields": {
+      "cluster_name": "Name",
+      "cluster_id": "Cluster ID",
+      "id": "Record ID",
+      "node_count": "Nodes",
+      "svc_count": "Services",
+      "cluster_nodes": "Configured nodes",
+      "agent_versions": "Agent versions",
+      "frozen": "Frozen",
+      "quorum": "Quorum",
+      "compat": "Compatible daemons",
+      "listener_port": "Listener port",
+      "cluster_updated": "Status pushed"
+    },
+    "detail": {
+      "title": "Cluster",
+      "groups": {
+        "identity": "Identity",
+        "members": "Members",
+        "state": "State"
+      }
+    },
+    "nodeUnknown": "Not among the nodes you can see in the collector"
   }
 }

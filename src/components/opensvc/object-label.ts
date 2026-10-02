@@ -101,6 +101,13 @@ async function fetchLabel(step: PeekStep): Promise<string> {
       const rows = Array.isArray(data?.data) ? data.data : [];
       return text(readProp(rows[0] ?? {}, "metric_name")) || step.id;
     }
+    case "cluster": {
+      const { data } = await api.GET("/clusters/{cluster_id}", {
+        params: { path: { cluster_id: step.id }, query: { props: "cluster_name" } },
+      });
+      const rows = Array.isArray(data?.data) ? data.data : [];
+      return text(readProp(rows[0] ?? {}, "cluster_name")) || step.id;
+    }
     case "chart": {
       const { data } = await api.GET("/charts/{chart_id}", {
         params: { path: { chart_id: step.id }, query: { props: "chart_name" } },

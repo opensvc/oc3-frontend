@@ -13,6 +13,7 @@ export interface NavEntry {
   to:
     | "/"
     | "/nodes"
+    | "/clusters"
     | "/hardware"
     | "/services"
     | "/instances"
@@ -64,6 +65,9 @@ export const NAV_CATEGORIES: NavCategory[] = [
     labelKey: "nav.categories.infrastructure",
     entries: [
       { to: "/nodes", labelKey: "nav.nodes", icon: "node" },
+      // Not in the historical menu: the clusters whose daemon pushes its status, next
+      // to the nodes they group.
+      { to: "/clusters", labelKey: "nav.clusters", icon: "cluster" },
       { to: "/services", labelKey: "nav.services", icon: "service" },
       { to: "/instances", labelKey: "nav.instances", icon: "instance" },
       { to: "/networks", labelKey: "nav.networks", icon: "network" },

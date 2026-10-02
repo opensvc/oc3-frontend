@@ -13,6 +13,7 @@ import { ReportsPage } from "@/features/reports/ReportsPage";
 import { ReportReaderPage } from "@/features/report-reader/ReportReaderPage";
 import { parseReaderSearch } from "@/features/report-reader/reader-search";
 import { ChartsPage } from "@/features/charts/ChartsPage";
+import { ClustersPage } from "@/features/clusters/ClustersPage";
 import { FiltersPage } from "@/features/filters/FiltersPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
 import { FormsPage } from "@/features/forms/FormsPage";
@@ -124,6 +125,13 @@ const metricsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/metrics",
   component: MetricsPage,
+  validateSearch: parseListSearch,
+});
+
+const clustersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/clusters",
+  component: ClustersPage,
   validateSearch: parseListSearch,
 });
 
@@ -296,6 +304,7 @@ const routeTree = rootRoute.addChildren([
   dashboardRoute,
   dashboardRedirectRoute,
   nodesRoute,
+  clustersRoute,
   servicesRoute,
   instancesRoute,
   networksRoute,

@@ -6,6 +6,7 @@ import { useBookmarksPref } from "@/lib/user-prefs";
 /** Lists whose selected row is a record that can be bookmarked. */
 const ROUTE_KINDS: Record<string, string> = {
   "/nodes": "node",
+  "/clusters": "cluster",
   "/services": "service",
   "/instances": "instance",
   "/apps": "app",
