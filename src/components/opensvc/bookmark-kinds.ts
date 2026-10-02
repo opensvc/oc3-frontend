@@ -13,4 +13,5 @@ export const BOOKMARK_KINDS: ReadonlySet<string> = new Set([
   "chart",
   "report",
   "moduleset",
+  "ruleset",
 ]);

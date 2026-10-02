@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import type { CompUsage } from "@/components/opensvc/CompEditorParts";
 
 type ModulesetRow = components["schemas"]["ModulesetRow"];
 type ModuleRow = components["schemas"]["ModulesetModuleRow"];
@@ -26,12 +27,6 @@ export interface ModulesetDetail {
   /** Roles of the groups the moduleset is published to and is under the responsibility of. */
   publications: string[];
   responsibles: string[];
-}
-
-/** The node and service usage of a moduleset. */
-export interface ModulesetUsage {
-  nodes: { id: string; name: string }[];
-  services: { id: string; name: string }[];
 }
 
 const rows = <T>(data: unknown): T[] => (Array.isArray(data) ? (data as T[]) : []);
@@ -117,7 +112,7 @@ export function useModulesetUsage(modsetId: string | undefined) {
   return useQuery({
     queryKey: ["moduleset", modsetId, "usage"],
     enabled: modsetId !== undefined,
-    queryFn: async (): Promise<ModulesetUsage> => {
+    queryFn: async (): Promise<CompUsage> => {
       const path = { modset_id: modsetId ?? "" };
       const [nodes, services] = await Promise.all([
         api.GET("/compliance/modulesets/{modset_id}/nodes", {
@@ -139,42 +134,6 @@ export function useModulesetUsage(modsetId: string | undefined) {
           name: String(s.svcname ?? ""),
         })),
       };
-    },
-  });
-}
-
-/** A ruleset or a moduleset, as the pickers of the panel offer it. */
-export interface CompObject {
-  id: number;
-  name: string;
-}
-
-/** Every ruleset or every moduleset the user sees, for the pickers and the links of the panel. */
-export function useCompObjects(kind: "ruleset" | "moduleset") {
-  return useQuery({
-    queryKey: ["compliance", kind, "names"],
-    staleTime: 60_000,
-    queryFn: async (): Promise<CompObject[]> => {
-      if (kind === "ruleset") {
-        const { data, error } = await api.GET("/compliance/rulesets", {
-          params: { query: { props: "id,ruleset_name", orderby: "ruleset_name", limit: 0 } },
-        });
-        if (error !== undefined) throw new Error(problemText(error));
-        return rows<{ id?: number; ruleset_name?: string }>(data.data).flatMap((r) =>
-          r.id === undefined || r.ruleset_name === undefined
-            ? []
-            : [{ id: r.id, name: r.ruleset_name }],
-        );
-      }
-      const { data, error } = await api.GET("/compliance/modulesets", {
-        params: { query: { props: "id,modset_name", orderby: "modset_name", limit: 0 } },
-      });
-      if (error !== undefined) throw new Error(problemText(error));
-      return rows<{ id?: number; modset_name?: string }>(data.data).flatMap((m) =>
-        m.id === undefined || m.modset_name === undefined
-          ? []
-          : [{ id: m.id, name: m.modset_name }],
-      );
     },
   });
 }

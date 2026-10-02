@@ -1423,7 +1423,9 @@
       "group": "team",
       "tag": "tag",
       "user": "user",
-      "moduleset": "moduleset"
+      "moduleset": "moduleset",
+      "ruleset": "ruleset",
+      "filterset": "filterset"
     }
   },
   "actions": {
@@ -1704,21 +1706,6 @@
       "excludeModuleset": "Remove {{name}} from the included modulesets",
       "modulesetIncluded": "Moduleset {{name}} included.",
       "modulesetExcluded": "Moduleset {{name}} no longer included.",
-      "teams": "Teams",
-      "responsibles": "Responsible",
-      "publications": "Published to",
-      "noTeam": "No team",
-      "addTeam": "Add to {{list}}",
-      "removeTeam": "Remove {{team}} from {{list}}",
-      "teamAdded": "{{team}} added to {{list}}.",
-      "teamRemoved": "{{team}} removed from {{list}}.",
-      "noMatch": "Nothing matches",
-      "usedBy": "Used by",
-      "unused": "No node nor service uses it.",
-      "nodes_one": "1 node",
-      "nodes_other": "{{count}} nodes",
-      "services_one": "1 service",
-      "services_other": "{{count}} services",
       "fields": {
         "modset_name": "Name",
         "modset_author": "Author",
@@ -1748,6 +1735,52 @@
       "var_author": "Author",
       "encap_rset_id": "Encapsulated ruleset id",
       "fset_id": "Filterset id"
+    },
+    "detail": {
+      "title": "Ruleset",
+      "notFound": "This ruleset does not exist, or is not published to your groups.",
+      "groups": {
+        "identity": "Identity",
+        "record": "Record"
+      },
+      "fields": {
+        "ruleset_name": "Name",
+        "ruleset_type": "Type",
+        "ruleset_public": "Public",
+        "id": "Ruleset id"
+      },
+      "editHint": "Editing a ruleset requires the CompManager privilege and the responsibility of the ruleset. Every change is written to the collector at once.",
+      "readOnly": "Read only: none of your groups is responsible for this ruleset.",
+      "saved": "Ruleset saved.",
+      "filterset": "Filterset",
+      "filtersetHint": "A contextual ruleset applies to the nodes and services its filterset selects.",
+      "noFilterset": "No filterset: the ruleset applies to nothing.",
+      "setFilterset": "Set the filterset",
+      "removeFilterset": "Remove the filterset {{name}}",
+      "filtersetSet": "Filterset {{name}} set.",
+      "filtersetRemoved": "Filterset {{name}} removed.",
+      "variables": "Variables",
+      "noVariable": "No variable yet.",
+      "variableName": "Variable name",
+      "variableClass": "Class",
+      "addVariable": "Add a variable",
+      "variableAdded": "Variable {{name}} added.",
+      "renameVariable": "Rename {{name}}",
+      "variableRenamed": "Variable renamed {{name}}.",
+      "removeVariable": "Remove {{name}}",
+      "variableRemoved": "Variable {{name}} removed.",
+      "editValue": "Edit the value",
+      "saveValue": "Save the value",
+      "valueSaved": "Value of {{name}} saved.",
+      "cancel": "Cancel",
+      "emptyValue": "No value.",
+      "rawValue": "Value, as stored",
+      "rulesets": "Included rulesets",
+      "noRuleset": "No ruleset included.",
+      "includeRuleset": "Include a ruleset",
+      "excludeRuleset": "Remove {{name}} from the included rulesets",
+      "rulesetIncluded": "Ruleset {{name}} included.",
+      "rulesetExcluded": "Ruleset {{name}} no longer included."
     }
   },
   "complianceLogs": {
@@ -2094,5 +2127,28 @@
     "dialogTitle": "Impersonate a user",
     "user": "User id or email",
     "cancel": "Cancel"
+  },
+  "compEditor": {
+    "teams": "Teams",
+    "responsibles": "Responsible",
+    "publications": "Published to",
+    "noTeam": "No team",
+    "addTeam": "Add to {{list}}",
+    "removeTeam": "Remove {{team}} from {{list}}",
+    "teamAdded": "{{team}} added to {{list}}.",
+    "teamRemoved": "{{team}} removed from {{list}}.",
+    "noMatch": "Nothing matches",
+    "usedBy": "Used by",
+    "unused": "Nothing uses it.",
+    "usage": {
+      "moduleset_one": "1 moduleset",
+      "moduleset_other": "{{count}} modulesets",
+      "ruleset_one": "1 ruleset",
+      "ruleset_other": "{{count}} rulesets",
+      "node_one": "1 node",
+      "node_other": "{{count}} nodes",
+      "service_one": "1 service",
+      "service_other": "{{count}} services"
+    }
   }
 }

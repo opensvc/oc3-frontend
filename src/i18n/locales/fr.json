@@ -1423,7 +1423,9 @@
       "group": "équipe",
       "tag": "tag",
       "user": "utilisateur",
-      "moduleset": "moduleset"
+      "moduleset": "moduleset",
+      "ruleset": "ruleset",
+      "filterset": "filterset"
     }
   },
   "actions": {
@@ -1704,21 +1706,6 @@
       "excludeModuleset": "Retirer {{name}} des modulesets inclus",
       "modulesetIncluded": "Moduleset {{name}} inclus.",
       "modulesetExcluded": "Moduleset {{name}} n'est plus inclus.",
-      "teams": "Équipes",
-      "responsibles": "Responsables",
-      "publications": "Publié à",
-      "noTeam": "Aucune équipe",
-      "addTeam": "Ajouter à {{list}}",
-      "removeTeam": "Retirer {{team}} de {{list}}",
-      "teamAdded": "{{team}} ajouté à {{list}}.",
-      "teamRemoved": "{{team}} retiré de {{list}}.",
-      "noMatch": "Aucune correspondance",
-      "usedBy": "Utilisé par",
-      "unused": "Aucun nœud ni service ne l'utilise.",
-      "nodes_one": "1 nœud",
-      "nodes_other": "{{count}} nœuds",
-      "services_one": "1 service",
-      "services_other": "{{count}} services",
       "fields": {
         "modset_name": "Nom",
         "modset_author": "Auteur",
@@ -1748,6 +1735,52 @@
       "var_author": "Auteur",
       "encap_rset_id": "Id du ruleset encapsulé",
       "fset_id": "Id du filterset"
+    },
+    "detail": {
+      "title": "Ruleset",
+      "notFound": "Ce ruleset n'existe pas, ou n'est pas publié à vos groupes.",
+      "groups": {
+        "identity": "Identité",
+        "record": "Enregistrement"
+      },
+      "fields": {
+        "ruleset_name": "Nom",
+        "ruleset_type": "Type",
+        "ruleset_public": "Public",
+        "id": "Id du ruleset"
+      },
+      "editHint": "Modifier un ruleset requiert le privilège CompManager et la responsabilité du ruleset. Chaque modification est écrite aussitôt dans le collecteur.",
+      "readOnly": "Lecture seule : aucun de vos groupes n'est responsable de ce ruleset.",
+      "saved": "Ruleset enregistré.",
+      "filterset": "Filterset",
+      "filtersetHint": "Un ruleset contextuel s'applique aux nœuds et services que son filterset sélectionne.",
+      "noFilterset": "Aucun filterset : le ruleset ne s'applique à rien.",
+      "setFilterset": "Choisir le filterset",
+      "removeFilterset": "Retirer le filterset {{name}}",
+      "filtersetSet": "Filterset {{name}} choisi.",
+      "filtersetRemoved": "Filterset {{name}} retiré.",
+      "variables": "Variables",
+      "noVariable": "Aucune variable pour l'instant.",
+      "variableName": "Nom de la variable",
+      "variableClass": "Classe",
+      "addVariable": "Ajouter une variable",
+      "variableAdded": "Variable {{name}} ajoutée.",
+      "renameVariable": "Renommer {{name}}",
+      "variableRenamed": "Variable renommée {{name}}.",
+      "removeVariable": "Retirer {{name}}",
+      "variableRemoved": "Variable {{name}} retirée.",
+      "editValue": "Modifier la valeur",
+      "saveValue": "Enregistrer la valeur",
+      "valueSaved": "Valeur de {{name}} enregistrée.",
+      "cancel": "Annuler",
+      "emptyValue": "Aucune valeur.",
+      "rawValue": "Valeur, telle que stockée",
+      "rulesets": "Rulesets inclus",
+      "noRuleset": "Aucun ruleset inclus.",
+      "includeRuleset": "Inclure un ruleset",
+      "excludeRuleset": "Retirer {{name}} des rulesets inclus",
+      "rulesetIncluded": "Ruleset {{name}} inclus.",
+      "rulesetExcluded": "Ruleset {{name}} n'est plus inclus."
     }
   },
   "complianceLogs": {
@@ -2094,5 +2127,28 @@
     "dialogTitle": "Se faire passer pour un utilisateur",
     "user": "Identifiant ou email de l'utilisateur",
     "cancel": "Annuler"
+  },
+  "compEditor": {
+    "teams": "Équipes",
+    "responsibles": "Responsables",
+    "publications": "Publié à",
+    "noTeam": "Aucune équipe",
+    "addTeam": "Ajouter à {{list}}",
+    "removeTeam": "Retirer {{team}} de {{list}}",
+    "teamAdded": "{{team}} ajouté à {{list}}.",
+    "teamRemoved": "{{team}} retiré de {{list}}.",
+    "noMatch": "Aucune correspondance",
+    "usedBy": "Utilisé par",
+    "unused": "Rien ne l'utilise.",
+    "usage": {
+      "moduleset_one": "1 moduleset",
+      "moduleset_other": "{{count}} modulesets",
+      "ruleset_one": "1 ruleset",
+      "ruleset_other": "{{count}} rulesets",
+      "node_one": "1 nœud",
+      "node_other": "{{count}} nœuds",
+      "service_one": "1 service",
+      "service_other": "{{count}} services"
+    }
   }
 }

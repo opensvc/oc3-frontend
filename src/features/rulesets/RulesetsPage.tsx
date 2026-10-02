@@ -23,6 +23,7 @@ import {
 } from "@/lib/list-search";
 import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
+import { RulesetDetailPanel } from "./RulesetDetailPanel";
 
 /**
  * A variable of a ruleset, its own or one of a ruleset it encapsulates, or a ruleset
@@ -140,6 +141,16 @@ function queryProps(cols: string[] | undefined): string {
   return [...new Set([...FETCHED_PROPS, ...visibleProps(cols, DEFAULT_COLS, ALL_PROPS)])].join(",");
 }
 
+/**
+ * The ruleset of a selected row, whose key is "<ruleset id>:<encapsulated ruleset
+ * id>:<variable id>": the ruleset the row is listed under, even when the variable
+ * comes from a ruleset it encapsulates.
+ */
+function rulesetOf(sel: string | undefined): string | undefined {
+  const id = sel?.split(":")[0];
+  return id === undefined || id === "" ? undefined : id;
+}
+
 function rowKey(row: RulesetRow): string | undefined {
   if (row.id === undefined || row.ruleset_id === undefined) return undefined;
   return `${String(row.ruleset_id)}:${String(row.encap_rset_id ?? 0)}:${String(row.id)}`;
@@ -188,8 +199,9 @@ function useRulesets(search: ResolvedListSearch) {
 /**
  * The variables of the compliance rulesets published to the user's groups, one row
  * per variable with its ruleset, the ruleset's filterset and teams, and the
- * encapsulated ruleset it comes from, as the collector's rulesets view. Read-only;
- * the rows are filtered and sorted by the server.
+ * encapsulated ruleset it comes from, as the collector's rulesets view. The rows
+ * are filtered and sorted by the server; a row opens the panel of its ruleset,
+ * where it is read and edited.
  */
 export function RulesetsPage() {
   const { t } = useTranslation();
@@ -200,6 +212,7 @@ export function RulesetsPage() {
   );
   const navigate = useNavigate({ from: "/compliance/rulesets" });
   const { data, isPending, isError, error, isFetching } = useRulesets(search);
+  const selected = data?.rows.find((row) => rowKey(row) === search.sel);
 
   /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
@@ -250,6 +263,14 @@ export function RulesetsPage() {
         total={data?.total}
         selectAllMatching={allIds}
         filterable
+      />
+
+      <RulesetDetailPanel
+        rsetId={rulesetOf(search.sel)}
+        label={selected?.ruleset_name ?? ""}
+        onClose={() => {
+          update({ sel: undefined });
+        }}
       />
     </section>
   );

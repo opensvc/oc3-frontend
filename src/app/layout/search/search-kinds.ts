@@ -268,18 +268,15 @@ export function toHit(
         undefined,
       );
     case "ruleset": {
-      const name = text(item, "ruleset_name");
-      return {
-        key: `${kind}:${text(item, "id")}`,
-        kind,
-        label: name,
-        context: facts(
+      return peek(
+        text(item, "id"),
+        text(item, "ruleset_name"),
+        facts(
           text(item, "ruleset_type"),
           text(item, "ruleset_public") === "T" ? t("search.public") : "",
         ),
-        ref: undefined,
-        target: list("/compliance/rulesets", "ruleset_name", `eq:${name}`),
-      };
+        undefined,
+      );
     }
     case "filterset": {
       const id = text(item, "id");

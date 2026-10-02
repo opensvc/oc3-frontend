@@ -14,6 +14,7 @@ import { MetricDetailPanel } from "@/features/metrics/MetricDetailPanel";
 import { ChartDetailPanel } from "@/features/charts/ChartDetailPanel";
 import { ReportDetailPanel } from "@/features/reports/ReportDetailPanel";
 import { ModulesetDetailPanel } from "@/features/modulesets/ModulesetDetailPanel";
+import { RulesetDetailPanel } from "@/features/rulesets/RulesetDetailPanel";
 import { useTag } from "@/features/tags/use-tag";
 import { currentIndex, parseTrail } from "@/lib/peek-trail";
 import { isPeekStep } from "@/components/opensvc/panel-trail";
@@ -152,6 +153,8 @@ export function PeekPanel() {
         );
       case "moduleset":
         return <ModulesetDetailPanel modsetId={id} label={label} onClose={close} />;
+      case "ruleset":
+        return <RulesetDetailPanel rsetId={id} label={label} onClose={close} />;
       default:
         return null;
     }
