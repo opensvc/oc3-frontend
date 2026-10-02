@@ -4147,13 +4147,45 @@ export interface paths {
         /**
          * @description The availability of a service over the last days, as periods of one status:
          *     the closed ones of services_log and the current one of services_log_last,
-         *     oldest first, clipped to the period. The service must be visible to the
-         *     caller.
+         *     oldest first, with their justification when they have one. The availability
+         *     rate of the period follows, as the historical service availability computes
+         *     it: the time up or standby up over the time counted, from the start of the
+         *     history when that is later; the time no status covers is downtime, and the
+         *     justified downtime marked not to account is left out of the count. The
+         *     service must be visible to the caller.
          */
         get: operations["GetServiceStatusLog"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/services/{svc_id}/status_log/ack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * @description Justify a period of the availability of a service, or change its
+         *     justification: a comment, and whether the period still counts in the
+         *     availability rate. The period is named by its bounds, as the status log
+         *     gives them. Requires the responsibility of the service. The change is
+         *     logged.
+         */
+        put: operations["PutServiceStatusLogAck"];
+        post?: never;
+        /**
+         * @description Remove the justification of a period of the availability of a service,
+         *     named by its bounds. Requires the responsibility of the service. The
+         *     change is logged.
+         */
+        delete: operations["DeleteServiceStatusLogAck"];
         options?: never;
         head?: never;
         patch?: never;
@@ -5760,6 +5792,20 @@ export interface components {
         SearchResponse: {
             data: components["schemas"]["SearchGroup"][];
         };
+        ServiceAvailability: {
+            available_s: number;
+            counted_s: number;
+            /** @description The justified downtime left out of the count. */
+            excluded_s: number;
+            /** @description The start of the time counted, the start of the history when later than the days asked. */
+            from: string;
+            /**
+             * Format: double
+             * @description The available share of the counted time, in percent.
+             */
+            rate: number;
+            to: string;
+        };
         ServiceListResponse: {
             data: components["schemas"]["ServiceRow"][] | {
                 [key: string]: {
@@ -5811,12 +5857,20 @@ export interface components {
             updated?: string;
         };
         ServiceStatusPeriod: {
+            ack?: components["schemas"]["StatusAck"];
             /** @description "YYYY-MM-DD HH:MM:SS" in the collector time zone. */
             begin: string;
             /** @description Its end; for the current period, the last status received. */
             end: string;
             /** @description The availability status of the service. */
             status: string;
+        };
+        StatusAck: {
+            /** @description Whether the period still counts in the availability rate. */
+            account: boolean;
+            acked_by: string;
+            acked_on: string;
+            comment: string;
         };
         SwitchPortListResponse: {
             data: components["schemas"]["SwitchPortRow"][] | {
@@ -17653,7 +17707,10 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        /** @description Whether one of the groups of the caller is responsible for the service, a Manager being responsible for all. */
+                        data: boolean;
+                    };
                 };
             };
             401: components["responses"]["401"];
@@ -18654,12 +18711,86 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        availability: components["schemas"]["ServiceAvailability"];
                         data: components["schemas"]["ServiceStatusPeriod"][];
                     };
                 };
             };
             400: components["responses"]["400"];
             401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    PutServiceStatusLogAck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service id or name */
+                svc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description False to leave the period out of the availability rate. */
+                    account: boolean;
+                    begin: string;
+                    comment: string;
+                    end: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteServiceStatusLogAck: {
+        parameters: {
+            query: {
+                begin: string;
+                end: string;
+            };
+            header?: never;
+            path: {
+                /** @description Service id or name */
+                svc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        info?: string;
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
             404: components["responses"]["404"];
             500: components["responses"]["500"];
         };

@@ -206,11 +206,13 @@ export function InstanceDetailPanel({
                       },
                     );
                     if (failure !== undefined) throw new Error(problemText(failure));
-                    return data.data.map((p) => ({
-                      begin: p.begin,
-                      end: p.end,
-                      values: { avail: p.avail, overall: p.overall },
-                    }));
+                    return {
+                      periods: data.data.map((p) => ({
+                        begin: p.begin,
+                        end: p.end,
+                        values: { avail: p.avail, overall: p.overall },
+                      })),
+                    };
                   }}
                 />
               ),

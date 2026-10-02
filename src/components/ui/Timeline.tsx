@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { formatDuration } from "@/lib/format";
 
 /** The colour of a range: a state, read with its label rather than alone. */
@@ -14,6 +14,8 @@ export interface TimelineRange {
   tone?: TimelineTone;
   /** What the period was, such as a status, shown with its dates. */
   label?: string;
+  /** A remark on the period, such as its justification, shown in the tooltip. */
+  note?: string;
 }
 
 /** A row of the timeline, named when there are several. */
@@ -37,6 +39,10 @@ export interface TimelineLabels {
   status?: string;
   /** Header of the track column of the table, when there are several tracks. */
   track?: string;
+  /** Header of the action column of the table, when `rowAction` is given. */
+  action?: string;
+  /** How to open a period from the keyboard, read with the title when `onSelect` is given. */
+  selectHint?: string;
 }
 
 const FILL: Record<TimelineTone, string> = {
@@ -77,12 +83,27 @@ export function Timeline({
   from,
   labels,
   locale,
+  rowAction,
+  tableOpen,
+  onSelect,
+  selected,
 }: {
   tracks: TimelineTrack[];
   now: number;
   from?: number;
   labels: TimelineLabels;
   locale: string;
+  /** Content of a last column of the table, by period, such as its justification. */
+  rowAction?: (range: TimelineRange, track: TimelineTrack) => ReactNode;
+  /** Unfolds the table from the start. */
+  tableOpen?: boolean;
+  /**
+   * Called with the period clicked, or chosen with Enter from the keyboard: the
+   * caller opens its details. The period selected is outlined.
+   */
+  onSelect?: (range: TimelineRange, track: TimelineTrack) => void;
+  /** Key of the selected period, as `${track.key}/${range.key}`. */
+  selected?: string;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(600);
@@ -189,6 +210,15 @@ export function Timeline({
         next = { track, range: index === -1 ? other.length - 1 : index };
         break;
       }
+      case "Enter":
+      case " ": {
+        const range = tracks[current.track]?.ranges[current.range];
+        const track = tracks[current.track];
+        if (onSelect === undefined || range === undefined || track === undefined) return;
+        event.preventDefault();
+        onSelect(range, track);
+        return;
+      }
       case "Escape":
         if (active !== null) {
           event.stopPropagation();
@@ -203,7 +233,7 @@ export function Timeline({
   }
 
   const rows = tracks.flatMap((track) =>
-    [...track.ranges].reverse().map((r) => ({ track: track.label, range: r })),
+    [...track.ranges].reverse().map((r) => ({ track, range: r })),
   );
 
   return (
@@ -211,7 +241,11 @@ export function Timeline({
       <div
         ref={box}
         role="img"
-        aria-label={labels.title}
+        aria-label={
+          onSelect === undefined || labels.selectHint === undefined
+            ? labels.title
+            : `${labels.title}. ${labels.selectHint}`
+        }
         tabIndex={0}
         onKeyDown={onKeyDown}
         onPointerMove={(event) => {
@@ -220,10 +254,17 @@ export function Timeline({
         onPointerLeave={() => {
           setActive(null);
         }}
+        onClick={(event) => {
+          if (onSelect === undefined) return;
+          const hit = nearest(event.clientX, event.clientY);
+          const track = hit === null ? undefined : tracks[hit.track];
+          const range = hit === null ? undefined : track?.ranges[hit.range];
+          if (track !== undefined && range !== undefined) onSelect(range, track);
+        }}
         onBlur={() => {
           setActive(null);
         }}
-        className="relative rounded-(--radius-control) focus-visible:outline-2 focus-visible:outline-accent"
+        className={`relative rounded-(--radius-control) focus-visible:outline-2 focus-visible:outline-accent ${onSelect === undefined || active === null ? "" : "cursor-pointer"}`}
       >
         <svg width={width} height={height} aria-hidden="true" className="block">
           {tracks.map((track, ti) => (
@@ -248,6 +289,7 @@ export function Timeline({
               {track.ranges.map((r, ri) => {
                 const { x0, w } = geometry(r);
                 const isActive = active?.track === ti && active.range === ri;
+                const isSelected = selected === `${track.key}/${r.key}`;
                 return (
                   <rect
                     key={r.key}
@@ -256,7 +298,8 @@ export function Timeline({
                     width={w}
                     height={TRACK_HEIGHT}
                     rx={2}
-                    className={`${FILL[r.tone ?? "down"]} ${isActive ? "" : active === null ? "opacity-80" : "opacity-40"}`}
+                    className={`${FILL[r.tone ?? "down"]} ${isActive || isSelected ? "" : active === null ? "opacity-80" : "opacity-40"} ${isSelected ? "stroke-ink" : ""}`}
+                    strokeWidth={isSelected ? 2 : 0}
                   />
                 );
               })}
@@ -306,6 +349,7 @@ export function Timeline({
               <span className="text-ink-muted">{labels.duration} </span>
               {formatDuration(shown.end - shown.start, locale)}
             </div>
+            {shown.note !== undefined && <div className="mt-0.5 max-w-64 italic">{shown.note}</div>}
           </div>
         )}
       </div>
@@ -319,7 +363,7 @@ export function Timeline({
           ))}
         </ul>
       )}
-      <details className="text-data">
+      <details className="text-data" open={tableOpen}>
         <summary className="cursor-pointer text-ink-muted">{labels.showTable}</summary>
         <table className="mt-1 w-full">
           <thead>
@@ -328,17 +372,19 @@ export function Timeline({
               {withLabels && <th className="py-0.5 pr-3 font-normal">{labels.status}</th>}
               <th className="py-0.5 pr-3 font-normal">{labels.start}</th>
               <th className="py-0.5 pr-3 font-normal">{labels.end}</th>
-              <th className="py-0.5 font-normal">{labels.duration}</th>
+              <th className="py-0.5 pr-3 font-normal">{labels.duration}</th>
+              {rowAction !== undefined && <th className="py-0.5 font-normal">{labels.action}</th>}
             </tr>
           </thead>
           <tbody>
             {rows.map(({ track, range: r }) => (
-              <tr key={`${track ?? ""}/${r.key}`} className="border-t border-line">
-                {named && <td className="py-0.5 pr-3">{track}</td>}
+              <tr key={`${track.key}/${r.key}`} className="border-t border-line align-top">
+                {named && <td className="py-0.5 pr-3">{track.label}</td>}
                 {withLabels && <td className="py-0.5 pr-3">{r.label}</td>}
                 <td className="py-0.5 pr-3">{dateTime.format(new Date(r.start * 1000))}</td>
                 <td className="py-0.5 pr-3">{endText(r)}</td>
-                <td className="py-0.5">{formatDuration(r.end - r.start, locale)}</td>
+                <td className="py-0.5 pr-3">{formatDuration(r.end - r.start, locale)}</td>
+                {rowAction !== undefined && <td className="py-0.5">{rowAction(r, track)}</td>}
               </tr>
             ))}
           </tbody>

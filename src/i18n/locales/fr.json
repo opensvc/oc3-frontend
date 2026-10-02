@@ -2241,6 +2241,27 @@
     "duration": "Durée",
     "status": "État",
     "track": "État de",
-    "showTable": "Afficher les périodes"
+    "showTable": "Afficher les périodes",
+    "rate": "Disponibilité {{rate}} %",
+    "rateSince": "depuis le {{since}}",
+    "rateExcluded": "{{duration}} d'indisponibilité justifiée non comptée",
+    "justification": "Justification",
+    "justify": "Justifier",
+    "comment": "Pourquoi le service était indisponible",
+    "exclude": "Ne pas compter dans la disponibilité",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "remove": "Retirer",
+    "edit": "Modifier la justification",
+    "counted": "Comptée dans la disponibilité",
+    "excluded": "Non comptée dans la disponibilité",
+    "by": "{{by}}, {{on}}",
+    "justifiedNote": "Justifiée : {{comment}}",
+    "justifiedExcludedNote": "Justifiée, non comptée : {{comment}}",
+    "selectHint": "Flèches pour parcourir les périodes, Entrée pour en ouvrir une.",
+    "details": "Détails de la période",
+    "ongoingNoJustify": "En cours : justifiable une fois terminée.",
+    "availableNoJustify": "Disponible : rien à justifier.",
+    "notJustified": "Non justifiée."
   }
 }

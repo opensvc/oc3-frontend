@@ -153,6 +153,18 @@ export function ServiceDetailPanel({
   const open = svcId !== undefined;
   const tags = useServiceTags(svcId);
   const tagEdit = useTagEdit("service", svcId);
+  // The owners of the service justify its periods of unavailability.
+  const responsible = useQuery({
+    queryKey: ["service", svcId, "responsible"],
+    enabled: svcId !== undefined,
+    queryFn: async () => {
+      const { data, error: failure } = await api.GET("/services/{svc_id}/am_i_responsible", {
+        params: { path: { svc_id: svcId ?? "" } },
+      });
+      if (failure !== undefined) throw new Error(problemText(failure));
+      return data.data === true;
+    },
+  });
 
   return (
     <RelatedTabsPanel
@@ -201,16 +213,53 @@ export function ServiceDetailPanel({
                     load={async (days) => {
                       const { data, error: failure } = await api.GET(
                         "/services/{svc_id}/status_log",
-                        {
-                          params: { path: { svc_id: svcId }, query: { days } },
-                        },
+                        { params: { path: { svc_id: svcId }, query: { days } } },
                       );
                       if (failure !== undefined) throw new Error(problemText(failure));
-                      return data.data.map((p) => ({
-                        begin: p.begin,
-                        end: p.end,
-                        values: { avail: p.status },
-                      }));
+                      return {
+                        periods: data.data.map((p) => ({
+                          begin: p.begin,
+                          end: p.end,
+                          values: { avail: p.status },
+                          ack:
+                            p.ack === undefined
+                              ? undefined
+                              : {
+                                  comment: p.ack.comment,
+                                  account: p.ack.account,
+                                  by: p.ack.acked_by,
+                                  on: p.ack.acked_on,
+                                },
+                        })),
+                        availability: {
+                          rate: data.availability.rate,
+                          from: data.availability.from,
+                          excludedSeconds: data.availability.excluded_s,
+                        },
+                      };
+                    }}
+                    justify={{
+                      track: "avail",
+                      canEdit: responsible.data === true,
+                      save: async (begin, end, comment, account) => {
+                        const { error: failure } = await api.PUT(
+                          "/services/{svc_id}/status_log/ack",
+                          {
+                            params: { path: { svc_id: svcId } },
+                            body: { begin, end, comment, account },
+                          },
+                        );
+                        return failure === undefined ? null : problemText(failure);
+                      },
+                      remove: async (begin, end) => {
+                        const { error: failure } = await api.DELETE(
+                          "/services/{svc_id}/status_log/ack",
+                          {
+                            params: { path: { svc_id: svcId }, query: { begin, end } },
+                          },
+                        );
+                        return failure === undefined ? null : problemText(failure);
+                      },
                     }}
                   />
                 ),

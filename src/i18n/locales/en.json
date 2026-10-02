@@ -2241,6 +2241,27 @@
     "duration": "Lasted",
     "status": "Status",
     "track": "Status of",
-    "showTable": "Show the periods"
+    "showTable": "Show the periods",
+    "rate": "Availability {{rate}} %",
+    "rateSince": "since {{since}}",
+    "rateExcluded": "{{duration}} of justified downtime left out",
+    "justification": "Justification",
+    "justify": "Justify",
+    "comment": "Why the service was unavailable",
+    "exclude": "Leave out of the availability rate",
+    "save": "Save",
+    "cancel": "Cancel",
+    "remove": "Remove",
+    "edit": "Edit the justification",
+    "counted": "Counted in the availability",
+    "excluded": "Left out of the availability",
+    "by": "{{by}}, {{on}}",
+    "justifiedNote": "Justified: {{comment}}",
+    "justifiedExcludedNote": "Justified, left out of the availability: {{comment}}",
+    "selectHint": "Arrows to walk the periods, Enter to open one.",
+    "details": "Period details",
+    "ongoingNoJustify": "Ongoing: it can be justified once it has ended.",
+    "availableNoJustify": "Available: nothing to justify.",
+    "notJustified": "Not justified."
   }
 }
