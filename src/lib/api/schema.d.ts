@@ -5824,6 +5824,16 @@ export interface components {
             id?: number;
             svc_app?: string;
             svc_autostart?: string;
+            /**
+             * Format: double
+             * @description The availability rate of the last 30 days, in percent, as the status
+             *     history of the service computes it, stored by the scheduler every 10
+             *     minutes and at once when a justification changes; sortable and
+             *     filterable. Null without status recorded.
+             */
+            svc_availability?: number | null;
+            /** @description When svc_availability was computed. */
+            svc_availability_updated?: string | null;
             svc_availstatus?: string;
             svc_comment?: string;
             svc_config?: string;
@@ -5848,6 +5858,11 @@ export interface components {
             svc_notifications?: string;
             svc_placement?: string;
             svc_provisioned?: string;
+            /**
+             * Format: double
+             * @description The availability target, in percent; null without SLA.
+             */
+            svc_sla?: number | null;
             svc_snooze_till?: string;
             svc_status?: string;
             svc_status_updated?: string;
@@ -17593,6 +17608,11 @@ export interface operations {
                     svc_notifications?: boolean;
                     svc_placement?: string;
                     svc_provisioned?: string;
+                    /**
+                     * @description The availability target, a percent between 0 and 100, compared with
+                     *     the availability rate of the service; empty to remove it.
+                     */
+                    svc_sla?: string;
                     svc_snooze_till?: string;
                     svc_topology?: string;
                     svc_wave?: number;

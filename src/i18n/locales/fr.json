@@ -564,7 +564,10 @@
       "updated": "Mis à jour",
       "svc_hostid": "Identifiant d'hôte",
       "id": "Identifiant d'enregistrement",
-      "svc_config": "Configuration"
+      "svc_config": "Configuration",
+      "svc_sla": "SLA",
+      "svc_availability": "Disponibilité (30 jours)",
+      "svc_availability_updated": "Disponibilité calculée"
     },
     "detail": {
       "title": "Détail du service",
@@ -657,7 +660,8 @@
         "error": "lecture impossible",
         "none": "rien à comparer"
       }
-    }
+    },
+    "belowSla": "sous le SLA de {{sla}}"
   },
   "alerts": {
     "fields": {

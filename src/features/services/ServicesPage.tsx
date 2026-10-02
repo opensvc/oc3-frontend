@@ -28,6 +28,8 @@ import {
 import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ServiceDetailPanel } from "./ServiceDetailPanel";
+import { AvailabilityRate } from "@/components/opensvc/AvailabilityRate";
+import { formatPercent } from "@/lib/format";
 
 type ServiceRow = components["schemas"]["ServiceRow"];
 
@@ -74,6 +76,9 @@ const SERVICE_PROPS = [
   "svc_drnoaction",
   "svc_notifications",
   "svc_snooze_till",
+  "svc_sla",
+  "svc_availability",
+  "svc_availability_updated",
   "updated",
 ] as const satisfies readonly (keyof ServiceRow)[];
 
@@ -83,12 +88,16 @@ const DEFAULT_COLS: string[] = [
   "svc_availstatus",
   "svc_status",
   "svc_app",
+  "svc_sla",
+  "svc_availability",
   "svc_status_updated",
 ];
 
 /** Integer props of the oc3 `service` mapping (the `colInt` and `col` helpers), aligned right. */
 const NUMERIC_PROPS = new Set<string>([
   "id",
+  "svc_sla",
+  "svc_availability",
   "svc_ha",
   "svc_wave",
   "svc_flex_min_nodes",
@@ -100,6 +109,7 @@ const NUMERIC_PROPS = new Set<string>([
 
 /** Props the collector stores as datetime. */
 const DATE_PROPS = new Set<string>([
+  "svc_availability_updated",
   "svc_created",
   "svc_status_updated",
   "svc_config_updated",
@@ -146,6 +156,9 @@ const FAMILY: Record<string, ColumnFamily> = {
   svc_drnoaction: "service",
   svc_notifications: "alert",
   svc_snooze_till: "alert",
+  svc_sla: "state",
+  svc_availability: "state",
+  svc_availability_updated: "time",
   updated: "time",
 };
 
@@ -170,6 +183,12 @@ const COLUMNS: ListColumn<ServiceRow>[] = SERVICE_PROPS.map((prop) => ({
     if (STATUS_PROPS.has(prop) && typeof value === "string") {
       return <StatusBadge {...statusBadge(value)} />;
     }
+    if (prop === "svc_sla")
+      return typeof value === "number" ? formatPercent(value, locale, 3) : null;
+    if (prop === "svc_availability")
+      return typeof value === "number" ? (
+        <AvailabilityRate rate={value} sla={row.svc_sla} locale={locale} />
+      ) : null;
     // Like the last contact of a node: what counts is the age of the status.
     if (prop === "svc_status_updated" && typeof value === "string")
       return <RelativeTime value={value} locale={locale} />;
@@ -185,7 +204,9 @@ const ALL_PROPS = COLUMNS.map((column) => column.prop);
 /** `svc_frozen` is always requested: freezing is marked even with the column hidden. */
 function queryProps(cols: string[] | undefined): string {
   const shown = visibleProps(cols, DEFAULT_COLS, ALL_PROPS);
-  return [...new Set(["svc_id", "svc_frozen", ...shown])].join(",");
+  // The SLA goes with the availability, which is flagged against it.
+  const withSla = shown.includes("svc_availability") ? ["svc_sla"] : [];
+  return [...new Set(["svc_id", "svc_frozen", ...withSla, ...shown])].join(",");
 }
 
 /**

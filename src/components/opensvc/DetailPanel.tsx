@@ -97,7 +97,7 @@ interface DetailContentProps<T> {
   /**
    * Note shown under the properties when editing is possible. By default the one for
    * nodes, part of whose attributes come from the agent; every object whose rule
-   * differs provides its own.
+   * differs provides its own, or the empty string for none.
    */
   editHint?: string;
   /**
@@ -436,7 +436,9 @@ export function DetailContent<T>({
             </p>
           )}
 
-          {canEdit && <p className="text-ink-muted">{editHint ?? t("detail.editHint")}</p>}
+          {canEdit && editHint !== "" && (
+            <p className="text-ink-muted">{editHint ?? t("detail.editHint")}</p>
+          )}
         </div>
       )}
 

@@ -564,7 +564,10 @@
       "updated": "Updated",
       "svc_hostid": "Host id",
       "id": "Record id",
-      "svc_config": "Configuration"
+      "svc_config": "Configuration",
+      "svc_sla": "SLA",
+      "svc_availability": "Availability (30 days)",
+      "svc_availability_updated": "Availability computed"
     },
     "detail": {
       "title": "Service details",
@@ -657,7 +660,8 @@
         "error": "could not be read",
         "none": "nothing to compare"
       }
-    }
+    },
+    "belowSla": "below the {{sla}} SLA"
   },
   "alerts": {
     "fields": {

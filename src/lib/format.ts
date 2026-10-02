@@ -108,3 +108,8 @@ export function formatDuration(seconds: number, locale: string): string {
   }
   return parts.join(" ");
 }
+
+/** A percent, with up to two decimals, in the locale. */
+export function formatPercent(value: number, locale: string, digits = 2): string {
+  return `${new Intl.NumberFormat(locale, { maximumFractionDigits: digits }).format(value)} %`;
+}

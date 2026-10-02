@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { statusField } from "@/components/opensvc/status-field";
+import { AvailabilityRate } from "@/components/opensvc/AvailabilityRate";
+import { formatPercent } from "@/lib/format";
 import { linkedField } from "@/components/opensvc/linked-field";
 import { NodeNameLinks } from "@/components/opensvc/NodeNameLinks";
 import { ObjectTags } from "@/components/opensvc/ObjectTags";
@@ -61,6 +63,25 @@ const GROUPS: DetailGroup<ServiceRow>[] = [
     fields: [
       statusField<ServiceRow>("svc_availstatus", (row) => row.svc_availstatus),
       statusField<ServiceRow>("svc_status", (row) => row.svc_status),
+      // The availability target the Services view flags the rate against; set by
+      // the responsibles of the service, empty to remove it.
+      {
+        prop: "svc_sla",
+        format: (row) => (typeof row.svc_sla === "number" ? String(row.svc_sla) : undefined),
+        render: (row, locale) =>
+          typeof row.svc_sla === "number" ? formatPercent(row.svc_sla, locale, 3) : null,
+        editable: true,
+      },
+      {
+        prop: "svc_availability",
+        format: (row) =>
+          typeof row.svc_availability === "number" ? String(row.svc_availability) : undefined,
+        // Flagged against the SLA, as in the Services view.
+        render: (row, locale) =>
+          typeof row.svc_availability === "number" ? (
+            <AvailabilityRate rate={row.svc_availability} sla={row.svc_sla} locale={locale} />
+          ) : null,
+      },
       field("svc_frozen"),
       field("svc_provisioned"),
       field("svc_status_updated", date("svc_status_updated")),
@@ -153,6 +174,7 @@ export function ServiceDetailPanel({
   const open = svcId !== undefined;
   const tags = useServiceTags(svcId);
   const tagEdit = useTagEdit("service", svcId);
+  const queryClient = useQueryClient();
   // The owners of the service justify its periods of unavailability.
   const responsible = useQuery({
     queryKey: ["service", svcId, "responsible"],
@@ -199,6 +221,21 @@ export function ServiceDetailPanel({
         groupPrefix="services.detail.groups"
         isPending={open && isPending}
         errorMessage={isError ? error.message : null}
+        editHint=""
+        onSave={async (changes) => {
+          if (svcId === undefined) return;
+          const sla = changes.svc_sla;
+          if (typeof sla !== "string") return;
+          const { error: failure } = await api.POST("/services/{svc_id}", {
+            params: { path: { svc_id: svcId } },
+            body: { svc_sla: sla },
+          });
+          if (failure !== undefined) throw new Error(problemText(failure));
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ["service", svcId] }),
+            queryClient.invalidateQueries({ queryKey: ["services"] }),
+          ]);
+        }}
         groupFooters={
           svcId === undefined
             ? undefined
