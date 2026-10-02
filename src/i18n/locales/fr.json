@@ -692,7 +692,8 @@
       "title": "Code application",
       "groups": {
         "identity": "Propriétés"
-      }
+      },
+      "teamsHint": "Modifier les équipes d'une app requiert le privilège AppManager et la responsabilité de l'app ; sauf pour un Manager, seules les équipes dont vous êtes membre peuvent être ajoutées. Les équipes responsables gèrent l'app, celles à qui elle est publiée voient ses nœuds et services."
     },
     "create": {
       "open": "Nouveau code",

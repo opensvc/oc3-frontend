@@ -7,6 +7,14 @@ import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { TrashIcon } from "@/components/ui/icons";
 import { problemText } from "@/lib/api/problem";
 import { formatDateTime } from "@/lib/format";
+import { ChangeOutcomeLine, TeamsPart } from "@/components/opensvc/CompEditorParts";
+import { useChanges } from "@/components/opensvc/comp-changes";
+import {
+  useAppTeamCandidates,
+  useAppTeams,
+  useAppTeamsChanged,
+  useCanEditAppTeams,
+} from "./use-app-teams";
 
 type AppRow = components["schemas"]["AppRow"];
 
@@ -33,6 +41,12 @@ const GROUPS: DetailGroup<AppRow>[] = [
   },
 ];
 
+/**
+ * An application code: its properties, its responsible and publication teams, and
+ * its deletion. An AppManager responsible for the app adds and removes its teams
+ * in place, each change written at once: the responsible teams manage the app,
+ * the publication teams see its nodes and services.
+ */
 export function AppDetailPanel({
   appId,
   label,
@@ -60,6 +74,14 @@ export function AppDetailPanel({
       if (failure !== undefined) throw new Error(JSON.stringify(failure));
       return data;
     },
+  });
+
+  const teams = useAppTeams(appId);
+  const editable = useCanEditAppTeams(appId);
+  const candidates = useAppTeamCandidates(editable);
+  const teamsChanged = useAppTeamsChanged();
+  const { outcome, busy, change, dismiss } = useChanges(async () => {
+    if (appId !== undefined) await teamsChanged(appId);
   });
 
   // The links of the application code go too: responsibles and publications.
@@ -91,6 +113,45 @@ export function AppDetailPanel({
       errorMessage={isError ? error.message : null}
       actions={
         <>
+          <div className="mb-4 space-y-3">
+            <ChangeOutcomeLine outcome={outcome} onDismiss={dismiss} />
+            {teams.isError && (
+              <p role="alert" className="text-state-down">
+                ■ {teams.error.message}
+              </p>
+            )}
+            <TeamsPart
+              teams={{
+                responsibles: (teams.data?.responsibles ?? []).map((g) => g.role),
+                publications: (teams.data?.publications ?? []).map((g) => g.role),
+              }}
+              groups={
+                candidates.data ?? [
+                  ...(teams.data?.responsibles ?? []),
+                  ...(teams.data?.publications ?? []),
+                ]
+              }
+              editable={editable}
+              busy={busy}
+              onAdd={(role, group, list) => {
+                const params = { path: { app_id: appId ?? "", group_id: String(group.id) } };
+                void change(t("compEditor.teamAdded", { team: group.role, list }), () =>
+                  role === "responsibles"
+                    ? api.POST("/apps/{app_id}/responsibles/{group_id}", { params })
+                    : api.POST("/apps/{app_id}/publications/{group_id}", { params }),
+                );
+              }}
+              onRemove={(role, team, groupId, list) => {
+                const params = { path: { app_id: appId ?? "", group_id: groupId } };
+                void change(t("compEditor.teamRemoved", { team, list }), () =>
+                  role === "responsibles"
+                    ? api.DELETE("/apps/{app_id}/responsibles/{group_id}", { params })
+                    : api.DELETE("/apps/{app_id}/publications/{group_id}", { params }),
+                );
+              }}
+            />
+            {editable && <p className="text-ink-muted">{t("apps.detail.teamsHint")}</p>}
+          </div>
           <ConfirmButton
             icon={<TrashIcon />}
             label={t("detail.delete")}

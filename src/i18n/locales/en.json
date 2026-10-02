@@ -692,7 +692,8 @@
       "title": "Application code",
       "groups": {
         "identity": "Properties"
-      }
+      },
+      "teamsHint": "Changing the teams of an app requires the AppManager privilege and the responsibility of the app; unless you are a Manager, you can only add teams you are a member of. The responsible teams manage the app, the teams it is published to see its nodes and services."
     },
     "create": {
       "open": "New app",
