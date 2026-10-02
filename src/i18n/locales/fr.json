@@ -2321,6 +2321,21 @@
         "state": "État"
       }
     },
-    "nodeUnknown": "Absent des nodes que vous voyez dans le collector"
+    "nodeUnknown": "Absent des nodes que vous voyez dans le collector",
+    "actions": {
+      "open": "Actions",
+      "question_one": "Mettre {{action}} en file sur ce cluster ?",
+      "question_other": "Mettre {{action}} en file sur {{count}} clusters ?",
+      "confirm": "Mettre en file",
+      "queueing": "Mise en file…",
+      "queued_one": "{{action}} en file sur 1 cluster.",
+      "queued_other": "{{action}} en file sur {{count}} clusters.",
+      "failure": "{{name}} : {{message}}",
+      "items": {
+        "freeze": "Geler tous les nodes",
+        "thaw": "Dégeler tous les nodes",
+        "abort": "Interrompre l'orchestration en cours"
+      }
+    }
   }
 }

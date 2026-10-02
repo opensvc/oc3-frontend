@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -23,6 +24,7 @@ import {
 } from "@/lib/list-search";
 import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
+import { ClusterActionsMenu } from "./ClusterActionsMenu";
 import { ClusterDetailPanel } from "./ClusterDetailPanel";
 import { ClusterNodes } from "./ClusterNodes";
 
@@ -195,6 +197,7 @@ export function ClustersPage() {
   );
   const navigate = useNavigate({ from: "/clusters" });
   const { data, isPending, isError, error, isFetching } = useClusters(search);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
@@ -217,13 +220,24 @@ export function ClustersPage() {
   }
 
   const selected = data?.rows.find((row) => row.cluster_id === search.sel);
+  // Names from the page on display: a selection extended to the following pages does
+  // not have them all, so the id then serves as a fallback in the messages.
+  const clusterNames = Object.fromEntries(
+    (data?.rows ?? []).map((row) => [row.cluster_id ?? "", row.cluster_name ?? ""]),
+  );
 
   return (
     <section>
-      <h1 className="mb-3 flex items-center gap-2 text-title font-semibold">
-        <ObjectIcon kind="cluster" className="h-5 w-5" />
-        {t("clusters.title")}
-      </h1>
+      <div className="mb-3 flex items-center gap-3">
+        <h1 className="flex items-center gap-2 text-title font-semibold">
+          <ObjectIcon kind="cluster" className="h-5 w-5" />
+          {t("clusters.title")}
+        </h1>
+        {/* On the rows checked in the list; nothing checked, no menu. */}
+        <ClusterActionsMenu
+          clusters={selectedIds.map((id) => ({ id, name: clusterNames[id] ?? id }))}
+        />
+      </div>
       <p className="mb-3 max-w-3xl text-ink-muted">{t("clusters.intro")}</p>
 
       <CollectorList
@@ -243,6 +257,7 @@ export function ClustersPage() {
         total={data?.total}
         selectAllMatching={allIds}
         rowLead={(row) => <FrozenMark frozen={row.frozen === 1} />}
+        onSelectionChange={setSelectedIds}
         filterable
       />
 

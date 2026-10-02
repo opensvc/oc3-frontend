@@ -2321,6 +2321,21 @@
         "state": "State"
       }
     },
-    "nodeUnknown": "Not among the nodes you can see in the collector"
+    "nodeUnknown": "Not among the nodes you can see in the collector",
+    "actions": {
+      "open": "Actions",
+      "question_one": "Queue {{action}} on this cluster?",
+      "question_other": "Queue {{action}} on {{count}} clusters?",
+      "confirm": "Queue",
+      "queueing": "Queuing…",
+      "queued_one": "{{action}} queued on 1 cluster.",
+      "queued_other": "{{action}} queued on {{count}} clusters.",
+      "failure": "{{name}}: {{message}}",
+      "items": {
+        "freeze": "Freeze every node",
+        "thaw": "Thaw every node",
+        "abort": "Abort the running orchestration"
+      }
+    }
   }
 }

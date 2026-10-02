@@ -29,6 +29,11 @@ export interface paths {
          *       service seen alive in the last 15 minutes. Same requirements.
          *     - node_id alone: a node action. Requires the NodeExec privilege (CompExec
          *       for compliance_check and compliance_fix) and responsibility for the node.
+         *     - cluster_id alone: an action on the whole cluster, posted for a node of the
+         *       cluster seen alive in the last 15 minutes and running the om3 agent,
+         *       which runs it on every node of the cluster (`om node <action> --node *`).
+         *       Requires the NodeExec privilege and responsibility for every node of the
+         *       cluster.
          *
          *     Accepted actions: push resinfo, push config, start, stop, giveback,
          *     switch, abort, clear, freeze and thaw on a service; the same, and restart,
@@ -38,7 +43,8 @@ export interface paths {
          *     checks, sysreport, updatecomp, updatepkg, scanscsi,
          *     reboot, schedule_reboot, unschedule_reboot, shutdown, drain,
          *     compliance_check, compliance_fix (on every module attached to the node),
-         *     freeze and thaw on a node. Compliance actions on a given module, moduleset
+         *     freeze and thaw on a node; freeze, thaw and abort (of the running
+         *     orchestration) on a cluster. Compliance actions on a given module, moduleset
          *     or ruleset, Wake On LAN, the root password rotation and agent options are
          *     not supported.
          *
@@ -4692,6 +4698,8 @@ export interface components {
         ActionEnqueue: {
             /** @description Agent action to run */
             action: string;
+            /** @description Target cluster (clusters.cluster_id), alone */
+            cluster_id?: string;
             /** @description Target node (node_id or nodename) */
             node_id?: string;
             /** @description Resource ids to limit an instance action to, comma separated */

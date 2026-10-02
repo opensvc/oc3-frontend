@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { DetailPanel } from "@/components/opensvc/DetailPanel";
+import { ClusterActionsMenu } from "./ClusterActionsMenu";
 import { CLUSTER_GROUPS } from "./cluster-groups";
 import { useCluster } from "./use-cluster";
 
@@ -35,6 +36,15 @@ export function ClusterDetailPanel({
       isPending={isPending}
       errorMessage={isError ? error.message : null}
       editHint=""
+      before={
+        clusterId === undefined ? undefined : (
+          // The API checks the rights, node by node of the cluster, and says why it
+          // refuses: the interface does not know the caller's privileges.
+          <div className="mb-4">
+            <ClusterActionsMenu clusters={[{ id: clusterId, name: title }]} />
+          </div>
+        )
+      }
     />
   );
 }
