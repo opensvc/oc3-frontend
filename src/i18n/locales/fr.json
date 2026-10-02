@@ -198,15 +198,30 @@
       "failure": "{{name}} : {{message}}",
       "items": {
         "pushasset": "Remonter l'inventaire du node",
-        "pushdisks": "Remonter les disques",
-        "pushpkg": "Remonter les paquets",
-        "pushpatch": "Remonter les correctifs",
-        "pushstats": "Remonter les statistiques",
         "checks": "Remonter les relevés",
         "sysreport": "Remonter le sysreport",
+        "pushdisks": "Remonter les disques",
+        "pushpkg": "Remonter les paquets installés",
+        "pushpatch": "Remonter les correctifs installés",
+        "pushstats": "Remonter les statistiques",
         "scanscsi": "Réexaminer les hôtes SCSI",
+        "compliance_check": "Vérifier la conformité",
+        "compliance_fix": "Corriger la conformité",
+        "updatecomp": "Mettre à jour les modules de conformité",
+        "updatepkg": "Mettre à jour l'agent OpenSVC",
         "freeze": "Geler",
-        "thaw": "Dégeler"
+        "thaw": "Dégeler",
+        "reboot": "Redémarrer",
+        "schedule_reboot": "Programmer un redémarrage",
+        "unschedule_reboot": "Annuler le redémarrage programmé",
+        "drain": "Drainer",
+        "shutdown": "Arrêter"
+      },
+      "groups": {
+        "inventory": "Inventaire",
+        "compliance": "Conformité",
+        "agent": "Agent",
+        "power": "Redémarrage et arrêt"
       }
     },
     "hardware": {

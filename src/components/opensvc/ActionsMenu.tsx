@@ -8,6 +8,12 @@ export interface ActionEntry {
   action: string;
   /** Separator line before this entry, to mark a group. */
   separatorBefore?: boolean;
+  /**
+   * The submenu the entry goes in, labelled `<prefix>.groups.<group>`: the entries
+   * of a group follow each other in it, the submenu standing where its first entry
+   * is in the list.
+   */
+  group?: string;
 }
 
 /** Object to queue the action on: its id, and its name for refusal messages. */
@@ -72,7 +78,7 @@ export function ActionsMenu({
 
   if (targets.length === 0) return null;
 
-  const items: MenuItem[] = actions.map((entry) => ({
+  const itemOf = (entry: ActionEntry): MenuItem => ({
     key: entry.action,
     label: t(`${prefix}.items.${entry.action}`),
     separatorBefore: entry.separatorBefore === true,
@@ -81,7 +87,27 @@ export function ActionsMenu({
       setOutcome(null);
       setPending(entry.action);
     },
-  }));
+  });
+  const items: MenuItem[] = [];
+  const submenus = new Map<string, MenuItem>();
+  for (const entry of actions) {
+    if (entry.group === undefined) {
+      items.push(itemOf(entry));
+      continue;
+    }
+    let submenu = submenus.get(entry.group);
+    if (submenu === undefined) {
+      submenu = {
+        key: `group:${entry.group}`,
+        label: t(`${prefix}.groups.${entry.group}`),
+        separatorBefore: entry.separatorBefore === true,
+        items: [],
+      };
+      submenus.set(entry.group, submenu);
+      items.push(submenu);
+    }
+    submenu.items?.push({ ...itemOf(entry), separatorBefore: false });
+  }
 
   const label = pending === null ? "" : t(`${prefix}.items.${pending}`);
 

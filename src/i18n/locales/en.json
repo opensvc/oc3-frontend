@@ -197,16 +197,31 @@
       "queued_other": "{{action}} queued on {{count}} nodes.",
       "failure": "{{name}}: {{message}}",
       "items": {
-        "pushasset": "Push asset information",
-        "pushdisks": "Push disks information",
-        "pushpkg": "Push packages information",
-        "pushpatch": "Push patches information",
-        "pushstats": "Push stats",
-        "checks": "Push check values",
-        "sysreport": "Push sysreport",
+        "pushasset": "Update node information",
+        "checks": "Update check values",
+        "sysreport": "Update sysreport",
+        "pushdisks": "Update disks information",
+        "pushpkg": "Update installed packages information",
+        "pushpatch": "Update installed patches information",
+        "pushstats": "Update stats",
         "scanscsi": "Rescan SCSI hosts",
+        "compliance_check": "Compliance check",
+        "compliance_fix": "Compliance fix",
+        "updatecomp": "Update compliance modules",
+        "updatepkg": "Update OpenSVC agent",
         "freeze": "Freeze",
-        "thaw": "Thaw"
+        "thaw": "Thaw",
+        "reboot": "Reboot",
+        "schedule_reboot": "Schedule a reboot",
+        "unschedule_reboot": "Unschedule the reboot",
+        "drain": "Drain",
+        "shutdown": "Shut down"
+      },
+      "groups": {
+        "inventory": "Inventory",
+        "compliance": "Compliance",
+        "agent": "Agent",
+        "power": "Reboot and shutdown"
       }
     },
     "hardware": {
