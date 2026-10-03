@@ -14,6 +14,7 @@ import { ActionQueueLink } from "@/features/actions/ActionQueueLink";
 import { UserMenu } from "./UserMenu";
 import { ImpersonationBanner } from "./ImpersonationBanner";
 import { LiveIndicator } from "./LiveIndicator";
+import { SessionFilter } from "./SessionFilter";
 import { SidebarIcon } from "@/components/ui/icons";
 import { useAppearance } from "@/lib/user-prefs";
 import { BookmarksBar } from "./BookmarksBar";
@@ -34,8 +35,7 @@ function readSidebarOpen(): boolean {
 
 /**
  * Application shell. It mirrors the functional areas of the collector: navigation in
- * a side menu, session filter, action queue, global search. The session filter is
- * still a placeholder.
+ * a side menu, session filter, action queue, global search.
  */
 export function AppShell() {
   const { t } = useTranslation();
@@ -104,13 +104,7 @@ export function AppShell() {
             </Link>
 
             <div className="ml-auto flex items-center gap-3">
-              <button
-                type="button"
-                className="rounded-(--radius-control) border border-line px-2 py-1 text-ink-muted"
-                title={t("header.sessionFilter")}
-              >
-                {t("header.sessionFilter")}: {t("header.noFilter")}
-              </button>
+              <SessionFilter />
               <ActionQueueLink />
               <GlobalSearch />
               <LiveIndicator />

@@ -64,7 +64,11 @@
     "actionQueueEmpty": "Aucune action en attente : ouvrir l'historique des actions",
     "actionQueuePending_one": "1 action en attente dans la file",
     "actionQueuePending_other": "{{count}} actions en attente dans la file",
-    "actionQueueOpen": "Ouvrir la file d'actions"
+    "actionQueueOpen": "Ouvrir la file d'actions",
+    "sessionFilterNoMatch": "Aucun filterset ne correspond",
+    "sessionFilterFailed": "Non appliqué",
+    "sessionFilterImpersonating": "Le filtre de session de l'utilisateur incarné : il ne peut pas être changé en agissant comme un autre utilisateur.",
+    "sessionFilterClear": "Retirer le filtre de session"
   },
   "state": {
     "up": "up",
@@ -1245,7 +1249,7 @@
       "date": "Date",
       "total": "Total",
       "tab": "Aperçu",
-      "notice": "Aperçu du rapport : chaque métrique est exécutée maintenant. Ses paramètres désignent les nodes et services que vous voyez.",
+      "notice": "Aperçu du rapport : chaque métrique est exécutée maintenant. Ses paramètres désignent les nodes et services que vous voyez, restreints par votre filtre de session.",
       "empty": "Le rapport n'a pas encore de définition : en écrire une pour l'aperçu.",
       "untitled": "Section sans titre",
       "emptySection": "Rien dans cette section.",
@@ -2278,7 +2282,7 @@
     "noMatch": "Aucun rapport ne correspond.",
     "fold": "Replier la liste",
     "unfold": "Déplier la liste",
-    "intro": "Choisir un rapport dans la liste pour le lire. Ses métriques sont exécutées à l'ouverture, sur les nodes et services que vous voyez ; ses graphiques montrent leur historique enregistré.",
+    "intro": "Choisir un rapport dans la liste pour le lire. Ses métriques sont exécutées à l'ouverture, sur les nodes et services que vous voyez, restreints par votre filtre de session ; ses graphiques montrent leur historique enregistré.",
     "empty": "Ce rapport n'a pas encore de contenu.",
     "period": "Période des graphiques",
     "days_one": "{{count}} jour",

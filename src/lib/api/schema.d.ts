@@ -4494,6 +4494,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/self/filterset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description The session filterset of the signed-in user, or null data. As in the
+         *     historical collector, it narrows every list naming a node or a service to the
+         *     filterset's nodes and services (a row without a node, or without a service,
+         *     is judged on the other side), the dashboard and its counters included, and
+         *     it is what the %%fset_node_ids%% and %%fset_svc_ids%% placeholders of a
+         *     metric stand for. Single records read by their id are not narrowed.
+         */
+        get: operations["GetUserSelfFilterset"];
+        /**
+         * @description Choose the session filterset of the signed-in user, by id or name, in place
+         *     of the previous one. Refused while acting as another user.
+         */
+        put: operations["PutUserSelfFilterset"];
+        post?: never;
+        /**
+         * @description Remove the session filterset of the signed-in user: the lists show everything
+         *     the user may see again. Refused while acting as another user.
+         */
+        delete: operations["DeleteUserSelfFilterset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/self/password": {
         parameters: {
             query?: never;
@@ -5960,6 +5992,13 @@ export interface components {
             end: string;
             /** @description The availability status of the service. */
             status: string;
+        };
+        SessionFilterset: {
+            fset_id: number;
+            fset_name: string;
+        };
+        SessionFiltersetResponse: {
+            data?: components["schemas"]["SessionFilterset"];
         };
         StatusAck: {
             /** @description Whether the period still counts in the availability rate. */
@@ -20035,6 +20074,83 @@ export interface operations {
             401: components["responses"]["401"];
             403: components["responses"]["403"];
             409: components["responses"]["409"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetUserSelfFilterset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionFiltersetResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    PutUserSelfFilterset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Filterset id (gen_filtersets.id) or name */
+                    fset_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionFiltersetResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
+    DeleteUserSelfFilterset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionFiltersetResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
             500: components["responses"]["500"];
         };
     };

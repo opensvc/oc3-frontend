@@ -29,6 +29,7 @@ export function Combobox({
   emptyText,
   className = "",
   inputRef,
+  accent = false,
 }: {
   options: ComboboxOption[];
   /** Value of the chosen option, "" when none. */
@@ -41,6 +42,8 @@ export function Combobox({
   emptyText: string;
   className?: string;
   inputRef?: Ref<HTMLInputElement>;
+  /** Accent border and weight: the choice is one in force, worth noticing. */
+  accent?: boolean;
 }) {
   const listId = useId();
   const [open, setOpen] = useState(false);
@@ -144,7 +147,7 @@ export function Combobox({
               return;
           }
         }}
-        className="h-7 w-full rounded-(--radius-control) border border-line bg-surface px-2"
+        className={`h-7 w-full rounded-(--radius-control) border bg-surface px-2 ${accent ? "border-accent font-medium" : "border-line"}`}
       />
       <ul
         ref={list}

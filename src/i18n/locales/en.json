@@ -64,7 +64,11 @@
     "actionQueueEmpty": "No action waiting: open the action history",
     "actionQueuePending_one": "1 action waiting in the queue",
     "actionQueuePending_other": "{{count}} actions waiting in the queue",
-    "actionQueueOpen": "Open the action queue"
+    "actionQueueOpen": "Open the action queue",
+    "sessionFilterNoMatch": "No filterset matches",
+    "sessionFilterFailed": "Not applied",
+    "sessionFilterImpersonating": "The session filter of the user you act as: it cannot be changed while acting as another user.",
+    "sessionFilterClear": "Remove the session filter"
   },
   "state": {
     "up": "up",
@@ -1245,7 +1249,7 @@
       "date": "Date",
       "total": "Total",
       "tab": "Preview",
-      "notice": "Preview of the report: each metric is run now. Its placeholders stand for the nodes and services you can see.",
+      "notice": "Preview of the report: each metric is run now. Its placeholders stand for the nodes and services you can see, narrowed by your session filter.",
       "empty": "The report has no definition yet: write one to preview it.",
       "untitled": "Untitled section",
       "emptySection": "Nothing in this section.",
@@ -2278,7 +2282,7 @@
     "noMatch": "No report matches.",
     "fold": "Fold the list",
     "unfold": "Unfold the list",
-    "intro": "Choose a report in the list to read it. Its metrics are run when it opens, over the nodes and services you can see; its charts show their recorded history.",
+    "intro": "Choose a report in the list to read it. Its metrics are run when it opens, over the nodes and services you can see, narrowed by your session filter; its charts show their recorded history.",
     "empty": "This report has no content yet.",
     "period": "Period of the charts",
     "days_one": "{{count}} day",

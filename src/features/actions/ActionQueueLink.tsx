@@ -30,7 +30,7 @@ function usePendingActions() {
 
 /**
  * "Action queue" entry of the top bar: always a link to the queue, which also keeps
- * the past actions, with the number of those still waiting when there are any.
+ * the past actions, with the number of those still waiting, 0 included.
  */
 export function ActionQueueLink() {
   const { t } = useTranslation();
@@ -44,12 +44,17 @@ export function ActionQueueLink() {
       className="flex items-center gap-1.5 text-ink-muted hover:text-ink"
     >
       {t("header.actionQueue")}
-      {count > 0 && (
-        <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-state-warn-soft px-1.5 text-[0.6875rem] leading-4 font-medium text-state-warn tabular-nums">
-          {count}
-          {count === LIMIT && "+"}
-        </span>
-      )}
+      {/* Always shown, 0 included: the number says the state, its tint only stresses
+          a waiting action. Two digits fit, so that the bar does not shift as the
+          queue fills and drains. */}
+      <span
+        className={`inline-flex min-w-7 items-center justify-center rounded-full px-1.5 text-[0.6875rem] leading-4 font-medium tabular-nums ${
+          count === 0 ? "bg-surface-sunken text-ink-muted" : "bg-state-warn-soft text-state-warn"
+        }`}
+      >
+        {count}
+        {count === LIMIT && "+"}
+      </span>
     </Link>
   );
 }

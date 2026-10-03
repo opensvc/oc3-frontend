@@ -41,6 +41,8 @@ const TABLE_KEYS: Record<string, readonly string[]> = {
   auth_group: ["groups", "group"],
   auth_membership: ["users", "user", "groups", "group"],
   gen_filtersets: ["filtersets", "filterset", "designer"],
+  // The session filterset: `SessionFilter` reads the views again when it changes.
+  gen_filterset_user: ["session-filterset"],
   gen_filtersets_filters: ["filtersets", "filterset", "designer"],
   gen_filters: ["filters", "filter", "filtersets", "filterset"],
   forms: ["forms", "form", "form-by-name"],
