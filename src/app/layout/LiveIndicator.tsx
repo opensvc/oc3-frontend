@@ -6,6 +6,8 @@ import { useImpersonation } from "@/lib/api/impersonation";
 
 const LIVE_KEY = "oc3.live";
 
+const STATES = ["live", "offline", "paused"] as const;
+
 /** Live mode is a comfort of the browser, as the folded menu: kept there, not with the account. */
 function readLiveEnabled(): boolean {
   try {
@@ -61,6 +63,11 @@ export function LiveIndicator() {
     paused: t("realtime.pausedHint"),
   }[state];
   const action = enabled ? t("realtime.turnOff") : t("realtime.turnOn");
+  const labels = {
+    live: t("realtime.live"),
+    offline: t("realtime.offline"),
+    paused: t("realtime.paused"),
+  };
 
   return (
     <button
@@ -84,12 +91,20 @@ export function LiveIndicator() {
           className={`h-2 w-2 rounded-full border ${live ? "border-state-up bg-state-up" : "border-current"}`}
         />
       )}
-      <span role="status">
-        {state === "live"
-          ? t("realtime.live")
-          : state === "offline"
-            ? t("realtime.offline")
-            : t("realtime.paused")}
+      {/* The three words in one cell, the other two hidden: the button keeps the
+          width of the longest, and the top bar does not shift when the state changes. */}
+      <span className="grid">
+        {STATES.map((each) =>
+          each === state ? (
+            <span key={each} role="status" className="col-start-1 row-start-1">
+              {labels[each]}
+            </span>
+          ) : (
+            <span key={each} aria-hidden="true" className="invisible col-start-1 row-start-1">
+              {labels[each]}
+            </span>
+          ),
+        )}
       </span>
       <span className="sr-only">{action}</span>
     </button>
