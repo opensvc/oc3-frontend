@@ -1639,10 +1639,9 @@
   },
   "requests": {
     "title": "New request",
-    "intro": "Choose the form of your request. The search narrows the list as you type, on the forms' names, labels and descriptions.",
+    "intro": "Choose the form of your request: browse the folders on the left, or search the whole catalog. Star the forms you use often.",
     "search": "Search the forms",
     "noMatch": "No form matches the search.",
-    "back": "Back to the catalog",
     "notFound": "This form does not exist, or is not published to you.",
     "unusable": "This form has no usable definition.",
     "submit": "Submit the request",
@@ -1654,7 +1653,41 @@
       "running": "in progress ({{status}})",
       "noLog": "Nothing logged."
     },
-    "empty": "No form is available to you."
+    "empty": "No form is available to you.",
+    "folderCount_one": "{{count}} form",
+    "folderCount_other": "{{count}} forms",
+    "searchResults": "Search results",
+    "views": {
+      "favorites": "Favorites",
+      "recent": "Recent",
+      "all": "All forms"
+    },
+    "browse": "Browse: {{name}}",
+    "navigation": "Request catalog",
+    "folders": "Folders",
+    "foldFolder": "Fold {{name}}",
+    "unfoldFolder": "Unfold {{name}}",
+    "breadcrumb": "Folder path",
+    "layout": "Layout",
+    "layouts": {
+      "grid": "Cards",
+      "list": "List"
+    },
+    "noFavorites": "No favorite yet: star a form to find it here.",
+    "noRecent": "No form submitted yet from this account.",
+    "folderNotFound": "This folder holds no form available to you.",
+    "favorite": "Add {{name}} to the favorites",
+    "unfavorite": "Remove {{name}} from the favorites",
+    "close": "Close the form",
+    "cancel": "Cancel",
+    "submitted": "Request submitted.",
+    "created": {
+      "title": "Request #{{id}} created",
+      "awaiting": "Waiting for {{assignee}}.",
+      "view": "View the request",
+      "all": "All requests",
+      "new": "New request"
+    }
   },
   "packages": {
     "title": "Packages",

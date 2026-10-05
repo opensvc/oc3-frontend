@@ -68,6 +68,11 @@ export interface UserPrefs {
    * id. The old interface has no bookmarks: the key is ours alone.
    */
   bookmarks?: Bookmark[];
+  /**
+   * The request forms the user starred, and those they submitted last, newest
+   * first, by form id. The old interface has neither: the key is ours alone.
+   */
+  requests?: { favorites?: number[]; recent?: number[] };
   [key: string]: unknown;
 }
 
@@ -488,6 +493,69 @@ export function useBookmarksPref() {
     },
     clear: () => {
       save.mutate([]);
+    },
+  };
+}
+
+/** Forms kept in the recent list of the request catalog. */
+const RECENT_FORMS_SIZE = 8;
+
+function formIds(value: unknown): number[] {
+  return Array.isArray(value) ? value.filter((v): v is number => Number.isInteger(v)) : [];
+}
+
+/**
+ * The favorite and recently submitted request forms, and what changes them. Saved
+ * with the account, as the bookmarks: a change shows at once and is saved in the
+ * background, the stored lists read again if the save fails. A submission adds
+ * its form at the head of the recent list, which keeps the last
+ * `RECENT_FORMS_SIZE`.
+ */
+export function useRequestFormsPref() {
+  const queryClient = useQueryClient();
+  const prefs = useUserPrefs();
+  const favorites = formIds(prefs.data?.requests?.favorites);
+  const recent = formIds(prefs.data?.requests?.recent);
+  const save = useMutation({
+    mutationFn: async (
+      change: (current: { favorites: number[]; recent: number[] }) => {
+        favorites: number[];
+        recent: number[];
+      },
+    ) => {
+      const apply = (current: UserPrefs | undefined): UserPrefs => ({
+        ...current,
+        requests: change({
+          favorites: formIds(current?.requests?.favorites),
+          recent: formIds(current?.requests?.recent),
+        }),
+      });
+      queryClient.setQueryData<UserPrefs>(PREFS_KEY, apply);
+      await savePrefs(queryClient, apply);
+    },
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: PREFS_KEY });
+    },
+  });
+  return {
+    favorites,
+    recent,
+    // Read, or given up: a failed read leaves the lists empty rather than waiting.
+    isLoaded: !prefs.isPending,
+    isFavorite: (id: number) => favorites.includes(id),
+    toggleFavorite: (id: number) => {
+      save.mutate((current) => ({
+        ...current,
+        favorites: current.favorites.includes(id)
+          ? current.favorites.filter((f) => f !== id)
+          : [...current.favorites, id],
+      }));
+    },
+    addRecent: (id: number) => {
+      save.mutate((current) => ({
+        ...current,
+        recent: [id, ...current.recent.filter((r) => r !== id)].slice(0, RECENT_FORMS_SIZE),
+      }));
     },
   };
 }

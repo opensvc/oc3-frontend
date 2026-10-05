@@ -1,8 +1,8 @@
 /**
  * The catalog of the forms users submit requests with, organised in folders as
  * the historical request page does (`init/static/js/osvc/requests.js`): a form
- * lives in the folder its form_folder names. All the forms are listed at once,
- * grouped by folder, rather than browsed folder by folder.
+ * lives in the folder its form_folder names. The folders nest as a tree, each
+ * one folded until opened, rather than browsed one level at a time.
  */
 
 /** A form of the catalog, as GET /forms returns it. */
@@ -22,6 +22,8 @@ export interface CatalogEntry {
   desc: string;
   /** Legacy classes of the form (Css): the icon of its card. */
   css: string;
+  /** Where its first output sends the data (Dest): "workflow", "db"… */
+  dest: string;
 }
 
 /**
@@ -54,6 +56,9 @@ function formEntry(form: CatalogForm): CatalogEntry {
     label: text(d.Label) || form.name,
     desc: text(d.Desc),
     css: text(d.Css),
+    dest: Array.isArray(d.Outputs)
+      ? text((d.Outputs[0] as Record<string, unknown> | undefined)?.Dest)
+      : "",
   };
 }
 
@@ -88,16 +93,7 @@ export function catalogGroups(forms: CatalogForm[], search: string): CatalogFold
     const folder = normalizeFolder(f.folder);
     groups.set(folder, [...(groups.get(folder) ?? []), entry]);
   }
-  const folders = new Map<string, Omit<CatalogFolder, "folder" | "entries">>();
-  for (const f of forms) {
-    const d = f.definition ?? {};
-    if (f.type !== "folder" || text(d.FolderName) === "") continue;
-    folders.set(normalizeFolder(`${f.folder}/${text(d.FolderName)}`), {
-      label: text(d.FolderLabel),
-      desc: text(d.FolderDesc),
-      css: text(d.FolderCss),
-    });
-  }
+  const folders = folderDefinitions(forms);
   return [...groups]
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([folder, entries]) => ({
@@ -107,9 +103,116 @@ export function catalogGroups(forms: CatalogForm[], search: string): CatalogFold
     }));
 }
 
-/** URL state of the request page: the form chosen. */
+/**
+ * A folder of the catalog tree: its forms, and its subfolders, which nest as the
+ * historical folder navigation did (a folder "/a/b" lives in "/a"). `count` is the
+ * number of forms in it and below.
+ */
+export interface CatalogNode {
+  /** Full path, "/a/b". */
+  path: string;
+  /** Last part of the path, "b". */
+  name: string;
+  label: string;
+  desc: string;
+  css: string;
+  entries: CatalogEntry[];
+  children: CatalogNode[];
+  count: number;
+}
+
+/**
+ * The catalog as a tree of folders, from the groups of `catalogGroups` and the
+ * folder definitions (`folderDefinitions`): a folder holding no form but a
+ * subfolder that does is kept, to reach it, with its own definition. The forms of the
+ * root folder come apart, at the top level. Folders sort by name at each level.
+ */
+export function catalogTree(
+  groups: CatalogFolder[],
+  definitions: Map<string, FolderDefinition>,
+): { root: CatalogEntry[]; folders: CatalogNode[] } {
+  const nodes = new Map<string, CatalogNode>();
+  const top: CatalogNode[] = [];
+  let root: CatalogEntry[] = [];
+
+  function node(path: string): CatalogNode {
+    const known = nodes.get(path);
+    if (known !== undefined) return known;
+    const parts = path.split("/").filter((p) => p !== "");
+    // Label, description and icon of the "folder" form defining it, if any.
+    const g = definitions.get(path);
+    const created: CatalogNode = {
+      path,
+      name: parts[parts.length - 1] ?? "",
+      label: g?.label ?? "",
+      desc: g?.desc ?? "",
+      css: g?.css ?? "",
+      entries: [],
+      children: [],
+      count: 0,
+    };
+    nodes.set(path, created);
+    if (parts.length === 1) top.push(created);
+    else node("/" + parts.slice(0, -1).join("/")).children.push(created);
+    return created;
+  }
+
+  for (const g of groups) {
+    if (g.folder === "/") {
+      root = g.entries;
+      continue;
+    }
+    node(g.folder).entries = g.entries;
+  }
+  // Counts from the leaves up, and folders sorted by name at each level.
+  function finish(n: CatalogNode): number {
+    n.children.sort((a, b) => a.name.localeCompare(b.name));
+    n.count = n.entries.length + n.children.reduce((sum, c) => sum + finish(c), 0);
+    return n.count;
+  }
+  top.sort((a, b) => a.name.localeCompare(b.name));
+  top.forEach(finish);
+  return { root, folders: top };
+}
+
+/** What a "folder" form says of the folder it defines. */
+export interface FolderDefinition {
+  label: string;
+  desc: string;
+  /** Legacy classes of its icon (FolderCss); empty for the default folder icon. */
+  css: string;
+}
+
+/**
+ * The folders defined by the "folder" forms, by path: a "folder" form in folder F
+ * with FolderName N defines F/N, as the historical folder navigation reads it.
+ */
+export function folderDefinitions(forms: CatalogForm[]): Map<string, FolderDefinition> {
+  const folders = new Map<string, FolderDefinition>();
+  for (const f of forms) {
+    const d = f.definition ?? {};
+    if (f.type !== "folder" || text(d.FolderName) === "") continue;
+    folders.set(normalizeFolder(`${f.folder}/${text(d.FolderName)}`), {
+      label: text(d.FolderLabel),
+      desc: text(d.FolderDesc),
+      css: text(d.FolderCss),
+    });
+  }
+  return folders;
+}
+
+/** The lists of the catalog besides its folders. */
+export type CatalogView = "favorites" | "recent" | "all";
+
+/**
+ * URL state of the request page: the form chosen, and what the catalog shows, a
+ * folder or one of the views; neither, the favorites when the user has some, every
+ * form otherwise.
+ */
 export interface RequestSearch {
   form?: string;
+  folder?: string;
+  view?: CatalogView;
 }
 
 /**
@@ -123,5 +226,9 @@ export function parseRequestSearch(raw: Record<string, unknown>): RequestSearch 
       : typeof raw.form === "number"
         ? String(raw.form)
         : undefined;
-  return { form };
+  const folder =
+    typeof raw.folder === "string" && raw.folder !== "" ? normalizeFolder(raw.folder) : undefined;
+  const view =
+    raw.view === "favorites" || raw.view === "recent" || raw.view === "all" ? raw.view : undefined;
+  return { form, folder, view };
 }

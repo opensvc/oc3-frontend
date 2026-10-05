@@ -160,6 +160,8 @@ export function FormRender({
   onDataChange,
   submitLabel,
   initialData,
+  stickySubmit = false,
+  secondaryAction,
 }: {
   def: FormDefinition;
   user: FormUser;
@@ -168,6 +170,13 @@ export function FormRender({
   onSubmit?: (data: unknown) => void;
   onDataChange?: (data: unknown) => void;
   submitLabel?: string;
+  /**
+   * Keeps the submit button at the bottom of the screen while a long form
+   * scrolls: it is never out of reach.
+   */
+  stickySubmit?: boolean;
+  /** Placed before the submit button, a cancel for instance. */
+  secondaryAction?: ReactNode;
 }) {
   const { t } = useTranslation();
   const repeated = isRepeated(def);
@@ -286,7 +295,19 @@ export function FormRender({
       )}
 
       {onSubmit !== undefined && (
-        <div>
+        <div
+          className={
+            stickySubmit
+              ? "sticky bottom-0 z-10 -mx-4 -mb-4 flex flex-wrap items-center justify-end gap-2 rounded-b-(--radius-panel) border-t border-line bg-surface-raised px-4 py-3"
+              : undefined
+          }
+        >
+          {violations.length > 0 && stickySubmit && (
+            <p role="status" className="mr-auto text-state-down">
+              ■ {t("forms.render.violations", { count: violations.length })}
+            </p>
+          )}
+          {secondaryAction}
           <button
             type="button"
             disabled={violations.length > 0}
@@ -297,7 +318,7 @@ export function FormRender({
           >
             {submitLabel ?? t("forms.render.submit")}
           </button>
-          {violations.length > 0 && (
+          {violations.length > 0 && !stickySubmit && (
             <p role="status" className="mt-2 text-state-down">
               ■ {t("forms.render.violations", { count: violations.length })}
             </p>

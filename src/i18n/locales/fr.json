@@ -1639,10 +1639,9 @@
   },
   "requests": {
     "title": "Nouvelle demande",
-    "intro": "Choisissez le formulaire de votre demande. La recherche restreint la liste au fil de la saisie, sur les noms, libellés et descriptions des formulaires.",
+    "intro": "Choisir le formulaire de votre demande : parcourir les dossiers à gauche, ou chercher dans tout le catalogue. Étoiler les formulaires utilisés souvent.",
     "search": "Rechercher un formulaire",
     "noMatch": "Aucun formulaire ne correspond à la recherche.",
-    "back": "Retour au catalogue",
     "notFound": "Ce formulaire n'existe pas ou ne vous est pas publié.",
     "unusable": "Ce formulaire n'a pas de définition utilisable.",
     "submit": "Soumettre la demande",
@@ -1654,7 +1653,41 @@
       "running": "en cours ({{status}})",
       "noLog": "Rien de journalisé."
     },
-    "empty": "Aucun formulaire ne vous est proposé."
+    "empty": "Aucun formulaire ne vous est proposé.",
+    "folderCount_one": "{{count}} formulaire",
+    "folderCount_other": "{{count}} formulaires",
+    "searchResults": "Résultats de la recherche",
+    "views": {
+      "favorites": "Favoris",
+      "recent": "Récents",
+      "all": "Tous les formulaires"
+    },
+    "browse": "Parcourir : {{name}}",
+    "navigation": "Catalogue des demandes",
+    "folders": "Dossiers",
+    "foldFolder": "Replier {{name}}",
+    "unfoldFolder": "Déplier {{name}}",
+    "breadcrumb": "Chemin du dossier",
+    "layout": "Affichage",
+    "layouts": {
+      "grid": "Cartes",
+      "list": "Liste"
+    },
+    "noFavorites": "Pas encore de favori : étoiler un formulaire pour le retrouver ici.",
+    "noRecent": "Aucun formulaire soumis depuis ce compte.",
+    "folderNotFound": "Ce dossier ne contient aucun formulaire disponible pour vous.",
+    "favorite": "Ajouter {{name}} aux favoris",
+    "unfavorite": "Retirer {{name}} des favoris",
+    "close": "Fermer le formulaire",
+    "cancel": "Annuler",
+    "submitted": "Demande soumise.",
+    "created": {
+      "title": "Demande n° {{id}} créée",
+      "awaiting": "En attente de {{assignee}}.",
+      "view": "Voir la demande",
+      "all": "Toutes les demandes",
+      "new": "Nouvelle demande"
+    }
   },
   "packages": {
     "title": "Paquets",
