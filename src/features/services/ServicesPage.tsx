@@ -262,6 +262,8 @@ export function ServicesPage() {
   const { data, isPending, isError, error, isFetching } = useServices(search);
   const filtersets = useFiltersets();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // The services the last deletion removed, unticked from the list.
+  const [deleted, setDeleted] = useState<string[]>([]);
 
   /** Ids of the whole selection, filterset and filters included, without pagination. */
   async function allIds(): Promise<string[]> {
@@ -303,6 +305,12 @@ export function ServicesPage() {
         </h1>
         <ServiceActionsMenu
           services={selectedIds.map((id) => ({ id, name: svcNames[id] ?? id }))}
+          onDeleted={(ids) => {
+            setDeleted(ids);
+            // The detail of a deleted object has nothing left to show.
+            if (search.sel !== undefined && ids.includes(search.sel))
+              update({ sel: undefined, tab: undefined });
+          }}
         />
       </div>
 
@@ -323,6 +331,7 @@ export function ServicesPage() {
         rowLead={(row) => <FrozenMark frozen={row.svc_frozen === "frozen"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
+        unselect={deleted}
         filterable
       />
 

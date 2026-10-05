@@ -189,6 +189,7 @@ export function InstanceDetailPanel({
         <div className="mb-4">
           <InstanceActionsMenu
             instances={instanceId === undefined ? [] : [{ id: instanceId, name: title }]}
+            onDeleted={onClose}
           />
         </div>
       )}

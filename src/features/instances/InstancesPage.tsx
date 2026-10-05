@@ -265,6 +265,8 @@ export function InstancesPage() {
   }
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // The instances the last deletion removed, unticked from the list.
+  const [deleted, setDeleted] = useState<string[]>([]);
 
   const selected = data?.rows.find(
     (row) => toInstanceId(row.svc_id, row.node_id, row.mon_vmname) === search.sel,
@@ -290,6 +292,12 @@ export function InstancesPage() {
         </h1>
         <InstanceActionsMenu
           instances={selectedIds.map((id) => ({ id, name: instanceNames[id] ?? id }))}
+          onDeleted={(ids) => {
+            setDeleted(ids);
+            // The detail of a deleted object has nothing left to show.
+            if (search.sel !== undefined && ids.includes(search.sel))
+              update({ sel: undefined, tab: undefined });
+          }}
         />
       </div>
 
@@ -311,6 +319,7 @@ export function InstancesPage() {
         rowLead={(row) => <FrozenMark frozen={row.mon_frozen === "1"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
+        unselect={deleted}
         filterable
       />
 

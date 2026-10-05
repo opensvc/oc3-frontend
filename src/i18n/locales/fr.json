@@ -627,6 +627,18 @@
       "groups": {
         "recovery": "Reprise",
         "inventory": "Inventaire"
+      },
+      "data": {
+        "delete": {
+          "label": "Supprimer du collector",
+          "question_one": "Supprimer ce service du collector ? Ses instances, ressources, alertes, tags, rattachements de conformité, actions et historique d'état partent avec lui. Les agents le recréent à leur prochain envoi s'il existe encore. Cette action est irréversible.",
+          "question_other": "Supprimer ces {{count}} services du collector ? Leurs instances, ressources, alertes, tags, rattachements de conformité, actions et historiques d'état partent avec eux. Les agents recréent un service à leur prochain envoi s'il existe encore. Cette action est irréversible.",
+          "confirm_one": "Supprimer le service",
+          "confirm_other": "Supprimer {{count}} services",
+          "running": "Suppression…",
+          "done_one": "1 service supprimé.",
+          "done_other": "{{count}} services supprimés."
+        }
       }
     },
     "pkgdiff": {
@@ -1175,6 +1187,18 @@
         "sync": "Synchronisation",
         "maintenance": "Maintenance",
         "compliance": "Conformité"
+      },
+      "data": {
+        "delete": {
+          "label": "Supprimer du collector",
+          "question_one": "Supprimer cette instance du collector ? Ses ressources, alertes et checks partent avec elle, ainsi que tous les conteneurs du service sur ce nœud. L'agent la recrée à son prochain envoi si elle existe encore. Cette action est irréversible.",
+          "question_other": "Supprimer ces {{count}} instances du collector ? Leurs ressources, alertes et checks partent avec elles, ainsi que tous les conteneurs du service sur chaque nœud. Un agent recrée une instance à son prochain envoi si elle existe encore. Cette action est irréversible.",
+          "confirm_one": "Supprimer l'instance",
+          "confirm_other": "Supprimer {{count}} instances",
+          "running": "Suppression…",
+          "done_one": "1 instance supprimée.",
+          "done_other": "{{count}} instances supprimées."
+        }
       }
     }
   },

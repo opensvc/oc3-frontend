@@ -1,4 +1,10 @@
-import { ActionsMenu, type ActionEntry, type ActionTarget } from "@/components/opensvc/ActionsMenu";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  ActionsMenu,
+  type ActionEntry,
+  type ActionTarget,
+  type DataActionEntry,
+} from "@/components/opensvc/ActionsMenu";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 
@@ -23,11 +29,46 @@ const SERVICE_ACTIONS: readonly ActionEntry[] = [
   { action: "push resinfo", group: "inventory" },
 ];
 
-export function ServiceActionsMenu({ services }: { services: ActionTarget[] }) {
+/**
+ * The agent actions, then the data actions of the historical collector ("Data
+ * actions › On services"): for now the deletion of the service from the collector.
+ * As there, no privilege group is needed, only the responsibility for the service,
+ * which the API checks for each one (a Manager is responsible for them all).
+ * `onDeleted` receives the ids of the services deleted.
+ */
+export function ServiceActionsMenu({
+  services,
+  onDeleted,
+}: {
+  services: ActionTarget[];
+  onDeleted?: (ids: string[]) => void;
+}) {
+  const queryClient = useQueryClient();
+  const dataActions: DataActionEntry[] = [
+    {
+      key: "delete",
+      privileges: [],
+      run: async (target) => {
+        // Cascades on the collector side: instances, resources, alerts, tags,
+        // compliance attachments and the history of the service go with it.
+        const { error } = await api.DELETE("/services/{svc_id}", {
+          params: { path: { svc_id: target.id } },
+        });
+        return error === undefined ? null : problemText(error);
+      },
+      onDone: (done) => {
+        if (done.length === 0) return;
+        void queryClient.invalidateQueries({ queryKey: ["services"] });
+        void queryClient.invalidateQueries({ queryKey: ["instances"] });
+        onDeleted?.(done.map((target) => target.id));
+      },
+    },
+  ];
   return (
     <ActionsMenu
       targets={services}
       actions={SERVICE_ACTIONS}
+      dataActions={dataActions}
       prefix="services.actions"
       queue={async (target, action) => {
         // `svc_id` alone targets the whole service, as in the historical collector.

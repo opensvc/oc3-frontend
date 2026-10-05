@@ -1,4 +1,10 @@
-import { ActionsMenu, type ActionEntry, type ActionTarget } from "@/components/opensvc/ActionsMenu";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  ActionsMenu,
+  type ActionEntry,
+  type ActionTarget,
+  type DataActionEntry,
+} from "@/components/opensvc/ActionsMenu";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 import { fromInstanceId } from "./instance-id";
@@ -42,7 +48,15 @@ const INSTANCE_ACTIONS: readonly ActionEntry[] = [
  * Queued through `PUT /actions` with the service and the node, as the historical
  * collector and its REST API do, rather than through an endpoint of their own.
  */
-export function InstanceActionsMenu({ instances }: { instances: ActionTarget[] }) {
+export function InstanceActionsMenu({
+  instances,
+  onDeleted,
+}: {
+  instances: ActionTarget[];
+  /** Ids of the instances deleted, as given in `instances`, containers included. */
+  onDeleted?: (ids: string[]) => void;
+}) {
+  const queryClient = useQueryClient();
   const targets = [
     ...new Map(
       instances.map((target) => {
@@ -58,10 +72,44 @@ export function InstanceActionsMenu({ instances }: { instances: ActionTarget[] }
       }),
     ).values(),
   ];
+  // The data actions of the historical collector ("Data actions › On services
+  // instances"): for now the deletion of the instance from the collector, which
+  // takes every container of the service on that node, as the API deletes by
+  // service and node. No privilege group is needed, only the responsibility for the
+  // service, which the API checks.
+  const dataActions: DataActionEntry[] = [
+    {
+      key: "delete",
+      privileges: [],
+      run: async (target) => {
+        const key = fromInstanceId(target.id);
+        if (key === null) return "invalid instance id";
+        const { error } = await api.DELETE("/services/{svc_id}/instances/{node_id}", {
+          params: { path: { svc_id: key.svcId, node_id: key.nodeId } },
+        });
+        return error === undefined ? null : problemText(error);
+      },
+      onDone: (done) => {
+        if (done.length === 0) return;
+        void queryClient.invalidateQueries({ queryKey: ["instances"] });
+        void queryClient.invalidateQueries({ queryKey: ["services"] });
+        const gone = new Set(done.map((target) => target.id));
+        onDeleted?.(
+          instances
+            .filter((instance) => {
+              const key = fromInstanceId(instance.id);
+              return key !== null && gone.has(`${key.svcId}@${key.nodeId}`);
+            })
+            .map((instance) => instance.id),
+        );
+      },
+    },
+  ];
   return (
     <ActionsMenu
       targets={targets}
       actions={INSTANCE_ACTIONS}
+      dataActions={dataActions}
       prefix="instances.actions"
       queue={async (target, action) => {
         const key = fromInstanceId(target.id);

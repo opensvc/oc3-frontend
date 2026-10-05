@@ -627,6 +627,18 @@
       "groups": {
         "recovery": "Recovery",
         "inventory": "Inventory"
+      },
+      "data": {
+        "delete": {
+          "label": "Delete from the collector",
+          "question_one": "Delete this service from the collector? Its instances, resources, alerts, tags, compliance attachments, actions and status history go with it. The agents recreate it at their next push if it still exists. This cannot be undone.",
+          "question_other": "Delete these {{count}} services from the collector? Their instances, resources, alerts, tags, compliance attachments, actions and status history go with them. The agents recreate a service at their next push if it still exists. This cannot be undone.",
+          "confirm_one": "Delete the service",
+          "confirm_other": "Delete {{count}} services",
+          "running": "Deleting…",
+          "done_one": "1 service deleted.",
+          "done_other": "{{count}} services deleted."
+        }
       }
     },
     "pkgdiff": {
@@ -1175,6 +1187,18 @@
         "sync": "Synchronization",
         "maintenance": "Maintenance",
         "compliance": "Compliance"
+      },
+      "data": {
+        "delete": {
+          "label": "Delete from the collector",
+          "question_one": "Delete this instance from the collector? Its resources, alerts and checks go with it, and every container of the service on that node. The agent recreates it at its next push if it still exists. This cannot be undone.",
+          "question_other": "Delete these {{count}} instances from the collector? Their resources, alerts and checks go with them, and every container of the service on each node. An agent recreates an instance at its next push if it still exists. This cannot be undone.",
+          "confirm_one": "Delete the instance",
+          "confirm_other": "Delete {{count}} instances",
+          "running": "Deleting…",
+          "done_one": "1 instance deleted.",
+          "done_other": "{{count}} instances deleted."
+        }
       }
     }
   },

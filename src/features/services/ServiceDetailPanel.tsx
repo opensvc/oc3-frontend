@@ -205,6 +205,7 @@ export function ServiceDetailPanel({
         <div className="mb-4">
           <ServiceActionsMenu
             services={svcId === undefined ? [] : [{ id: svcId, name: service?.svcname ?? svcId }]}
+            onDeleted={onClose}
           />
         </div>
       )}
