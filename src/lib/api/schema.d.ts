@@ -2951,7 +2951,7 @@ export interface paths {
         put?: never;
         /** @description Update a node properties */
         post: operations["PostNode"];
-        /** @description Delete an OpenSVC node and cascade delete its related entries. */
+        /** @description Delete an OpenSVC node and cascade delete its related entries. The user must hold the NodeManager privilege and be responsible for the node (a Manager is responsible for every node). */
         delete: operations["DeleteNode"];
         options?: never;
         head?: never;

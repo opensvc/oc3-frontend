@@ -181,9 +181,6 @@
       "submit": "Create",
       "submitting": "Creating…"
     },
-    "delete": {
-      "question": "Delete {{nodename}}? Its instances, alerts and collected records go with it. This cannot be undone."
-    },
     "related": {
       "label": "Node data",
       "hardware": "Hardware inventory",
@@ -230,6 +227,18 @@
         "compliance": "Compliance",
         "agent": "Agent",
         "power": "Reboot and shutdown"
+      },
+      "data": {
+        "delete": {
+          "label": "Delete from the collector",
+          "question_one": "Delete this node from the collector? Its instances, alerts, checks, packages, tags and other collected records go with it, as does its registration: its agent must register again to report. This cannot be undone.",
+          "question_other": "Delete these {{count}} nodes from the collector? Their instances, alerts, checks, packages, tags and other collected records go with them, as do their registrations: each agent must register again to report. This cannot be undone.",
+          "confirm_one": "Delete the node",
+          "confirm_other": "Delete {{count}} nodes",
+          "running": "Deleting…",
+          "done_one": "1 node deleted.",
+          "done_other": "{{count}} nodes deleted."
+        }
       }
     },
     "hardware": {
@@ -2429,5 +2438,10 @@
         "record": "Record"
       }
     }
+  },
+  "actionsMenu": {
+    "dataActions": "Data actions",
+    "more_one": "and 1 more",
+    "more_other": "and {{count}} more"
   }
 }

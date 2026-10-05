@@ -139,6 +139,7 @@ export function CollectorList<T>({
   selectAllMatching,
   exportPage,
   filterable = false,
+  unselect,
 }: {
   columns: ListColumn<T>[];
   /** Props shown as long as the user has not chosen their columns. */
@@ -183,6 +184,11 @@ export function CollectorList<T>({
    * `filter` and whose page forwards `search.filters` to it.
    */
   filterable?: boolean;
+  /**
+   * Rows to untick, each time a new array is given: those an action deleted, which
+   * the selection must not keep acting on.
+   */
+  unselect?: readonly string[];
 }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
@@ -288,6 +294,17 @@ export function CollectorList<T>({
     // moment it changes, with no risk of looping on the identity of the callback.
     onSelectionChange?.(Object.keys(next).filter((id) => next[id]));
   };
+
+  useEffect(() => {
+    if (unselect === undefined || unselect.length === 0) return;
+    onRowSelectionChange((previous) => {
+      const next = { ...previous };
+      for (const id of unselect) delete next[id];
+      return next;
+    });
+    // Only a new array unticks: the callbacks change identity on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unselect]);
 
   // The row last ticked or unticked: where a Shift+Click range starts.
   const anchor = useRef<string | null>(null);

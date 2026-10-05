@@ -181,9 +181,6 @@
       "submit": "Créer",
       "submitting": "Création…"
     },
-    "delete": {
-      "question": "Supprimer {{nodename}} ? Ses instances, ses alertes et ses relevés partent avec lui. C'est irréversible."
-    },
     "related": {
       "label": "Données du node",
       "hardware": "Inventaire matériel",
@@ -230,6 +227,18 @@
         "compliance": "Conformité",
         "agent": "Agent",
         "power": "Redémarrage et arrêt"
+      },
+      "data": {
+        "delete": {
+          "label": "Supprimer du collector",
+          "question_one": "Supprimer ce nœud du collector ? Ses instances, alertes, checks, paquets, tags et autres données collectées partent avec lui, ainsi que son enregistrement : son agent devra s'enregistrer à nouveau pour remonter ses données. Cette action est irréversible.",
+          "question_other": "Supprimer ces {{count}} nœuds du collector ? Leurs instances, alertes, checks, paquets, tags et autres données collectées partent avec eux, ainsi que leurs enregistrements : chaque agent devra s'enregistrer à nouveau pour remonter ses données. Cette action est irréversible.",
+          "confirm_one": "Supprimer le nœud",
+          "confirm_other": "Supprimer {{count}} nœuds",
+          "running": "Suppression…",
+          "done_one": "1 nœud supprimé.",
+          "done_other": "{{count}} nœuds supprimés."
+        }
       }
     },
     "hardware": {
@@ -2429,5 +2438,10 @@
         "record": "Enregistrement"
       }
     }
+  },
+  "actionsMenu": {
+    "dataActions": "Actions sur les données",
+    "more_one": "et 1 autre",
+    "more_other": "et {{count}} autres"
   }
 }

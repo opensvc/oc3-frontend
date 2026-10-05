@@ -260,6 +260,8 @@ export function NodesPage() {
   // Selection held by the list; the page keeps only its ids, for the actions menu.
   // The names come from the page on display, hence the fallback to the id.
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // The nodes the last deletion removed, unticked from the list.
+  const [deleted, setDeleted] = useState<string[]>([]);
 
   /** Ids of the whole selection, filterset and filters included, without pagination. */
   async function allIds(): Promise<string[]> {
@@ -313,7 +315,15 @@ export function NodesPage() {
         >
           {t("nodes.create.open")}
         </button>
-        <NodeActionsMenu nodes={selectedIds.map((id) => ({ id, name: nodeNames[id] ?? id }))} />
+        <NodeActionsMenu
+          nodes={selectedIds.map((id) => ({ id, name: nodeNames[id] ?? id }))}
+          onDeleted={(ids) => {
+            setDeleted(ids);
+            // The detail of a deleted node has nothing left to show.
+            if (search.sel !== undefined && ids.includes(search.sel))
+              update({ sel: undefined, tab: undefined });
+          }}
+        />
       </div>
 
       <CollectorList
@@ -333,6 +343,7 @@ export function NodesPage() {
         rowLead={(row) => <FrozenMark frozen={row.node_frozen === "T"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
+        unselect={deleted}
         filterable
       />
 
