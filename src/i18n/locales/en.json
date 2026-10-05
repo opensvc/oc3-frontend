@@ -42,7 +42,8 @@
     "complianceLogs": "Logs",
     "designer": "Designer",
     "statReports": "Reports",
-    "clusters": "Clusters"
+    "clusters": "Clusters",
+    "resources": "Resources"
   },
   "shortcuts": {
     "title": "Keyboard shortcuts",
@@ -2372,6 +2373,36 @@
         "freeze": "Freeze every node",
         "thaw": "Thaw every node",
         "abort": "Abort the running orchestration"
+      }
+    }
+  },
+  "resources": {
+    "title": "Resources",
+    "intro": "The resources of the service instances, as their agents report them: their status, their flags and their last log. A Manager sees every resource; the others see those of the services of an app their teams are responsible for.",
+    "fields": {
+      "id": "Record ID",
+      "svc_id": "Service ID",
+      "services.svcname": "Service",
+      "node_id": "Node ID",
+      "nodes.nodename": "Node",
+      "vmname": "Container",
+      "rid": "Resource ID",
+      "res_type": "Type",
+      "res_status": "Status",
+      "res_desc": "Description",
+      "res_log": "Log",
+      "res_monitor": "Monitored",
+      "res_disable": "Disabled",
+      "res_optional": "Optional",
+      "changed": "Changed",
+      "updated": "Updated"
+    },
+    "detail": {
+      "title": "Resource",
+      "groups": {
+        "identity": "Identity",
+        "state": "State",
+        "record": "Record"
       }
     }
   }

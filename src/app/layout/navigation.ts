@@ -17,6 +17,7 @@ export interface NavEntry {
     | "/hardware"
     | "/services"
     | "/instances"
+    | "/resources"
     | "/networks"
     | "/disks"
     | "/san-switches"
@@ -70,6 +71,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
       { to: "/clusters", labelKey: "nav.clusters", icon: "cluster" },
       { to: "/services", labelKey: "nav.services", icon: "service" },
       { to: "/instances", labelKey: "nav.instances", icon: "instance" },
+      // `view-resources` of the historical menu: the resources of every instance.
+      { to: "/resources", labelKey: "nav.resources", icon: "resource" },
       { to: "/networks", labelKey: "nav.networks", icon: "network" },
       { to: "/disks", labelKey: "nav.disks", icon: "disk" },
       // `view-san` of the historical menu: the ports of the SAN switches.

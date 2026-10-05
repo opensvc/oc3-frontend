@@ -14,6 +14,7 @@ import { ReportReaderPage } from "@/features/report-reader/ReportReaderPage";
 import { parseReaderSearch } from "@/features/report-reader/reader-search";
 import { ChartsPage } from "@/features/charts/ChartsPage";
 import { ClustersPage } from "@/features/clusters/ClustersPage";
+import { ResourcesPage } from "@/features/resources/ResourcesPage";
 import { FiltersPage } from "@/features/filters/FiltersPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
 import { FormsPage } from "@/features/forms/FormsPage";
@@ -177,6 +178,14 @@ const instancesRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
+// `view-resources` of the historical menu: the resources of the service instances.
+const resourcesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/resources",
+  component: ResourcesPage,
+  validateSearch: parseListSearch,
+});
+
 const tagsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/tags",
@@ -307,6 +316,7 @@ const routeTree = rootRoute.addChildren([
   clustersRoute,
   servicesRoute,
   instancesRoute,
+  resourcesRoute,
   networksRoute,
   disksRoute,
   switchesRoute,

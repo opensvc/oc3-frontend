@@ -42,7 +42,8 @@
     "complianceLogs": "Journaux",
     "designer": "Concepteur",
     "statReports": "Rapports",
-    "clusters": "Clusters"
+    "clusters": "Clusters",
+    "resources": "Ressources"
   },
   "shortcuts": {
     "title": "Raccourcis clavier",
@@ -2372,6 +2373,36 @@
         "freeze": "Geler tous les nodes",
         "thaw": "Dégeler tous les nodes",
         "abort": "Interrompre l'orchestration en cours"
+      }
+    }
+  },
+  "resources": {
+    "title": "Ressources",
+    "intro": "Les ressources des instances de services, telles que leurs agents les rapportent : leur statut, leurs drapeaux et leur dernier journal. Un Manager voit toutes les ressources ; les autres voient celles des services d'une app dont leurs équipes sont responsables.",
+    "fields": {
+      "id": "ID d'enregistrement",
+      "svc_id": "ID du service",
+      "services.svcname": "Service",
+      "node_id": "ID du node",
+      "nodes.nodename": "Node",
+      "vmname": "Conteneur",
+      "rid": "ID de ressource",
+      "res_type": "Type",
+      "res_status": "Statut",
+      "res_desc": "Description",
+      "res_log": "Journal",
+      "res_monitor": "Surveillée",
+      "res_disable": "Désactivée",
+      "res_optional": "Optionnelle",
+      "changed": "Modifiée",
+      "updated": "Mise à jour"
+    },
+    "detail": {
+      "title": "Ressource",
+      "groups": {
+        "identity": "Identité",
+        "state": "État",
+        "record": "Enregistrement"
       }
     }
   }

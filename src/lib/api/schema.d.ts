@@ -3713,6 +3713,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the resources of the service instances, as the agents report them
+         *     (resmon), with the names of their service and node as joined props
+         *     (`services.svcname`, `nodes.nodename`). Sorted by service, node, container
+         *     and resource id by default. A manager sees every resource; the others see
+         *     those of the services of an app their groups are responsible for.
+         */
+        get: operations["GetResources"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resources/{resource_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display a resource, if the caller may see it (see GET /resources). */
+        get: operations["GetResource"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/san-switches": {
         parameters: {
             query?: never;
@@ -5742,6 +5782,42 @@ export interface components {
             id?: number;
             report_name?: string;
             report_yaml?: string;
+        };
+        ResourceListResponse: {
+            data: components["schemas"]["ResourceRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A resource of a service instance, as its agent reports it. Every property
+         *     is optional: the `props` query parameter selects which columns the server
+         *     returns. The `services.` and `nodes.` props come from joined tables.
+         */
+        ResourceRow: {
+            changed?: string;
+            id?: number;
+            node_id?: string;
+            "nodes.nodename"?: string | null;
+            res_desc?: string;
+            /** @description T when the resource is disabled. */
+            res_disable?: string;
+            res_log?: string;
+            /** @description T when the resource is monitored. */
+            res_monitor?: string;
+            /** @description T when the resource is optional. */
+            res_optional?: string;
+            res_status?: string;
+            res_type?: string;
+            /** @description Resource id in the service configuration (fs#1, ip#0…). */
+            rid?: string;
+            "services.svcname"?: string | null;
+            svc_id?: string;
+            updated?: string;
+            /** @description Container of an encapsulated service, empty otherwise. */
+            vmname?: string;
         };
         RulesetListResponse: {
             data: components["schemas"]["RulesetRow"][] | {
@@ -17520,6 +17596,95 @@ export interface operations {
                     "application/json": components["schemas"]["Problem"];
                 };
             };
+            500: components["responses"]["500"];
+        };
+    };
+    GetResources: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetResource: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Resource record identifier (resmon.id) */
+                resource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
             500: components["responses"]["500"];
         };
     };
