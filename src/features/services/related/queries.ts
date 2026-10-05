@@ -2,6 +2,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import { toPage } from "@/lib/api/page";
 import { toTagRows } from "@/features/tags/tag-row";
 import { NODE_PROPS } from "@/features/nodes/node-props";
 
@@ -259,6 +260,36 @@ export function useServiceResources(svcId: string | undefined) {
         ...row,
         nodename: names.get(row.node_id ?? "") || (row.node_id ?? ""),
       }));
+    },
+  });
+}
+
+type LogRow = components["schemas"]["LogRow"];
+
+/** Log entries shown in the service tab: the Logs view, filtered on the service, has them all. */
+export const SERVICE_LOGS_LIMIT = 100;
+
+/** The latest log entries of the service, the most recent first. */
+export function useServiceLogs(svcId: string | undefined) {
+  return useQuery({
+    queryKey: ["service", svcId, "logs"],
+    enabled: svcId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/logs", {
+        params: {
+          query: {
+            props:
+              "id,log_date,log_level,node_id,nodes.nodename,log_user,log_impersonator,log_action,log_fmt,log_dict",
+            orderby: "-log_date,-id",
+            // One more than shown: whether older entries remain.
+            limit: SERVICE_LOGS_LIMIT + 1,
+            filter: [`svc_id:eq:${svcId ?? ""}`],
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      const rows: LogRow[] = Array.isArray(data.data) ? data.data : [];
+      return toPage(rows, data.meta, SERVICE_LOGS_LIMIT);
     },
   });
 }

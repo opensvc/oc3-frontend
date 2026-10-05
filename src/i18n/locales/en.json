@@ -591,7 +591,8 @@
       "label": "Service data",
       "storage": "Storage",
       "nodediff": "Nodes Differences",
-      "resources": "Resource status"
+      "resources": "Resource status",
+      "logs": "Logs"
     },
     "actions": {
       "open": "Actions",
@@ -685,6 +686,9 @@
       "warnCount_other": "{{count}} resources in warning",
       "otherCount_one": "{{count}} other resource",
       "otherCount_other": "{{count}} other resources"
+    },
+    "logs": {
+      "empty": "No log entry for this service."
     }
   },
   "alerts": {

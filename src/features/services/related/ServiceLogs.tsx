@@ -8,19 +8,20 @@ import { DateTime } from "@/components/ui/DateTime";
 import { filterKey } from "@/lib/column-filters";
 import { formatLogMessage, logLevelState } from "@/features/logs/log-message";
 import { LogUser } from "@/features/logs/LogUser";
-import { NODE_LOGS_LIMIT, useNodeLogs } from "./queries";
+import { SERVICE_LOGS_LIMIT, useServiceLogs } from "./queries";
 
 type LogRow = components["schemas"]["LogRow"];
 
 /**
- * The log entries of a node, the most recent first, as the historical node logs
- * tab: date, level, service, user, action and message, the message filled from its
- * values. The latest `NODE_LOGS_LIMIT` show here; the Logs view, filtered on the
- * node, has them all.
+ * The log entries of a service, the most recent first, as the historical service
+ * log tab: date, level, node, user (and who really signed in, when impersonated),
+ * action and message, the message filled from its values. The latest
+ * `SERVICE_LOGS_LIMIT` show here; the Logs view, filtered on the service, has them
+ * all.
  */
-export function NodeLogs({ nodeId, locale }: { nodeId: string; locale: string }) {
+export function ServiceLogs({ svcId, locale }: { svcId: string; locale: string }) {
   const { t } = useTranslation();
-  const logs = useNodeLogs(nodeId);
+  const logs = useServiceLogs(svcId);
   const rows = logs.data?.rows ?? [];
   const total = logs.data?.total;
 
@@ -39,12 +40,12 @@ export function NodeLogs({ nodeId, locale }: { nodeId: string; locale: string })
         ),
     },
     {
-      key: "services.svcname",
-      label: t("logs.fields.services.svcname"),
+      key: "nodes.nodename",
+      label: t("logs.fields.nodes.nodename"),
       render: (row) =>
-        row["services.svcname"] === null || row["services.svcname"] === undefined ? null : (
-          <CrossLink kind="service" id={row.svc_id}>
-            {row["services.svcname"]}
+        row["nodes.nodename"] === null || row["nodes.nodename"] === undefined ? null : (
+          <CrossLink kind="node" id={row.node_id}>
+            {row["nodes.nodename"]}
           </CrossLink>
         ),
     },
@@ -79,19 +80,19 @@ export function NodeLogs({ nodeId, locale }: { nodeId: string; locale: string })
         rowKey={(row) => String(row.id)}
         isPending={logs.isPending}
         errorMessage={logs.isError ? logs.error.message : null}
-        empty={t("nodes.logs.empty")}
-        caption={t("nodes.related.logs")}
+        empty={t("services.logs.empty")}
+        caption={t("services.related.logs")}
       />
       {rows.length > 0 && (
         <p className="flex flex-wrap items-center gap-x-3 text-ink-muted">
           {logs.data?.hasMore === true &&
             t("nodes.logs.latest", {
-              count: NODE_LOGS_LIMIT,
-              total: total ?? NODE_LOGS_LIMIT,
+              count: SERVICE_LOGS_LIMIT,
+              total: total ?? SERVICE_LOGS_LIMIT,
             })}
           <Link
             to="/logs"
-            search={{ [filterKey("node_id")]: `eq:${nodeId}` }}
+            search={{ [filterKey("svc_id")]: `eq:${svcId}` }}
             className="text-accent hover:underline"
           >
             {t("nodes.logs.open")}

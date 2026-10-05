@@ -591,7 +591,8 @@
       "label": "Données du service",
       "storage": "Stockage",
       "nodediff": "Différences entre nodes",
-      "resources": "Statut des ressources"
+      "resources": "Statut des ressources",
+      "logs": "Journal"
     },
     "actions": {
       "open": "Actions",
@@ -685,6 +686,9 @@
       "warnCount_other": "{{count}} ressources en alerte",
       "otherCount_one": "{{count}} autre ressource",
       "otherCount_other": "{{count}} autres ressources"
+    },
+    "logs": {
+      "empty": "Aucune entrée de journal pour ce service."
     }
   },
   "alerts": {

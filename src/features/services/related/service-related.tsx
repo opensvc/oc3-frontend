@@ -1,11 +1,12 @@
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import type { RelatedTab } from "@/components/opensvc/related-tabs";
 import { useTranslation } from "react-i18next";
+import { ServiceLogs } from "./ServiceLogs";
 import { ServiceNodesDiff } from "./ServiceNodesDiff";
 import { ServiceResources } from "./ServiceResources";
 import { resourceStatusSummary } from "./resource-status";
 import { ServiceStorage } from "./ServiceStorage";
-import { useServiceDisks, useServiceResources } from "./queries";
+import { useServiceDisks, useServiceLogs, useServiceResources } from "./queries";
 import { useNodesDiffSummary } from "./use-nodes-diff-summary";
 
 /**
@@ -43,5 +44,16 @@ export const SERVICE_RELATED_TABS: RelatedTab[] = [
     // reuses them.
     useSummary: (svcId) => useNodesDiffSummary(svcId),
     render: (svcId) => <ServiceNodesDiff svcId={svcId} />,
+  },
+  {
+    key: "logs",
+    labelKey: "services.related.logs",
+    icon: <ColumnFamilyIcon family="time" />,
+    // All the entries of the service, not only those the tab shows.
+    useSummary: (svcId) => {
+      const page = useServiceLogs(svcId).data;
+      return { count: page === undefined ? undefined : (page.total ?? page.rows.length) };
+    },
+    render: (svcId, locale) => <ServiceLogs svcId={svcId} locale={locale} />,
   },
 ];
