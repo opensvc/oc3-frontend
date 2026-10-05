@@ -28,6 +28,7 @@ import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ActionDetailPanel } from "./ActionDetailPanel";
 import { ActionQueueMenu } from "./ActionQueueMenu";
 import { ACTION_PROPS, isPending, realDate, toActionRows, type ActionRow } from "./action-row";
+import { stripAnsi } from "@/lib/ansi";
 
 /** The queue reads from the most recent to the oldest, like the log. */
 const DEFAULT_SORT = ["-id"];
@@ -108,7 +109,10 @@ const COLUMNS: ListColumn<ActionRow>[] = ACTION_PROPS.map((prop) => ({
       const date = realDate(value);
       return date === undefined ? undefined : <DateTime value={date} locale={locale} />;
     }
-    if (LONG_PROPS.has(prop)) return <span className="line-clamp-1">{value}</span>;
+    if (LONG_PROPS.has(prop))
+      return (
+        <span className="line-clamp-1">{typeof value === "string" ? stripAnsi(value) : value}</span>
+      );
     return value;
   },
 }));
