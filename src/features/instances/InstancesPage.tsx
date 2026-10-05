@@ -21,7 +21,8 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
-import { filterQuery, filtersKey } from "@/lib/column-filters";
+import { filterQuery, filtersKey, type ColumnFilters } from "@/lib/column-filters";
+import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stats";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { InstanceDetailPanel } from "./InstanceDetailPanel";
 import { FrozenMark } from "@/components/opensvc/FrozenMark";
@@ -209,6 +210,17 @@ async function fetchInstances(search: ResolvedListSearch) {
   return toPage(all, data.meta, search.limit);
 }
 
+/** The distribution of a column's values over the selection, with the filters given. */
+async function instanceStats(prop: string, filters: ColumnFilters): Promise<ValueStats> {
+  const { data, error } = await api.GET("/services_instances", {
+    params: {
+      query: { props: prop, stats: "1", limit: STATS_LIMIT, filter: filterQuery(filters) },
+    },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  return toValueStats(data.data, data.meta, prop);
+}
+
 function useInstances(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -320,6 +332,7 @@ export function InstancesPage() {
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
         unselect={deleted}
+        valueStats={instanceStats}
         filterable
       />
 

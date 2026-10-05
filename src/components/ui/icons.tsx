@@ -242,6 +242,15 @@ export function PieChartIcon(props: IconProps) {
   );
 }
 
+/** Distribution of the values of a column: bars ranked from the longest. */
+export function DistributionIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3 5a1.5 1.5 0 0 1 1.5-1.5h15a1.5 1.5 0 0 1 0 3h-15A1.5 1.5 0 0 1 3 5Zm0 7a1.5 1.5 0 0 1 1.5-1.5h10a1.5 1.5 0 0 1 0 3h-10A1.5 1.5 0 0 1 3 12Zm0 7a1.5 1.5 0 0 1 1.5-1.5h5a1.5 1.5 0 0 1 0 3h-5A1.5 1.5 0 0 1 3 19Z" />
+    </Svg>
+  );
+}
+
 /** Metrics: the code brackets of the historical collector (`metric16`, fa-code). */
 export function CodeIcon(props: IconProps) {
   return (

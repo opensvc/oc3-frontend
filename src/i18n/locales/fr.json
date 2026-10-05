@@ -522,7 +522,24 @@
     "page": "Page {{page}} sur {{pages}}",
     "pageUnknown": "Page {{page}}",
     "rangeOf": "{{from}}–{{to}} sur {{total}}",
-    "pagination": "Pagination"
+    "pagination": "Pagination",
+    "distribution": {
+      "open": "Répartition des valeurs de {{column}}",
+      "title": "Valeurs de {{column}}",
+      "summary_one": "{{values}} valeur · {{rows}} lignes",
+      "summary_other": "{{values}} valeurs · {{rows}} lignes",
+      "narrow": "Restreindre les valeurs…",
+      "empty": "(vide)",
+      "none": "Aucune ligne avec les autres filtres.",
+      "other_one": "Et 1 autre valeur, sur {{rows}} lignes.",
+      "other_other": "Et {{count}} autres valeurs, sur {{rows}} lignes : tapez pour les trouver.",
+      "unique": "Chaque ligne a sa propre valeur.",
+      "alsoPicked": "Aussi retenues : {{values}}.",
+      "excluding": "Les valeurs cochées sont exclues.",
+      "hint": "Clic : seulement · Ctrl+clic : ajouter",
+      "exclude": "Exclure",
+      "clear": "Effacer"
+    }
   },
   "detail": {
     "close": "Fermer",

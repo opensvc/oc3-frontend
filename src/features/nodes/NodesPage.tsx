@@ -26,7 +26,8 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
-import { filterQuery, filtersKey } from "@/lib/column-filters";
+import { filterQuery, filtersKey, type ColumnFilters } from "@/lib/column-filters";
+import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stats";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateNodePanel } from "./CreateNodePanel";
 import { NODE_PROPS } from "./node-props";
@@ -228,6 +229,26 @@ async function fetchNodes(search: ResolvedListSearch) {
   return toPage(all, response.data.meta, search.limit);
 }
 
+/**
+ * The distribution of a column's values over the selection: the filterset of
+ * `search` and the filters given apply, not the pagination.
+ */
+async function nodeStats(
+  search: ResolvedListSearch,
+  prop: string,
+  filters: ColumnFilters,
+): Promise<ValueStats> {
+  const query = { props: prop, stats: "1", limit: STATS_LIMIT, filter: filterQuery(filters) };
+  const response =
+    search.fset === ""
+      ? await api.GET("/nodes", { params: { query } })
+      : await api.GET("/filtersets/{filterset_id}/nodes", {
+          params: { path: { filterset_id: search.fset }, query },
+        });
+  if (response.error !== undefined) throw new Error(problemText(response.error));
+  return toValueStats(response.data.data, response.data.meta, prop);
+}
+
 function useNodes(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -344,6 +365,7 @@ export function NodesPage() {
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
         unselect={deleted}
+        valueStats={(prop, filters) => nodeStats(search, prop, filters)}
         filterable
       />
 

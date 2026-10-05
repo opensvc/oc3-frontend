@@ -25,7 +25,8 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
-import { filterQuery, filtersKey } from "@/lib/column-filters";
+import { filterQuery, filtersKey, type ColumnFilters } from "@/lib/column-filters";
+import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stats";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ServiceDetailPanel } from "./ServiceDetailPanel";
 import { AvailabilityRate } from "@/components/opensvc/AvailabilityRate";
@@ -233,6 +234,26 @@ async function fetchServices(search: ResolvedListSearch) {
   return toPage(all, response.data.meta, search.limit);
 }
 
+/**
+ * The distribution of a column's values over the selection: the filterset of
+ * `search` and the filters given apply, not the pagination.
+ */
+async function serviceStats(
+  search: ResolvedListSearch,
+  prop: string,
+  filters: ColumnFilters,
+): Promise<ValueStats> {
+  const query = { props: prop, stats: "1", limit: STATS_LIMIT, filter: filterQuery(filters) };
+  const response =
+    search.fset === ""
+      ? await api.GET("/services", { params: { query } })
+      : await api.GET("/filtersets/{filterset_id}/services", {
+          params: { path: { filterset_id: search.fset }, query },
+        });
+  if (response.error !== undefined) throw new Error(problemText(response.error));
+  return toValueStats(response.data.data, response.data.meta, prop);
+}
+
 function useServices(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -332,6 +353,7 @@ export function ServicesPage() {
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
         unselect={deleted}
+        valueStats={(prop, filters) => serviceStats(search, prop, filters)}
         filterable
       />
 

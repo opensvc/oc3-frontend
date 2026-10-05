@@ -522,7 +522,24 @@
     "page": "Page {{page}} of {{pages}}",
     "pageUnknown": "Page {{page}}",
     "rangeOf": "{{from}}–{{to}} of {{total}}",
-    "pagination": "Pagination"
+    "pagination": "Pagination",
+    "distribution": {
+      "open": "Value distribution of {{column}}",
+      "title": "Values of {{column}}",
+      "summary_one": "{{values}} value · {{rows}} rows",
+      "summary_other": "{{values}} values · {{rows}} rows",
+      "narrow": "Narrow the values…",
+      "empty": "(empty)",
+      "none": "No row under the other filters.",
+      "other_one": "And 1 other value, on {{rows}} rows.",
+      "other_other": "And {{count}} other values, on {{rows}} rows: type to find them.",
+      "unique": "Every row holds its own value.",
+      "alsoPicked": "Also picked: {{values}}.",
+      "excluding": "The ticked values are excluded.",
+      "hint": "Click: only · Ctrl+click: add",
+      "exclude": "Exclude",
+      "clear": "Clear"
+    }
   },
   "detail": {
     "close": "Close",
