@@ -48,8 +48,11 @@ const ACTIONS: readonly ActionEntry[] = [
 export function NodeActionsMenu({
   nodes,
   onDeleted,
+  onCompare,
 }: {
   nodes: ActionTarget[];
+  /** Opens the comparison of the selection, see ActionsMenu. */
+  onCompare?: () => void;
   onDeleted?: (ids: string[]) => void;
 }) {
   const queryClient = useQueryClient();
@@ -77,6 +80,7 @@ export function NodeActionsMenu({
       targets={nodes}
       actions={ACTIONS}
       dataActions={dataActions}
+      onCompare={onCompare}
       prefix="nodes.actions"
       queue={async (target, action) => {
         // `node_id` alone targets the node, as in the historical collector.

@@ -150,6 +150,7 @@ export function CollectorList<T>({
   exportPage,
   filterable = false,
   unselect,
+  reselect,
   valueStats,
 }: {
   columns: ListColumn<T>[];
@@ -200,6 +201,11 @@ export function CollectorList<T>({
    * the selection must not keep acting on.
    */
   unselect?: readonly string[];
+  /**
+   * The rows to tick in place of the selection, each time a new array is given:
+   * the selection narrowed from its comparison, for instance.
+   */
+  reselect?: readonly string[];
   /**
    * Counts the values of a column over the selection, with the filters given in
    * place of those of the moment: the view knows its endpoint. With it, the filter
@@ -323,6 +329,13 @@ export function CollectorList<T>({
     // Only a new array unticks: the callbacks change identity on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unselect]);
+
+  useEffect(() => {
+    if (reselect === undefined) return;
+    onRowSelectionChange(() => Object.fromEntries(reselect.map((id) => [id, true])));
+    // Only a new array ticks: the callbacks change identity on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reselect]);
 
   // The row last ticked or unticked: where a Shift+Click range starts.
   const anchor = useRef<string | null>(null);

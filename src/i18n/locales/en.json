@@ -445,6 +445,10 @@
         "identical": "Nothing changed between these two reports.",
         "clear": "Clear the selection"
       }
+    },
+    "compare": {
+      "noun_one": "1 node",
+      "noun_other": "{{count}} nodes"
     }
   },
   "auth": {
@@ -727,6 +731,10 @@
     },
     "logs": {
       "empty": "No log entry for this service."
+    },
+    "compare": {
+      "noun_one": "1 service",
+      "noun_other": "{{count}} services"
     }
   },
   "alerts": {
@@ -1217,6 +1225,10 @@
           "done_other": "{{count}} instances deleted."
         }
       }
+    },
+    "compare": {
+      "noun_one": "1 instance",
+      "noun_other": "{{count}} instances"
     }
   },
   "obsolescence": {
@@ -2483,6 +2495,43 @@
   "actionsMenu": {
     "dataActions": "Data actions",
     "more_one": "and 1 more",
-    "more_other": "and {{count}} more"
+    "more_other": "and {{count}} more",
+    "compare": "Compare the selection"
+  },
+  "commonality": {
+    "title": "Commonality of {{what}}",
+    "summary": "{{rows}} compared: {{shared}} attributes shared, {{differing}} differing, {{empty}} empty in all.",
+    "show": {
+      "label": "Attributes shown",
+      "all": "All ({{count}})",
+      "shared": "Shared ({{count}})",
+      "differing": "Differing ({{count}})"
+    },
+    "search": "Find an attribute…",
+    "noMatch": "No attribute matches.",
+    "empty": "(empty)",
+    "emptyInAll_one": "Empty in all: 1 attribute",
+    "emptyInAll_other": "Empty in all: {{count}} attributes",
+    "others_one": "And 1 other value.",
+    "others_other": "And {{count}} other values.",
+    "rangeFrom": "From",
+    "rangeTo": "to",
+    "apart_one": "Differs:",
+    "apart_other": "Differ:",
+    "keep": "Keep",
+    "exclude": "Exclude",
+    "keepHint_one": "Keep only this row in the selection",
+    "keepHint_other": "Keep only these {{count}} rows in the selection",
+    "excludeHint_one": "Remove this row from the selection",
+    "excludeHint_other": "Remove these {{count}} rows from the selection",
+    "sharedHint": "Every row holds this value",
+    "shareHint": "Share of the rows holding the most common value",
+    "tooFew": "Select at least two rows to compare them.",
+    "tooMany": "{{count}} rows selected: the comparison takes {{max}} at most. Narrow the selection.",
+    "missing_one": "1 selected row could not be read: deleted, or out of your reach.",
+    "missing_other": "{{count}} selected rows could not be read: deleted, or out of your reach.",
+    "copy": "Copy as text",
+    "copied": "Copied",
+    "copyFailed": "Copy failed"
   }
 }

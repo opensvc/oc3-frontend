@@ -39,8 +39,11 @@ const SERVICE_ACTIONS: readonly ActionEntry[] = [
 export function ServiceActionsMenu({
   services,
   onDeleted,
+  onCompare,
 }: {
   services: ActionTarget[];
+  /** Opens the comparison of the selection, see ActionsMenu. */
+  onCompare?: () => void;
   onDeleted?: (ids: string[]) => void;
 }) {
   const queryClient = useQueryClient();
@@ -69,6 +72,7 @@ export function ServiceActionsMenu({
       targets={services}
       actions={SERVICE_ACTIONS}
       dataActions={dataActions}
+      onCompare={onCompare}
       prefix="services.actions"
       queue={async (target, action) => {
         // `svc_id` alone targets the whole service, as in the historical collector.

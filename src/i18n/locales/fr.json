@@ -445,6 +445,10 @@
         "identical": "Rien n'a changé entre ces deux rapports.",
         "clear": "Effacer la sélection"
       }
+    },
+    "compare": {
+      "noun_one": "1 nœud",
+      "noun_other": "{{count}} nœuds"
     }
   },
   "auth": {
@@ -727,6 +731,10 @@
     },
     "logs": {
       "empty": "Aucune entrée de journal pour ce service."
+    },
+    "compare": {
+      "noun_one": "1 service",
+      "noun_other": "{{count}} services"
     }
   },
   "alerts": {
@@ -1217,6 +1225,10 @@
           "done_other": "{{count}} instances supprimées."
         }
       }
+    },
+    "compare": {
+      "noun_one": "1 instance",
+      "noun_other": "{{count}} instances"
     }
   },
   "obsolescence": {
@@ -2483,6 +2495,43 @@
   "actionsMenu": {
     "dataActions": "Actions sur les données",
     "more_one": "et 1 autre",
-    "more_other": "et {{count}} autres"
+    "more_other": "et {{count}} autres",
+    "compare": "Comparer la sélection"
+  },
+  "commonality": {
+    "title": "Points communs de {{what}}",
+    "summary": "{{rows}} comparés : {{shared}} attributs communs, {{differing}} différents, {{empty}} vides partout.",
+    "show": {
+      "label": "Attributs affichés",
+      "all": "Tous ({{count}})",
+      "shared": "Communs ({{count}})",
+      "differing": "Différents ({{count}})"
+    },
+    "search": "Chercher un attribut…",
+    "noMatch": "Aucun attribut ne correspond.",
+    "empty": "(vide)",
+    "emptyInAll_one": "Vide partout : 1 attribut",
+    "emptyInAll_other": "Vides partout : {{count}} attributs",
+    "others_one": "Et 1 autre valeur.",
+    "others_other": "Et {{count}} autres valeurs.",
+    "rangeFrom": "De",
+    "rangeTo": "à",
+    "apart_one": "Diffère :",
+    "apart_other": "Diffèrent :",
+    "keep": "Garder",
+    "exclude": "Exclure",
+    "keepHint_one": "Ne garder que cette ligne dans la sélection",
+    "keepHint_other": "Ne garder que ces {{count}} lignes dans la sélection",
+    "excludeHint_one": "Retirer cette ligne de la sélection",
+    "excludeHint_other": "Retirer ces {{count}} lignes de la sélection",
+    "sharedHint": "Toutes les lignes ont cette valeur",
+    "shareHint": "Part des lignes ayant la valeur la plus courante",
+    "tooFew": "Sélectionnez au moins deux lignes pour les comparer.",
+    "tooMany": "{{count}} lignes sélectionnées : la comparaison en prend {{max}} au plus. Restreignez la sélection.",
+    "missing_one": "1 ligne sélectionnée n'a pu être lue : supprimée, ou hors de votre portée.",
+    "missing_other": "{{count}} lignes sélectionnées n'ont pu être lues : supprimées, ou hors de votre portée.",
+    "copy": "Copier en texte",
+    "copied": "Copié",
+    "copyFailed": "Échec de la copie"
   }
 }

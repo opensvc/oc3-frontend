@@ -80,6 +80,7 @@ export function ActionsMenu({
   prefix,
   queue: queueOne,
   dataActions = [],
+  onCompare,
 }: {
   targets: ActionTarget[];
   actions: readonly ActionEntry[];
@@ -88,6 +89,11 @@ export function ActionsMenu({
   /** Queues the action on one object; returns the API error message, or null. */
   queue: (target: ActionTarget, action: string) => Promise<string | null>;
   dataActions?: readonly DataActionEntry[];
+  /**
+   * Opens the comparison of the targets: offered from two of them, apart from the
+   * actions, which change something, as it only reads.
+   */
+  onCompare?: () => void;
 }) {
   const { t } = useTranslation();
   const [pending, setPending] = useState<Pending | null>(null);
@@ -177,6 +183,15 @@ export function ActionsMenu({
     }
     submenu.items?.push({ ...itemOf(entry), separatorBefore: false });
   }
+
+  if (onCompare !== undefined && targets.length >= 2)
+    items.push({
+      key: "compare",
+      label: t("actionsMenu.compare"),
+      separatorBefore: true,
+      disabled: busy,
+      onSelect: onCompare,
+    });
 
   // Shown once the privileges are known: an entry must not appear then vanish.
   const allowed = dataActions.filter(

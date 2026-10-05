@@ -27,6 +27,8 @@ import {
 } from "@/lib/list-search";
 import { filterQuery, filtersKey, type ColumnFilters } from "@/lib/column-filters";
 import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stats";
+import { idBatches } from "@/lib/commonality";
+import { CommonalityPanel } from "@/components/opensvc/CommonalityPanel";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ServiceDetailPanel } from "./ServiceDetailPanel";
 import { AvailabilityRate } from "@/components/opensvc/AvailabilityRate";
@@ -261,6 +263,22 @@ async function serviceStats(
   return toValueStats(response.data.data, response.data.meta, prop);
 }
 
+/** The services of `ids` with every column, for their comparison. */
+async function fetchServicesByIds(ids: readonly string[]): Promise<ServiceRow[]> {
+  const pages = await Promise.all(
+    idBatches(ids).map(async (batch) => {
+      const { data, error } = await api.GET("/services", {
+        params: {
+          query: { props: ALL_PROPS.join(","), limit: 0, filter: [`svc_id:in:${batch.join(",")}`] },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return Array.isArray(data.data) ? data.data : [];
+    }),
+  );
+  return pages.flat();
+}
+
 function useServices(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -292,6 +310,9 @@ export function ServicesPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   // The services the last deletion removed, unticked from the list.
   const [deleted, setDeleted] = useState<string[]>([]);
+  const [comparing, setComparing] = useState(false);
+  // The selection narrowed from its comparison, ticked in the list.
+  const [reselect, setReselect] = useState<string[] | undefined>(undefined);
 
   /** Ids of the whole selection, filterset and filters included, without pagination. */
   async function allIds(): Promise<string[]> {
@@ -308,6 +329,8 @@ export function ServicesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // A row's detail and the comparison share the right edge.
+    if (next.sel !== undefined) setComparing(false);
     // Columns, sort, filters and page size follow the account, the other states
     // stay in the URL.
     prefs.saveSearch(next);
@@ -339,6 +362,11 @@ export function ServicesPage() {
             if (search.sel !== undefined && ids.includes(search.sel))
               update({ sel: undefined, tab: undefined });
           }}
+          onCompare={() => {
+            // The drawers share the right edge: the comparison takes it.
+            update({ sel: undefined, tab: undefined });
+            setComparing(true);
+          }}
         />
       </div>
 
@@ -360,8 +388,29 @@ export function ServicesPage() {
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
         unselect={deleted}
+        reselect={reselect}
         valueStats={(prop, filters) => serviceStats(search, prop, filters)}
         filterable
+      />
+
+      <CommonalityPanel
+        open={comparing}
+        onClose={() => {
+          setComparing(false);
+        }}
+        kind="service"
+        noun={(count) => t("services.compare.noun", { count })}
+        ids={selectedIds}
+        queryKey={["services"]}
+        fetchRows={fetchServicesByIds}
+        columns={COLUMNS}
+        exclude={UNIQUE_PROPS}
+        rowId={(row) => row.svc_id}
+        rowName={(row) => row.svcname ?? row.svc_id ?? ""}
+        onOpenRow={(id) => {
+          update({ sel: id });
+        }}
+        onSelect={setReselect}
       />
 
       <ServiceDetailPanel

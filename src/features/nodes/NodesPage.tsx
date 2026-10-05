@@ -28,6 +28,8 @@ import {
 } from "@/lib/list-search";
 import { filterQuery, filtersKey, type ColumnFilters } from "@/lib/column-filters";
 import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stats";
+import { idBatches } from "@/lib/commonality";
+import { CommonalityPanel } from "@/components/opensvc/CommonalityPanel";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateNodePanel } from "./CreateNodePanel";
 import { NODE_PROPS } from "./node-props";
@@ -256,6 +258,26 @@ async function nodeStats(
   return toValueStats(response.data.data, response.data.meta, prop);
 }
 
+/** The nodes of `ids` with every column, for their comparison. */
+async function fetchNodesByIds(ids: readonly string[]): Promise<NodeRow[]> {
+  const pages = await Promise.all(
+    idBatches(ids).map(async (batch) => {
+      const { data, error } = await api.GET("/nodes", {
+        params: {
+          query: {
+            props: ALL_PROPS.join(","),
+            limit: 0,
+            filter: [`node_id:in:${batch.join(",")}`],
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return Array.isArray(data.data) ? data.data : [];
+    }),
+  );
+  return pages.flat();
+}
+
 function useNodes(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -288,6 +310,9 @@ export function NodesPage() {
   // Selection held by the list; the page keeps only its ids, for the actions menu.
   // The names come from the page on display, hence the fallback to the id.
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [comparing, setComparing] = useState(false);
+  // The selection narrowed from its comparison, ticked in the list.
+  const [reselect, setReselect] = useState<string[] | undefined>(undefined);
   // The nodes the last deletion removed, unticked from the list.
   const [deleted, setDeleted] = useState<string[]>([]);
 
@@ -308,7 +333,10 @@ export function NodesPage() {
   function update(next: Partial<ResolvedListSearch>) {
     // Choosing a row ends a creation in progress: the row's detail takes the right
     // edge, where the two drawers would otherwise overlap.
-    if (next.sel !== undefined) setCreating(false);
+    if (next.sel !== undefined) {
+      setCreating(false);
+      setComparing(false);
+    }
     // Columns, sort, filters and page size follow the account, the other states
     // stay in the URL.
     prefs.saveSearch(next);
@@ -351,6 +379,12 @@ export function NodesPage() {
             if (search.sel !== undefined && ids.includes(search.sel))
               update({ sel: undefined, tab: undefined });
           }}
+          onCompare={() => {
+            // The drawers share the right edge: the comparison takes it.
+            update({ sel: undefined, tab: undefined });
+            setCreating(false);
+            setComparing(true);
+          }}
         />
       </div>
 
@@ -372,8 +406,29 @@ export function NodesPage() {
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
         unselect={deleted}
+        reselect={reselect}
         valueStats={(prop, filters) => nodeStats(search, prop, filters)}
         filterable
+      />
+
+      <CommonalityPanel
+        open={comparing}
+        onClose={() => {
+          setComparing(false);
+        }}
+        kind="node"
+        noun={(count) => t("nodes.compare.noun", { count })}
+        ids={selectedIds}
+        queryKey={["nodes"]}
+        fetchRows={fetchNodesByIds}
+        columns={COLUMNS}
+        exclude={UNIQUE_PROPS}
+        rowId={(row) => row.node_id}
+        rowName={(row) => row.nodename ?? row.node_id ?? ""}
+        onOpenRow={(id) => {
+          update({ sel: id });
+        }}
+        onSelect={setReselect}
       />
 
       <NodeDetailPanel
