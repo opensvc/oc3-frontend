@@ -216,6 +216,7 @@ export function CollectorList<T>({
   const [selectingAll, setSelectingAll] = useState(false);
   const [selectionError, setSelectionError] = useState<string | null>(null);
   const picker = useRef<HTMLDetailsElement>(null);
+  const pickerSearch = useRef<HTMLInputElement>(null);
   const exportMenu = useRef<HTMLDetailsElement>(null);
   const { pathname } = useLocation();
   // Rows read so far by the export under way, or null when none is.
@@ -587,7 +588,15 @@ export function CollectorList<T>({
           </select>
         </label>
 
-        <details ref={picker} onKeyDown={onPickerKeyDown} className="relative">
+        <details
+          ref={picker}
+          onKeyDown={onPickerKeyDown}
+          // Opened, the menu is for finding a column: the search field takes the focus.
+          onToggle={(event) => {
+            if (event.currentTarget.open) pickerSearch.current?.focus();
+          }}
+          className="relative"
+        >
           <summary className="flex h-7 cursor-pointer list-none items-center gap-1.5 rounded-(--radius-control) border border-line px-2 text-ink-muted hover:text-ink">
             <ColumnsIcon />
             {t("list.columns", { shown: shown.length, total: columns.length })}
@@ -598,6 +607,7 @@ export function CollectorList<T>({
             <div className="mb-2 flex h-7 items-center gap-1.5 rounded-(--radius-control) border border-line bg-surface px-2 text-ink-muted">
               <SearchIcon />
               <input
+                ref={pickerSearch}
                 type="search"
                 value={columnFilter}
                 onChange={(event) => {
