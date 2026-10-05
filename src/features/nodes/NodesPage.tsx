@@ -152,11 +152,18 @@ const FAMILY: Record<string, ColumnFamily> = {
   updated: "time",
 };
 
+/**
+ * Columns holding one value per node, the id by constraint, the name in practice:
+ * their distribution would only list each node once.
+ */
+const UNIQUE_PROPS = new Set<string>(["node_id", "nodename"]);
+
 const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
   prop,
   labelKey: `nodes.fields.${prop}`,
   numeric: NUMERIC_PROPS.has(prop),
   family: FAMILY[prop] ?? "node",
+  distribution: UNIQUE_PROPS.has(prop) ? false : undefined,
   filter:
     prop === "node_frozen"
       ? { kind: "enum" as const, options: frozenFilterOptions("T", "F") }
