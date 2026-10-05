@@ -590,7 +590,8 @@
     "related": {
       "label": "Service data",
       "storage": "Storage",
-      "nodediff": "Nodes Differences"
+      "nodediff": "Nodes Differences",
+      "resources": "Resource status"
     },
     "actions": {
       "open": "Actions",
@@ -669,7 +670,22 @@
         "none": "nothing to compare"
       }
     },
-    "belowSla": "below the {{sla}} SLA"
+    "belowSla": "below the {{sla}} SLA",
+    "resources": {
+      "flags": "Flags",
+      "empty": "No resource reported for this service.",
+      "flag": {
+        "res_monitor": "monitored",
+        "res_disable": "disabled",
+        "res_optional": "optional"
+      },
+      "downCount_one": "{{count}} resource down",
+      "downCount_other": "{{count}} resources down",
+      "warnCount_one": "{{count}} resource in warning",
+      "warnCount_other": "{{count}} resources in warning",
+      "otherCount_one": "{{count}} other resource",
+      "otherCount_other": "{{count}} other resources"
+    }
   },
   "alerts": {
     "fields": {

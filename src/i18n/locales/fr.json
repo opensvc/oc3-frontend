@@ -590,7 +590,8 @@
     "related": {
       "label": "Données du service",
       "storage": "Stockage",
-      "nodediff": "Différences entre nodes"
+      "nodediff": "Différences entre nodes",
+      "resources": "Statut des ressources"
     },
     "actions": {
       "open": "Actions",
@@ -669,7 +670,22 @@
         "none": "rien à comparer"
       }
     },
-    "belowSla": "sous le SLA de {{sla}}"
+    "belowSla": "sous le SLA de {{sla}}",
+    "resources": {
+      "flags": "Drapeaux",
+      "empty": "Aucune ressource rapportée pour ce service.",
+      "flag": {
+        "res_monitor": "surveillée",
+        "res_disable": "désactivée",
+        "res_optional": "optionnelle"
+      },
+      "downCount_one": "{{count}} ressource down",
+      "downCount_other": "{{count}} ressources down",
+      "warnCount_one": "{{count}} ressource en alerte",
+      "warnCount_other": "{{count}} ressources en alerte",
+      "otherCount_one": "{{count}} autre ressource",
+      "otherCount_other": "{{count}} autres ressources"
+    }
   },
   "alerts": {
     "fields": {

@@ -210,3 +210,55 @@ export function useNodesCompliance(nodeIds: string[] | undefined) {
     }),
   });
 }
+
+type ResourceRow = components["schemas"]["ResourceRow"];
+
+/** A resource of the service, with the name of the node that reports it. */
+export interface ServiceResource extends ResourceRow {
+  nodename: string;
+}
+
+/**
+ * Resources of the service, as each of its instances reports them: the historical
+ * "resources status" tab (`table_resources_svc`). The per-service endpoint has no
+ * node names: they come from the service's instances, as for the HBAs.
+ */
+export function useServiceResources(svcId: string | undefined) {
+  return useQuery({
+    queryKey: ["service", svcId, "resources"],
+    enabled: svcId !== undefined,
+    queryFn: async (): Promise<ServiceResource[]> => {
+      const [resources, instances] = await Promise.all([
+        api.GET("/services/{svc_id}/resources", {
+          params: {
+            path: { svc_id: svcId ?? "" },
+            query: {
+              props:
+                "id,node_id,vmname,rid,res_type,res_status,res_desc,res_log,res_monitor,res_disable,res_optional,updated",
+              orderby: "node_id,vmname,rid",
+              limit: 0,
+            },
+          },
+        }),
+        api.GET("/services_instances/{svc_id}", {
+          params: {
+            path: { svc_id: svcId ?? "" },
+            query: { props: "node_id,nodes.nodename", limit: 0 },
+          },
+        }),
+      ]);
+      if (resources.error !== undefined) throw new Error(problemText(resources.error));
+      if (instances.error !== undefined) throw new Error(problemText(instances.error));
+      const names = new Map(
+        (Array.isArray(instances.data.data) ? (instances.data.data as InstanceRow[]) : []).map(
+          (row) => [row.node_id ?? "", row["nodes.nodename"] ?? ""],
+        ),
+      );
+      const rows = (Array.isArray(resources.data.data) ? resources.data.data : []) as ResourceRow[];
+      return rows.map((row) => ({
+        ...row,
+        nodename: names.get(row.node_id ?? "") || (row.node_id ?? ""),
+      }));
+    },
+  });
+}
