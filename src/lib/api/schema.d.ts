@@ -4883,6 +4883,42 @@ export interface components {
             points: number[][];
             unit?: string;
         };
+        CheckListResponse: {
+            data: components["schemas"]["CheckRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A check of a node, as its check drivers report it, with the
+         *     thresholds the collector sets. Every property is optional: the
+         *     `props` query parameter selects which columns the server returns.
+         *     `chk_low`, `chk_high` and `chk_err` are null for a check without
+         *     thresholds. `chk_err` is 0 within the thresholds, 1 under the low
+         *     one, 2 over the high one.
+         */
+        CheckRow: {
+            chk_created?: string;
+            chk_err?: number | null;
+            /** Format: int64 */
+            chk_high?: number | null;
+            chk_instance?: string;
+            /** Format: int64 */
+            chk_low?: number | null;
+            /** @description Where the thresholds come from, settings, fset:<filterset> or defaults. */
+            chk_threshold_provider?: string;
+            chk_type?: string;
+            chk_updated?: string;
+            /** Format: int64 */
+            chk_value?: number;
+            id?: number;
+            node_id?: string;
+            "services.svcname"?: string | null;
+            /** @description The object the check is attributed to, empty for the node. */
+            svc_id?: string;
+        };
         ClusterListResponse: {
             data: components["schemas"]["ClusterRow"][] | {
                 [key: string]: {
@@ -16837,7 +16873,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListResponse"];
+                    "application/json": components["schemas"]["CheckListResponse"];
                 };
             };
             404: components["responses"]["404"];
@@ -19444,7 +19480,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListResponse"];
+                    "application/json": components["schemas"]["CheckListResponse"];
                 };
             };
             404: components["responses"]["404"];

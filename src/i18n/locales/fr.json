@@ -190,7 +190,8 @@
       "inventory": "Inventaire",
       "sysreport": "Sysreport",
       "logs": "Journal",
-      "stats": "Statistiques"
+      "stats": "Statistiques",
+      "checks": "Contrôles"
     },
     "actions": {
       "open": "Actions",
@@ -449,6 +450,23 @@
     "compare": {
       "noun_one": "1 nœud",
       "noun_other": "{{count}} nœuds"
+    },
+    "checks": {
+      "fields": {
+        "chk_instance": "Instance",
+        "object": "Objet",
+        "chk_value": "Valeur",
+        "thresholds": "Seuils",
+        "chk_err": "État"
+      },
+      "within": "dans les seuils",
+      "below": "sous le seuil bas",
+      "above": "au-dessus du seuil haut",
+      "noThresholds": "aucun seuil",
+      "reported": "Remonté par l'agent",
+      "empty": "Aucun contrôle : l'agent n'en a remonté aucun pour ce nœud.",
+      "outOfBoundsCount_one": "{{count}} contrôle hors seuils",
+      "outOfBoundsCount_other": "{{count}} contrôles hors seuils"
     }
   },
   "auth": {

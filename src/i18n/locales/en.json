@@ -190,7 +190,8 @@
       "inventory": "Inventory",
       "sysreport": "Sysreport",
       "logs": "Logs",
-      "stats": "Stats"
+      "stats": "Stats",
+      "checks": "Checks"
     },
     "actions": {
       "open": "Actions",
@@ -449,6 +450,23 @@
     "compare": {
       "noun_one": "1 node",
       "noun_other": "{{count}} nodes"
+    },
+    "checks": {
+      "fields": {
+        "chk_instance": "Instance",
+        "object": "Object",
+        "chk_value": "Value",
+        "thresholds": "Thresholds",
+        "chk_err": "State"
+      },
+      "within": "within thresholds",
+      "below": "below the low threshold",
+      "above": "above the high threshold",
+      "noThresholds": "no thresholds",
+      "reported": "Reported by the agent",
+      "empty": "No check: the agent has not reported any for this node.",
+      "outOfBoundsCount_one": "{{count}} check out of bounds",
+      "outOfBoundsCount_other": "{{count}} checks out of bounds"
     }
   },
   "auth": {
