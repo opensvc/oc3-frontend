@@ -15,8 +15,8 @@ const flag = (prop: keyof UserRow) => ({ ...field(prop), input: "boolean" as con
 
 /**
  * Properties of a user, shared by the detail panel and the profile page, read-only.
- * `registration_id` and `reset_password_key` are not among them: the reset key is
- * enough to change a password, see notes.md.
+ * `registration_id`, an identifier at an external identity provider, is not among
+ * them; the credentials are not exposed by the API.
  */
 export const USER_GROUPS: DetailGroup<UserRow>[] = [
   {

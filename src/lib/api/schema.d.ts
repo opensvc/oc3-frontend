@@ -2634,8 +2634,8 @@ export interface paths {
         };
         /**
          * @description List the users member of the group. Managers can see all groups; other
-         *     users only see the groups they belong to. The password and
-         *     registration_key columns are never exposed.
+         *     users only see the groups they belong to. The password, registration_key
+         *     and reset_password_key columns are never exposed.
          */
         get: operations["GetGroupUsers"];
         put?: never;
@@ -6149,7 +6149,8 @@ export interface components {
             };
         };
         /**
-         * @description A user of the users list. `password` and `registration_key` are never
+         * @description A user of the users list. `password`, `registration_key` and
+         *     `reset_password_key` are never
          *     returned. The boolean-like columns (`email_notifications`,
          *     `im_notifications`, `lock_filter`) carry the collector's "T"/"F"
          *     convention, and the delay and quota columns are returned as strings.
@@ -6175,7 +6176,6 @@ export interface components {
             quota_docker_registries?: string;
             quota_org_group?: string;
             registration_id?: string;
-            reset_password_key?: string;
             username?: string;
         };
         WorkflowListResponse: {

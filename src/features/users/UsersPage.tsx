@@ -27,10 +27,9 @@ const DEFAULT_SORT = ["email"];
 
 /**
  * User properties exposed by apicollector, in the order of its
- * `meta.available_props`, with two exceptions: `registration_id` and
- * `reset_password_key` are not offered. The reset key is enough to change the
- * password of an account; it has no place in a list, and the fact that apicollector
- * returns it is reported in notes.md.
+ * `meta.available_props`, but `registration_id`, the account's identifier at an
+ * external identity provider, of no use in a list. The credentials (password,
+ * registration and password reset keys) are not exposed by the API.
  */
 const USER_PROPS = [
   "id",
