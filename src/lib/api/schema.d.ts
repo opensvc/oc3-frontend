@@ -2380,7 +2380,7 @@ export interface paths {
         };
         /**
          * @description List the forms stored by workflows, with the revision they were submitted
-         *     with.
+         *     with, among those of the requests the caller may see (see GET /workflows).
          */
         get: operations["GetFormsStore"];
         put?: never;
@@ -2398,7 +2398,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Show a form stored by a workflow. */
+        /**
+         * @description Show a form stored by a workflow, if the caller may see its request (see
+         *     GET /workflows): an empty list otherwise.
+         */
         get: operations["GetFormStore"];
         put?: never;
         post?: never;
@@ -2417,7 +2420,8 @@ export interface paths {
         };
         /**
          * @description Show a form stored by a workflow, with its workflow, the workflow head and
-         *     tail stored forms.
+         *     tail stored forms, if the caller may see its request (see GET /workflows):
+         *     404 otherwise.
          */
         get: operations["GetFormStoreDump"];
         put?: never;
@@ -4708,8 +4712,10 @@ export interface paths {
         };
         /**
          * @description List the requests: the workflows started by the submission of a form with a
-         *     workflow output. As the historical API,
-         *     every workflow is listed to any authenticated user. `form_name`,
+         *     workflow output. A manager sees every request; the others see those they
+         *     or one of their teams take part in: created, are assigned, or submitted or
+         *     were assigned one of its steps (the historical API listed every workflow
+         *     to any authenticated user). `form_name`,
          *     `form_folder` and `form_yaml` are those of the form revision the request
          *     started from.
          */

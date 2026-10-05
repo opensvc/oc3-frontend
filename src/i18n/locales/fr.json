@@ -1713,7 +1713,7 @@
   },
   "allRequests": {
     "title": "Toutes les demandes",
-    "intro": "Les demandes soumises par un formulaire à sortie workflow, quel qu'en soit l'auteur : leur statut, leurs étapes et qui elles attendent.",
+    "intro": "Les demandes auxquelles vous ou vos équipes prenez part (auteur, assignée, ou une de leurs étapes traitée), toutes pour un Manager : leur statut, leurs étapes et qui elles attendent.",
     "status": {
       "pending": "en attente",
       "closed": "close"

@@ -237,7 +237,10 @@ function RequestsList({
   );
 }
 
-/** Every request submitted, whoever submitted it: the historical `req-all`. */
+/**
+ * The requests the user or their teams take part in, every one for a Manager: the
+ * historical `req-all`, which listed every request to anyone.
+ */
 export function AllRequestsPage() {
   const navigate = useNavigate({ from: "/requests/all" });
   return (

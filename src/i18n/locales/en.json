@@ -1713,7 +1713,7 @@
   },
   "allRequests": {
     "title": "All requests",
-    "intro": "The requests submitted with a form having a workflow output, whoever submitted them: their status, their steps and who they await.",
+    "intro": "The requests you or your teams take part in (created, are assigned, or handled one of their steps), all of them for a Manager: their status, their steps and who they await.",
     "status": {
       "pending": "pending",
       "closed": "closed"
