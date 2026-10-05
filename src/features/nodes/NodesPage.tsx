@@ -26,7 +26,10 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
-import { filterQuery, filtersKey } from "@/lib/column-filters";
+import { filterQuery, filtersKey, type ColumnFilters } from "@/lib/column-filters";
+import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stats";
+import { idBatches } from "@/lib/commonality";
+import { CommonalityPanel } from "@/components/opensvc/CommonalityPanel";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateNodePanel } from "./CreateNodePanel";
 import { NODE_PROPS } from "./node-props";
@@ -151,11 +154,18 @@ const FAMILY: Record<string, ColumnFamily> = {
   updated: "time",
 };
 
+/**
+ * Columns holding one value per node, the id by constraint, the name in practice:
+ * their distribution would only list each node once.
+ */
+const UNIQUE_PROPS = new Set<string>(["node_id", "nodename"]);
+
 const COLUMNS: ListColumn<NodeRow>[] = NODE_PROPS.map((prop) => ({
   prop,
   labelKey: `nodes.fields.${prop}`,
   numeric: NUMERIC_PROPS.has(prop),
   family: FAMILY[prop] ?? "node",
+  distribution: UNIQUE_PROPS.has(prop) ? false : undefined,
   filter:
     prop === "node_frozen"
       ? { kind: "enum" as const, options: frozenFilterOptions("T", "F") }
@@ -228,6 +238,46 @@ async function fetchNodes(search: ResolvedListSearch) {
   return toPage(all, response.data.meta, search.limit);
 }
 
+/**
+ * The distribution of a column's values over the selection: the filterset of
+ * `search` and the filters given apply, not the pagination.
+ */
+async function nodeStats(
+  search: ResolvedListSearch,
+  prop: string,
+  filters: ColumnFilters,
+): Promise<ValueStats> {
+  const query = { props: prop, stats: "1", limit: STATS_LIMIT, filter: filterQuery(filters) };
+  const response =
+    search.fset === ""
+      ? await api.GET("/nodes", { params: { query } })
+      : await api.GET("/filtersets/{filterset_id}/nodes", {
+          params: { path: { filterset_id: search.fset }, query },
+        });
+  if (response.error !== undefined) throw new Error(problemText(response.error));
+  return toValueStats(response.data.data, response.data.meta, prop);
+}
+
+/** The nodes of `ids` with every column, for their comparison. */
+async function fetchNodesByIds(ids: readonly string[]): Promise<NodeRow[]> {
+  const pages = await Promise.all(
+    idBatches(ids).map(async (batch) => {
+      const { data, error } = await api.GET("/nodes", {
+        params: {
+          query: {
+            props: ALL_PROPS.join(","),
+            limit: 0,
+            filter: [`node_id:in:${batch.join(",")}`],
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      return Array.isArray(data.data) ? data.data : [];
+    }),
+  );
+  return pages.flat();
+}
+
 function useNodes(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -260,6 +310,11 @@ export function NodesPage() {
   // Selection held by the list; the page keeps only its ids, for the actions menu.
   // The names come from the page on display, hence the fallback to the id.
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [comparing, setComparing] = useState(false);
+  // The selection narrowed from its comparison, ticked in the list.
+  const [reselect, setReselect] = useState<string[] | undefined>(undefined);
+  // The nodes the last deletion removed, unticked from the list.
+  const [deleted, setDeleted] = useState<string[]>([]);
 
   /** Ids of the whole selection, filterset and filters included, without pagination. */
   async function allIds(): Promise<string[]> {
@@ -278,7 +333,10 @@ export function NodesPage() {
   function update(next: Partial<ResolvedListSearch>) {
     // Choosing a row ends a creation in progress: the row's detail takes the right
     // edge, where the two drawers would otherwise overlap.
-    if (next.sel !== undefined) setCreating(false);
+    if (next.sel !== undefined) {
+      setCreating(false);
+      setComparing(false);
+    }
     // Columns, sort, filters and page size follow the account, the other states
     // stay in the URL.
     prefs.saveSearch(next);
@@ -313,7 +371,21 @@ export function NodesPage() {
         >
           {t("nodes.create.open")}
         </button>
-        <NodeActionsMenu nodes={selectedIds.map((id) => ({ id, name: nodeNames[id] ?? id }))} />
+        <NodeActionsMenu
+          nodes={selectedIds.map((id) => ({ id, name: nodeNames[id] ?? id }))}
+          onDeleted={(ids) => {
+            setDeleted(ids);
+            // The detail of a deleted node has nothing left to show.
+            if (search.sel !== undefined && ids.includes(search.sel))
+              update({ sel: undefined, tab: undefined });
+          }}
+          onCompare={() => {
+            // The drawers share the right edge: the comparison takes it.
+            update({ sel: undefined, tab: undefined });
+            setCreating(false);
+            setComparing(true);
+          }}
+        />
       </div>
 
       <CollectorList
@@ -333,7 +405,30 @@ export function NodesPage() {
         rowLead={(row) => <FrozenMark frozen={row.node_frozen === "T"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
+        unselect={deleted}
+        reselect={reselect}
+        valueStats={(prop, filters) => nodeStats(search, prop, filters)}
         filterable
+      />
+
+      <CommonalityPanel
+        open={comparing}
+        onClose={() => {
+          setComparing(false);
+        }}
+        kind="node"
+        noun={(count) => t("nodes.compare.noun", { count })}
+        ids={selectedIds}
+        queryKey={["nodes"]}
+        fetchRows={fetchNodesByIds}
+        columns={COLUMNS}
+        exclude={UNIQUE_PROPS}
+        rowId={(row) => row.node_id}
+        rowName={(row) => row.nodename ?? row.node_id ?? ""}
+        onOpenRow={(id) => {
+          update({ sel: id });
+        }}
+        onSelect={setReselect}
       />
 
       <NodeDetailPanel

@@ -2951,7 +2951,7 @@ export interface paths {
         put?: never;
         /** @description Update a node properties */
         post: operations["PostNode"];
-        /** @description Delete an OpenSVC node and cascade delete its related entries. */
+        /** @description Delete an OpenSVC node and cascade delete its related entries. The user must hold the NodeManager privilege and be responsible for the node (a Manager is responsible for every node). */
         delete: operations["DeleteNode"];
         options?: never;
         head?: never;
@@ -3705,6 +3705,46 @@ export interface paths {
          *     metric_id) and Charts (by chart_id). An empty definition is an empty object.
          */
         get: operations["GetReportDefinition"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description List the resources of the service instances, as the agents report them
+         *     (resmon), with the names of their service and node as joined props
+         *     (`services.svcname`, `nodes.nodename`). Sorted by service, node, container
+         *     and resource id by default. A manager sees every resource; the others see
+         *     those of the services of an app their groups are responsible for.
+         */
+        get: operations["GetResources"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resources/{resource_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Display a resource, if the caller may see it (see GET /resources). */
+        get: operations["GetResource"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4843,6 +4883,42 @@ export interface components {
             points: number[][];
             unit?: string;
         };
+        CheckListResponse: {
+            data: components["schemas"]["CheckRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A check of a node, as its check drivers report it, with the
+         *     thresholds the collector sets. Every property is optional: the
+         *     `props` query parameter selects which columns the server returns.
+         *     `chk_low`, `chk_high` and `chk_err` are null for a check without
+         *     thresholds. `chk_err` is 0 within the thresholds, 1 under the low
+         *     one, 2 over the high one.
+         */
+        CheckRow: {
+            chk_created?: string;
+            chk_err?: number | null;
+            /** Format: int64 */
+            chk_high?: number | null;
+            chk_instance?: string;
+            /** Format: int64 */
+            chk_low?: number | null;
+            /** @description Where the thresholds come from, settings, fset:<filterset> or defaults. */
+            chk_threshold_provider?: string;
+            chk_type?: string;
+            chk_updated?: string;
+            /** Format: int64 */
+            chk_value?: number;
+            id?: number;
+            node_id?: string;
+            "services.svcname"?: string | null;
+            /** @description The object the check is attributed to, empty for the node. */
+            svc_id?: string;
+        };
         ClusterListResponse: {
             data: components["schemas"]["ClusterRow"][] | {
                 [key: string]: {
@@ -5315,12 +5391,20 @@ export interface components {
         ListMeta: {
             available_props?: string[];
             count?: number;
+            /** @description With stats, the number of distinct values of each property. */
             distinct?: {
                 [key: string]: number;
             };
             included_props?: string[];
             limit?: number;
             offset?: number;
+            /**
+             * @description With stats and a limit, the number of rows of each property whose value
+             *     is not among those returned.
+             */
+            other?: {
+                [key: string]: number;
+            };
             /**
              * @description Number of rows of the list without pagination, the filters applied; for
              *     a grouped list, the number of groups. With stats, the number of rows the
@@ -5361,6 +5445,11 @@ export interface components {
             log_entry_id?: number | null;
             log_fmt?: string;
             log_gtalk_sent?: number | null;
+            /**
+             * @description The user who really signed in when the action was made as log_user
+             *     (impersonation); empty otherwise.
+             */
+            log_impersonator?: string;
             log_level?: string;
             log_user?: string;
             node_id?: string;
@@ -5742,6 +5831,42 @@ export interface components {
             id?: number;
             report_name?: string;
             report_yaml?: string;
+        };
+        ResourceListResponse: {
+            data: components["schemas"]["ResourceRow"][] | {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            meta?: components["schemas"]["ListMeta"];
+        };
+        /**
+         * @description A resource of a service instance, as its agent reports it. Every property
+         *     is optional: the `props` query parameter selects which columns the server
+         *     returns. The `services.` and `nodes.` props come from joined tables.
+         */
+        ResourceRow: {
+            changed?: string;
+            id?: number;
+            node_id?: string;
+            "nodes.nodename"?: string | null;
+            res_desc?: string;
+            /** @description T when the resource is disabled. */
+            res_disable?: string;
+            res_log?: string;
+            /** @description T when the resource is monitored. */
+            res_monitor?: string;
+            /** @description T when the resource is optional. */
+            res_optional?: string;
+            res_status?: string;
+            res_type?: string;
+            /** @description Resource id in the service configuration (fs#1, ip#0…). */
+            rid?: string;
+            "services.svcname"?: string | null;
+            svc_id?: string;
+            updated?: string;
+            /** @description Container of an encapsulated service, empty otherwise. */
+            vmname?: string;
         };
         RulesetListResponse: {
             data: components["schemas"]["RulesetRow"][] | {
@@ -6328,7 +6453,19 @@ export interface components {
         inQueryOrderby: string;
         /** @description A list of properties to include in each data dictionnary. */
         inQueryProps: string;
-        /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+        /**
+         * @description With "1" or "true", the response counts the distinct values of each
+         *     selected property instead of listing the rows: `data` maps each property
+         *     to an object of value → number of rows ("empty" for a null or blank
+         *     value), over the whole selection (access control, filters and session
+         *     filterset applied, `offset` ignored). `limit`, when given, caps the
+         *     number of values returned per property, the most frequent first; without
+         *     it every value is returned. `meta.total` is the number of rows,
+         *     `meta.distinct` the number of distinct values of each property, and
+         *     `meta.other` the number of rows whose value was left out by the limit.
+         *     A count taking longer than 5 seconds is refused with a 400, asking to
+         *     narrow the selection.
+         */
         inQueryStats: string;
     };
     requestBodies: never;
@@ -6353,7 +6490,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -6478,7 +6627,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -6551,7 +6712,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -6592,7 +6765,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -6724,7 +6909,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -6873,7 +7070,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -7122,7 +7331,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -7167,7 +7388,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -7277,7 +7510,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -7322,7 +7567,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -7432,7 +7689,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -7623,7 +7892,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -7697,7 +7978,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -7858,7 +8151,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -7983,7 +8288,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -8073,7 +8390,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -8379,7 +8708,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -8446,7 +8787,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -8538,7 +8891,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -8806,7 +9171,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -8871,7 +9248,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -8998,7 +9387,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -9189,7 +9590,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -9288,7 +9701,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -9642,7 +10067,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -9956,7 +10393,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -10023,7 +10472,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -10177,7 +10638,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -10242,7 +10715,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -10369,7 +10854,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -10562,7 +11059,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -10655,7 +11164,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -11199,7 +11720,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -11296,7 +11829,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -11448,7 +11993,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -11581,7 +12138,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -11653,7 +12222,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -11786,7 +12367,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -11901,7 +12494,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -12033,7 +12638,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -12167,7 +12784,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -12283,7 +12912,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -12400,7 +13041,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -12462,7 +13115,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -12774,7 +13439,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -12900,7 +13577,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -13120,7 +13809,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -13244,7 +13945,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -13584,7 +14297,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -13644,7 +14369,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -13707,7 +14444,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -13767,7 +14516,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -13857,7 +14618,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -13899,7 +14672,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14026,7 +14811,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14134,7 +14931,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14178,7 +14987,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14295,7 +15116,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14339,7 +15172,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14383,7 +15228,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14427,7 +15284,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14471,7 +15340,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14537,7 +15418,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14629,7 +15522,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14705,7 +15610,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14797,7 +15714,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -14842,7 +15771,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15074,7 +16015,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15222,7 +16175,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15418,7 +16383,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15477,7 +16454,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15518,7 +16507,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15697,7 +16698,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15769,7 +16782,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15814,7 +16839,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15836,7 +16873,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListResponse"];
+                    "application/json": components["schemas"]["CheckListResponse"];
                 };
             };
             404: components["responses"]["404"];
@@ -15859,7 +16896,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15916,7 +16965,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -15973,7 +17034,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16018,7 +17091,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16143,7 +17228,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16268,7 +17365,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16325,7 +17434,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16370,7 +17491,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16415,7 +17548,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16460,7 +17605,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16505,7 +17662,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16576,7 +17745,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16621,7 +17802,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16900,7 +18093,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -16997,7 +18202,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -17125,7 +18342,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -17259,7 +18488,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -17377,7 +18618,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -17523,6 +18776,107 @@ export interface operations {
             500: components["responses"]["500"];
         };
     };
+    GetResources: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+                /** @description The maximum number of entries to return. 0 means no limit. */
+                limit?: components["parameters"]["inQueryLimit"];
+                /** @description Skip the first entries of the data cursor. */
+                offset?: components["parameters"]["inQueryOffset"];
+                /**
+                 * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+                 *     the meta field. The metadata of a list carries its total number of rows
+                 *     without pagination (total), as well as the rows returned (count), the offset
+                 *     and the limit.
+                 */
+                meta?: components["parameters"]["inQueryMeta"];
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
+                stats?: components["parameters"]["inQueryStats"];
+                /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+                orderby?: components["parameters"]["inQueryOrderby"];
+                /**
+                 * @description Column filter, repeatable; several filters combine with AND. Each value is
+                 *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+                 *     for orderby) and `expr` one of:
+                 *       - text: case-insensitive match anywhere in the value;
+                 *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+                 *       - `in:a,b,c`: one of the listed values;
+                 *       - `eq:v`, `ne:v`: equal, not equal;
+                 *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+                 *       - `empty`: no value;
+                 *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+                 *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+                 *         `!empty` (any value).
+                 *     An unknown property, a property without a column, or an invalid regular
+                 *     expression is answered with 400.
+                 */
+                filter?: components["parameters"]["inQueryFilter"];
+                /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+                groupby?: components["parameters"]["inQueryGroupby"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceListResponse"];
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            500: components["responses"]["500"];
+        };
+    };
+    GetResource: {
+        parameters: {
+            query?: {
+                /** @description A list of properties to include in each data dictionnary. */
+                props?: components["parameters"]["inQueryProps"];
+            };
+            header?: never;
+            path: {
+                /** @description Resource record identifier (resmon.id) */
+                resource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceListResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            500: components["responses"]["500"];
+        };
+    };
     GetSanSwitches: {
         parameters: {
             query?: {
@@ -17539,7 +18893,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -17633,7 +18999,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -17779,7 +19157,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -17912,7 +19302,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -17987,7 +19389,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18032,7 +19446,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18054,7 +19480,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListResponse"];
+                    "application/json": components["schemas"]["CheckListResponse"];
                 };
             };
             404: components["responses"]["404"];
@@ -18077,7 +19503,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18124,7 +19562,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18169,7 +19619,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18216,7 +19678,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18327,7 +19801,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18436,7 +19922,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18481,7 +19979,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18526,7 +20036,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18636,7 +20158,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18681,7 +20215,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18728,7 +20274,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18775,7 +20333,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18822,7 +20392,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18867,7 +20449,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -18912,7 +20506,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -19063,7 +20669,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -19108,7 +20726,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -19204,7 +20834,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -19249,7 +20891,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -19290,7 +20944,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -19331,7 +20997,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -19458,7 +21136,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -19574,7 +21264,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -19889,7 +21591,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -20004,7 +21718,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -20210,7 +21936,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -20298,7 +22036,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];
@@ -20546,7 +22296,19 @@ export interface operations {
                  *     and the limit.
                  */
                 meta?: components["parameters"]["inQueryMeta"];
-                /** @description Controls the inclusion in the returned dictionnary of a "stats" key, containing the selected properties distinct values counts. */
+                /**
+                 * @description With "1" or "true", the response counts the distinct values of each
+                 *     selected property instead of listing the rows: `data` maps each property
+                 *     to an object of value → number of rows ("empty" for a null or blank
+                 *     value), over the whole selection (access control, filters and session
+                 *     filterset applied, `offset` ignored). `limit`, when given, caps the
+                 *     number of values returned per property, the most frequent first; without
+                 *     it every value is returned. `meta.total` is the number of rows,
+                 *     `meta.distinct` the number of distinct values of each property, and
+                 *     `meta.other` the number of rows whose value was left out by the limit.
+                 *     A count taking longer than 5 seconds is refused with a 400, asking to
+                 *     narrow the selection.
+                 */
                 stats?: components["parameters"]["inQueryStats"];
                 /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
                 orderby?: components["parameters"]["inQueryOrderby"];

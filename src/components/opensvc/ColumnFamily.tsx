@@ -22,6 +22,7 @@ import {
   StackIcon,
   TargetIcon,
   UsersIcon,
+  HashIcon,
 } from "@/components/ui/icons";
 
 /**
@@ -44,6 +45,7 @@ export type ColumnFamily =
   | "network"
   | "time"
   | "service"
+  | "resource"
   | "power"
   | "team"
   | "app"
@@ -75,6 +77,8 @@ const FAMILIES: Record<ColumnFamily, { Icon: typeof ServerIcon; className: strin
   security: { Icon: FirewallIcon, className: "text-icon-network" },
   network: { Icon: NetworkIcon, className: "text-icon-network" },
   service: { Icon: StackIcon, className: "text-icon-service" },
+  // The sea green hashtag of the historical `resource` class: the service tint.
+  resource: { Icon: HashIcon, className: "text-icon-service" },
   team: { Icon: UsersIcon, className: "text-icon-group" },
   app: { Icon: AsteriskIcon, className: "text-icon-app" },
   disk: { Icon: DatabaseIcon, className: "text-icon-disk" },

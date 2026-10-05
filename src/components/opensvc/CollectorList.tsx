@@ -32,7 +32,11 @@ import {
   toEnumValues,
   toTextDraft,
   withFilter,
+  filtersKey,
+  type ColumnFilters,
 } from "@/lib/column-filters";
+import type { ValueStats } from "@/lib/api/value-stats";
+import { ColumnDistribution } from "./ColumnDistribution";
 import { PAGE_SIZES, visibleProps, type ResolvedListSearch } from "@/lib/list-search";
 import { readProp } from "@/lib/row";
 import { FlashCell, FlashScope } from "./Flash";
@@ -54,6 +58,12 @@ export interface ListColumn<T> {
    * default, a list of values for a column holding a known set, or nothing.
    */
   filter?: ColumnFilterSpec;
+  /**
+   * Whether the filter offers the distribution of the column's values, in a list
+   * given `valueStats`. By default yes, but for dates and times, nearly one value
+   * per row.
+   */
+  distribution?: boolean;
   render: (row: T, locale: string) => ReactNode;
 }
 
@@ -139,6 +149,9 @@ export function CollectorList<T>({
   selectAllMatching,
   exportPage,
   filterable = false,
+  unselect,
+  reselect,
+  valueStats,
 }: {
   columns: ListColumn<T>[];
   /** Props shown as long as the user has not chosen their columns. */
@@ -183,6 +196,22 @@ export function CollectorList<T>({
    * `filter` and whose page forwards `search.filters` to it.
    */
   filterable?: boolean;
+  /**
+   * Rows to untick, each time a new array is given: those an action deleted, which
+   * the selection must not keep acting on.
+   */
+  unselect?: readonly string[];
+  /**
+   * The rows to tick in place of the selection, each time a new array is given:
+   * the selection narrowed from its comparison, for instance.
+   */
+  reselect?: readonly string[];
+  /**
+   * Counts the values of a column over the selection, with the filters given in
+   * place of those of the moment: the view knows its endpoint. With it, the filter
+   * of each column offers the distribution of its values (see ColumnDistribution).
+   */
+  valueStats?: (prop: string, filters: ColumnFilters) => Promise<ValueStats>;
 }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
@@ -193,6 +222,7 @@ export function CollectorList<T>({
   const [selectingAll, setSelectingAll] = useState(false);
   const [selectionError, setSelectionError] = useState<string | null>(null);
   const picker = useRef<HTMLDetailsElement>(null);
+  const pickerSearch = useRef<HTMLInputElement>(null);
   const exportMenu = useRef<HTMLDetailsElement>(null);
   const { pathname } = useLocation();
   // Rows read so far by the export under way, or null when none is.
@@ -288,6 +318,24 @@ export function CollectorList<T>({
     // moment it changes, with no risk of looping on the identity of the callback.
     onSelectionChange?.(Object.keys(next).filter((id) => next[id]));
   };
+
+  useEffect(() => {
+    if (unselect === undefined || unselect.length === 0) return;
+    onRowSelectionChange((previous) => {
+      const next = { ...previous };
+      for (const id of unselect) delete next[id];
+      return next;
+    });
+    // Only a new array unticks: the callbacks change identity on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unselect]);
+
+  useEffect(() => {
+    if (reselect === undefined) return;
+    onRowSelectionChange(() => Object.fromEntries(reselect.map((id) => [id, true])));
+    // Only a new array ticks: the callbacks change identity on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reselect]);
 
   // The row last ticked or unticked: where a Shift+Click range starts.
   const anchor = useRef<string | null>(null);
@@ -553,7 +601,15 @@ export function CollectorList<T>({
           </select>
         </label>
 
-        <details ref={picker} onKeyDown={onPickerKeyDown} className="relative">
+        <details
+          ref={picker}
+          onKeyDown={onPickerKeyDown}
+          // Opened, the menu is for finding a column: the search field takes the focus.
+          onToggle={(event) => {
+            if (event.currentTarget.open) pickerSearch.current?.focus();
+          }}
+          className="relative"
+        >
           <summary className="flex h-7 cursor-pointer list-none items-center gap-1.5 rounded-(--radius-control) border border-line px-2 text-ink-muted hover:text-ink">
             <ColumnsIcon />
             {t("list.columns", { shown: shown.length, total: columns.length })}
@@ -564,6 +620,7 @@ export function CollectorList<T>({
             <div className="mb-2 flex h-7 items-center gap-1.5 rounded-(--radius-control) border border-line bg-surface px-2 text-ink-muted">
               <SearchIcon />
               <input
+                ref={pickerSearch}
                 type="search"
                 value={columnFilter}
                 onChange={(event) => {
@@ -926,13 +983,28 @@ export function CollectorList<T>({
                         // The same padding above and below: the control sits in the
                         // middle of its row, clear of the line under the headers.
                         <td key={column.id} className="px-2 py-1">
-                          <ColumnFilterControl
-                            column={meta}
-                            value={search.filters[meta.prop]}
-                            onChange={(expr) => {
-                              setFilter(meta.prop, expr);
-                            }}
-                          />
+                          <div className="flex items-center gap-1">
+                            <div className="min-w-0 flex-1">
+                              <ColumnFilterControl
+                                column={meta}
+                                value={search.filters[meta.prop]}
+                                onChange={(expr) => {
+                                  setFilter(meta.prop, expr);
+                                }}
+                              />
+                            </div>
+                            {valueStats !== undefined && hasDistribution(meta) && (
+                              <ColumnValues
+                                column={meta}
+                                filters={search.filters}
+                                scope={[pathname, search.fset]}
+                                valueStats={valueStats}
+                                onChange={(expr) => {
+                                  setFilter(meta.prop, expr);
+                                }}
+                              />
+                            )}
+                          </div>
                         </td>
                       );
                     })}
@@ -1089,6 +1161,57 @@ function ColumnFilterControl<T>({
   );
 }
 
+/** Whether a column offers the distribution of its values: see ListColumn. */
+function hasDistribution<T>(column: ListColumn<T>): boolean {
+  if (column.filter?.kind === "none") return false;
+  return column.distribution ?? column.family !== "time";
+}
+
+/**
+ * The distribution of a column's values under every filter but its own, read with
+ * the view's `valueStats`; the values are named as the enumerated filter names them.
+ */
+function ColumnValues<T>({
+  column,
+  filters,
+  scope,
+  valueStats,
+  onChange,
+}: {
+  column: ListColumn<T>;
+  filters: ColumnFilters;
+  /** What tells the lists apart in the cache: the page and its filterset. */
+  scope: readonly unknown[];
+  valueStats: (prop: string, filters: ColumnFilters) => Promise<ValueStats>;
+  onChange: (expr: string | undefined) => void;
+}) {
+  const { t } = useTranslation();
+  const others = Object.fromEntries(
+    Object.entries(filters).filter(([prop]) => prop !== column.prop),
+  );
+  const options = column.filter?.kind === "enum" ? column.filter.options : [];
+  return (
+    <ColumnDistribution
+      column={t(column.labelKey)}
+      expr={filters[column.prop]}
+      onChange={onChange}
+      queryKey={["valueStats", ...scope, column.prop, filtersKey(others)]}
+      fetchStats={(narrow) =>
+        valueStats(
+          column.prop,
+          narrow === undefined ? others : { ...others, [column.prop]: narrow },
+        )
+      }
+      labelOf={(value) => {
+        const option = options.find((candidate) => candidate.value === value);
+        return option === undefined
+          ? { text: value }
+          : { text: optionLabel(option, t), render: option.render };
+      }}
+    />
+  );
+}
+
 function optionLabel(option: ColumnFilterOption, t: TFunction): string {
   return option.labelKey === undefined ? option.value : t(option.labelKey);
 }
@@ -1100,16 +1223,20 @@ function optionLabel(option: ColumnFilterOption, t: TFunction): string {
 function describeFilter<T>(column: ListColumn<T> | undefined, expr: string, t: TFunction): string {
   if (column === undefined) return expr;
   const spec = column.filter;
-  if (spec?.kind === "enum") {
+  const draft = toTextDraft(expr);
+  // Values picked from a list, or from the distribution of a text column: named.
+  // A single exact value of a text column keeps its "=", which tells it from a
+  // substring.
+  if (spec?.kind === "enum" || draft.text.startsWith("in:")) {
+    const options = spec?.kind === "enum" ? spec.options : [];
     const values = toEnumValues(expr);
     if (values.length > 0)
       return values
         .map((value) => {
-          const option = spec.options.find((candidate) => candidate.value === value);
+          const option = options.find((candidate) => candidate.value === value);
           return option === undefined ? value : optionLabel(option, t);
         })
         .join(", ");
   }
-  const draft = toTextDraft(expr);
   return draft.regex ? `/${draft.text}/` : draft.text;
 }

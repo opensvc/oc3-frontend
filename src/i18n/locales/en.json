@@ -42,7 +42,8 @@
     "complianceLogs": "Logs",
     "designer": "Designer",
     "statReports": "Reports",
-    "clusters": "Clusters"
+    "clusters": "Clusters",
+    "resources": "Resources"
   },
   "shortcuts": {
     "title": "Keyboard shortcuts",
@@ -180,9 +181,6 @@
       "submit": "Create",
       "submitting": "Creating…"
     },
-    "delete": {
-      "question": "Delete {{nodename}}? Its instances, alerts and collected records go with it. This cannot be undone."
-    },
     "related": {
       "label": "Node data",
       "hardware": "Hardware inventory",
@@ -192,7 +190,8 @@
       "inventory": "Inventory",
       "sysreport": "Sysreport",
       "logs": "Logs",
-      "stats": "Stats"
+      "stats": "Stats",
+      "checks": "Checks"
     },
     "actions": {
       "open": "Actions",
@@ -229,6 +228,18 @@
         "compliance": "Compliance",
         "agent": "Agent",
         "power": "Reboot and shutdown"
+      },
+      "data": {
+        "delete": {
+          "label": "Delete from the collector",
+          "question_one": "Delete this node from the collector? Its instances, alerts, checks, packages, tags and other collected records go with it, as does its registration: its agent must register again to report. This cannot be undone.",
+          "question_other": "Delete these {{count}} nodes from the collector? Their instances, alerts, checks, packages, tags and other collected records go with them, as do their registrations: each agent must register again to report. This cannot be undone.",
+          "confirm_one": "Delete the node",
+          "confirm_other": "Delete {{count}} nodes",
+          "running": "Deleting…",
+          "done_one": "1 node deleted.",
+          "done_other": "{{count}} nodes deleted."
+        }
       }
     },
     "hardware": {
@@ -435,6 +446,27 @@
         "identical": "Nothing changed between these two reports.",
         "clear": "Clear the selection"
       }
+    },
+    "compare": {
+      "noun_one": "1 node",
+      "noun_other": "{{count}} nodes"
+    },
+    "checks": {
+      "fields": {
+        "chk_instance": "Instance",
+        "object": "Object",
+        "chk_value": "Value",
+        "thresholds": "Thresholds",
+        "chk_err": "State"
+      },
+      "within": "within thresholds",
+      "below": "below the low threshold",
+      "above": "above the high threshold",
+      "noThresholds": "no thresholds",
+      "reported": "Reported by the agent",
+      "empty": "No check: the agent has not reported any for this node.",
+      "outOfBoundsCount_one": "{{count}} check out of bounds",
+      "outOfBoundsCount_other": "{{count}} checks out of bounds"
     }
   },
   "auth": {
@@ -512,7 +544,24 @@
     "page": "Page {{page}} of {{pages}}",
     "pageUnknown": "Page {{page}}",
     "rangeOf": "{{from}}–{{to}} of {{total}}",
-    "pagination": "Pagination"
+    "pagination": "Pagination",
+    "distribution": {
+      "open": "Value distribution of {{column}}",
+      "title": "Values of {{column}}",
+      "summary_one": "{{values}} value · {{rows}} rows",
+      "summary_other": "{{values}} values · {{rows}} rows",
+      "narrow": "Narrow the values…",
+      "empty": "(empty)",
+      "none": "No row under the other filters.",
+      "other_one": "And 1 other value, on {{rows}} rows.",
+      "other_other": "And {{count}} other values, on {{rows}} rows: type to find them.",
+      "unique": "Every row holds its own value.",
+      "alsoPicked": "Also picked: {{values}}.",
+      "excluding": "The ticked values are excluded.",
+      "hint": "Click: only · Ctrl+click: add",
+      "exclude": "Exclude",
+      "clear": "Clear"
+    }
   },
   "detail": {
     "close": "Close",
@@ -589,7 +638,9 @@
     "related": {
       "label": "Service data",
       "storage": "Storage",
-      "nodediff": "Nodes Differences"
+      "nodediff": "Nodes Differences",
+      "resources": "Resource status",
+      "logs": "Logs"
     },
     "actions": {
       "open": "Actions",
@@ -615,6 +666,18 @@
       "groups": {
         "recovery": "Recovery",
         "inventory": "Inventory"
+      },
+      "data": {
+        "delete": {
+          "label": "Delete from the collector",
+          "question_one": "Delete this service from the collector? Its instances, resources, alerts, tags, compliance attachments, actions and status history go with it. The agents recreate it at their next push if it still exists. This cannot be undone.",
+          "question_other": "Delete these {{count}} services from the collector? Their instances, resources, alerts, tags, compliance attachments, actions and status history go with them. The agents recreate a service at their next push if it still exists. This cannot be undone.",
+          "confirm_one": "Delete the service",
+          "confirm_other": "Delete {{count}} services",
+          "running": "Deleting…",
+          "done_one": "1 service deleted.",
+          "done_other": "{{count}} services deleted."
+        }
       }
     },
     "pkgdiff": {
@@ -668,7 +731,29 @@
         "none": "nothing to compare"
       }
     },
-    "belowSla": "below the {{sla}} SLA"
+    "belowSla": "below the {{sla}} SLA",
+    "resources": {
+      "flags": "Flags",
+      "empty": "No resource reported for this service.",
+      "flag": {
+        "res_monitor": "monitored",
+        "res_disable": "disabled",
+        "res_optional": "optional"
+      },
+      "downCount_one": "{{count}} resource down",
+      "downCount_other": "{{count}} resources down",
+      "warnCount_one": "{{count}} resource in warning",
+      "warnCount_other": "{{count}} resources in warning",
+      "otherCount_one": "{{count}} other resource",
+      "otherCount_other": "{{count}} other resources"
+    },
+    "logs": {
+      "empty": "No log entry for this service."
+    },
+    "compare": {
+      "noun_one": "1 service",
+      "noun_other": "{{count}} services"
+    }
   },
   "alerts": {
     "fields": {
@@ -1105,7 +1190,8 @@
         "state": "State",
         "resources": "Resource status",
         "virtualization": "Virtualization"
-      }
+      },
+      "tabs": "Instance tabs"
     },
     "actions": {
       "open": "Actions",
@@ -1144,7 +1230,23 @@
         "sync": "Synchronization",
         "maintenance": "Maintenance",
         "compliance": "Compliance"
+      },
+      "data": {
+        "delete": {
+          "label": "Delete from the collector",
+          "question_one": "Delete this instance from the collector? Its resources, alerts and checks go with it, and every container of the service on that node. The agent recreates it at its next push if it still exists. This cannot be undone.",
+          "question_other": "Delete these {{count}} instances from the collector? Their resources, alerts and checks go with them, and every container of the service on each node. An agent recreates an instance at its next push if it still exists. This cannot be undone.",
+          "confirm_one": "Delete the instance",
+          "confirm_other": "Delete {{count}} instances",
+          "running": "Deleting…",
+          "done_one": "1 instance deleted.",
+          "done_other": "{{count}} instances deleted."
+        }
       }
+    },
+    "compare": {
+      "noun_one": "1 instance",
+      "noun_other": "{{count}} instances"
     }
   },
   "obsolescence": {
@@ -1199,7 +1301,8 @@
       "node_id": "Node id",
       "log_entry_id": "Entry id",
       "log_gtalk_sent": "Sent by IM",
-      "log_email_sent": "Sent by email"
+      "log_email_sent": "Sent by email",
+      "log_impersonator": "Impersonator"
     },
     "detail": {
       "title": "Log event",
@@ -1208,7 +1311,9 @@
         "object": "Object",
         "raw": "Record"
       }
-    }
+    },
+    "via": "via {{impersonator}}",
+    "impersonatedBy": "{{impersonator}} acting as {{user}}"
   },
   "charts": {
     "title": "Charts",
@@ -2374,5 +2479,77 @@
         "abort": "Abort the running orchestration"
       }
     }
+  },
+  "resources": {
+    "title": "Resources",
+    "intro": "The resources of the service instances, as their agents report them: their status, their flags and their last log. A Manager sees every resource; the others see those of the services of an app their teams are responsible for.",
+    "fields": {
+      "id": "Record ID",
+      "svc_id": "Service ID",
+      "services.svcname": "Service",
+      "node_id": "Node ID",
+      "nodes.nodename": "Node",
+      "vmname": "Container",
+      "rid": "Resource ID",
+      "res_type": "Type",
+      "res_status": "Status",
+      "res_desc": "Description",
+      "res_log": "Log",
+      "res_monitor": "Monitored",
+      "res_disable": "Disabled",
+      "res_optional": "Optional",
+      "changed": "Changed",
+      "updated": "Updated"
+    },
+    "detail": {
+      "title": "Resource",
+      "groups": {
+        "identity": "Identity",
+        "state": "State",
+        "record": "Record"
+      }
+    }
+  },
+  "actionsMenu": {
+    "dataActions": "Data actions",
+    "more_one": "and 1 more",
+    "more_other": "and {{count}} more",
+    "compare": "Compare the selection"
+  },
+  "commonality": {
+    "title": "Commonality of {{what}}",
+    "summary": "{{rows}} compared: {{shared}} attributes shared, {{differing}} differing, {{empty}} empty in all.",
+    "show": {
+      "label": "Attributes shown",
+      "all": "All ({{count}})",
+      "shared": "Shared ({{count}})",
+      "differing": "Differing ({{count}})"
+    },
+    "search": "Find an attribute…",
+    "noMatch": "No attribute matches.",
+    "empty": "(empty)",
+    "emptyInAll_one": "Empty in all: 1 attribute",
+    "emptyInAll_other": "Empty in all: {{count}} attributes",
+    "others_one": "And 1 other value.",
+    "others_other": "And {{count}} other values.",
+    "rangeFrom": "From",
+    "rangeTo": "to",
+    "apart_one": "Differs:",
+    "apart_other": "Differ:",
+    "keep": "Keep",
+    "exclude": "Exclude",
+    "keepHint_one": "Keep only this row in the selection",
+    "keepHint_other": "Keep only these {{count}} rows in the selection",
+    "excludeHint_one": "Remove this row from the selection",
+    "excludeHint_other": "Remove these {{count}} rows from the selection",
+    "sharedHint": "Every row holds this value",
+    "shareHint": "Share of the rows holding the most common value",
+    "tooFew": "Select at least two rows to compare them.",
+    "tooMany": "{{count}} rows selected: the comparison takes {{max}} at most. Narrow the selection.",
+    "missing_one": "1 selected row could not be read: deleted, or out of your reach.",
+    "missing_other": "{{count}} selected rows could not be read: deleted, or out of your reach.",
+    "copy": "Copy as text",
+    "copied": "Copied",
+    "copyFailed": "Copy failed"
   }
 }

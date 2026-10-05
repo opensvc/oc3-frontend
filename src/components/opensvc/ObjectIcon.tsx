@@ -22,6 +22,7 @@ import {
   UserIcon,
   UsersIcon,
   ClusterIcon,
+  HashIcon,
 } from "@/components/ui/icons";
 
 /** Collector object kinds that have a visual identity of their own. */
@@ -31,6 +32,7 @@ export type ObjectKind =
   | "cluster"
   | "service"
   | "instance"
+  | "resource"
   | "network"
   | "disk"
   | "app"
@@ -69,6 +71,8 @@ const KINDS: Record<ObjectKind, { Icon: typeof ServerIcon; className: string }> 
   service: { Icon: StackIcon, className: "text-icon-service" },
   // Service tint: an instance is a service seen from a node.
   instance: { Icon: InstanceIcon, className: "text-icon-service" },
+  // The sea green hashtag of the historical `resource` class, a part of a service.
+  resource: { Icon: HashIcon, className: "text-icon-service" },
   network: { Icon: NetworkIcon, className: "text-icon-network" },
   disk: { Icon: DatabaseIcon, className: "text-icon-disk" },
   app: { Icon: AsteriskIcon, className: "text-icon-app" },

@@ -4,6 +4,7 @@ import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { CaretRightIcon } from "@/components/ui/icons";
 import type { KeyboardEvent } from "react";
 import { useNavCollapsedPref } from "@/lib/user-prefs";
+import { hasPrivilege, useEffectivePrivileges } from "@/lib/api/effective-privileges";
 import { NAV_CATEGORIES, NAV_TOP, type NavEntry } from "./navigation";
 
 const LINK =
@@ -38,10 +39,20 @@ function NavLink({ entry }: { entry: NavEntry }) {
  * From the keyboard, "n" brings the focus here (`AppShell`); the arrows then move
  * from one entry or section title to the next, Home and End go to the ends, and
  * Escape gives the focus back to the page.
+ *
+ * An entry needing a privilege (`NavEntry.privileges`) shows only to a user who
+ * holds it, the impersonated user while impersonating; a section left empty goes.
+ * Until the privileges are read, those entries wait; should they not be read, they
+ * show: the menu does not lose its way to the views, the API checking the actions.
  */
 export function Sidebar({ open }: { open: boolean }) {
   const { t } = useTranslation();
   const sections = useNavCollapsedPref();
+  const privileges = useEffectivePrivileges();
+  const allowed = (entry: NavEntry) =>
+    entry.privileges === undefined ||
+    privileges.isError ||
+    (privileges.data !== undefined && hasPrivilege(privileges.data, entry.privileges));
 
   function onKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
@@ -90,6 +101,8 @@ export function Sidebar({ open }: { open: boolean }) {
         </ul>
 
         {NAV_CATEGORIES.map((category) => {
+          const entries = category.entries.filter(allowed);
+          if (entries.length === 0) return null;
           const expanded = !sections.isCollapsed(category.key);
           return (
             <section key={category.key} className="mt-3">
@@ -115,7 +128,7 @@ export function Sidebar({ open }: { open: boolean }) {
                 aria-labelledby={`nav-category-${category.key}`}
                 hidden={!expanded}
               >
-                {category.entries.map((entry) => (
+                {entries.map((entry) => (
                   <NavLink key={entry.to} entry={entry} />
                 ))}
               </ul>

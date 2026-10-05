@@ -28,6 +28,8 @@ const GROUPS: DetailGroup<LogRow>[] = [
       field("log_level"),
       field("log_action"),
       field("log_user"),
+      // The user who really signed in, when the action was made as log_user.
+      field("log_impersonator"),
       // Plain text in the panel: the bold of the table adds nothing there.
       { prop: "log_fmt", format: (row) => formatLogMessage(row.log_fmt, row.log_dict).text },
     ],
@@ -67,6 +69,7 @@ const PROPS = [
   "log_level",
   "log_action",
   "log_user",
+  "log_impersonator",
   "log_fmt",
   "log_dict",
   "services.svcname",

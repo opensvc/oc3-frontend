@@ -14,8 +14,6 @@ import { useAppCodes } from "@/features/apps/use-app-codes";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
 import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
 import { useNodeTags } from "./related/queries";
-import { ConfirmButton } from "@/components/ui/ConfirmButton";
-import { TrashIcon } from "@/components/ui/icons";
 import { problemText } from "@/lib/api/problem";
 
 /**
@@ -289,21 +287,6 @@ export function NodeDetailPanel({
     },
   });
 
-  // Deletion cascades on the collector side: the node's instances, alerts and
-  // readings go with it.
-  const remove = useMutation({
-    mutationFn: async () => {
-      const { error: failure } = await api.DELETE("/nodes/{node_id}", {
-        params: { path: { node_id: nodeId ?? "" } },
-      });
-      if (failure !== undefined) throw new Error(problemText(failure));
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["nodes"] });
-      onClose();
-    },
-  });
-
   const save = useMutation({
     mutationFn: async (changes: Record<string, string | number | boolean>) => {
       const { error: failure } = await api.POST("/nodes/{node_id}", {
@@ -341,6 +324,7 @@ export function NodeDetailPanel({
         <div className="mb-4">
           <NodeActionsMenu
             nodes={nodeId === undefined ? [] : [{ id: nodeId, name: node?.nodename ?? nodeId }]}
+            onDeleted={onClose}
           />
         </div>
       )}
@@ -360,27 +344,6 @@ export function NodeDetailPanel({
         isPending={open && isPending}
         errorMessage={isError ? error.message : null}
       />
-      {node !== null && node !== undefined && (
-        <div className="mt-4 border-t border-line pt-3">
-          <ConfirmButton
-            icon={<TrashIcon />}
-            label={t("detail.delete")}
-            question={t("nodes.delete.question", { nodename: node.nodename ?? "" })}
-            confirmLabel={t("detail.deleteConfirm")}
-            cancelLabel={t("detail.cancel")}
-            pendingLabel={t("detail.deleting")}
-            pending={remove.isPending}
-            onConfirm={() => {
-              remove.mutate();
-            }}
-          />
-          {remove.isError && (
-            <p role="alert" className="mt-2 text-state-down">
-              ■ {remove.error.message}
-            </p>
-          )}
-        </div>
-      )}
     </RelatedTabsPanel>
   );
 }

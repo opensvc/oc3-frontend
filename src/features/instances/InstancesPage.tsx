@@ -21,13 +21,16 @@ import {
   visibleProps,
   type ResolvedListSearch,
 } from "@/lib/list-search";
-import { filterQuery, filtersKey } from "@/lib/column-filters";
+import { filterQuery, filtersKey, type ColumnFilters } from "@/lib/column-filters";
+import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stats";
+import { idBatches } from "@/lib/commonality";
+import { CommonalityPanel } from "@/components/opensvc/CommonalityPanel";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { InstanceDetailPanel } from "./InstanceDetailPanel";
 import { FrozenMark } from "@/components/opensvc/FrozenMark";
 import { frozenFilterOptions, STATUS_FILTER_OPTIONS } from "@/components/opensvc/filter-options";
 import { InstanceActionsMenu } from "./InstanceActionsMenu";
-import { instanceName, toInstanceId } from "./instance-id";
+import { fromInstanceId, instanceName, toInstanceId } from "./instance-id";
 
 type InstanceRow = components["schemas"]["InstanceRow"];
 
@@ -209,6 +212,53 @@ async function fetchInstances(search: ResolvedListSearch) {
   return toPage(all, data.meta, search.limit);
 }
 
+/** The distribution of a column's values over the selection, with the filters given. */
+async function instanceStats(prop: string, filters: ColumnFilters): Promise<ValueStats> {
+  const { data, error } = await api.GET("/services_instances", {
+    params: {
+      query: { props: prop, stats: "1", limit: STATS_LIMIT, filter: filterQuery(filters) },
+    },
+  });
+  if (error !== undefined) throw new Error(problemText(error));
+  return toValueStats(data.data, data.meta, prop);
+}
+
+/**
+ * The instances of `ids` with every column, for their comparison: read by their
+ * services and nodes, then kept by their own id, the pairs being crossed.
+ */
+async function fetchInstancesByIds(ids: readonly string[]): Promise<InstanceRow[]> {
+  const wanted = new Set(ids);
+  const pages = await Promise.all(
+    idBatches(ids).map(async (batch) => {
+      const keys = batch.flatMap((id) => {
+        const key = fromInstanceId(id);
+        return key === null ? [] : [key];
+      });
+      const svcIds = [...new Set(keys.map((key) => key.svcId))];
+      const nodeIds = [...new Set(keys.map((key) => key.nodeId))];
+      const { data, error } = await api.GET("/services_instances", {
+        params: {
+          query: {
+            props: ALL_PROPS.join(","),
+            limit: 0,
+            filter: [`svc_id:in:${svcIds.join(",")}`, `node_id:in:${nodeIds.join(",")}`],
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      const rows: InstanceRow[] = Array.isArray(data.data) ? data.data : [];
+      return rows.filter((row) =>
+        wanted.has(toInstanceId(row.svc_id, row.node_id, row.mon_vmname) ?? ""),
+      );
+    }),
+  );
+  return pages.flat();
+}
+
+/** The ids of the service and the node: the names of the instance say the same. */
+const COMPARE_EXCLUDED = new Set<string>(["svc_id", "node_id"]);
+
 function useInstances(search: ResolvedListSearch) {
   return useQuery({
     queryKey: [
@@ -255,6 +305,8 @@ export function InstancesPage() {
   }
 
   function update(next: Partial<ResolvedListSearch>) {
+    // A row's detail and the comparison share the right edge.
+    if (next.sel !== undefined) setComparing(false);
     // Columns, sort, filters and page size follow the account, the other states
     // stay in the URL.
     prefs.saveSearch(next);
@@ -265,6 +317,11 @@ export function InstancesPage() {
   }
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // The instances the last deletion removed, unticked from the list.
+  const [deleted, setDeleted] = useState<string[]>([]);
+  const [comparing, setComparing] = useState(false);
+  // The selection narrowed from its comparison, ticked in the list.
+  const [reselect, setReselect] = useState<string[] | undefined>(undefined);
 
   const selected = data?.rows.find(
     (row) => toInstanceId(row.svc_id, row.node_id, row.mon_vmname) === search.sel,
@@ -290,6 +347,17 @@ export function InstancesPage() {
         </h1>
         <InstanceActionsMenu
           instances={selectedIds.map((id) => ({ id, name: instanceNames[id] ?? id }))}
+          onDeleted={(ids) => {
+            setDeleted(ids);
+            // The detail of a deleted object has nothing left to show.
+            if (search.sel !== undefined && ids.includes(search.sel))
+              update({ sel: undefined, tab: undefined });
+          }}
+          onCompare={() => {
+            // The drawers share the right edge: the comparison takes it.
+            update({ sel: undefined, tab: undefined });
+            setComparing(true);
+          }}
         />
       </div>
 
@@ -311,7 +379,36 @@ export function InstancesPage() {
         rowLead={(row) => <FrozenMark frozen={row.mon_frozen === "1"} />}
         onSelectionChange={setSelectedIds}
         selectAllMatching={allIds}
+        unselect={deleted}
+        reselect={reselect}
+        valueStats={instanceStats}
         filterable
+      />
+
+      <CommonalityPanel
+        open={comparing}
+        onClose={() => {
+          setComparing(false);
+        }}
+        kind="instance"
+        noun={(count) => t("instances.compare.noun", { count })}
+        ids={selectedIds}
+        queryKey={["instances"]}
+        fetchRows={fetchInstancesByIds}
+        columns={COLUMNS}
+        exclude={COMPARE_EXCLUDED}
+        rowId={(row) => toInstanceId(row.svc_id, row.node_id, row.mon_vmname)}
+        rowName={(row) =>
+          instanceName(
+            row["services.svcname"] ?? row.svc_id ?? "",
+            row["nodes.nodename"] ?? row.node_id ?? "",
+            row.mon_vmname,
+          )
+        }
+        onOpenRow={(id) => {
+          update({ sel: id });
+        }}
+        onSelect={setReselect}
       />
 
       <InstanceDetailPanel
@@ -326,7 +423,11 @@ export function InstancesPage() {
               )
         }
         onClose={() => {
-          update({ sel: undefined });
+          update({ sel: undefined, tab: undefined });
+        }}
+        tab={search.tab}
+        onTabChange={(tab) => {
+          update({ tab });
         }}
       />
     </section>

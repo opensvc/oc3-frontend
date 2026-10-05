@@ -182,3 +182,40 @@ export function fromEnumValues(values: string[], inverted = false): string | und
   if (values.length === 0) return undefined;
   return `${inverted ? NOT : ""}in:${values.join(",")}`;
 }
+
+/** The value apicollector counts null and blank values under, and filters them with. */
+export const EMPTY_VALUE = "empty";
+
+/**
+ * The values a filter picks exactly, inverted or not: `eq:v`, `in:a,b` or `empty`.
+ * A substring, a regular expression or a comparison picks none.
+ */
+export function toPickedValues(expr: string | undefined): string[] {
+  if (expr === undefined) return [];
+  if (positive(expr) === EMPTY_VALUE) return [EMPTY_VALUE];
+  return toEnumValues(expr);
+}
+
+/**
+ * The filter picking exactly `values`: `eq:v` for one, `in:a,b` for several,
+ * `empty` for the empty one; undefined for none. See canPickWithOthers.
+ */
+export function fromPickedValues(values: string[], inverted = false): string | undefined {
+  const [first] = values;
+  if (first === undefined) return undefined;
+  const expr =
+    values.length > 1
+      ? `in:${values.join(",")}`
+      : first === EMPTY_VALUE
+        ? EMPTY_VALUE
+        : `eq:${first}`;
+  return inverted ? NOT + expr : expr;
+}
+
+/**
+ * Whether a value can be picked along with others: `in:` separates its values with
+ * commas, and has no way to name the empty one.
+ */
+export function canPickWithOthers(value: string): boolean {
+  return value !== EMPTY_VALUE && !value.includes(",");
+}

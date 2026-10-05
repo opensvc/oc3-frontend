@@ -7,6 +7,7 @@ import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { StatusBadge } from "@/components/opensvc/StatusBadge";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { DateTime } from "@/components/ui/DateTime";
+import { AnsiText } from "@/components/ui/AnsiText";
 import { ActionQueueMenu } from "./ActionQueueMenu";
 import { isPending, realDate, toActionRows, type ActionRow } from "./action-row";
 
@@ -131,13 +132,17 @@ export function ActionDetailPanel({
           {row.stdout !== "" && (
             <section className="mb-4">
               <h3 className="mb-1 font-semibold text-ink-muted">{t("actions.fields.stdout")}</h3>
-              <pre className={OUTPUT}>{row.stdout}</pre>
+              <pre className={OUTPUT}>
+                <AnsiText text={row.stdout} />
+              </pre>
             </section>
           )}
           {row.stderr !== "" && (
             <section>
               <h3 className="mb-1 font-semibold text-ink-muted">{t("actions.fields.stderr")}</h3>
-              <pre className={`${OUTPUT} text-state-down`}>{row.stderr}</pre>
+              <pre className={`${OUTPUT} text-state-down`}>
+                <AnsiText text={row.stderr} />
+              </pre>
             </section>
           )}
           {row.stdout === "" && row.stderr === "" && (

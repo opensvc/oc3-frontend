@@ -1,7 +1,8 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { fromEnumValues, isInverted, toEnumValues } from "@/lib/column-filters";
 import { ChevronDownIcon } from "./icons";
+import { useAnchoredPlacement } from "./use-anchored-placement";
 
 export interface EnumFilterOption {
   value: string;
@@ -73,39 +74,7 @@ export function EnumFilter({
     };
   }, [open]);
 
-  // Placed before paint, then again on every scroll (of the page or of the table,
-  // hence the capture) and resize: the style is written on the element, without a
-  // render.
-  useLayoutEffect(() => {
-    if (!open) return;
-    function place() {
-      const anchor = button.current?.getBoundingClientRect();
-      const element = list.current;
-      if (anchor === undefined || element === null) return;
-      const gap = 4;
-      const below = window.innerHeight - anchor.bottom - gap;
-      const above = anchor.top - gap;
-      const height = element.scrollHeight;
-      const upward = height > below && above > below;
-      element.style.left = `${String(Math.max(gap, Math.min(anchor.left, window.innerWidth - element.offsetWidth - gap)))}px`;
-      element.style.minWidth = `${String(anchor.width)}px`;
-      element.style.maxHeight = `${String(Math.max(upward ? above : below, 80))}px`;
-      if (upward) {
-        element.style.top = "";
-        element.style.bottom = `${String(window.innerHeight - anchor.top + gap)}px`;
-      } else {
-        element.style.bottom = "";
-        element.style.top = `${String(anchor.bottom + gap)}px`;
-      }
-    }
-    place();
-    window.addEventListener("scroll", place, true);
-    window.addEventListener("resize", place);
-    return () => {
-      window.removeEventListener("scroll", place, true);
-      window.removeEventListener("resize", place);
-    };
-  }, [open]);
+  useAnchoredPlacement(open, button, list);
 
   const labels = options.filter((option) => chosen.includes(option.value)).map((o) => o.label);
   // Values the list does not know, from a hand-made link: shown as they are.

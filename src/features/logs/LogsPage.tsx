@@ -26,6 +26,7 @@ import { filterQuery, filtersKey } from "@/lib/column-filters";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { LogDetailPanel } from "./LogDetailPanel";
 import { formatLogMessage, logLevelState } from "./log-message";
+import { LogUser } from "./LogUser";
 
 type LogRow = components["schemas"]["LogRow"];
 
@@ -46,6 +47,7 @@ const LOG_PROPS = [
   "services.svcname",
   "nodes.nodename",
   "log_user",
+  "log_impersonator",
   "log_action",
   "log_fmt",
   "log_dict",
@@ -82,6 +84,7 @@ const FAMILY: Record<string, ColumnFamily> = {
   "services.svcname": "service",
   "nodes.nodename": "node",
   log_user: "team",
+  log_impersonator: "team",
   log_action: "state",
   log_fmt: "alert",
   log_dict: "alert",
@@ -104,6 +107,8 @@ function queryProps(cols: string[] | undefined): string {
     // The joined names are badges towards their view: they need their id.
     ...(shown.includes("nodes.nodename") ? ["node_id"] : []),
     ...(shown.includes("services.svcname") ? ["svc_id"] : []),
+    // The user cell names the impersonator, when there was one.
+    ...(shown.includes("log_user") ? ["log_impersonator"] : []),
   ];
   return [...new Set(["id", ...shown, ...extra])].join(",");
 }
@@ -217,6 +222,8 @@ export function LogsPage() {
             {value}
           </CrossLink>
         );
+      if (prop === "log_user")
+        return <LogUser user={row.log_user} impersonator={row.log_impersonator} />;
       if (prop === "log_fmt") {
         const message = formatLogMessage(row.log_fmt, row.log_dict);
         return message.corrupted ? (

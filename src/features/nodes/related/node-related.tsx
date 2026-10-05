@@ -3,12 +3,14 @@ import type { RelatedTab } from "@/components/opensvc/related-tabs";
 import { SEVERITY_LEVELS, severityLevel } from "@/components/opensvc/severity";
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import { NodeAlerts } from "./NodeAlerts";
+import { NodeChecks } from "./NodeChecks";
+import { isOutOfBounds } from "./checks";
 import { NodeInventory } from "./NodeInventory";
 import { NodeLogs } from "./NodeLogs";
 import { NodeStats } from "./NodeStats";
 import { LineChartIcon } from "@/components/ui/icons";
 import { NodeSysreport } from "./NodeSysreport";
-import { useNodeAlerts, useNodeLogs, useNodeSysreport } from "./queries";
+import { useNodeAlerts, useNodeChecks, useNodeLogs, useNodeSysreport } from "./queries";
 import { periodBegin } from "./sysreport-period";
 
 /**
@@ -70,6 +72,29 @@ export const NODE_RELATED_TABS: RelatedTab[] = [
       };
     },
     render: (nodeId, locale) => <NodeAlerts nodeId={nodeId} locale={locale} />,
+  },
+  {
+    key: "checks",
+    labelKey: "nodes.related.checks",
+    icon: <ColumnFamilyIcon family="state" />,
+    // The checks out of their thresholds stand out from the others.
+    useSummary: (nodeId) => {
+      const { t } = useTranslation();
+      const rows = useNodeChecks(nodeId).data;
+      const count = (rows ?? []).filter(isOutOfBounds).length;
+      return {
+        count: rows?.length,
+        parts: [
+          {
+            key: "outOfBounds",
+            count,
+            box: "bg-state-down-soft text-state-down",
+            label: t("nodes.checks.outOfBoundsCount", { count }),
+          },
+        ],
+      };
+    },
+    render: (nodeId, locale) => <NodeChecks nodeId={nodeId} locale={locale} />,
   },
   {
     key: "logs",

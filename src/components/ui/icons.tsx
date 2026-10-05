@@ -242,6 +242,15 @@ export function PieChartIcon(props: IconProps) {
   );
 }
 
+/** Distribution of the values of a column: bars ranked from the longest. */
+export function DistributionIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M3 5a1.5 1.5 0 0 1 1.5-1.5h15a1.5 1.5 0 0 1 0 3h-15A1.5 1.5 0 0 1 3 5Zm0 7a1.5 1.5 0 0 1 1.5-1.5h10a1.5 1.5 0 0 1 0 3h-10A1.5 1.5 0 0 1 3 12Zm0 7a1.5 1.5 0 0 1 1.5-1.5h5a1.5 1.5 0 0 1 0 3h-5A1.5 1.5 0 0 1 3 19Z" />
+    </Svg>
+  );
+}
+
 /** Metrics: the code brackets of the historical collector (`metric16`, fa-code). */
 export function CodeIcon(props: IconProps) {
   return (
@@ -675,6 +684,15 @@ export function SidebarIcon({ open = true, ...props }: IconProps & { open?: bool
         d="M5 4h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm5 2v12h9a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-9ZM8 6H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3V6Z"
       />
       {open && <path d="M5 8.25h2v1.5H5v-1.5Zm0 3h2v1.5H5v-1.5Z" />}
+    </Svg>
+  );
+}
+
+/** A resource of a service (`resource`, fa-hashtag): its id reads "fs#1". */
+export function HashIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M10.2 3.1a1.2 1.2 0 0 1 1 1.4L10.8 8h3.6l.5-3.9a1.2 1.2 0 1 1 2.4.3L16.8 8h2.7a1.2 1.2 0 1 1 0 2.4h-3L16 13.6h2.5a1.2 1.2 0 1 1 0 2.4h-2.8l-.5 3.9a1.2 1.2 0 1 1-2.4-.3l.5-3.6H9.7l-.5 3.9a1.2 1.2 0 1 1-2.4-.3l.5-3.6H4.5a1.2 1.2 0 1 1 0-2.4h3.1l.4-3.2H5.5a1.2 1.2 0 1 1 0-2.4h2.8l.5-3.9a1.2 1.2 0 0 1 1.4-1Zm.3 7.3-.4 3.2h3.6l.4-3.2h-3.6Z" />
     </Svg>
   );
 }

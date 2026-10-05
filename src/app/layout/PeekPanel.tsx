@@ -98,7 +98,15 @@ export function PeekPanel() {
           />
         );
       case "instance":
-        return <InstanceDetailPanel instanceId={id} label={label} onClose={close} />;
+        return (
+          <InstanceDetailPanel
+            instanceId={id}
+            label={label}
+            tab={tab}
+            onTabChange={onTabChange}
+            onClose={close}
+          />
+        );
       case "app":
         return <AppDetailPanel appId={id} label={label} onClose={close} />;
       case "group":

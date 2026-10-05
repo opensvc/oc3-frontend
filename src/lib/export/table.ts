@@ -1,3 +1,4 @@
+import { stripAnsi } from "@/lib/ansi";
 import { zip } from "./zip";
 
 /**
@@ -14,10 +15,13 @@ export interface ExportTable {
 
 export type ExportFormat = "csv" | "xlsx";
 
-/** A cell as text; an object, which a few props hold, as JSON. */
+/**
+ * A cell as text; an object, which a few props hold, as JSON. The terminal escapes of
+ * the agent outputs are dropped: a spreadsheet would show them as noise.
+ */
 function cellText(value: unknown): string {
   if (value === null || value === undefined) return "";
-  if (typeof value === "string") return value;
+  if (typeof value === "string") return stripAnsi(value);
   if (typeof value === "number" || typeof value === "boolean" || typeof value === "bigint")
     return String(value);
   return JSON.stringify(value);
@@ -35,7 +39,7 @@ function defused(text: string): string {
 }
 
 function csvField(value: unknown): string {
-  const text = typeof value === "string" ? defused(value) : cellText(value);
+  const text = typeof value === "string" ? defused(cellText(value)) : cellText(value);
   return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 

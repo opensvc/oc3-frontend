@@ -2,6 +2,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
+import { toPage } from "@/lib/api/page";
 import { toTagRows } from "@/features/tags/tag-row";
 import { NODE_PROPS } from "@/features/nodes/node-props";
 
@@ -208,5 +209,87 @@ export function useNodesCompliance(nodeIds: string[] | undefined) {
       isPending: results.some((r) => r.isPending),
       error: results.find((r) => r.isError)?.error ?? null,
     }),
+  });
+}
+
+type ResourceRow = components["schemas"]["ResourceRow"];
+
+/** A resource of the service, with the name of the node that reports it. */
+export interface ServiceResource extends ResourceRow {
+  nodename: string;
+}
+
+/**
+ * Resources of the service, as each of its instances reports them: the historical
+ * "resources status" tab (`table_resources_svc`). The per-service endpoint has no
+ * node names: they come from the service's instances, as for the HBAs.
+ */
+export function useServiceResources(svcId: string | undefined) {
+  return useQuery({
+    queryKey: ["service", svcId, "resources"],
+    enabled: svcId !== undefined,
+    queryFn: async (): Promise<ServiceResource[]> => {
+      const [resources, instances] = await Promise.all([
+        api.GET("/services/{svc_id}/resources", {
+          params: {
+            path: { svc_id: svcId ?? "" },
+            query: {
+              props:
+                "id,node_id,vmname,rid,res_type,res_status,res_desc,res_log,res_monitor,res_disable,res_optional,updated",
+              orderby: "node_id,vmname,rid",
+              limit: 0,
+            },
+          },
+        }),
+        api.GET("/services_instances/{svc_id}", {
+          params: {
+            path: { svc_id: svcId ?? "" },
+            query: { props: "node_id,nodes.nodename", limit: 0 },
+          },
+        }),
+      ]);
+      if (resources.error !== undefined) throw new Error(problemText(resources.error));
+      if (instances.error !== undefined) throw new Error(problemText(instances.error));
+      const names = new Map(
+        (Array.isArray(instances.data.data) ? (instances.data.data as InstanceRow[]) : []).map(
+          (row) => [row.node_id ?? "", row["nodes.nodename"] ?? ""],
+        ),
+      );
+      const rows = (Array.isArray(resources.data.data) ? resources.data.data : []) as ResourceRow[];
+      return rows.map((row) => ({
+        ...row,
+        nodename: names.get(row.node_id ?? "") || (row.node_id ?? ""),
+      }));
+    },
+  });
+}
+
+type LogRow = components["schemas"]["LogRow"];
+
+/** Log entries shown in the service tab: the Logs view, filtered on the service, has them all. */
+export const SERVICE_LOGS_LIMIT = 100;
+
+/** The latest log entries of the service, the most recent first. */
+export function useServiceLogs(svcId: string | undefined) {
+  return useQuery({
+    queryKey: ["service", svcId, "logs"],
+    enabled: svcId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/logs", {
+        params: {
+          query: {
+            props:
+              "id,log_date,log_level,node_id,nodes.nodename,log_user,log_impersonator,log_action,log_fmt,log_dict",
+            orderby: "-log_date,-id",
+            // One more than shown: whether older entries remain.
+            limit: SERVICE_LOGS_LIMIT + 1,
+            filter: [`svc_id:eq:${svcId ?? ""}`],
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      const rows: LogRow[] = Array.isArray(data.data) ? data.data : [];
+      return toPage(rows, data.meta, SERVICE_LOGS_LIMIT);
+    },
   });
 }

@@ -1,16 +1,32 @@
 import { ColumnFamilyIcon } from "@/components/opensvc/ColumnFamily";
 import type { RelatedTab } from "@/components/opensvc/related-tabs";
+import { useTranslation } from "react-i18next";
+import { ServiceLogs } from "./ServiceLogs";
 import { ServiceNodesDiff } from "./ServiceNodesDiff";
+import { ServiceResources } from "./ServiceResources";
+import { resourceStatusSummary } from "./resource-status";
 import { ServiceStorage } from "./ServiceStorage";
-import { useServiceDisks } from "./queries";
+import { useServiceDisks, useServiceLogs, useServiceResources } from "./queries";
 import { useNodesDiffSummary } from "./use-nodes-diff-summary";
 
 /**
  * Data attached to a service, one tab each, on the model of the node
- * (`NODE_RELATED_TABS`). Adding instances, resources, alerts or tags amounts to
+ * (`NODE_RELATED_TABS`). Adding instances, alerts or tags amounts to
  * writing the component and adding it here.
  */
 export const SERVICE_RELATED_TABS: RelatedTab[] = [
+  {
+    key: "resources",
+    labelKey: "services.related.resources",
+    icon: <ColumnFamilyIcon family="resource" />,
+    // The resources split into those down, in warning, and the others: the shares
+    // add up to the count, and the first two are what the tab is opened for.
+    useSummary: (svcId) => {
+      const { t } = useTranslation();
+      return resourceStatusSummary(useServiceResources(svcId).data, t);
+    },
+    render: (svcId, locale) => <ServiceResources svcId={svcId} locale={locale} />,
+  },
   {
     key: "storage",
     labelKey: "services.related.storage",
@@ -28,5 +44,16 @@ export const SERVICE_RELATED_TABS: RelatedTab[] = [
     // reuses them.
     useSummary: (svcId) => useNodesDiffSummary(svcId),
     render: (svcId) => <ServiceNodesDiff svcId={svcId} />,
+  },
+  {
+    key: "logs",
+    labelKey: "services.related.logs",
+    icon: <ColumnFamilyIcon family="time" />,
+    // All the entries of the service, not only those the tab shows.
+    useSummary: (svcId) => {
+      const page = useServiceLogs(svcId).data;
+      return { count: page === undefined ? undefined : (page.total ?? page.rows.length) };
+    },
+    render: (svcId, locale) => <ServiceLogs svcId={svcId} locale={locale} />,
   },
 ];

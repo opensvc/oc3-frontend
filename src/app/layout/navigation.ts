@@ -17,6 +17,7 @@ export interface NavEntry {
     | "/hardware"
     | "/services"
     | "/instances"
+    | "/resources"
     | "/networks"
     | "/disks"
     | "/san-switches"
@@ -46,6 +47,12 @@ export interface NavEntry {
   icon: ObjectKind;
   /** True for the root: without it, prefix matching would activate it everywhere. */
   exact?: boolean;
+  /**
+   * The privileges one of which the entry needs to be shown; a Manager holds them
+   * all. Absent, everybody sees it. The menu only: the API serves the view to
+   * whoever opens its address, its actions checking their own privilege.
+   */
+  privileges?: readonly string[];
 }
 
 export interface NavCategory {
@@ -70,6 +77,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
       { to: "/clusters", labelKey: "nav.clusters", icon: "cluster" },
       { to: "/services", labelKey: "nav.services", icon: "service" },
       { to: "/instances", labelKey: "nav.instances", icon: "instance" },
+      // `view-resources` of the historical menu: the resources of every instance.
+      { to: "/resources", labelKey: "nav.resources", icon: "resource" },
       { to: "/networks", labelKey: "nav.networks", icon: "network" },
       { to: "/disks", labelKey: "nav.disks", icon: "disk" },
       // `view-san` of the historical menu: the ports of the SAN switches.
@@ -119,7 +128,12 @@ export const NAV_CATEGORIES: NavCategory[] = [
       // `comp-rsets` of the historical menu.
       { to: "/compliance/rulesets", labelKey: "nav.rulesets", icon: "ruleset" },
       // `comp-designer` of the historical menu.
-      { to: "/compliance/designer", labelKey: "nav.designer", icon: "designer" },
+      {
+        to: "/compliance/designer",
+        labelKey: "nav.designer",
+        icon: "designer",
+        privileges: ["CompManager"],
+      },
       // `comp-log` of the historical menu.
       { to: "/compliance/logs", labelKey: "nav.complianceLogs", icon: "complianceLog" },
     ],
@@ -139,27 +153,33 @@ export const NAV_CATEGORIES: NavCategory[] = [
     key: "administration",
     labelKey: "nav.categories.administration",
     entries: [
-      { to: "/users", labelKey: "nav.users", icon: "user" },
+      { to: "/users", labelKey: "nav.users", icon: "user", privileges: ["UserManager"] },
       // Groups follow the users they gather. The historical menu kept them under Data
       // Management (`dm-add-group`); moved here on request.
-      { to: "/groups", labelKey: "nav.groups", icon: "group" },
+      { to: "/groups", labelKey: "nav.groups", icon: "group", privileges: ["GroupManager"] },
       // `adm-obs` in the historical menu.
-      { to: "/obsolescence", labelKey: "nav.obsolescence", icon: "obsolescence" },
+      {
+        to: "/obsolescence",
+        labelKey: "nav.obsolescence",
+        icon: "obsolescence",
+        privileges: ["ObsManager"],
+      },
       // `adm-log`.
       { to: "/logs", labelKey: "nav.logs", icon: "log" },
       // `adm-filters`.
-      { to: "/filters", labelKey: "nav.filters", icon: "filter" },
+      // No privilege of their own in the collector: Manager.
+      { to: "/filters", labelKey: "nav.filters", icon: "filter", privileges: ["Manager"] },
       // `adm-filtersets`.
-      { to: "/filtersets", labelKey: "nav.filtersets", icon: "filterset" },
+      { to: "/filtersets", labelKey: "nav.filtersets", icon: "filterset", privileges: ["Manager"] },
       // `adm-forms`.
-      { to: "/forms", labelKey: "nav.forms", icon: "form" },
+      { to: "/forms", labelKey: "nav.forms", icon: "form", privileges: ["FormsManager"] },
       // `adm-metrics`: the SQL requests feeding the charts and the reports.
-      { to: "/metrics", labelKey: "nav.metrics", icon: "metric" },
+      { to: "/metrics", labelKey: "nav.metrics", icon: "metric", privileges: ["ReportsManager"] },
       // `adm-charts`: the time series of historized metrics.
-      { to: "/charts", labelKey: "nav.charts", icon: "chart" },
+      { to: "/charts", labelKey: "nav.charts", icon: "chart", privileges: ["ReportsManager"] },
       // `adm-reports`: the definitions of the pages of charts and metrics, read in
       // Statistics.
-      { to: "/reports", labelKey: "nav.reports", icon: "report" },
+      { to: "/reports", labelKey: "nav.reports", icon: "report", privileges: ["ReportsManager"] },
     ],
   },
 ];

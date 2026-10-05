@@ -11,6 +11,7 @@ type AlertRow = components["schemas"]["AlertRow"];
 type IpRow = components["schemas"]["IpRow"];
 type DiskRow = components["schemas"]["DiskRow"];
 type HbaRow = components["schemas"]["HbaRow"];
+type CheckRow = components["schemas"]["CheckRow"];
 
 /**
  * Hardware inventory of the node, as pushed by the agent. Loaded whole: a node counts
@@ -38,7 +39,6 @@ export function useNodeHardware(nodeId: string | undefined) {
   });
 }
 
-/** Dashboard alerts aimed at the node, the most severe then the most recent first. */
 /** Log entries of a node shown in its tab: the most recent ones. */
 export const NODE_LOGS_LIMIT = 100;
 
@@ -55,7 +55,7 @@ export function useNodeLogs(nodeId: string | undefined) {
         params: {
           query: {
             props:
-              "id,log_date,log_level,svc_id,services.svcname,log_user,log_action,log_fmt,log_dict",
+              "id,log_date,log_level,svc_id,services.svcname,log_user,log_impersonator,log_action,log_fmt,log_dict",
             orderby: "-log_date,-id",
             // One more than shown: whether older entries remain.
             limit: NODE_LOGS_LIMIT + 1,
@@ -70,6 +70,7 @@ export function useNodeLogs(nodeId: string | undefined) {
   });
 }
 
+/** Dashboard alerts aimed at the node, the most severe then the most recent first. */
 export function useNodeAlerts(nodeId: string | undefined) {
   return useQuery({
     queryKey: ["node", nodeId, "alerts"],
@@ -87,6 +88,34 @@ export function useNodeAlerts(nodeId: string | undefined) {
       });
       if (error !== undefined) throw new Error(problemText(error));
       const rows: AlertRow[] = Array.isArray(data.data) ? data.data : [];
+      return rows;
+    },
+  });
+}
+
+/**
+ * Checks of the node, as its agent last reported them, with the thresholds the
+ * collector set and the object each one is attributed to. Loaded whole: a node
+ * counts a few hundred at most.
+ */
+export function useNodeChecks(nodeId: string | undefined) {
+  return useQuery({
+    queryKey: ["node", nodeId, "checks"],
+    enabled: nodeId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/nodes/{node_id}/checks", {
+        params: {
+          path: { node_id: nodeId ?? "" },
+          query: {
+            props:
+              "id,svc_id,services.svcname,chk_type,chk_instance,chk_value,chk_low,chk_high,chk_err,chk_threshold_provider,chk_updated",
+            orderby: "chk_type,chk_instance",
+            limit: 0,
+          },
+        },
+      });
+      if (error !== undefined) throw new Error(problemText(error));
+      const rows: CheckRow[] = Array.isArray(data.data) ? data.data : [];
       return rows;
     },
   });

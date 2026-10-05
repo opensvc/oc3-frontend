@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
-import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { DetailContent, type DetailGroup } from "@/components/opensvc/DetailPanel";
+import { RelatedTabsPanel } from "@/components/opensvc/RelatedTabsPanel";
+import { INSTANCE_RELATED_TABS } from "./instance-related";
 import { statusField } from "@/components/opensvc/status-field";
 import { StatusTimeline } from "@/components/opensvc/StatusTimeline";
 import { linkedField } from "@/components/opensvc/linked-field";
@@ -111,14 +113,23 @@ const GROUPS: DetailGroup<InstanceRow>[] = [
 
 const PROPS = GROUPS.flatMap((group) => group.fields.map((f) => f.prop)).join(",");
 
+/**
+ * An instance: its properties, the instance status timeline at the end of its
+ * state, and its resources in a tab. The open tab lives in the URL, held by the
+ * view (`tab` from the list, `peektab` over another view).
+ */
 export function InstanceDetailPanel({
   instanceId,
   label,
   onClose,
+  tab,
+  onTabChange,
 }: {
   instanceId: string | undefined;
   label: string;
   onClose: () => void;
+  tab: string | undefined;
+  onTabChange: (tab: string | undefined) => void;
 }) {
   const { t, i18n } = useTranslation();
   const key = instanceId === undefined ? null : fromInstanceId(instanceId);
@@ -162,73 +173,79 @@ export function InstanceDetailPanel({
         );
 
   return (
-    <DetailPanel
-      kind="instance"
-      recordId={instanceId}
+    <RelatedTabsPanel
       open={instanceId !== undefined}
       title={title}
+      kind="instance"
       onClose={onClose}
-      groups={GROUPS}
-      // A malformed URL id names nothing: it is said rather than waited on.
-      row={key === null && instanceId !== undefined ? null : instance}
-      labelPrefix="instances.fields"
-      groupPrefix="instances.detail.groups"
-      before={
-        <>
-          {tagEdit.allowed && (
-            <div className="mb-4">
-              <InstanceActionsMenu
-                instances={instanceId === undefined ? [] : [{ id: instanceId, name: title }]}
-              />
-            </div>
-          )}
-          <ObjectTags
-            tags={tags.data}
-            isPending={svcId !== undefined && tags.isPending}
-            errorMessage={tags.isError ? tags.error.message : null}
-            edit={tagEdit}
+      objectId={instanceId}
+      tabs={INSTANCE_RELATED_TABS}
+      tab={tab}
+      onTabChange={onTabChange}
+      propertiesFamily="service"
+      label={t("instances.detail.tabs")}
+    >
+      {tagEdit.allowed && (
+        <div className="mb-4">
+          <InstanceActionsMenu
+            instances={instanceId === undefined ? [] : [{ id: instanceId, name: title }]}
+            onDeleted={onClose}
           />
-        </>
-      }
-      isPending={key !== null && isPending}
-      errorMessage={isError ? error.message : null}
-      groupFooters={
-        key === null
-          ? undefined
-          : {
-              // Availability and overall status on two named tracks, at the end of
-              // the state: the instance history the service panel leaves out.
-              state: (
-                <StatusTimeline
-                  queryKey={["instance", key.svcId, key.nodeId, "status-log"]}
-                  locale={i18n.language}
-                  tracks={[
-                    { key: "avail", label: t("statusTimeline.avail") },
-                    { key: "overall", label: t("statusTimeline.overall") },
-                  ]}
-                  load={async (days) => {
-                    const { data, error: failure } = await api.GET(
-                      "/services/{svc_id}/instances/{node_id}/status_log",
-                      {
-                        params: {
-                          path: { svc_id: key.svcId, node_id: key.nodeId },
-                          query: { days },
+        </div>
+      )}
+      <ObjectTags
+        tags={tags.data}
+        isPending={svcId !== undefined && tags.isPending}
+        errorMessage={tags.isError ? tags.error.message : null}
+        edit={tagEdit}
+      />
+      <DetailContent
+        groups={GROUPS}
+        // A malformed URL id names nothing: it is said rather than waited on.
+        row={key === null && instanceId !== undefined ? null : instance}
+        labelPrefix="instances.fields"
+        groupPrefix="instances.detail.groups"
+        isPending={instanceId !== undefined && key !== null && isPending}
+        errorMessage={isError ? error.message : null}
+        editHint=""
+        groupFooters={
+          key === null
+            ? undefined
+            : {
+                // Availability and overall status on two named tracks, at the end of
+                // the state: the instance history the service panel leaves out.
+                state: (
+                  <StatusTimeline
+                    queryKey={["instance", key.svcId, key.nodeId, "status-log"]}
+                    locale={i18n.language}
+                    tracks={[
+                      { key: "avail", label: t("statusTimeline.avail") },
+                      { key: "overall", label: t("statusTimeline.overall") },
+                    ]}
+                    load={async (days) => {
+                      const { data, error: failure } = await api.GET(
+                        "/services/{svc_id}/instances/{node_id}/status_log",
+                        {
+                          params: {
+                            path: { svc_id: key.svcId, node_id: key.nodeId },
+                            query: { days },
+                          },
                         },
-                      },
-                    );
-                    if (failure !== undefined) throw new Error(problemText(failure));
-                    return {
-                      periods: data.data.map((p) => ({
-                        begin: p.begin,
-                        end: p.end,
-                        values: { avail: p.avail, overall: p.overall },
-                      })),
-                    };
-                  }}
-                />
-              ),
-            }
-      }
-    />
+                      );
+                      if (failure !== undefined) throw new Error(problemText(failure));
+                      return {
+                        periods: data.data.map((p) => ({
+                          begin: p.begin,
+                          end: p.end,
+                          values: { avail: p.avail, overall: p.overall },
+                        })),
+                      };
+                    }}
+                  />
+                ),
+              }
+        }
+      />
+    </RelatedTabsPanel>
   );
 }

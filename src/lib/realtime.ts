@@ -27,7 +27,7 @@ const TABLE_KEYS: Record<string, readonly string[]> = {
   nodes: ["nodes", "node", "search", "object-label"],
   services: ["services", "service", "search", "object-label"],
   svcmon: ["instances", "instance", "service", "node", "services"],
-  resmon: ["service", "instance"],
+  resmon: ["service", "instance", "resources", "resource"],
   resinfo: ["service", "instance"],
   dashboard: ["alerts", "alert", "node", "service"],
   action_queue: ["actions", "action"],

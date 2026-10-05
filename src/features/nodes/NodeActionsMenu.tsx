@@ -1,4 +1,10 @@
-import { ActionsMenu, type ActionEntry, type ActionTarget } from "@/components/opensvc/ActionsMenu";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  ActionsMenu,
+  type ActionEntry,
+  type ActionTarget,
+  type DataActionEntry,
+} from "@/components/opensvc/ActionsMenu";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
 
@@ -33,11 +39,48 @@ const ACTIONS: readonly ActionEntry[] = [
   { action: "shutdown", group: "power" },
 ];
 
-export function NodeActionsMenu({ nodes }: { nodes: ActionTarget[] }) {
+/**
+ * The agent actions, then the data actions of the historical collector ("Data
+ * actions › On nodes"): for now the deletion of the node from the collector, offered
+ * to NodeManager as the API requires, which also checks the responsibility for each
+ * node. `onDeleted` receives the ids of the nodes deleted.
+ */
+export function NodeActionsMenu({
+  nodes,
+  onDeleted,
+  onCompare,
+}: {
+  nodes: ActionTarget[];
+  /** Opens the comparison of the selection, see ActionsMenu. */
+  onCompare?: () => void;
+  onDeleted?: (ids: string[]) => void;
+}) {
+  const queryClient = useQueryClient();
+  const dataActions: DataActionEntry[] = [
+    {
+      key: "delete",
+      privileges: ["NodeManager"],
+      run: async (target) => {
+        // Cascades on the collector side: instances, alerts, checks, packages, tags
+        // and the other records of the node go with it.
+        const { error } = await api.DELETE("/nodes/{node_id}", {
+          params: { path: { node_id: target.id } },
+        });
+        return error === undefined ? null : problemText(error);
+      },
+      onDone: (done) => {
+        if (done.length === 0) return;
+        void queryClient.invalidateQueries({ queryKey: ["nodes"] });
+        onDeleted?.(done.map((target) => target.id));
+      },
+    },
+  ];
   return (
     <ActionsMenu
       targets={nodes}
       actions={ACTIONS}
+      dataActions={dataActions}
+      onCompare={onCompare}
       prefix="nodes.actions"
       queue={async (target, action) => {
         // `node_id` alone targets the node, as in the historical collector.
