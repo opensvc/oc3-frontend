@@ -326,7 +326,11 @@ export function InstancesPage() {
               )
         }
         onClose={() => {
-          update({ sel: undefined });
+          update({ sel: undefined, tab: undefined });
+        }}
+        tab={search.tab}
+        onTabChange={(tab) => {
+          update({ tab });
         }}
       />
     </section>

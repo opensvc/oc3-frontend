@@ -17,12 +17,40 @@ import { useServiceResources, type ServiceResource } from "./queries";
  * when it has one. The whole list, with every column, is the Resources view.
  */
 export function ServiceResources({ svcId, locale }: { svcId: string; locale: string }) {
-  const { t } = useTranslation();
   const resources = useServiceResources(svcId);
+  return (
+    <ResourceStatusTable
+      rows={resources.data}
+      isPending={resources.isPending}
+      errorMessage={resources.isError ? resources.error.message : null}
+      grouped
+      locale={locale}
+    />
+  );
+}
+
+/**
+ * The resources of a service or of one of its instances: grouped by instance for a
+ * service, a single list for an instance.
+ */
+export function ResourceStatusTable({
+  rows,
+  isPending,
+  errorMessage,
+  grouped,
+  locale,
+}: {
+  rows: ServiceResource[] | undefined;
+  isPending: boolean;
+  errorMessage: string | null;
+  grouped: boolean;
+  locale: string;
+}) {
+  const { t } = useTranslation();
 
   const groups = new Map<string, RelatedGroup<ServiceResource>>();
-  for (const row of resources.data ?? []) {
-    const key = `${row.node_id ?? ""}/${row.vmname ?? ""}`;
+  for (const row of rows ?? []) {
+    const key = grouped ? `${row.node_id ?? ""}/${row.vmname ?? ""}` : "";
     const label =
       row.vmname !== undefined && row.vmname !== ""
         ? `${row.nodename} / ${row.vmname}`
@@ -91,8 +119,8 @@ export function ServiceResources({ svcId, locale }: { svcId: string; locale: str
       rowKey={(row) =>
         String(row.id ?? `${row.node_id ?? ""}/${row.vmname ?? ""}/${row.rid ?? ""}`)
       }
-      isPending={resources.isPending}
-      errorMessage={resources.isError ? resources.error.message : null}
+      isPending={isPending}
+      errorMessage={errorMessage}
       empty={t("services.resources.empty")}
       caption={t("services.related.resources")}
     />
