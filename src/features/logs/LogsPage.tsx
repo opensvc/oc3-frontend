@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { UserIcon } from "@/components/ui/icons";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { toPage } from "@/lib/api/page";
@@ -46,6 +47,7 @@ const LOG_PROPS = [
   "services.svcname",
   "nodes.nodename",
   "log_user",
+  "log_impersonator",
   "log_action",
   "log_fmt",
   "log_dict",
@@ -82,6 +84,7 @@ const FAMILY: Record<string, ColumnFamily> = {
   "services.svcname": "service",
   "nodes.nodename": "node",
   log_user: "team",
+  log_impersonator: "team",
   log_action: "state",
   log_fmt: "alert",
   log_dict: "alert",
@@ -104,6 +107,8 @@ function queryProps(cols: string[] | undefined): string {
     // The joined names are badges towards their view: they need their id.
     ...(shown.includes("nodes.nodename") ? ["node_id"] : []),
     ...(shown.includes("services.svcname") ? ["svc_id"] : []),
+    // The user cell names the impersonator, when there was one.
+    ...(shown.includes("log_user") ? ["log_impersonator"] : []),
   ];
   return [...new Set(["id", ...shown, ...extra])].join(",");
 }
@@ -217,6 +222,8 @@ export function LogsPage() {
             {value}
           </CrossLink>
         );
+      if (prop === "log_user")
+        return <LogUser user={row.log_user} impersonator={row.log_impersonator} />;
       if (prop === "log_fmt") {
         const message = formatLogMessage(row.log_fmt, row.log_dict);
         return message.corrupted ? (
@@ -268,5 +275,32 @@ export function LogsPage() {
         }}
       />
     </section>
+  );
+}
+
+/**
+ * The user of an entry, and below, when the action was made as that user by
+ * another (impersonation), the user who really signed in: in words, never by a
+ * tint alone.
+ */
+function LogUser({
+  user,
+  impersonator,
+}: {
+  user: string | undefined;
+  impersonator: string | undefined;
+}) {
+  const { t } = useTranslation();
+  if (impersonator === undefined || impersonator === "") return <>{user}</>;
+  const label = t("logs.impersonatedBy", { impersonator, user: user ?? "" });
+  return (
+    <span title={label}>
+      {user}
+      <span className="mt-0.5 flex items-center gap-1 text-data text-state-warn">
+        <UserIcon aria-hidden="true" className="h-3 w-3 shrink-0" />
+        <span>{t("logs.via", { impersonator })}</span>
+        <span className="sr-only">{label}</span>
+      </span>
+    </span>
   );
 }

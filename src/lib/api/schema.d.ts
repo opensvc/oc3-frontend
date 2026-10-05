@@ -5401,6 +5401,11 @@ export interface components {
             log_entry_id?: number | null;
             log_fmt?: string;
             log_gtalk_sent?: number | null;
+            /**
+             * @description The user who really signed in when the action was made as log_user
+             *     (impersonation); empty otherwise.
+             */
+            log_impersonator?: string;
             log_level?: string;
             log_user?: string;
             node_id?: string;
