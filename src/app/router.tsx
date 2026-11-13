@@ -37,6 +37,7 @@ import { FieldConstraintsPage } from "@/features/field-constraints/FieldConstrai
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
 import { FormsPage } from "@/features/forms/FormsPage";
 import { SafePage } from "@/features/safe/SafePage";
+import { parseAssistantSearch } from "@/features/assistant/assistant-status";
 import { AssistantPage } from "@/features/assistant/AssistantPage";
 import { NewRequestPage } from "@/features/requests/NewRequestPage";
 import { QuotasPage } from "@/features/quotas/QuotasPage";
@@ -371,6 +372,8 @@ const assistantRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/ai",
   component: AssistantPage,
+  // The question a link of another page opens the assistant with, bounded.
+  validateSearch: parseAssistantSearch,
 });
 
 // The files of the collector safe, a list as the others.

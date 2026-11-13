@@ -67,7 +67,17 @@ type Dialog = "" | "replace" | "delete";
  * waits on a card with its exact arguments, which the user approves, edits when
  * the tool allows it, or rejects.
  */
-export function Assistant({ client }: { client: AssistantClient }) {
+export function Assistant({
+  client,
+  initialPrompt,
+  onPromptTaken,
+}: {
+  client: AssistantClient;
+  /** A question to put in the message box of a new conversation, not sent. */
+  initialPrompt?: string;
+  /** Called once the question is in the message box. */
+  onPromptTaken?: () => void;
+}) {
   const { t } = useTranslation();
   const chat = useAssistantChat(client);
   const toolDocs = useToolDocs(client, chat.confirmation !== null);
@@ -138,6 +148,23 @@ export function Assistant({ client }: { client: AssistantClient }) {
     // The conversation shown only: the queue is read when it changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationKey, chat.pending, chat.historyReady]);
+
+  // A question another page opened the assistant with, read once: the assistant
+  // opens on no conversation, so the question goes in the message box of a new
+  // one, once ready and after the effect above emptied the box. It is put there,
+  // never sent: the user reads it first. Read when the assistant mounts only: the
+  // links that give one are on other pages; a link in this page would need an
+  // effect on initialPrompt.
+  const pendingPrompt = useRef(initialPrompt ?? "");
+  useEffect(() => {
+    if (pendingPrompt.current === "" || !chat.historyReady) return;
+    setDraft(pendingPrompt.current);
+    pendingPrompt.current = "";
+    composer.current?.focus();
+    onPromptTaken?.();
+    // Once the history is ready only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat.historyReady]);
 
   // The message the dialog would replace went meanwhile: there is nothing left
   // to replace, and what the user typed stays in the box.
@@ -311,7 +338,7 @@ export function Assistant({ client }: { client: AssistantClient }) {
             <p className="px-2 text-ink-muted">{t("assistant.conversations.noMatch")}</p>
           )}
         </div>
-        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-2 pb-2">
+        <div className="relative flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-2 pb-2">
           {groups.map((group) => (
             <div key={group.key}>
               <h3
@@ -472,7 +499,10 @@ export function Assistant({ client }: { client: AssistantClient }) {
           aria-live="polite"
           aria-relevant="additions text"
           aria-busy={answering}
-          className="min-h-48 flex-1 overflow-y-auto"
+          // Relative: the containing block of the hidden labels (sr-only) of the
+          // steps, which are absolute. Without it, a step opened far down the
+          // conversation placed them against the page, which grew and scrolled.
+          className="relative min-h-48 flex-1 overflow-y-auto"
         >
           {chat.historyCursor !== "" && (
             <div className="px-4 pt-3">
