@@ -79,7 +79,8 @@
     "saves": "Backups",
     "notifications": "Notifications",
     "aiResources": "Resources",
-    "aiSkills": "Skills"
+    "aiSkills": "Skills",
+    "om3Grants": "om3 grants"
   },
   "shortcuts": {
     "title": "Keyboard shortcuts",
@@ -3653,6 +3654,52 @@
       "question": "Delete the rule {{rule}}?",
       "consequence": "The accounts the rules put in a team no other rule names leave it at once; those added by hand stay, and the team is managed by hand again. The teams other rules still name follow the claims at the next sign-in of each account."
     }
+  },
+  "om3Grants": {
+    "title": "om3 grants",
+    "new": "New rule",
+    "intro": "The collector is the OpenID Connect provider of the om3 clusters: their webapps and the om CLI sign their users in here. A user gets on a cluster the om3 grants of the rules naming one of their teams and this cluster, or every cluster. Without any grant, the sign-in is refused.",
+    "setup": "An om3 cluster signs its users in with the collector once its listener names this issuer and its own cluster id as client id:",
+    "setupClientId": "The client id of a cluster is its cluster id, shown on the Clusters page. The webapps must be reached by a node name or address the collector knows, or a host allowed by server.oidc_provider.redirect_hosts.",
+    "disabled": "The collector is not configured as an OpenID Connect provider (server.oidc_provider.enable): the rules have no effect until it is.",
+    "empty": "No rule: nobody may sign in to an om3 cluster with the collector.",
+    "everyCluster": "Every cluster",
+    "fields": {
+      "team": "Team",
+      "cluster": "Cluster",
+      "grants": "om3 grants",
+      "updated": "Updated"
+    },
+    "form": {
+      "createTitle": "New om3 grant rule",
+      "editTitle": "om3 grants of {{team}}",
+      "rule": "Rule",
+      "pickTeam": "Pick a team",
+      "teamHint": "The members of the team get the grants. A private team (user_…) names a single user.",
+      "clusterHint": "One rule per team and cluster; a rule on every cluster adds to those of a cluster.",
+      "grantsHint": "om3 grants separated by spaces: root, prioritizer, squatter, blacklistadmin, scraper, and admin, operator, guest alone or on a namespace or a pattern (admin:prod, guest:*).",
+      "saving": "Saving…",
+      "saveCreate": "Create",
+      "saveEdit": "Save",
+      "saved": "Saved",
+      "delete": "Delete the rule",
+      "deleteQuestion": "Delete the om3 grant rule of {{team}}? Its members lose these grants at their next token renewal.",
+      "deleteConfirm": "Delete",
+      "deleting": "Deleting…"
+    }
+  },
+  "oidcAuthorize": {
+    "title": "Sign in to the cluster {{cluster}}",
+    "noRequest": "No sign-in request: start again from the om3 cluster.",
+    "user": "As",
+    "cluster": "Cluster",
+    "returnTo": "Back to",
+    "grants": "om3 grants",
+    "noGrant": "You have no om3 grant on this cluster: ask a Manager for one.",
+    "approve": "Continue",
+    "deny": "Cancel",
+    "back": "Back to the cluster",
+    "redirecting": "Going back to the cluster {{cluster}}…"
   },
   "fieldConstraints": {
     "title": "Field values",
