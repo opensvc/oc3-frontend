@@ -79,7 +79,8 @@
     "saves": "Sauvegardes",
     "notifications": "Notifications",
     "aiResources": "Ressources",
-    "aiSkills": "Skills"
+    "aiSkills": "Skills",
+    "om3Grants": "Droits om3"
   },
   "shortcuts": {
     "title": "Raccourcis clavier",
@@ -3653,6 +3654,52 @@
       "question": "Supprimer la règle {{rule}} ?",
       "consequence": "Les comptes que les règles ont mis dans une équipe qu'aucune autre règle ne nomme la quittent aussitôt ; ceux ajoutés à la main restent, et l'équipe redevient gérée à la main. Les équipes que d'autres règles nomment encore suivent les revendications à la prochaine connexion de chaque compte."
     }
+  },
+  "om3Grants": {
+    "title": "Droits om3",
+    "new": "Nouvelle règle",
+    "intro": "Le collector est le fournisseur OpenID Connect des clusters om3 : leurs webapps et la CLI om y connectent leurs utilisateurs. Un utilisateur obtient sur un cluster les droits om3 des règles qui nomment une de ses équipes et ce cluster, ou tous les clusters. Sans aucun droit, la connexion est refusée.",
+    "setup": "Un cluster om3 connecte ses utilisateurs avec le collector dès que son listener désigne cet issuer et son propre identifiant de cluster comme client id :",
+    "setupClientId": "Le client id d'un cluster est son identifiant de cluster, affiché sur la page Clusters. Les webapps doivent être atteintes par un nom ou une adresse de nœud que le collector connaît, ou par un hôte autorisé par server.oidc_provider.redirect_hosts.",
+    "disabled": "Le collector n'est pas configuré comme fournisseur OpenID Connect (server.oidc_provider.enable) : les règles sont sans effet tant qu'il ne l'est pas.",
+    "empty": "Aucune règle : personne ne peut se connecter à un cluster om3 avec le collector.",
+    "everyCluster": "Tous les clusters",
+    "fields": {
+      "team": "Équipe",
+      "cluster": "Cluster",
+      "grants": "Droits om3",
+      "updated": "Modifiée"
+    },
+    "form": {
+      "createTitle": "Nouvelle règle de droits om3",
+      "editTitle": "Droits om3 de {{team}}",
+      "rule": "Règle",
+      "pickTeam": "Choisir une équipe",
+      "teamHint": "Les membres de l'équipe reçoivent les droits. Une équipe privée (user_…) désigne un seul utilisateur.",
+      "clusterHint": "Une règle par équipe et par cluster ; une règle sur tous les clusters s'ajoute à celles d'un cluster.",
+      "grantsHint": "Droits om3 séparés par des espaces : root, prioritizer, squatter, blacklistadmin, scraper, et admin, operator, guest seuls ou sur un namespace ou un motif (admin:prod, guest:*).",
+      "saving": "Enregistrement…",
+      "saveCreate": "Créer",
+      "saveEdit": "Enregistrer",
+      "saved": "Enregistrée",
+      "delete": "Supprimer la règle",
+      "deleteQuestion": "Supprimer la règle de droits om3 de {{team}} ? Ses membres perdent ces droits au prochain renouvellement de leur jeton.",
+      "deleteConfirm": "Supprimer",
+      "deleting": "Suppression…"
+    }
+  },
+  "oidcAuthorize": {
+    "title": "Connexion au cluster {{cluster}}",
+    "noRequest": "Aucune demande de connexion : recommencez depuis le cluster om3.",
+    "user": "En tant que",
+    "cluster": "Cluster",
+    "returnTo": "Retour vers",
+    "grants": "Droits om3",
+    "noGrant": "Vous n'avez aucun droit om3 sur ce cluster : demandez-en un à un Manager.",
+    "approve": "Continuer",
+    "deny": "Annuler",
+    "back": "Retour au cluster",
+    "redirecting": "Retour au cluster {{cluster}}…"
   },
   "fieldConstraints": {
     "title": "Valeurs des champs",

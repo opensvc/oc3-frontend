@@ -42,6 +42,29 @@ function toInput(o: Orchestration): OrchestrationInput {
 }
 
 /**
+ * A plan as text, whatever the order of its keys and without the empty ones:
+ * the server returns the fields in its own order and omits the empty ones, the
+ * draft holds them in the order they were edited.
+ */
+function canonical(value: unknown): string {
+  return JSON.stringify(value, (_key, v: unknown) => {
+    if (v === null || typeof v !== "object" || Array.isArray(v)) return v;
+    return Object.fromEntries(
+      Object.entries(v as Record<string, unknown>)
+        .filter(
+          ([, x]) =>
+            x !== undefined && x !== null && x !== "" && !(Array.isArray(x) && x.length === 0),
+        )
+        .sort(([a], [b]) => a.localeCompare(b)),
+    );
+  });
+}
+
+function samePlan(a: OrchestrationInput, b: OrchestrationInput): boolean {
+  return canonical(a) === canonical(b);
+}
+
+/**
  * The editor of an orchestration (`/orchestrations/$orchestrationId`, "new" to
  * create one): its name, its steps, and beside them what a run starting now
  * would act on, each target checked as the action queue would. A saved plan
@@ -69,9 +92,7 @@ export function OrchestrationEditorPage() {
     setDraft(toInput(saved.data));
   }
   const dirty =
-    id === undefined || saved.data === undefined
-      ? true
-      : JSON.stringify(toInput(saved.data)) !== JSON.stringify(draft);
+    id === undefined || saved.data === undefined ? true : !samePlan(toInput(saved.data), draft);
   const settled = useSettled(draft, 600);
   const check = useOrchestrationCheck(settled, true);
   const checkOf = (index: number): CheckStep | undefined => check.data?.[index];
@@ -131,8 +152,11 @@ export function OrchestrationEditorPage() {
           type="button"
           disabled={!dirty || save.isPending}
           onClick={() => {
-            save.mutate(draft, {
+            const sent = draft;
+            save.mutate(sent, {
               onSuccess: (o) => {
+                // The plan as saved becomes the draft, unless edited meanwhile.
+                setDraft((current) => (samePlan(current, sent) ? toInput(o) : current));
                 if (id === undefined)
                   void navigate({
                     to: "/orchestrations/$orchestrationId",
@@ -142,7 +166,7 @@ export function OrchestrationEditorPage() {
               },
             });
           }}
-          className={id === undefined ? PRIMARY : BUTTON}
+          className={dirty ? PRIMARY : BUTTON}
         >
           {save.isPending ? t("orchestrations.saving") : t("orchestrations.save")}
         </button>

@@ -30,6 +30,8 @@ import { ResourcesPage } from "@/features/resources/ResourcesPage";
 import { ServiceActionsPage } from "@/features/service-actions/ServiceActionsPage";
 import { FiltersPage } from "@/features/filters/FiltersPage";
 import { ClaimMappingsPage } from "@/features/claim-mappings/ClaimMappingsPage";
+import { Om3GrantsPage } from "@/features/om3-grants/Om3GrantsPage";
+import { OidcAuthorizePage } from "@/features/om3-grants/OidcAuthorizePage";
 import { FormConnectorsPage } from "@/features/form-connectors/FormConnectorsPage";
 import { AIResourcesPage, AISkillsPage } from "@/features/ai-content/AIContentPage";
 import { NotificationsPage } from "@/features/notifications/NotificationsPage";
@@ -338,6 +340,26 @@ const claimMappingsRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
+// The om3 grants of the teams, which the collector gives as the OpenID Connect
+// provider of the om3 clusters: Manager only, as the api.
+const om3GrantsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/om3-grants",
+  component: Om3GrantsPage,
+  validateSearch: parseListSearch,
+});
+
+// Where an om3 cluster sends its users to sign in with the collector: the request
+// its provider endpoint saved, for the user signed in to approve.
+const oidcAuthorizeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/oidc/authorize",
+  component: OidcAuthorizePage,
+  validateSearch: (raw: Record<string, unknown>): { request?: string } => ({
+    request: typeof raw.request === "string" && raw.request !== "" ? raw.request : undefined,
+  }),
+});
+
 const fieldConstraintsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/field-constraints",
@@ -539,6 +561,8 @@ const routeTree = rootRoute.addChildren([
   logsRoute,
   filtersRoute,
   claimMappingsRoute,
+  om3GrantsRoute,
+  oidcAuthorizeRoute,
   formConnectorsRoute,
   aiResourcesRoute,
   aiSkillsRoute,

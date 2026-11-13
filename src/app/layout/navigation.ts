@@ -40,6 +40,7 @@ export type MenuId =
   | "adm-usr"
   | "adm-groups"
   | "adm-claim-mappings"
+  | "adm-om3-grants"
   | "adm-form-connectors"
   | "adm-ai-resources"
   | "adm-ai-skills"
@@ -92,6 +93,7 @@ export interface NavEntry {
     | "/logs"
     | "/filters"
     | "/claim-mappings"
+    | "/om3-grants"
     | "/form-connectors"
     | "/ai-resources"
     | "/ai-skills"
@@ -306,6 +308,15 @@ export const NAV_CATEGORIES: NavCategory[] = [
         menuId: "adm-claim-mappings",
         labelKey: "nav.claimMappings",
         icon: "claimMapping",
+        privileges: ["Manager"],
+      },
+      // The om3 grants the collector, as the OpenID Connect provider of the
+      // clusters, gives the teams: Manager only, as the api.
+      {
+        to: "/om3-grants",
+        menuId: "adm-om3-grants",
+        labelKey: "nav.om3Grants",
+        icon: "cluster",
         privileges: ["Manager"],
       },
       // Who the alerts are sent to, by mail or to the team messaging.
