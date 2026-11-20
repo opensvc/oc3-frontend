@@ -20,6 +20,8 @@ export function CreateAppPanel({ open, onClose }: { open: boolean; onClose: () =
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [values, setValues] = useState<Record<Field, string>>(EMPTY);
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = JSON.stringify(values) !== JSON.stringify(EMPTY);
 
   const create = useMutation({
     mutationFn: async () => {
@@ -48,6 +50,7 @@ export function CreateAppPanel({ open, onClose }: { open: boolean; onClose: () =
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("apps.create.title")}
       onClose={onClose}

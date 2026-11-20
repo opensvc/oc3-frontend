@@ -68,6 +68,7 @@ export function FormFormPanel({
   useEffect(() => {
     if (open) setFields(fromRow(form));
   }, [open, form]);
+  const unsaved = JSON.stringify(fields) !== JSON.stringify(fromRow(form));
 
   const save = useMutation({
     mutationFn: async () => {
@@ -117,9 +118,9 @@ export function FormFormPanel({
 
   return (
     <SlideOver
-      // Created like the other objects, closing on a click beside it; an existing one
-      // being edited is not dropped by a stray click.
-      closeOnOutsideClick={!editing}
+      // Closes on a click beside it as the other panels, unless it holds an entry not
+      // saved yet: a stray click does not drop it.
+      closeOnOutsideClick={!unsaved}
       size="wide"
       open={open}
       title={editing ? t("forms.form.editTitle") : t("forms.form.createTitle")}

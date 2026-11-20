@@ -76,11 +76,11 @@ const RULESET_CHOICE: DataActionChoice = {
  * detaching a moduleset or a ruleset. Each object is changed on its own, through
  * the routes the detail panels use, so that a refusal names its object.
  *
- * The notifications and the tags are offered to every user, as in the historical
- * collector: the API requires the responsibility of each object, which a selection
- * cannot tell beforehand. The modulesets and rulesets require CompExec, as the
- * Compliance tab of the panels. On services, the attachments are those of the
- * service itself, not of its encapsulated part.
+ * The tags and the compliance attachments are offered to every user, as in the
+ * historical collector: the API requires the responsibility of each object, which a
+ * selection cannot tell beforehand. The notifications of a node, one of its
+ * properties, require NodeManager as well. On services, the attachments are those
+ * of the service itself, not of its encapsulated part.
  */
 export function objectDataActions(kind: ObjectKind, queryClient: QueryClient): DataActionEntry[] {
   const refresh = (done: ActionTarget[]) => {
@@ -124,17 +124,22 @@ export function objectDataActions(kind: ObjectKind, queryClient: QueryClient): D
       return error === undefined ? null : problemText(error);
     };
 
+  // The notifications of a node are one of its properties, which a NodeManager
+  // changes (POST /nodes/{node_id}); those of a service, any user responsible
+  // for it (POST /services/{svc_id}).
+  const notificationsPrivileges = kind === "node" ? ["NodeManager"] : [];
+
   return [
     {
       key: "notificationsOn",
-      privileges: [],
+      privileges: notificationsPrivileges,
       tone: "change",
       run: notifications(true),
       onDone: refresh,
     },
     {
       key: "notificationsOff",
-      privileges: [],
+      privileges: notificationsPrivileges,
       tone: "change",
       run: notifications(false),
       onDone: refresh,
@@ -153,7 +158,7 @@ export function objectDataActions(kind: ObjectKind, queryClient: QueryClient): D
     },
     {
       key: "modulesetAttach",
-      privileges: ["CompExec"],
+      privileges: [],
       tone: "change",
       separatorBefore: true,
       choice: MODULESET_CHOICE,
@@ -162,7 +167,7 @@ export function objectDataActions(kind: ObjectKind, queryClient: QueryClient): D
     },
     {
       key: "modulesetDetach",
-      privileges: ["CompExec"],
+      privileges: [],
       tone: "change",
       choice: MODULESET_CHOICE,
       run: compliance("modulesets", false),
@@ -170,7 +175,7 @@ export function objectDataActions(kind: ObjectKind, queryClient: QueryClient): D
     },
     {
       key: "rulesetAttach",
-      privileges: ["CompExec"],
+      privileges: [],
       tone: "change",
       choice: RULESET_CHOICE,
       run: compliance("rulesets", true),
@@ -178,7 +183,7 @@ export function objectDataActions(kind: ObjectKind, queryClient: QueryClient): D
     },
     {
       key: "rulesetDetach",
-      privileges: ["CompExec"],
+      privileges: [],
       tone: "change",
       choice: RULESET_CHOICE,
       run: compliance("rulesets", false),

@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -10,6 +11,7 @@ import {
 } from "react";
 import { CloseIcon, PanelSideIcon } from "./icons";
 import { usePanelSide } from "./panel-side";
+import { DirtyFormsContext } from "./use-report-dirty";
 import { RESIZE_VISIBLE, RESIZED_WIDTH, ROOM_BESIDE } from "./slide-over-layout";
 import { useShortcut } from "@/lib/shortcuts";
 import { panelOpened } from "./slide-over-open";
@@ -86,9 +88,10 @@ export function SlideOver({
    */
   size?: "default" | "wide" | "wider";
   /**
-   * False for a drawer editing an existing object at length, a form definition for
-   * instance: a stray click beside it would drop the changes. Creation drawers close
-   * on it like the others.
+   * Whether a click beside the drawer closes it. A drawer holding a form closes on
+   * it unless the form holds an entry not saved yet, which the click would drop:
+   * the drawer passes `!unsaved`, or the form, deeper, tells it with
+   * `useReportDirty`. Creating or editing, an untouched form closes like the others.
    */
   closeOnOutsideClick?: boolean;
   /** Buttons of the header, before the close button: the bookmark button, say. */
@@ -132,6 +135,19 @@ export function SlideOver({
   // While the edge is dragged: the narrowest the content allows, measured once as
   // the drag starts.
   const dragFloor = useRef<number | null>(null);
+  // The forms of the panel holding an entry not saved yet (`useReportDirty`): a
+  // click beside the panel would drop it, so it does not close it.
+  const [dirtyForms, setDirtyForms] = useState<ReadonlySet<symbol>>(() => new Set());
+  const reportDirty = useCallback((form: symbol, dirty: boolean) => {
+    setDirtyForms((previous) => {
+      if (previous.has(form) === dirty) return previous;
+      const next = new Set(previous);
+      if (dirty) next.add(form);
+      else next.delete(form);
+      return next;
+    });
+  }, []);
+  const closesOnOutsideClick = closeOnOutsideClick && dirtyForms.size === 0;
 
   /** The edge follows the pointer: the panel is anchored to its edge of the window. */
   function onHandlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
@@ -273,7 +289,7 @@ export function SlideOver({
   // backgrounds count: a click on a control or on a list row does what it says, and
   // closing on top of that would feel like having missed the target.
   useEffect(() => {
-    if (!open || !closeOnOutsideClick) return;
+    if (!open || !closesOnOutsideClick) return;
     function onPointerDown(event: PointerEvent) {
       const target = event.target;
       if (!(target instanceof Element)) return;
@@ -296,7 +312,7 @@ export function SlideOver({
     return () => {
       document.removeEventListener("pointerdown", onPointerDown);
     };
-  }, [open, onClose, closeOnOutsideClick]);
+  }, [open, onClose, closesOnOutsideClick]);
 
   return (
     <div
@@ -356,7 +372,9 @@ export function SlideOver({
           </button>
         </div>
         {subheader}
-        <div className="min-h-0 flex-1 overflow-y-auto p-3">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+          <DirtyFormsContext.Provider value={reportDirty}>{children}</DirtyFormsContext.Provider>
+        </div>
       </div>
       {open && resizeLabel !== undefined && (
         <div

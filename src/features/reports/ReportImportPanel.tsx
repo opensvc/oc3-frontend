@@ -18,6 +18,8 @@ export function ReportImportPanel({ open, onClose }: { open: boolean; onClose: (
   const queryClient = useQueryClient();
   const [text, setText] = useState("");
   const [parseError, setParseError] = useState<string | null>(null);
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = text !== "";
 
   const run = useMutation({
     mutationFn: (body: ReportExport) => importReports(body),
@@ -57,6 +59,7 @@ export function ReportImportPanel({ open, onClose }: { open: boolean; onClose: (
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       size="wide"
       title={t("reportAdmin.import.title")}

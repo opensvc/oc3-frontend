@@ -28,6 +28,7 @@ import { filterQuery, filtersKey, type ColumnFilters } from "@/lib/column-filter
 import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stats";
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ObsolescenceDetailPanel } from "./ObsolescenceDetailPanel";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type ObsolescenceSettingRow = components["schemas"]["ObsolescenceSettingRow"];
 
@@ -140,6 +141,8 @@ function useSettings(search: ResolvedListSearch) {
 
 export function ObsolescencePage() {
   const { t } = useTranslation();
+  // The obsolescence settings are changed by an ObsManager.
+  const canChange = useHasPrivilege(["ObsManager"]);
   const queryClient = useQueryClient();
   const prefs = useViewPrefs("obsolescence");
   const search = resolveListSearch(
@@ -226,18 +229,20 @@ export function ObsolescencePage() {
           <ObjectIcon kind="obsolescence" className="h-5 w-5" />
           {t("obsolescence.title")}
         </h1>
-        <button
-          type="button"
-          disabled={refresh.isPending}
-          title={t("obsolescence.refresh.hint")}
-          onClick={() => {
-            refresh.mutate();
-          }}
-          className="flex h-7 items-center gap-1.5 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink disabled:opacity-60"
-        >
-          <RefreshIcon className="h-3.5 w-3.5" />
-          {refresh.isPending ? t("obsolescence.refresh.pending") : t("obsolescence.refresh.open")}
-        </button>
+        {canChange && (
+          <button
+            type="button"
+            disabled={refresh.isPending}
+            title={t("obsolescence.refresh.hint")}
+            onClick={() => {
+              refresh.mutate();
+            }}
+            className="flex h-7 items-center gap-1.5 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink disabled:opacity-60"
+          >
+            <RefreshIcon className="h-3.5 w-3.5" />
+            {refresh.isPending ? t("obsolescence.refresh.pending") : t("obsolescence.refresh.open")}
+          </button>
+        )}
         {refresh.isSuccess && dismissedRefresh !== refresh.submittedAt && (
           <TransientNotice
             id={refresh.submittedAt}

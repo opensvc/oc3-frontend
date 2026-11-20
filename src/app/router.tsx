@@ -32,9 +32,11 @@ import { FiltersPage } from "@/features/filters/FiltersPage";
 import { ClaimMappingsPage } from "@/features/claim-mappings/ClaimMappingsPage";
 import { Om3GrantsPage } from "@/features/om3-grants/Om3GrantsPage";
 import { SysreportAccessPage } from "@/features/sysreport-access/SysreportAccessPage";
+import { SchedulerTasksPage } from "@/features/scheduler/SchedulerTasksPage";
 import { OidcAuthorizePage } from "@/features/om3-grants/OidcAuthorizePage";
 import { FormConnectorsPage } from "@/features/form-connectors/FormConnectorsPage";
 import { AIResourcesPage, AISkillsPage } from "@/features/ai-content/AIContentPage";
+import { ProvisioningPage } from "@/features/provisioning/ProvisioningPage";
 import { NotificationsPage } from "@/features/notifications/NotificationsPage";
 import { FieldConstraintsPage } from "@/features/field-constraints/FieldConstraintsPage";
 import { FiltersetsPage } from "@/features/filtersets/FiltersetsPage";
@@ -338,6 +340,14 @@ const formConnectorsRoute = createRoute({
   validateSearch: parseListSearch,
 });
 
+// The clusters and nodes the collector provisions: NodeManager, as the api.
+const provisioningRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/provisioning",
+  component: ProvisioningPage,
+  validateSearch: parseListSearch,
+});
+
 // The channels and subscriptions of the alert notifications: AlertsManager, as the api.
 const notificationsRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -368,6 +378,13 @@ const sysreportAccessRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/sysreport-access",
   component: SysreportAccessPage,
+});
+
+// The tasks of the scheduler, their runs and their failures.
+const schedulerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/scheduler",
+  component: SchedulerTasksPage,
 });
 
 // Where an om3 cluster sends its users to sign in with the collector: the request
@@ -595,10 +612,12 @@ const routeTree = rootRoute.addChildren([
   claimMappingsRoute,
   om3GrantsRoute,
   sysreportAccessRoute,
+  schedulerRoute,
   oidcAuthorizeRoute,
   formConnectorsRoute,
   aiResourcesRoute,
   aiSkillsRoute,
+  provisioningRoute,
   notificationsRoute,
   fieldConstraintsRoute,
   filtersetsRoute,

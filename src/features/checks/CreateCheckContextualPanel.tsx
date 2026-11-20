@@ -60,6 +60,8 @@ export function CreateCheckContextualPanel({
   const queryClient = useQueryClient();
   const id = useId();
   const [fields, setFields] = useState<Fields>(EMPTY);
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = JSON.stringify(fields) !== JSON.stringify(EMPTY);
   const types = useCheckTypes(open);
   const filtersets = useFiltersetOptions(open);
 
@@ -150,6 +152,7 @@ export function CreateCheckContextualPanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("checkContextual.create.title")}
       onClose={onClose}

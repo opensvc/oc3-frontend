@@ -376,6 +376,18 @@ export function HoneycombIcon(props: IconProps) {
   );
 }
 
+/**
+ * Provisioning: the clusters honeycomb, its third cell a plus sign: a cluster
+ * declared before its nodes join it. Apart from the Clusters entry above it.
+ */
+export function HoneycombPlusIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 3.5l3.98 2.3v4.6L12 12.7l-3.98-2.3V5.8ZM7.52 11.3l3.98 2.3v4.6l-3.98 2.3-3.98-2.3v-4.6ZM15.6 12h1.8v3h3v1.8h-3v3h-1.8v-3h-3V15h3Z" />
+    </Svg>
+  );
+}
+
 /* --- Column families, taken from the classes of the historical collector. --- */
 
 /** Cluster (fa-circle-notch). */

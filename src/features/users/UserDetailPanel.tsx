@@ -13,13 +13,13 @@ import { UserGroupsParts } from "./UserGroupsParts";
 import { DeleteUser } from "./DeleteUser";
 import { SetUserPassword } from "./SetUserPassword";
 import { UserIdentities } from "./UserIdentities";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type UserRow = components["schemas"]["UserRow"];
 
 /**
- * Detail of a user. The name and email carry a pencil: a user may change their
- * own, a UserManager anyone's, and the server refuses the others with a message
- * under the field — the interface does not know the caller's privileges yet.
+ * Detail of a user. The name and email carry a pencil for whoever may change them:
+ * the user themselves, and a UserManager for anyone.
  *
  * "Impersonate" acts as that user from then on, as in the historical collector,
  * for a Manager only. Not offered on oneself, nor while already acting as somebody
@@ -66,6 +66,8 @@ export function UserDetailPanel({
     user?.email !== undefined &&
     user.email.toLowerCase() === effectiveUser.toLowerCase();
   const save = useSaveUser(userId, isSelf);
+  // A user changes their own name and email, a UserManager anyone's.
+  const userManager = useHasPrivilege(["UserManager"]);
 
   const allowed = useCanImpersonate();
   // Once started, the panel of the other identity has no reason to stay.
@@ -86,8 +88,8 @@ export function UserDetailPanel({
       groupPrefix="users.detail.groups"
       isPending={isPending}
       errorMessage={isError ? error.message : null}
-      onSave={save}
-      editHint={t("users.detail.editHint")}
+      onSave={isSelf || userManager ? save : undefined}
+      editHint={isSelf || userManager ? t("users.detail.editHint") : ""}
       actions={
         <div className="space-y-3">
           {userId !== undefined && <UserGroupsParts userId={userId} />}

@@ -1,4 +1,12 @@
-import { ActionsMenu, type ActionEntry, type ActionTarget } from "@/components/opensvc/ActionsMenu";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  ActionsMenu,
+  type ActionEntry,
+  type ActionTarget,
+  type DataActionEntry,
+} from "@/components/opensvc/ActionsMenu";
+import { api } from "@/lib/api/client";
+import { problemText } from "@/lib/api/problem";
 
 /**
  * Agent actions of a whole cluster: the three cluster-wide actions of om3 (`om
@@ -18,11 +26,45 @@ const CLUSTER_ACTIONS: readonly ActionEntry[] = [
   { action: "updatepkg", separatorBefore: true },
 ];
 
-export function ClusterActionsMenu({ clusters }: { clusters: ActionTarget[] }) {
+/**
+ * The cluster actions, and the deletion of the clusters from the collector, with
+ * their nodes and services. `onDeleted` receives the ids of the clusters deleted.
+ */
+export function ClusterActionsMenu({
+  clusters,
+  onDeleted,
+}: {
+  clusters: ActionTarget[];
+  onDeleted?: (ids: string[]) => void;
+}) {
+  const queryClient = useQueryClient();
+  const dataActions: DataActionEntry[] = [
+    {
+      key: "delete",
+      // NodeManager, as the deletion of a node; the API also requires the
+      // responsibility of every node and service of the cluster. One request per
+      // cluster, so that a refusal names its cluster.
+      privileges: ["NodeManager"],
+      run: async (target) => {
+        const { error } = await api.DELETE("/clusters/{cluster_id}", {
+          params: { path: { cluster_id: target.id } },
+        });
+        return error === undefined ? null : problemText(error);
+      },
+      onDone: (done) => {
+        if (done.length === 0) return;
+        // The nodes and services went with the clusters.
+        for (const key of ["clusters", "nodes", "services"])
+          void queryClient.invalidateQueries({ queryKey: [key] });
+        onDeleted?.(done.map((target) => target.id));
+      },
+    },
+  ];
   return (
     <ActionsMenu
       targets={clusters}
       actions={CLUSTER_ACTIONS}
+      dataActions={dataActions}
       prefix="clusters.actions"
       // `cluster_id` alone targets the whole cluster.
       enqueue={(target, action) => ({ cluster_id: target.id, action })}

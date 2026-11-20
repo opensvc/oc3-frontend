@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { ObjectIcon } from "@/components/opensvc/ObjectIcon";
 import { formatBytes, uploadSafeFile } from "./use-safe";
+import { useReportDirty } from "@/components/ui/use-report-dirty";
 
 const INPUT = "h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2";
 
@@ -29,6 +30,8 @@ export function SafeUploadForm({
   const ids = useId();
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState("");
+  // A file chosen or a name typed keeps the drawer open on a click beside it.
+  useReportDirty(file !== null || name !== "");
 
   const upload = useMutation({
     mutationFn: () => {

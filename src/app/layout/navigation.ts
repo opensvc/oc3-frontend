@@ -17,6 +17,7 @@ export type MenuId =
   | "orch-runs"
   | "view-nodes"
   | "view-clusters"
+  | "adm-provisioning"
   | "view-services"
   | "view-service-instances"
   | "view-resources"
@@ -43,6 +44,7 @@ export type MenuId =
   | "adm-claim-mappings"
   | "adm-om3-grants"
   | "adm-sysreport"
+  | "adm-scheduler"
   | "adm-form-connectors"
   | "adm-ai-resources"
   | "adm-ai-skills"
@@ -72,6 +74,7 @@ export interface NavEntry {
     | "/"
     | "/nodes"
     | "/clusters"
+    | "/provisioning"
     | "/hardware"
     | "/services"
     | "/instances"
@@ -98,6 +101,7 @@ export interface NavEntry {
     | "/claim-mappings"
     | "/om3-grants"
     | "/sysreport-access"
+    | "/scheduler"
     | "/form-connectors"
     | "/ai-resources"
     | "/ai-skills"
@@ -190,6 +194,14 @@ export const NAV_CATEGORIES: NavCategory[] = [
     entries: [
       { to: "/nodes", menuId: "view-nodes", labelKey: "nav.nodes", icon: "node" },
       { to: "/clusters", menuId: "view-clusters", labelKey: "nav.clusters", icon: "cluster" },
+      // NodeManager, as the api: it declares the clusters and nodes to provision.
+      {
+        to: "/provisioning",
+        menuId: "adm-provisioning",
+        labelKey: "nav.provisioning",
+        icon: "provisioning",
+        privileges: ["NodeManager"],
+      },
       { to: "/services", menuId: "view-services", labelKey: "nav.services", icon: "service" },
       {
         to: "/instances",
@@ -427,13 +439,12 @@ export const NAV_CATEGORIES: NavCategory[] = [
         labelKey: "nav.rulesets",
         icon: "ruleset",
       },
-      // Manager and CompExec, as the data actions attaching modulesets and rulesets.
+      // Every user: the API attaches the objects a user is responsible for.
       {
         to: "/compliance/attachments",
         menuId: "comp-attachments",
         labelKey: "nav.complianceAttachments",
         icon: "compAttachment",
-        privileges: ["CompExec"],
       },
       {
         to: "/compliance/designer",
@@ -506,7 +517,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
         menuId: "adm-metrics",
         labelKey: "nav.metrics",
         icon: "metric",
-        privileges: ["ReportsManager"],
+        // A Manager, as their changes: their SQL runs on the collector database.
+        privileges: ["Manager"],
       },
       {
         to: "/charts",
@@ -534,14 +546,15 @@ export const NAV_CATEGORIES: NavCategory[] = [
         menuId: "adm-filters",
         labelKey: "nav.filters",
         icon: "filter",
-        privileges: ["Manager"],
+        // CompManager, as their changes (requireCompManager).
+        privileges: ["CompManager"],
       },
       {
         to: "/filtersets",
         menuId: "adm-filtersets",
         labelKey: "nav.filtersets",
         icon: "filterset",
-        privileges: ["Manager"],
+        privileges: ["CompManager"],
       },
     ],
   },
@@ -549,7 +562,18 @@ export const NAV_CATEGORIES: NavCategory[] = [
     key: "audit",
     labelKey: "nav.categories.audit",
     view: "admin",
-    entries: [{ to: "/logs", menuId: "adm-log", labelKey: "nav.logs", icon: "log" }],
+    entries: [
+      { to: "/logs", menuId: "adm-log", labelKey: "nav.logs", icon: "log" },
+      // The scheduler tasks and their runs, errors included: a Manager reads and
+      // disables them, as the API requires.
+      {
+        to: "/scheduler",
+        menuId: "adm-scheduler",
+        labelKey: "nav.scheduler",
+        icon: "schedulerTask",
+        privileges: ["Manager"],
+      },
+    ],
   },
 ];
 

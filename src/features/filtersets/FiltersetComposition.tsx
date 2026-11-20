@@ -60,9 +60,12 @@ function useFilters() {
 export function FiltersetComposition({
   filtersetId,
   filtersetName,
+  editable,
 }: {
   filtersetId: string;
   filtersetName: string;
+  /** Changed by a CompManager, as the API requires; read-only otherwise. */
+  editable: boolean;
 }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -259,7 +262,7 @@ export function FiltersetComposition({
                 <select
                   aria-label={t("filtersets.composition.operatorFor", { label })}
                   value={entry.f_log_op}
-                  disabled={busy}
+                  disabled={busy || !editable}
                   onChange={(event) => {
                     changeOp(entry, event.target.value);
                   }}
@@ -289,116 +292,124 @@ export function FiltersetComposition({
                     <code className="truncate">{label}</code>
                   )}
                 </span>
-                <button
-                  type="button"
-                  disabled={busy || index === 0}
-                  onClick={() => {
-                    move(index, -1);
-                  }}
-                  title={t("filtersets.composition.up", { label })}
-                  className={ICON_BUTTON}
-                >
-                  <span aria-hidden="true">↑</span>
-                  <span className="sr-only">{t("filtersets.composition.up", { label })}</span>
-                </button>
-                <button
-                  type="button"
-                  disabled={busy || index === list.length - 1}
-                  onClick={() => {
-                    move(index, 1);
-                  }}
-                  title={t("filtersets.composition.down", { label })}
-                  className={ICON_BUTTON}
-                >
-                  <span aria-hidden="true">↓</span>
-                  <span className="sr-only">{t("filtersets.composition.down", { label })}</span>
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => {
-                    remove(entry);
-                  }}
-                  title={t("filtersets.composition.remove", { label })}
-                  className={ICON_BUTTON}
-                >
-                  <CloseIcon />
-                  <span className="sr-only">{t("filtersets.composition.remove", { label })}</span>
-                </button>
+                {editable && (
+                  <>
+                    <button
+                      type="button"
+                      disabled={busy || index === 0}
+                      onClick={() => {
+                        move(index, -1);
+                      }}
+                      title={t("filtersets.composition.up", { label })}
+                      className={ICON_BUTTON}
+                    >
+                      <span aria-hidden="true">↑</span>
+                      <span className="sr-only">{t("filtersets.composition.up", { label })}</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy || index === list.length - 1}
+                      onClick={() => {
+                        move(index, 1);
+                      }}
+                      title={t("filtersets.composition.down", { label })}
+                      className={ICON_BUTTON}
+                    >
+                      <span aria-hidden="true">↓</span>
+                      <span className="sr-only">{t("filtersets.composition.down", { label })}</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => {
+                        remove(entry);
+                      }}
+                      title={t("filtersets.composition.remove", { label })}
+                      className={ICON_BUTTON}
+                    >
+                      <CloseIcon />
+                      <span className="sr-only">
+                        {t("filtersets.composition.remove", { label })}
+                      </span>
+                    </button>
+                  </>
+                )}
               </li>
             );
           })}
         </ol>
       )}
 
-      <form onSubmit={add} className="flex flex-wrap items-center gap-1.5">
-        <select
-          aria-label={t("filtersets.composition.addOperator")}
-          value={newOp}
-          disabled={busy}
-          onChange={(event) => {
-            if (isLogOp(event.target.value)) setNewOp(event.target.value);
-          }}
-          className={`${CONTROL} w-24`}
-        >
-          {LOG_OPS.map((op) => (
-            <option key={op} value={op}>
-              {op}
-            </option>
-          ))}
-        </select>
-        <select
-          ref={kindSelect}
-          aria-label={t("filtersets.composition.addKind")}
-          value={kind}
-          disabled={busy}
-          onChange={(event) => {
-            const value = event.target.value;
-            setKind(value === "filterset" ? "filterset" : value === "new" ? "new" : "filter");
-            setTarget("");
-          }}
-          className={CONTROL}
-        >
-          <option value="filter">{t("filtersets.composition.kindFilter")}</option>
-          <option value="filterset">{t("filtersets.composition.kindFilterset")}</option>
-          <option value="new">{t("filtersets.composition.kindNewFilter")}</option>
-        </select>
-        {kind !== "new" && (
-          <>
-            <select
-              aria-label={t("filtersets.composition.addTarget")}
-              value={target}
-              disabled={busy}
-              onChange={(event) => {
-                setTarget(event.target.value);
-              }}
-              className={`${CONTROL} min-w-0 flex-1`}
-            >
-              <option value="">{t("filtersets.composition.choose")}</option>
-              {kind === "filter"
-                ? filterOptions.map((row) => (
-                    <option key={row.id} value={String(row.id)}>
-                      {row.f_label}
-                    </option>
-                  ))
-                : filtersetOptions.map((name) => (
-                    <option key={name} value={name}>
-                      {name}
-                    </option>
-                  ))}
-            </select>
-            <button
-              type="submit"
-              disabled={busy || target === ""}
-              className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink disabled:opacity-60"
-            >
-              {t("filtersets.composition.add")}
-            </button>
-          </>
-        )}
-      </form>
+      {editable && (
+        <form onSubmit={add} className="flex flex-wrap items-center gap-1.5">
+          <select
+            aria-label={t("filtersets.composition.addOperator")}
+            value={newOp}
+            disabled={busy}
+            onChange={(event) => {
+              if (isLogOp(event.target.value)) setNewOp(event.target.value);
+            }}
+            className={`${CONTROL} w-24`}
+          >
+            {LOG_OPS.map((op) => (
+              <option key={op} value={op}>
+                {op}
+              </option>
+            ))}
+          </select>
+          <select
+            ref={kindSelect}
+            aria-label={t("filtersets.composition.addKind")}
+            value={kind}
+            disabled={busy}
+            onChange={(event) => {
+              const value = event.target.value;
+              setKind(value === "filterset" ? "filterset" : value === "new" ? "new" : "filter");
+              setTarget("");
+            }}
+            className={CONTROL}
+          >
+            <option value="filter">{t("filtersets.composition.kindFilter")}</option>
+            <option value="filterset">{t("filtersets.composition.kindFilterset")}</option>
+            <option value="new">{t("filtersets.composition.kindNewFilter")}</option>
+          </select>
+          {kind !== "new" && (
+            <>
+              <select
+                aria-label={t("filtersets.composition.addTarget")}
+                value={target}
+                disabled={busy}
+                onChange={(event) => {
+                  setTarget(event.target.value);
+                }}
+                className={`${CONTROL} min-w-0 flex-1`}
+              >
+                <option value="">{t("filtersets.composition.choose")}</option>
+                {kind === "filter"
+                  ? filterOptions.map((row) => (
+                      <option key={row.id} value={String(row.id)}>
+                        {row.f_label}
+                      </option>
+                    ))
+                  : filtersetOptions.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+              </select>
+              <button
+                type="submit"
+                disabled={busy || target === ""}
+                className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink disabled:opacity-60"
+              >
+                {t("filtersets.composition.add")}
+              </button>
+            </>
+          )}
+        </form>
+      )}
 
-      {kind === "new" && (
+      {editable && kind === "new" && (
         <NewFilterForm
           initialTable={mostFilteredTable}
           busy={busy}

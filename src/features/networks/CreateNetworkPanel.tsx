@@ -44,6 +44,16 @@ export function CreateNetworkPanel({
   const [prio, setPrio] = useState("0");
   const [team, setTeam] = useState("");
   const [comment, setComment] = useState("");
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved =
+    name !== "" ||
+    address !== "" ||
+    prefix !== "24" ||
+    gateway !== "" ||
+    pvid !== "" ||
+    prio !== "0" ||
+    team !== "" ||
+    comment !== "";
 
   const prefixValue = Number(prefix);
   const range = ipv4Range(address, prefixValue);
@@ -106,6 +116,7 @@ export function CreateNetworkPanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("networks.create.title")}
       onClose={onClose}

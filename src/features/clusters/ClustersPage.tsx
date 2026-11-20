@@ -210,6 +210,7 @@ export function ClustersPage() {
   const navigate = useNavigate({ from: "/clusters" });
   const { data, isPending, isError, error, isFetching } = useClusters(search);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [deleted, setDeleted] = useState<string[]>([]);
 
   /** Ids of the whole selection, filters included, without pagination. */
   async function allIds(): Promise<string[]> {
@@ -249,6 +250,11 @@ export function ClustersPage() {
         {/* On the rows checked in the list; nothing checked, no menu. */}
         <ClusterActionsMenu
           clusters={selectedIds.map((id) => ({ id, name: clusterNames[id] ?? id }))}
+          onDeleted={(ids) => {
+            setDeleted(ids);
+            // The detail of a deleted cluster has nothing left to show.
+            if (search.sel !== undefined && ids.includes(search.sel)) update({ sel: undefined });
+          }}
         />
       </div>
       <p className="mb-3 max-w-3xl text-ink-muted">{t("clusters.intro")}</p>
@@ -271,6 +277,7 @@ export function ClustersPage() {
         selectAllMatching={allIds}
         rowLead={(row) => <FrozenMark frozen={row.frozen === 1} />}
         onSelectionChange={setSelectedIds}
+        unselect={deleted}
         filterable
       />
 

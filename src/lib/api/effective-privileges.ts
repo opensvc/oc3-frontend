@@ -39,3 +39,13 @@ export function hasPrivilege(
   if (required === undefined || required.length === 0) return true;
   return privileges.has("Manager") || required.some((p) => privileges.has(p));
 }
+
+/**
+ * Whether the user holds one of the privileges, a Manager holding them all:
+ * false until they are known, so that a control does not show then vanish. For
+ * the controls whose API call requires a privilege, such as a creation button.
+ */
+export function useHasPrivilege(required: readonly string[]): boolean {
+  const privileges = useEffectivePrivileges();
+  return privileges.data !== undefined && hasPrivilege(privileges.data, required);
+}

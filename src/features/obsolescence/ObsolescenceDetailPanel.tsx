@@ -5,6 +5,7 @@ import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
 import { problemText } from "@/lib/api/problem";
 import { formatDate, formatDateTime } from "@/lib/format";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type ObsolescenceSettingRow = components["schemas"]["ObsolescenceSettingRow"];
 
@@ -83,6 +84,8 @@ export function ObsolescenceDetailPanel({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  // The settings are changed by an ObsManager.
+  const editable = useHasPrivilege(["ObsManager"]);
   const queryClient = useQueryClient();
   const {
     data: setting,
@@ -127,8 +130,8 @@ export function ObsolescenceDetailPanel({
       onClose={onClose}
       groups={groups(t)}
       row={setting}
-      onSave={(changes) => save.mutateAsync(changes)}
-      editHint={t("obsolescence.detail.editHint")}
+      onSave={editable ? (changes) => save.mutateAsync(changes) : undefined}
+      editHint={editable ? t("obsolescence.detail.editHint") : ""}
       labelPrefix="obsolescence.fields"
       groupPrefix="obsolescence.detail.groups"
       isPending={isPending}

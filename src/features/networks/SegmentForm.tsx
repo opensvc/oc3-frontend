@@ -2,6 +2,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
 import { rangeProblem, rangeSize } from "./segment-range";
+import { useReportDirty } from "@/components/ui/use-report-dirty";
 
 type NetworkRow = components["schemas"]["NetworkRow"];
 export type SegmentType = "static" | "dynamic";
@@ -56,6 +57,12 @@ export function SegmentForm({
   const [segType, setSegType] = useState<SegmentType>(initial?.seg_type ?? "static");
   const [begin, setBegin] = useState(initial?.seg_begin ?? "");
   const [end, setEnd] = useState(initial?.seg_end ?? "");
+  // A range typed keeps the drawer open on a click beside it.
+  useReportDirty(
+    segType !== (initial?.seg_type ?? "static") ||
+      begin !== (initial?.seg_begin ?? "") ||
+      end !== (initial?.seg_end ?? ""),
+  );
 
   const problem = network === undefined ? null : rangeProblem(network, begin, end);
   const count = problem === null ? rangeSize(begin, end) : null;

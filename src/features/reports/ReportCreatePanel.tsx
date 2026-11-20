@@ -39,6 +39,9 @@ export function ReportCreatePanel({
   const [definition, setDefinition] = useState("");
 
   const editing = report !== undefined && report !== null;
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved =
+    name !== (report?.report_name ?? "") || definition !== (report?.report_yaml ?? "");
 
   // Every opening starts again from the report to edit, or from an empty form.
   useEffect(() => {
@@ -75,6 +78,7 @@ export function ReportCreatePanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       size="wide"
       title={editing ? t("reportAdmin.editTitle.report") : t("reports.form.title")}

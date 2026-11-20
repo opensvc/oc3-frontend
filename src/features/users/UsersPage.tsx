@@ -21,6 +21,7 @@ import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stat
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateUserPanel } from "./CreateUserPanel";
 import { UserDetailPanel } from "./UserDetailPanel";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type UserRow = components["schemas"]["UserRow"];
 
@@ -166,6 +167,8 @@ function useUsers(search: ResolvedListSearch) {
 
 export function UsersPage() {
   const { t } = useTranslation();
+  // The users are created by a UserManager.
+  const canCreate = useHasPrivilege(["UserManager"]);
   const prefs = useViewPrefs("users");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/users" }), prefs),
@@ -210,17 +213,19 @@ export function UsersPage() {
           <ObjectIcon kind="user" className="h-5 w-5" />
           {t("users.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The two drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setCreating(true);
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("users.create.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              // The two drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setCreating(true);
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("users.create.open")}
+          </button>
+        )}
       </div>
 
       <CollectorList

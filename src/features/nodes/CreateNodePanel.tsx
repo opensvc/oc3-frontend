@@ -37,6 +37,8 @@ export function CreateNodePanel({ open, onClose }: { open: boolean; onClose: () 
   const queryClient = useQueryClient();
   const [values, setValues] = useState<Record<Field, string>>(EMPTY);
   const [app, setApp] = useState("");
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = JSON.stringify(values) !== JSON.stringify(EMPTY) || app !== "";
   const appCodes = useAppCodes();
   // The values configured for the attributes, the city among them: offered in a
   // dropdown, the server refusing the others when the list is strict.
@@ -79,6 +81,7 @@ export function CreateNodePanel({ open, onClose }: { open: boolean; onClose: () 
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("nodes.create.title")}
       onClose={onClose}

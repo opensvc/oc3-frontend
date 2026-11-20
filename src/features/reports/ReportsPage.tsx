@@ -24,6 +24,7 @@ import { ReportCreatePanel } from "./ReportCreatePanel";
 import { ReportDetailPanel } from "./ReportDetailPanel";
 import { ReportImportPanel } from "./ReportImportPanel";
 import { useReport } from "./use-report";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type ReportRow = components["schemas"]["ReportRow"];
 
@@ -133,6 +134,8 @@ function useReports(search: ResolvedListSearch) {
  */
 export function ReportsPage() {
   const { t } = useTranslation();
+  // The reports are created and imported by a ReportsManager.
+  const canCreate = useHasPrivilege(["ReportsManager"]);
   const prefs = useViewPrefs("reports");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/reports" }), prefs),
@@ -178,29 +181,33 @@ export function ReportsPage() {
           <ObjectIcon kind="report" className="h-5 w-5" />
           {t("reports.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setImporting(false);
-            setForm("create");
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("reports.form.open")}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            update({ sel: undefined });
-            setForm(null);
-            setImporting(true);
-          }}
-          className="h-7 rounded-(--radius-control) border border-line px-3 text-ink hover:bg-surface-sunken"
-        >
-          {t("reportAdmin.import.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              // The drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setImporting(false);
+              setForm("create");
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("reports.form.open")}
+          </button>
+        )}
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              update({ sel: undefined });
+              setForm(null);
+              setImporting(true);
+            }}
+            className="h-7 rounded-(--radius-control) border border-line px-3 text-ink hover:bg-surface-sunken"
+          >
+            {t("reportAdmin.import.open")}
+          </button>
+        )}
       </div>
       <p className="mb-3 max-w-3xl text-ink-muted">{t("reports.intro")}</p>
 

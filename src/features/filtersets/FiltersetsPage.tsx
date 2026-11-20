@@ -26,6 +26,7 @@ import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stat
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateFiltersetPanel } from "./CreateFiltersetPanel";
 import { FiltersetDetailPanel } from "./FiltersetDetailPanel";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type FiltersetRow = components["schemas"]["FiltersetRow"];
 
@@ -109,6 +110,8 @@ function useFiltersetList(search: ResolvedListSearch) {
 
 export function FiltersetsPage() {
   const { t } = useTranslation();
+  // The filtersets are created by a CompManager (requireCompManager).
+  const canCreate = useHasPrivilege(["CompManager"]);
   const prefs = useViewPrefs("filtersets");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/filtersets" }), prefs),
@@ -184,16 +187,18 @@ export function FiltersetsPage() {
           <ObjectIcon kind="filterset" className="h-5 w-5" />
           {t("filtersets.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            update({ sel: undefined });
-            setCreating(true);
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("filtersets.create.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              update({ sel: undefined });
+              setCreating(true);
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("filtersets.create.open")}
+          </button>
+        )}
         {/* On the rows checked in the list; nothing checked, no menu. */}
         <SelectionDeleteMenu
           targets={selectedIds.map((id) => ({ id, name: names.get(id) ?? id }))}

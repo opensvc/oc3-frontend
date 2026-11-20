@@ -53,6 +53,7 @@ export function FilterFormPanel({
   useEffect(() => {
     if (open) setDefinition(fromRow(filter));
   }, [open, filter]);
+  const unsaved = JSON.stringify(definition) !== JSON.stringify(fromRow(filter));
 
   const save = useMutation({
     mutationFn: async () => {
@@ -88,9 +89,9 @@ export function FilterFormPanel({
 
   return (
     <SlideOver
-      // Created like the other objects, closing on a click beside it; an existing one
-      // being edited is not dropped by a stray click.
-      closeOnOutsideClick={!editing}
+      // Closes on a click beside it as the other panels, unless it holds an entry not
+      // saved yet: a stray click does not drop it.
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={editing ? t("filters.form.editTitle") : t("filters.form.createTitle")}
       onClose={onClose}

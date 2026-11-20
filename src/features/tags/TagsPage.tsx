@@ -23,6 +23,7 @@ import { TagCreatePanel } from "./TagCreatePanel";
 import { TagDetailPanel } from "./TagDetailPanel";
 import { toTagRows, type TagRow } from "./tag-row";
 import { useTag } from "./use-tag";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 const DEFAULT_SORT = ["tag_name"];
 
@@ -109,6 +110,8 @@ function useTags(search: ResolvedListSearch) {
 
 export function TagsPage() {
   const { t } = useTranslation();
+  // The tags are created by a TagManager (POST /tags).
+  const canCreate = useHasPrivilege(["TagManager"]);
   const prefs = useViewPrefs("tags");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/tags" }), prefs),
@@ -163,17 +166,19 @@ export function TagsPage() {
           <ObjectIcon kind="tags" className="h-5 w-5" />
           {t("tags.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setCreating(true);
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("tags.create.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              // The drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setCreating(true);
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("tags.create.open")}
+          </button>
+        )}
         {/* On the rows checked in the list; nothing checked, no menu. */}
         <SelectionDeleteMenu
           targets={selectedIds.map((id) => ({ id, name: names.get(id) ?? id }))}

@@ -30,6 +30,7 @@ import { CreateNetworkPanel } from "./CreateNetworkPanel";
 import { CreateSegmentPanel } from "./CreateSegmentPanel";
 import { networkLabel } from "./network-label";
 import { NetworkDetailPanel } from "./NetworkDetailPanel";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type IpRow = components["schemas"]["IpRow"];
 
@@ -201,6 +202,8 @@ function useIps(search: ResolvedListSearch) {
 
 export function NetworksPage() {
   const { t } = useTranslation();
+  // The networks and their segments are declared by a NetworkManager.
+  const canCreate = useHasPrivilege(["NetworkManager"]);
   const prefs = useViewPrefs("networks");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/networks" }), prefs),
@@ -258,27 +261,31 @@ export function NetworksPage() {
           <ObjectIcon kind="network" className="h-5 w-5" />
           {t("networks.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The two drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setCreating("network");
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("networks.create.open")}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            update({ sel: undefined });
-            setCreating("segment");
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("networks.segment.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              // The two drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setCreating("network");
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("networks.create.open")}
+          </button>
+        )}
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              update({ sel: undefined });
+              setCreating("segment");
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("networks.segment.open")}
+          </button>
+        )}
         {created !== null && (
           <span role="status" className="text-ink-muted">
             ● {created}

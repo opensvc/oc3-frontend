@@ -19,6 +19,8 @@ export function CreateGroupPanel({ open, onClose }: { open: boolean; onClose: ()
   const [role, setRole] = useState("");
   const [description, setDescription] = useState("");
   const [privilege, setPrivilege] = useState("F");
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = role !== "" || description !== "" || privilege !== "F";
 
   const create = useMutation({
     mutationFn: async () => {
@@ -49,6 +51,7 @@ export function CreateGroupPanel({ open, onClose }: { open: boolean; onClose: ()
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("groups.create.title")}
       onClose={onClose}

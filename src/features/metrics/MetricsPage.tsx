@@ -25,6 +25,7 @@ import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { MetricDetailPanel } from "./MetricDetailPanel";
 import { MetricFormPanel } from "./MetricFormPanel";
 import { useMetric } from "./use-metric";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type MetricRow = components["schemas"]["MetricRow"];
 
@@ -152,6 +153,8 @@ function useMetrics(search: ResolvedListSearch) {
  */
 export function MetricsPage() {
   const { t } = useTranslation();
+  // The metrics are created by a Manager (requireMetricsManager).
+  const canCreate = useHasPrivilege(["Manager"]);
   const prefs = useViewPrefs("metrics");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/metrics" }), prefs),
@@ -195,17 +198,19 @@ export function MetricsPage() {
           <ObjectIcon kind="metric" className="h-5 w-5" />
           {t("metrics.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setForm("create");
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("metrics.form.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              // The drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setForm("create");
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("metrics.form.open")}
+          </button>
+        )}
       </div>
       <p className="mb-3 max-w-3xl text-ink-muted">{t("metrics.intro")}</p>
 

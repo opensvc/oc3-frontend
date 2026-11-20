@@ -17,6 +17,7 @@ import {
   type CompModuleDetail,
   type CompModuleIssue,
 } from "./comp-modules-api";
+import { useReportDirty } from "@/components/ui/use-report-dirty";
 
 const INPUT = "h-8 w-full rounded-(--radius-control) border border-line bg-surface px-2";
 
@@ -226,6 +227,8 @@ function PropertiesForm({
   const [name, setName] = useState(module.name);
   const [order, setOrder] = useState(String(module.order));
   const [message, setMessage] = useState("");
+  // A change not saved yet keeps the drawer open on a click beside it.
+  useReportDirty(name !== module.name || order !== String(module.order) || message !== "");
   const orderValue = Number(order);
   const problems = [
     !MODULE_NAME.test(name) ? t("compModules.form.badName") : undefined,

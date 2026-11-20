@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { DetailPanel, type DetailGroup } from "@/components/opensvc/DetailPanel";
@@ -54,6 +55,8 @@ export function FilterDetailPanel({
 }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  // The filters are changed by a CompManager (requireCompManager).
+  const editable = useHasPrivilege(["CompManager"]);
   const { data: filter, isPending, isError, error } = useFilter(filterId);
   const usage = useFilterUsage(filterId);
   const usedBy = usage.data ?? [];
@@ -87,60 +90,62 @@ export function FilterDetailPanel({
       isPending={isPending}
       errorMessage={isError ? error.message : null}
       actions={
-        <div className="flex flex-wrap items-start gap-2">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="flex h-8 items-center gap-1.5 rounded-(--radius-control) border border-line px-3 text-ink hover:bg-surface-sunken"
-          >
-            <PencilIcon />
-            {t("filters.form.edit")}
-          </button>
-          <div>
-            <ConfirmButton
-              icon={<TrashIcon />}
-              label={t("detail.delete")}
-              question={t("filters.delete.question", { label: filter?.f_label ?? "" })}
-              confirmLabel={t("detail.deleteConfirm")}
-              cancelLabel={t("detail.cancel")}
-              pendingLabel={t("detail.deleting")}
-              pending={remove.isPending}
-              // The uses are read again on arming: the panel may have been open a while.
-              onArm={() => {
-                void usage.refetch();
-              }}
-              blocked={usage.isFetching}
-              details={
-                usage.isFetching ? (
-                  <p className="text-ink-muted">{t("usage.checking")}</p>
-                ) : usage.isError ? (
-                  <p role="alert" className="text-state-down">
-                    ■ {t("usage.error", { message: usage.error.message })}
-                  </p>
-                ) : usedBy.length > 0 ? (
-                  <UsageWarning title={t("usage.filter.warning", { count: usedBy.length })}>
-                    <FilterUsageList filtersets={usedBy} consequences />
-                  </UsageWarning>
-                ) : undefined
-              }
-              acknowledge={
-                usage.isError
-                  ? t("usage.acknowledgeUnknown")
-                  : usedBy.length > 0
-                    ? t("usage.filter.acknowledge", { count: usedBy.length })
-                    : undefined
-              }
-              onConfirm={() => {
-                remove.mutate();
-              }}
-            />
-            {remove.isError && (
-              <p role="alert" className="mt-2 text-state-down">
-                ■ {remove.error.message}
-              </p>
-            )}
+        editable && (
+          <div className="flex flex-wrap items-start gap-2">
+            <button
+              type="button"
+              onClick={onEdit}
+              className="flex h-8 items-center gap-1.5 rounded-(--radius-control) border border-line px-3 text-ink hover:bg-surface-sunken"
+            >
+              <PencilIcon />
+              {t("filters.form.edit")}
+            </button>
+            <div>
+              <ConfirmButton
+                icon={<TrashIcon />}
+                label={t("detail.delete")}
+                question={t("filters.delete.question", { label: filter?.f_label ?? "" })}
+                confirmLabel={t("detail.deleteConfirm")}
+                cancelLabel={t("detail.cancel")}
+                pendingLabel={t("detail.deleting")}
+                pending={remove.isPending}
+                // The uses are read again on arming: the panel may have been open a while.
+                onArm={() => {
+                  void usage.refetch();
+                }}
+                blocked={usage.isFetching}
+                details={
+                  usage.isFetching ? (
+                    <p className="text-ink-muted">{t("usage.checking")}</p>
+                  ) : usage.isError ? (
+                    <p role="alert" className="text-state-down">
+                      ■ {t("usage.error", { message: usage.error.message })}
+                    </p>
+                  ) : usedBy.length > 0 ? (
+                    <UsageWarning title={t("usage.filter.warning", { count: usedBy.length })}>
+                      <FilterUsageList filtersets={usedBy} consequences />
+                    </UsageWarning>
+                  ) : undefined
+                }
+                acknowledge={
+                  usage.isError
+                    ? t("usage.acknowledgeUnknown")
+                    : usedBy.length > 0
+                      ? t("usage.filter.acknowledge", { count: usedBy.length })
+                      : undefined
+                }
+                onConfirm={() => {
+                  remove.mutate();
+                }}
+              />
+              {remove.isError && (
+                <p role="alert" className="mt-2 text-state-down">
+                  ■ {remove.error.message}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
+        )
       }
     />
   );

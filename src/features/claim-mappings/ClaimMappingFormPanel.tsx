@@ -45,6 +45,9 @@ export function ClaimMappingFormPanel({
   const queryClient = useQueryClient();
   const editing = mapping !== undefined && mapping !== null;
   const [draft, setDraft] = useState<ClaimMappingDraft>(EMPTY_DRAFT);
+  // The draft the panel opened with, to tell an entry not saved yet.
+  const [start, setStart] = useState<ClaimMappingDraft>(EMPTY_DRAFT);
+  const unsaved = JSON.stringify(draft) !== JSON.stringify(start);
   const teams = useGrantableTeams();
   const claims = useCurrentClaims();
   const known = flattenClaims(claims.data?.claims ?? {});
@@ -52,7 +55,11 @@ export function ClaimMappingFormPanel({
 
   // Every opening starts again from the rule to edit, or from the values given.
   useEffect(() => {
-    if (open) setDraft(editing ? draftOf(mapping) : { ...EMPTY_DRAFT, ...initial });
+    if (open) {
+      const opened = editing ? draftOf(mapping) : { ...EMPTY_DRAFT, ...initial };
+      setDraft(opened);
+      setStart(opened);
+    }
     // `initial` is read on opening only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mapping]);
@@ -161,8 +168,9 @@ export function ClaimMappingFormPanel({
 
   return (
     <SlideOver
-      // An existing rule being edited is not dropped by a stray click.
-      closeOnOutsideClick={!editing}
+      // Closes on a click beside it as the other panels, unless it holds an entry not
+      // saved yet: a stray click does not drop it.
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={editing ? t("claimMappings.form.editTitle") : t("claimMappings.form.createTitle")}
       onClose={onClose}

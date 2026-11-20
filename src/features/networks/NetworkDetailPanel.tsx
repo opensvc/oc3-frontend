@@ -8,6 +8,7 @@ import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { TrashIcon } from "@/components/ui/icons";
 import { problemText } from "@/lib/api/problem";
 import { formatDateTime } from "@/lib/format";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type IpRow = components["schemas"]["IpRow"];
 
@@ -70,6 +71,9 @@ export function NetworkDetailPanel({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  // An address of a node is deleted by a NodeManager responsible for the node, as
+  // from the list (DeleteNodeIP).
+  const canDelete = useHasPrivilege(["NodeManager"]);
   const queryClient = useQueryClient();
   const {
     data: ip,
@@ -118,28 +122,30 @@ export function NetworkDetailPanel({
       isPending={isPending}
       errorMessage={isError ? error.message : null}
       actions={
-        <>
-          <ConfirmButton
-            icon={<TrashIcon />}
-            label={t("detail.delete")}
-            question={t("networks.delete.question", {
-              addr: ip?.addr ?? "",
-              nodename: ip?.nodename ?? "",
-            })}
-            confirmLabel={t("detail.deleteConfirm")}
-            cancelLabel={t("detail.cancel")}
-            pendingLabel={t("detail.deleting")}
-            pending={remove.isPending}
-            onConfirm={() => {
-              remove.mutate();
-            }}
-          />
-          {remove.isError && (
-            <p role="alert" className="mt-2 text-state-down">
-              ■ {remove.error.message}
-            </p>
-          )}
-        </>
+        canDelete && (
+          <>
+            <ConfirmButton
+              icon={<TrashIcon />}
+              label={t("detail.delete")}
+              question={t("networks.delete.question", {
+                addr: ip?.addr ?? "",
+                nodename: ip?.nodename ?? "",
+              })}
+              confirmLabel={t("detail.deleteConfirm")}
+              cancelLabel={t("detail.cancel")}
+              pendingLabel={t("detail.deleting")}
+              pending={remove.isPending}
+              onConfirm={() => {
+                remove.mutate();
+              }}
+            />
+            {remove.isError && (
+              <p role="alert" className="mt-2 text-state-down">
+                ■ {remove.error.message}
+              </p>
+            )}
+          </>
+        )
       }
     />
   );

@@ -27,6 +27,8 @@ export function CreateFiltersetPanel({
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [stats, setStats] = useState(false);
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = name !== "" || stats;
 
   const create = useMutation({
     mutationFn: async () => {
@@ -56,6 +58,7 @@ export function CreateFiltersetPanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("filtersets.create.title")}
       onClose={onClose}

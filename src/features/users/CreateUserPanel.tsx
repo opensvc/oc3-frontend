@@ -42,6 +42,10 @@ export function CreateUserPanel({
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = [email, firstName, lastName, username, phone, password, confirm].some(
+    (value) => value !== "",
+  );
   // Offered until the collector says otherwise: it refuses a password it would
   // not accept at sign-in.
   const passwords = useAuthInfo().data?.basic !== false;
@@ -111,6 +115,7 @@ export function CreateUserPanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("users.create.title")}
       onClose={onClose}

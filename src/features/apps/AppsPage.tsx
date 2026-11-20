@@ -24,6 +24,7 @@ import { STATS_LIMIT, toValueStats, type ValueStats } from "@/lib/api/value-stat
 import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { AppDetailPanel } from "./AppDetailPanel";
 import { CreateAppPanel } from "./CreateAppPanel";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type AppRow = components["schemas"]["AppRow"];
 
@@ -137,6 +138,8 @@ const FILTERSET_SOURCE: FiltersetSource = { table: "apps", selects: "related" };
 
 export function AppsPage() {
   const { t } = useTranslation();
+  // The apps are created by an AppManager (POST /apps).
+  const canCreate = useHasPrivilege(["AppManager"]);
   const prefs = useViewPrefs("apps");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/apps" }), prefs),
@@ -198,17 +201,19 @@ export function AppsPage() {
           <ObjectIcon kind="app" className="h-5 w-5" />
           {t("apps.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The two drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setCreating(true);
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("apps.create.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              // The two drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setCreating(true);
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("apps.create.open")}
+          </button>
+        )}
         {/* On the rows checked in the list; nothing checked, no menu. */}
         <SelectionDeleteMenu
           targets={selectedIds.map((id) => ({ id, name: names.get(id) ?? id }))}

@@ -26,6 +26,7 @@ import {
   useModulesetUsage,
   type ModulesetDetail,
 } from "./use-moduleset";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type ModulesetRow = components["schemas"]["ModulesetRow"];
 
@@ -79,7 +80,9 @@ export function ModulesetDetailPanel({
   const { t } = useTranslation();
   const detail = useModuleset(modsetId);
   const responsible = useModulesetResponsible(modsetId);
-  const editable = responsible.data === true;
+  // Changed by a CompManager responsible for the moduleset, as the API requires.
+  const compManager = useHasPrivilege(["CompManager"]);
+  const editable = responsible.data === true && compManager;
   const changed = useModulesetChanged();
   const { outcome, busy, change, dismiss } = useChanges(async () => {
     if (modsetId !== undefined) await changed(modsetId);

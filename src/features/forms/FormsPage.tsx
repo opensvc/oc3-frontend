@@ -4,6 +4,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { SelectionDeleteMenu } from "@/components/opensvc/SelectionDeleteMenu";
 import { api } from "@/lib/api/client";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 import { problemText } from "@/lib/api/problem";
 import { toPage } from "@/lib/api/page";
 import {
@@ -171,6 +172,8 @@ function useForms(search: ResolvedListSearch) {
  */
 export function FormsPage() {
   const { t } = useTranslation();
+  // Creating a form requires FormsManager, as the API checks.
+  const canCreate = useHasPrivilege(["FormsManager"]);
   const prefs = useViewPrefs("forms");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/forms" }), prefs),
@@ -228,17 +231,19 @@ export function FormsPage() {
           <ObjectIcon kind="form" className="h-5 w-5" />
           {t("forms.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setPanel("create");
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("forms.form.open")}
-        </button>
+        {canCreate ? (
+          <button
+            type="button"
+            onClick={() => {
+              // The drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setPanel("create");
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("forms.form.open")}
+          </button>
+        ) : null}
         {/* On the rows checked in the list; nothing checked, no menu. */}
         <SelectionDeleteMenu
           targets={selectedIds.map((id) => ({ id, name: names.get(id) ?? id }))}

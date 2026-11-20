@@ -40,6 +40,8 @@ export function ChartCreatePanel({
   const [definition, setDefinition] = useState("");
 
   const editing = chart !== undefined && chart !== null;
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = name !== (chart?.chart_name ?? "") || definition !== (chart?.chart_yaml ?? "");
 
   // Every opening starts again from the chart to edit, or from an empty form.
   useEffect(() => {
@@ -76,6 +78,7 @@ export function ChartCreatePanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       size="wide"
       title={editing ? t("reportAdmin.editTitle.chart") : t("charts.form.title")}

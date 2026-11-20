@@ -39,6 +39,8 @@ export function CreateCheckDefaultPanel({
   const queryClient = useQueryClient();
   const id = useId();
   const [fields, setFields] = useState<Fields>(EMPTY);
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = JSON.stringify(fields) !== JSON.stringify(EMPTY);
   const types = useCheckTypes(open);
 
   // Every opening starts from an empty panel.
@@ -122,6 +124,7 @@ export function CreateCheckDefaultPanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("checkDefaults.create.title")}
       onClose={onClose}

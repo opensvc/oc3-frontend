@@ -55,6 +55,9 @@ export function CreateSegmentPanel({
   const [netId, setNetId] = useState("");
   // A new form after each creation: its fields start empty again.
   const [formKey, setFormKey] = useState(0);
+  // The network picked keeps the panel open on a click beside it, as the range typed
+  // in the form does (`SegmentForm`).
+  const unsaved = netId !== "";
 
   const network = networks.data?.find((row) => String(row.id) === netId);
 
@@ -80,6 +83,7 @@ export function CreateSegmentPanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("networks.segment.title")}
       onClose={onClose}

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 import type { components } from "@/lib/api/schema";
 import { api } from "@/lib/api/client";
 import { problemText } from "@/lib/api/problem";
@@ -59,6 +60,8 @@ export function FiltersetDetailPanel({
   onTabChange: (tab: string | undefined) => void;
 }) {
   const { t } = useTranslation();
+  // The filtersets are changed by a CompManager (requireCompManager).
+  const editable = useHasPrivilege(["CompManager"]);
   const queryClient = useQueryClient();
   const filterset = useFilterset(filtersetId);
   const usage = useFiltersetUsage(filtersetId);
@@ -123,13 +126,17 @@ export function FiltersetDetailPanel({
           groupPrefix="filtersets.detail.groups"
           isPending={open && filterset.isPending}
           errorMessage={filterset.isError ? filterset.error.message : null}
-          onSave={(changes) => save.mutateAsync(changes)}
-          editHint={t("filtersets.detail.editHint")}
+          onSave={editable ? (changes) => save.mutateAsync(changes) : undefined}
+          editHint={editable ? t("filtersets.detail.editHint") : ""}
         />
 
         {row !== null && row !== undefined && filtersetId !== undefined && (
           <>
-            <FiltersetComposition filtersetId={filtersetId} filtersetName={name} />
+            <FiltersetComposition
+              filtersetId={filtersetId}
+              filtersetName={name}
+              editable={editable}
+            />
 
             <section>
               <h3 className="mb-1 flex items-center gap-2 font-semibold text-ink-muted">
@@ -142,50 +149,52 @@ export function FiltersetDetailPanel({
               {used !== undefined && usedCount > 0 && <FiltersetUsageList usage={used} />}
             </section>
 
-            <div className="border-t border-line pt-3">
-              <ConfirmButton
-                icon={<TrashIcon />}
-                label={t("detail.delete")}
-                question={t("filtersets.delete.question", { name })}
-                confirmLabel={t("detail.deleteConfirm")}
-                cancelLabel={t("detail.cancel")}
-                pendingLabel={t("detail.deleting")}
-                pending={remove.isPending}
-                // The uses are read again on arming: the panel may have been open a while.
-                onArm={() => {
-                  void usage.refetch();
-                }}
-                blocked={usage.isFetching}
-                details={
-                  usage.isFetching ? (
-                    <p className="text-ink-muted">{t("usage.checking")}</p>
-                  ) : usage.isError ? (
-                    <p role="alert" className="text-state-down">
-                      ■ {t("usage.error", { message: usage.error.message })}
-                    </p>
-                  ) : used !== undefined && usedCount > 0 ? (
-                    <UsageWarning title={t("usage.filterset.warning", { count: usedCount })}>
-                      <FiltersetUsageList usage={used} consequences />
-                    </UsageWarning>
-                  ) : undefined
-                }
-                acknowledge={
-                  usage.isError
-                    ? t("usage.acknowledgeUnknown")
-                    : usedCount > 0
-                      ? t("usage.filterset.acknowledge", { count: usedCount })
-                      : undefined
-                }
-                onConfirm={() => {
-                  remove.mutate();
-                }}
-              />
-              {remove.isError && (
-                <p role="alert" className="mt-2 text-state-down">
-                  ■ {remove.error.message}
-                </p>
-              )}
-            </div>
+            {editable && (
+              <div className="border-t border-line pt-3">
+                <ConfirmButton
+                  icon={<TrashIcon />}
+                  label={t("detail.delete")}
+                  question={t("filtersets.delete.question", { name })}
+                  confirmLabel={t("detail.deleteConfirm")}
+                  cancelLabel={t("detail.cancel")}
+                  pendingLabel={t("detail.deleting")}
+                  pending={remove.isPending}
+                  // The uses are read again on arming: the panel may have been open a while.
+                  onArm={() => {
+                    void usage.refetch();
+                  }}
+                  blocked={usage.isFetching}
+                  details={
+                    usage.isFetching ? (
+                      <p className="text-ink-muted">{t("usage.checking")}</p>
+                    ) : usage.isError ? (
+                      <p role="alert" className="text-state-down">
+                        ■ {t("usage.error", { message: usage.error.message })}
+                      </p>
+                    ) : used !== undefined && usedCount > 0 ? (
+                      <UsageWarning title={t("usage.filterset.warning", { count: usedCount })}>
+                        <FiltersetUsageList usage={used} consequences />
+                      </UsageWarning>
+                    ) : undefined
+                  }
+                  acknowledge={
+                    usage.isError
+                      ? t("usage.acknowledgeUnknown")
+                      : usedCount > 0
+                        ? t("usage.filterset.acknowledge", { count: usedCount })
+                        : undefined
+                  }
+                  onConfirm={() => {
+                    remove.mutate();
+                  }}
+                />
+                {remove.isError && (
+                  <p role="alert" className="mt-2 text-state-down">
+                    ■ {remove.error.message}
+                  </p>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>

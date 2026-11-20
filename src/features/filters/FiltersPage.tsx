@@ -30,6 +30,7 @@ import { FilterDetailPanel } from "./FilterDetailPanel";
 import { FilterFormPanel } from "./FilterFormPanel";
 import { useFilter } from "./use-filter";
 import { FILTER_OPERATORS } from "./filter-definition";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type FilterRow = components["schemas"]["FilterRow"];
 
@@ -142,6 +143,8 @@ function useFilters(search: ResolvedListSearch) {
 
 export function FiltersPage() {
   const { t } = useTranslation();
+  // The filters are created by a CompManager (requireCompManager).
+  const canCreate = useHasPrivilege(["CompManager"]);
   const prefs = useViewPrefs("filters");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/filters" }), prefs),
@@ -207,17 +210,19 @@ export function FiltersPage() {
           <ObjectIcon kind="filter" className="h-5 w-5" />
           {t("filters.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setForm("create");
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("filters.form.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              // The drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setForm("create");
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("filters.form.open")}
+          </button>
+        )}
         {/* On the rows checked in the list; nothing checked, no menu. */}
         <SelectionDeleteMenu
           targets={selectedIds.map((id) => ({ id, name: names.get(id) ?? id }))}

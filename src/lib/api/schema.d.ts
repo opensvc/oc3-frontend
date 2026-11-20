@@ -2000,7 +2000,16 @@ export interface paths {
      */
     get: operations["GetClusters"];
     put?: never;
-    post?: never;
+    /**
+     * @description Declare a cluster the collector provisions: its name, the app of its
+     *     nodes and its heartbeats. Without cluster_id a new cluster is declared,
+     *     its id generated, its first bootstrapped node creating it; with the id
+     *     of a cluster reporting already, its nodes are the seed and every node
+     *     bootstrapped joins it. Declare its nodes with POST /nodes (cluster_id),
+     *     then issue their tokens (POST /nodes/{node_id}/bootstrap_token).
+     *     Manager or NodeManager.
+     */
+    post: operations["PostClusters"];
     delete?: never;
     options?: never;
     head?: never;
@@ -2018,7 +2027,17 @@ export interface paths {
     get: operations["GetCluster"];
     put?: never;
     post?: never;
-    delete?: never;
+    /**
+     * @description Delete a cluster from the collector: its nodes and its services, with
+     *     everything that refers to them (instances, resources, alerts, checks,
+     *     packages, tags, registrations…), its heartbeats, its declaration with
+     *     its bootstrap tokens and enrollments, and the om3 grants given on it.
+     *     The history of its orchestration runs stays. The agents of a cluster
+     *     still running must register again to report. NodeManager privilege,
+     *     and responsibility for every node and service of the cluster (a
+     *     Manager is responsible for them all).
+     */
+    delete: operations["DeleteCluster"];
     options?: never;
     head?: never;
     patch?: never;
@@ -7750,6 +7769,77 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/scheduler/runs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description List the runs of the scheduler tasks and subtasks of the last 7 days,
+     *     the last first: filter on task_name for the runs of a task, on status
+     *     (ok or failed) for the failures. Requires a user authentication.
+     */
+    get: operations["GetSchedulerRuns"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/scheduler/tasks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description List the tasks of the scheduler and their subtasks, as the scheduler
+     *     declared them at its last start: a subtask is named
+     *     "<task>: <subtask>" and has its task as parent. Each has its period
+     *     and timeout in seconds, whether it is disabled, its last run (status,
+     *     begin, duration, error), its next run for an enabled task, and the
+     *     count, failures and durations of its runs of the last 24 hours.
+     *     Requires a user authentication.
+     */
+    get: operations["GetSchedulerTasks"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/scheduler/tasks/{task_name}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A task or a subtask of the scheduler. Requires a user authentication. */
+    get: operations["GetSchedulerTask"];
+    /**
+     * @description Disable or enable a task of the scheduler. The scheduler reads the
+     *     flag every 5 seconds: it stops a disabled task, interrupting a run in
+     *     progress, and starts an enabled one, which runs at the end of its
+     *     period from its last run. A subtask runs with its task and can not be
+     *     disabled alone. Requires the Manager privilege. The action is logged
+     *     in the collector's log.
+     */
+    put: operations["PutSchedulerTask"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/search": {
     parameters: {
       query?: never;
@@ -9356,6 +9446,226 @@ export interface paths {
     get: operations["GetWorkflows"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/auth/node/bootstrap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * @description A node being provisioned trades the bootstrap token issued for it
+     *     (POST /nodes/{node_id}/bootstrap_token) for its collector credentials
+     *     and the configuration of its declared cluster. The token is the
+     *     credential: it is used once, for the nodename it was issued for.
+     *
+     *     The first node of a cluster without seed is elected seed: it creates the
+     *     cluster. The others join it, enrolled by a member (POST
+     *     /clusters/{cluster_id}/enrollments). The uuid returned replaces any
+     *     previous registration of the node.
+     */
+    post: operations["PostAuthNodeBootstrap"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/cluster_declarations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description The declared clusters, by name, with their nodes declared and reporting
+     *     and their pending enrollments. Manager or NodeManager.
+     */
+    get: operations["GetClusterDeclarations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/clusters/{cluster_id}/declaration": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description The declaration of a cluster: what the collector provisions its nodes
+     *     with (name, app, heartbeats) and the node elected to create it, the
+     *     seed. Manager or NodeManager.
+     */
+    get: operations["GetClusterDeclaration"];
+    /**
+     * @description Change the app and the heartbeats of a declared cluster. The nodes
+     *     already bootstrapped keep the configuration they were given.
+     *     Manager or NodeManager.
+     */
+    put: operations["PutClusterDeclaration"];
+    post?: never;
+    /**
+     * @description Delete the declaration of a cluster, its unused bootstrap tokens and
+     *     its enrollments. The cluster, its nodes and their registrations stay.
+     *     Manager or NodeManager.
+     */
+    delete: operations["DeleteClusterDeclaration"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/clusters/{cluster_id}/declaration/nodes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description The nodes of a declared cluster, those the collector has with its
+     *     cluster_id or bootstrapped into it, with their last bootstrap token and
+     *     whether they report. Manager or NodeManager.
+     */
+    get: operations["GetClusterDeclarationNodes"];
+    put?: never;
+    /**
+     * @description Declare a node of a declared cluster: the collector creates it with the
+     *     cluster_id, the app given or the one of the declaration, the team of the
+     *     caller. A node of that name in the cluster already is returned as is;
+     *     one in another cluster is refused. Manager or NodeManager.
+     */
+    post: operations["PostClusterDeclarationNode"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/clusters/{cluster_id}/enrollments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description The last 100 enrollments of nodes into a declared cluster, newest first.
+     *     A user who sees the cluster (see GET /clusters), or a node of it.
+     */
+    get: operations["GetClusterEnrollments"];
+    put?: never;
+    /**
+     * @description A bootstrapped node asks to join its declared cluster. It hands a token
+     *     of the join role its daemon created: a member of the cluster claims the
+     *     enrollment and enrolls the node with it (om3 POST /api/cluster/enroll).
+     *     The token is kept in the cache only, until the enrollment expires
+     *     (15 minutes). A pending enrollment of the same node is replaced.
+     *
+     *     The caller is the joining node, authenticated by its credentials; its
+     *     cluster in the collector must be the one of the path, and it must not be
+     *     the seed of the cluster.
+     */
+    post: operations["PostClusterEnrollment"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/clusters/{cluster_id}/enrollments/{enrollment_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description An enrollment, the joining node polling it to wait for its join.
+     *     A user who sees the cluster, or a node of it.
+     */
+    get: operations["GetClusterEnrollment"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/clusters/{cluster_id}/enrollments/{enrollment_id}/result": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * @description The member that claimed an enrollment reports how it ended: done when
+     *     the joining node accepted the join order (om3 POST /api/cluster/enroll),
+     *     which it then carries out; failed with the error otherwise. The join is
+     *     complete when the node reports the cluster as its own.
+     */
+    post: operations["PostClusterEnrollmentResult"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/clusters/{cluster_id}/enrollments/claim": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * @description A member of the cluster claims the oldest pending enrollment of another
+     *     node, with its join token, to enroll it. 204 when none is pending.
+     *     The caller is a node, its cluster in the collector the one of the path.
+     */
+    post: operations["PostClusterEnrollmentClaim"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/nodes/{node_id}/bootstrap_token": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * @description Issue the bootstrap token of a declared node: the node must name a
+     *     cluster with a declaration. The token is shown once, kept hashed; it
+     *     revokes the unused token issued before. Manager or NodeManager.
+     */
+    post: operations["PostNodeBootstrapToken"];
     delete?: never;
     options?: never;
     head?: never;
@@ -12917,6 +13227,75 @@ export interface components {
        */
       total_size: number;
     };
+    SchedulerRunListResponse: {
+      data:
+        | components["schemas"]["SchedulerRunRow"][]
+        | {
+            [key: string]: {
+              [key: string]: number;
+            };
+          };
+      meta?: components["schemas"]["ListMeta"];
+    };
+    /**
+     * @description A run of a scheduler task or subtask. Every property is optional: the
+     *     `props` query parameter selects which columns the server returns.
+     */
+    SchedulerRunRow: {
+      begin_at?: string;
+      duration_ms?: number;
+      error?: string;
+      id?: number;
+      /** @description ok or failed. */
+      status?: string;
+      task_name?: string;
+    };
+    SchedulerTaskInput: {
+      is_disabled: boolean;
+    };
+    SchedulerTaskListResponse: {
+      data:
+        | components["schemas"]["SchedulerTaskRow"][]
+        | {
+            [key: string]: {
+              [key: string]: number;
+            };
+          };
+      meta?: components["schemas"]["ListMeta"];
+    };
+    /**
+     * @description A task or a subtask of the scheduler. Every property is optional: the
+     *     `props` query parameter selects which columns the server returns. The
+     *     dates are those of the database, as text, empty when unset.
+     */
+    SchedulerTaskRow: {
+      avg_duration_ms_24h?: number | null;
+      /** @description Whether the scheduler declared it at its last start; false for a task the code does not hold any more. */
+      declared?: boolean;
+      failures_24h?: number;
+      id?: number;
+      is_disabled?: boolean;
+      last_begin_at?: string;
+      last_duration_ms?: number | null;
+      last_error?: string;
+      /** @description When the scheduler last started the task, which the next run follows by its period. Empty for a subtask. */
+      last_run_at?: string;
+      /** @description ok or failed; empty before the first recorded run. */
+      last_status?: string;
+      max_duration_ms_24h?: number | null;
+      /** @description When the scheduler runs an enabled task next. Empty for a subtask or a disabled task. */
+      next_run_at?: string;
+      /** @description The task running this subtask, empty for a task. */
+      parent?: string;
+      /** @description Seconds between two runs, the period of its task for a subtask; 0 when not scheduled. */
+      period_s?: number;
+      runs_24h?: number;
+      task_desc?: string;
+      /** @description The name of the task, "<task>: <subtask>" for a subtask. */
+      task_name?: string;
+      /** @description Seconds a run may last. */
+      timeout_s?: number;
+    };
     /** @description The objects of one kind matching a search. */
     SearchGroup: {
       /** @description Set when the kind could not be searched. */
@@ -13734,6 +14113,142 @@ export interface components {
       status?: string;
       steps?: number;
     };
+    ClusterDeclaration: {
+      app: string;
+      cluster_id: string;
+      cluster_name: string;
+      /** Format: date-time */
+      created: string;
+      created_by: string;
+      heartbeats: components["schemas"]["ClusterHeartbeat"][];
+      seed_node_id?: string | null;
+      seed_nodename?: string | null;
+      /** Format: date-time */
+      updated: string;
+    };
+    ClusterDeclarationInput: {
+      /** @description The app of the nodes of the cluster. */
+      app?: string;
+      /** @description The id of a cluster reporting already. Omitted, a new id. */
+      cluster_id?: string;
+      cluster_name: string;
+      heartbeats?: components["schemas"]["ClusterHeartbeat"][];
+    };
+    ClusterDeclarationList: {
+      data: components["schemas"]["ClusterDeclarationSummary"][];
+    };
+    ClusterDeclarationNode: {
+      app: string;
+      /** @description The cluster the node row names now. */
+      cluster_id: string;
+      /**
+       * Format: date-time
+       * @description The last report of the node, null when it never reported.
+       */
+      last_comm?: string | null;
+      node_id: string;
+      nodename: string;
+      seed: boolean;
+      /** Format: date-time */
+      token_created?: string | null;
+      /** Format: date-time */
+      token_expires?: string | null;
+      /** Format: date-time */
+      token_used?: string | null;
+    };
+    ClusterDeclarationNodeInput: {
+      app?: string;
+      nodename: string;
+    };
+    ClusterDeclarationNodeList: {
+      data: components["schemas"]["ClusterDeclarationNode"][];
+    };
+    ClusterDeclarationSummary: components["schemas"]["ClusterDeclaration"] & {
+      /** @description The nodes the collector has with the cluster_id. */
+      node_count: number;
+      pending_enrollments: number;
+      /** @description Those that reported to the collector. */
+      reporting_count: number;
+    };
+    ClusterDeclarationUpdate: {
+      app?: string;
+      heartbeats?: components["schemas"]["ClusterHeartbeat"][];
+    };
+    ClusterEnrollment: {
+      claimed_by?: string | null;
+      cluster_id: string;
+      /** Format: date-time */
+      created: string;
+      /** Format: date-time */
+      expires: string;
+      /** Format: int64 */
+      id: number;
+      message: string;
+      node_addr: string;
+      node_id: string;
+      nodename: string;
+      state: components["schemas"]["ClusterEnrollmentState"];
+      /** Format: date-time */
+      updated: string;
+    };
+    ClusterEnrollmentClaim: {
+      enrollment: components["schemas"]["ClusterEnrollment"];
+      join_token: string;
+    };
+    ClusterEnrollmentList: {
+      data: components["schemas"]["ClusterEnrollment"][];
+    };
+    ClusterEnrollmentRequest: {
+      join_token: string;
+      /** @description Where the members reach the api of the node. Its nodename by default. */
+      node_addr?: string;
+    };
+    ClusterEnrollmentResult: {
+      message?: string;
+      /** @enum {string} */
+      state: "done" | "failed";
+    };
+    /** @enum {string} */
+    ClusterEnrollmentState: "pending" | "claimed" | "done" | "failed" | "expired";
+    /**
+     * @description A hb#<n> section of the om3 cluster configuration, n its rank from 1:
+     *     its keywords and their values. type is required.
+     */
+    ClusterHeartbeat: {
+      type: string;
+    } & {
+      [key: string]: string;
+    };
+    NodeBootstrap: {
+      app: string;
+      cluster: components["schemas"]["NodeBootstrapCluster"];
+      node_id: string;
+      nodename: string;
+      /** @description The credential of the node on the collector (node.uuid). */
+      uuid: string;
+    };
+    NodeBootstrapCluster: {
+      heartbeats: components["schemas"]["ClusterHeartbeat"][];
+      id: string;
+      name: string;
+      /** @enum {string} */
+      role: "seed" | "join";
+      /** @description The node that created the cluster, when role is join. */
+      seed_nodename?: string;
+    };
+    NodeBootstrapRequest: {
+      nodename: string;
+      token: string;
+    };
+    NodeBootstrapToken: {
+      /** Format: date-time */
+      expires: string;
+      token: string;
+    };
+    NodeBootstrapTokenRequest: {
+      /** @description The lifetime of the token, 60 by default, 1440 at most. */
+      ttl_minutes?: number;
+    };
   };
   responses: {
     /** @description OK */
@@ -13875,6 +14390,8 @@ export interface components {
     inPathOrchestrationRunId: number;
     /** @description ID of the ruleset */
     inPathRsetId: string;
+    /** @description The name of a scheduler task, "<task>: <subtask>" for a subtask, url-encoded. */
+    inPathSchedulerTaskName: string;
     /** @description The object of the node, as namespace/kind/name. Default the node. */
     inQueryAgentPath: string;
     /** @description only the objects for this backend, as the MCP servers ask; all of them when absent */
@@ -13932,6 +14449,9 @@ export interface components {
     inQueryStats: string;
     inQuerySync: boolean;
     ObjectPathHeader: string;
+    /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+    inPathClusterId: string;
+    inPathEnrollmentId: number;
   };
   requestBodies: never;
   headers: never;
@@ -14009,6 +14529,186 @@ export interface operations {
           "application/json": components["schemas"]["ListResponse"];
         };
       };
+      500: components["responses"]["500"];
+    };
+  };
+  GetSchedulerRuns: {
+    parameters: {
+      query?: {
+        /**
+         * @description Column filter, repeatable; several filters combine with AND. Each value is
+         *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+         *     for orderby) and `expr` one of:
+         *       - text: case-insensitive match anywhere in the value;
+         *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+         *       - `in:a,b,c`: one of the listed values;
+         *       - `eq:v`, `ne:v`: equal, not equal;
+         *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+         *         a date may be relative to now, `-` then a duration in weeks, days,
+         *         hours, minutes and seconds: `lt:-15m` keeps the dates older than 15
+         *         minutes, `gte:-1d12h` those of the last day and a half;
+         *       - `empty`: no value;
+         *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+         *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+         *         `!empty` (any value).
+         *     An unknown property, a property without a column, or an invalid regular
+         *     expression is answered with 400.
+         */
+        filter?: components["parameters"]["inQueryFilter"];
+        /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+        groupby?: components["parameters"]["inQueryGroupby"];
+        /** @description The maximum number of entries to return. 0 means no limit. */
+        limit?: components["parameters"]["inQueryLimit"];
+        /**
+         * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+         *     the meta field. The metadata of a list carries its total number of rows
+         *     without pagination (total), as well as the rows returned (count), the offset
+         *     and the limit.
+         */
+        meta?: components["parameters"]["inQueryMeta"];
+        /** @description Skip the first entries of the data cursor. */
+        offset?: components["parameters"]["inQueryOffset"];
+        /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+        orderby?: components["parameters"]["inQueryOrderby"];
+        /** @description A list of properties to include in each data dictionnary. */
+        props?: components["parameters"]["inQueryProps"];
+        /**
+         * @description With "1" or "true", the response counts the distinct values of each
+         *     selected property instead of listing the rows: `data` maps each property
+         *     to an object of value → number of rows ("empty" for a null or blank
+         *     value), over the whole selection (access control, filters and session
+         *     filterset applied, `offset` ignored). `limit`, when given, caps the
+         *     number of values returned per property, the most frequent first; without
+         *     it every value is returned. `meta.total` is the number of rows,
+         *     `meta.distinct` the number of distinct values of each property, and
+         *     `meta.other` the number of rows whose value was left out by the limit.
+         *     A count taking longer than 5 seconds is refused with a 400, asking to
+         *     narrow the selection.
+         */
+        stats?: components["parameters"]["inQueryStats"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SchedulerRunListResponse"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      500: components["responses"]["500"];
+    };
+  };
+  GetSchedulerTask: {
+    parameters: {
+      query?: {
+        /** @description A list of properties to include in each data dictionnary. */
+        props?: components["parameters"]["inQueryProps"];
+      };
+      header?: never;
+      path: {
+        /** @description The name of a scheduler task, "<task>: <subtask>" for a subtask, url-encoded. */
+        task_name: components["parameters"]["inPathSchedulerTaskName"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SchedulerTaskListResponse"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      404: components["responses"]["404"];
+      500: components["responses"]["500"];
+    };
+  };
+  GetSchedulerTasks: {
+    parameters: {
+      query?: {
+        /**
+         * @description Column filter, repeatable; several filters combine with AND. Each value is
+         *     `prop:expr`, `prop` being a property of the list (joined ones included, as
+         *     for orderby) and `expr` one of:
+         *       - text: case-insensitive match anywhere in the value;
+         *       - `~regex`: regular expression (RE2 syntax), case-insensitive;
+         *       - `in:a,b,c`: one of the listed values;
+         *       - `eq:v`, `ne:v`: equal, not equal;
+         *       - `gt:v`, `gte:v`, `lt:v`, `lte:v`: comparisons, for numbers and dates;
+         *         a date may be relative to now, `-` then a duration in weeks, days,
+         *         hours, minutes and seconds: `lt:-15m` keeps the dates older than 15
+         *         minutes, `gte:-1d12h` those of the last day and a half;
+         *       - `empty`: no value;
+         *       - `!expr`: the inverse of any of the above, that is the rows `expr` leaves
+         *         out, those without a value included: `!dev`, `!~^dev`, `!in:a,b`,
+         *         `!empty` (any value).
+         *     An unknown property, a property without a column, or an invalid regular
+         *     expression is answered with 400.
+         */
+        filter?: components["parameters"]["inQueryFilter"];
+        /** @description Comma-separated list of properties to group the result by (e.g. groupby=app,svcname). */
+        groupby?: components["parameters"]["inQueryGroupby"];
+        /** @description The maximum number of entries to return. 0 means no limit. */
+        limit?: components["parameters"]["inQueryLimit"];
+        /**
+         * @description Include metadata in the response. Enabled by default. Use false or 0 to omit
+         *     the meta field. The metadata of a list carries its total number of rows
+         *     without pagination (total), as well as the rows returned (count), the offset
+         *     and the limit.
+         */
+        meta?: components["parameters"]["inQueryMeta"];
+        /** @description Skip the first entries of the data cursor. */
+        offset?: components["parameters"]["inQueryOffset"];
+        /** @description Comma-separated list of properties to sort by. Prefix a property with - for descending order (e.g. orderby=nodename,-app). */
+        orderby?: components["parameters"]["inQueryOrderby"];
+        /** @description A list of properties to include in each data dictionnary. */
+        props?: components["parameters"]["inQueryProps"];
+        /**
+         * @description With "1" or "true", the response counts the distinct values of each
+         *     selected property instead of listing the rows: `data` maps each property
+         *     to an object of value → number of rows ("empty" for a null or blank
+         *     value), over the whole selection (access control, filters and session
+         *     filterset applied, `offset` ignored). `limit`, when given, caps the
+         *     number of values returned per property, the most frequent first; without
+         *     it every value is returned. `meta.total` is the number of rows,
+         *     `meta.distinct` the number of distinct values of each property, and
+         *     `meta.other` the number of rows whose value was left out by the limit.
+         *     A count taking longer than 5 seconds is refused with a 400, asking to
+         *     narrow the selection.
+         */
+        stats?: components["parameters"]["inQueryStats"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SchedulerTaskListResponse"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
       500: components["responses"]["500"];
     };
   };
@@ -30581,6 +31281,31 @@ export interface operations {
       500: components["responses"]["500"];
     };
   };
+  DeleteCluster: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      500: components["responses"]["500"];
+    };
+  };
   DeleteNode: {
     parameters: {
       query?: never;
@@ -38362,6 +39087,38 @@ export interface operations {
       500: components["responses"]["500"];
     };
   };
+  PutSchedulerTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description The name of a scheduler task, "<task>: <subtask>" for a subtask, url-encoded. */
+        task_name: components["parameters"]["inPathSchedulerTaskName"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SchedulerTaskInput"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SchedulerTaskListResponse"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      500: components["responses"]["500"];
+    };
+  };
   PutServiceStatusLogAck: {
     parameters: {
       query?: never;
@@ -41017,6 +41774,415 @@ export interface operations {
         };
       };
       401: components["responses"]["401"];
+      500: components["responses"]["500"];
+    };
+  };
+  PostAuthNodeBootstrap: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["NodeBootstrapRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["NodeBootstrap"];
+        };
+      };
+      400: components["responses"]["400"];
+      403: components["responses"]["403"];
+      500: components["responses"]["500"];
+    };
+  };
+  GetClusterDeclarations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterDeclarationList"];
+        };
+      };
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      500: components["responses"]["500"];
+    };
+  };
+  PostClusters: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClusterDeclarationInput"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterDeclaration"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      409: components["responses"]["409"];
+      500: components["responses"]["500"];
+    };
+  };
+  GetClusterDeclaration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterDeclaration"];
+        };
+      };
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      500: components["responses"]["500"];
+    };
+  };
+  PutClusterDeclaration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClusterDeclarationUpdate"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterDeclaration"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      500: components["responses"]["500"];
+    };
+  };
+  DeleteClusterDeclaration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      500: components["responses"]["500"];
+    };
+  };
+  GetClusterDeclarationNodes: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterDeclarationNodeList"];
+        };
+      };
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      500: components["responses"]["500"];
+    };
+  };
+  PostClusterDeclarationNode: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClusterDeclarationNodeInput"];
+      };
+    };
+    responses: {
+      /** @description Created, or found in the cluster */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterDeclarationNode"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      409: components["responses"]["409"];
+      500: components["responses"]["500"];
+    };
+  };
+  GetClusterEnrollments: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterEnrollmentList"];
+        };
+      };
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      500: components["responses"]["500"];
+    };
+  };
+  PostClusterEnrollment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClusterEnrollmentRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterEnrollment"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      500: components["responses"]["500"];
+    };
+  };
+  GetClusterEnrollment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+        enrollment_id: components["parameters"]["inPathEnrollmentId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterEnrollment"];
+        };
+      };
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      500: components["responses"]["500"];
+    };
+  };
+  PostClusterEnrollmentResult: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+        enrollment_id: components["parameters"]["inPathEnrollmentId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClusterEnrollmentResult"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterEnrollment"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      409: components["responses"]["409"];
+      500: components["responses"]["500"];
+    };
+  };
+  PostClusterEnrollmentClaim: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Cluster identifier (clusters.cluster_id, a uuid) */
+        cluster_id: components["parameters"]["inPathClusterId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Claimed */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClusterEnrollmentClaim"];
+        };
+      };
+      /** @description No pending enrollment */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      500: components["responses"]["500"];
+    };
+  };
+  PostNodeBootstrapToken: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description ID of the node */
+        node_id: components["parameters"]["inPathNodeId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["NodeBootstrapTokenRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["NodeBootstrapToken"];
+        };
+      };
+      400: components["responses"]["400"];
+      401: components["responses"]["401"];
+      403: components["responses"]["403"];
+      404: components["responses"]["404"];
+      409: components["responses"]["409"];
       500: components["responses"]["500"];
     };
   };

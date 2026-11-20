@@ -75,6 +75,7 @@ export function MetricFormPanel({
   useEffect(() => {
     if (open) setDraft(fromRow(metric));
   }, [open, metric]);
+  const unsaved = JSON.stringify(draft) !== JSON.stringify(fromRow(metric));
 
   const save = useMutation({
     mutationFn: async () => {
@@ -120,9 +121,9 @@ export function MetricFormPanel({
 
   return (
     <SlideOver
-      // Created like the other objects, closing on a click beside it; an existing one
-      // being edited is not dropped by a stray click.
-      closeOnOutsideClick={!editing}
+      // Closes on a click beside it as the other panels, unless it holds an entry not
+      // saved yet: a stray click does not drop it.
+      closeOnOutsideClick={!unsaved}
       open={open}
       size="wide"
       title={editing ? t("metrics.form.editTitle") : t("metrics.form.createTitle")}

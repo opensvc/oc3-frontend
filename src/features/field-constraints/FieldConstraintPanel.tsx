@@ -88,6 +88,14 @@ export function FieldConstraintPanel({
   const [text, setText] = useState("");
   const [pattern, setPattern] = useState("");
   const [sample, setSample] = useState("");
+  // An entry not saved yet keeps the panel open on a click beside it; the sample
+  // value tried against the pattern is not saved, so it does not count.
+  const unsaved =
+    chosenKind !== "" ||
+    chosen !== "" ||
+    mode !== (constraint?.mode ?? "suggest") ||
+    text !== (constraint?.values.join("\n") ?? "") ||
+    pattern !== (constraint?.pattern ?? "");
   const field = constraint?.field ?? chosen;
   const kind = constraint?.object_kind ?? (chosenKind === "" ? undefined : chosenKind);
   // For a new constraint, the attributes of the panel chosen still free text.
@@ -187,7 +195,7 @@ export function FieldConstraintPanel({
       closeLabel={t("detail.close")}
       resizeLabel={t("detail.resize")}
       leading={<ObjectIcon kind="fieldConstraint" />}
-      closeOnOutsideClick={false}
+      closeOnOutsideClick={!unsaved}
     >
       <form onSubmit={onSubmit} className="flex flex-col gap-3">
         {creating && (

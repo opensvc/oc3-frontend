@@ -36,6 +36,7 @@ import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { CreateNodePanel } from "./CreateNodePanel";
 import { NODE_PROPS } from "./node-props";
 import { NodeDetailPanel } from "./NodeDetailPanel";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type NodeRow = components["schemas"]["NodeRow"];
 
@@ -317,6 +318,8 @@ const FILTERSET_SOURCE: FiltersetSource = { table: "nodes", selects: "nodes" };
 
 export function NodesPage() {
   const { t } = useTranslation();
+  // The nodes are created by a NodeManager (POST /nodes).
+  const canCreate = useHasPrivilege(["NodeManager"]);
   const prefs = useViewPrefs("nodes");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/nodes" }), prefs),
@@ -375,17 +378,19 @@ export function NodesPage() {
           <ObjectIcon kind="node" className="h-5 w-5" />
           {t("nodes.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The two drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setCreating(true);
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("nodes.create.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              // The two drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setCreating(true);
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("nodes.create.open")}
+          </button>
+        )}
         <NodeActionsMenu
           nodes={selectedIds.map((id) => ({ id, name: nodeNames[id] ?? id }))}
           onDeleted={(ids) => {

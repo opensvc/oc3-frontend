@@ -38,6 +38,9 @@ export function CreateQuotaPanel({
   const [dgId, setDgId] = useState("");
   const [app, setApp] = useState("");
   const [value, setValue] = useState<SizeValue>({ amount: "", unit: "TiB" });
+  // An entry not saved yet keeps the panel open on a click beside it; the array alone,
+  // kept from a quota to the next, does not count.
+  const unsaved = dgId !== "" || app !== "" || value.amount !== "";
   const diskGroups = useDiskGroups(arrayId === "" ? undefined : arrayId);
   const dg = diskGroups.data?.find((d) => String(d.id) === dgId);
   const existing = useDiskGroupQuotas(arrayId, dgId);
@@ -72,6 +75,7 @@ export function CreateQuotaPanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("quotas.create.title")}
       onClose={onClose}

@@ -12,6 +12,7 @@ import { formatCapacityMiB } from "@/lib/format";
 import { QuotaUsage, SizeInput } from "./quota-parts";
 import { sizeMiB, toSizeValue } from "./quota-size";
 import { changeQuota, deleteQuota, useQuota, type QuotaRow } from "./use-quotas";
+import { useReportDirty } from "@/components/ui/use-report-dirty";
 
 /**
  * A quota: where it is, for which application, how much of it the
@@ -152,6 +153,8 @@ function QuotaEdit({
   const [done, setDone] = useState<string | null>(null);
   const mib = sizeMiB(value);
   const changed = (mib !== undefined && mib !== row.quota) || (app !== "" && app !== row.app);
+  // A change not saved yet keeps the drawer open on a click beside it.
+  useReportDirty(changed);
 
   const save = useMutation({
     mutationFn: () =>

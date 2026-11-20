@@ -7,7 +7,7 @@ import { useCluster } from "./use-cluster";
 /**
  * A cluster: its identity, the nodes and services of the collector that name it,
  * each count a link to their list filtered on it, and the state its daemon last
- * pushed. Nothing is edited here.
+ * pushed. Nothing is edited here; its actions menu deletes it from the collector.
  */
 export function ClusterDetailPanel({
   clusterId,
@@ -41,7 +41,7 @@ export function ClusterDetailPanel({
           // The API checks the rights, node by node of the cluster, and says why it
           // refuses: the interface does not know the caller's privileges.
           <div className="mb-4">
-            <ClusterActionsMenu clusters={[{ id: clusterId, name: title }]} />
+            <ClusterActionsMenu clusters={[{ id: clusterId, name: title }]} onDeleted={onClose} />
           </div>
         )
       }

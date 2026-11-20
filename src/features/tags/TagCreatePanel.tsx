@@ -73,6 +73,8 @@ export function TagCreatePanel({
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [fields, setFields] = useState<TagFields>(EMPTY);
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = JSON.stringify(fields) !== JSON.stringify(EMPTY);
 
   // Every opening starts from an empty panel.
   useEffect(() => {
@@ -126,6 +128,7 @@ export function TagCreatePanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("tags.create.title")}
       onClose={onClose}

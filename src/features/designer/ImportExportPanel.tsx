@@ -60,6 +60,8 @@ export function ImportExportPanel({
   const id = useId();
   const [text, setText] = useState("");
   const [fileError, setFileError] = useState<string | null>(null);
+  // An entry not saved yet keeps the panel open on a click beside it.
+  const unsaved = text !== "";
   const parsed = parseDump(text);
 
   // The download of the compliance as the collector holds it, in the import's format.
@@ -114,6 +116,7 @@ export function ImportExportPanel({
 
   return (
     <SlideOver
+      closeOnOutsideClick={!unsaved}
       open={open}
       title={t("designer.dump.title")}
       onClose={onClose}

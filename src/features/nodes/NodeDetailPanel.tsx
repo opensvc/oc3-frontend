@@ -14,6 +14,8 @@ import { OsLogo } from "@/components/opensvc/OsLogo";
 import { useTeams } from "@/features/groups/use-teams";
 import { useAppCodes } from "@/features/apps/use-app-codes";
 import { useTagEdit } from "@/features/tags/use-tag-edit";
+import { useAmIResponsible } from "@/lib/api/am-i-responsible";
+import { hasPrivilege, useEffectivePrivileges } from "@/lib/api/effective-privileges";
 import {
   useFieldConstraints,
   valueLists,
@@ -329,6 +331,14 @@ export function NodeDetailPanel({
   const teams = useTeams();
   const appCodes = useAppCodes();
   const tagEdit = useTagEdit("node", nodeId);
+  // The properties are changed by a NodeManager responsible for the node, as
+  // POST /nodes/{node_id} requires: the others read them.
+  const responsible = useAmIResponsible("node", nodeId, open);
+  const privileges = useEffectivePrivileges();
+  const editable =
+    responsible.data === true &&
+    privileges.data !== undefined &&
+    hasPrivilege(privileges.data, ["NodeManager"]);
   // The values a Manager configured for some attributes, offered when editing them.
   const constraints = useFieldConstraints("node");
 
@@ -370,7 +380,7 @@ export function NodeDetailPanel({
         options={{ teams: teams.data ?? [], apps: appCodes.data ?? [], actionTypes: ACTION_TYPES }}
         valueLists={valueLists(constraints.data?.data)}
         row={node}
-        onSave={(changes) => save.mutateAsync(changes)}
+        onSave={editable ? (changes) => save.mutateAsync(changes) : undefined}
         labelPrefix="nodes.fields"
         groupPrefix="nodes.detail.groups"
         isPending={open && isPending}

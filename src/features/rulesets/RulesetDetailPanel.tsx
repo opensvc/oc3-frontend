@@ -36,6 +36,7 @@ import {
   type RulesetRecord,
   type RulesetVariable,
 } from "./use-ruleset";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 const text = (prop: keyof RulesetRecord) => (row: RulesetRecord) => {
   const value = row[prop];
@@ -82,7 +83,9 @@ export function RulesetDetailPanel({
   const { t } = useTranslation();
   const detail = useRuleset(rsetId);
   const responsible = useRulesetResponsible(rsetId);
-  const editable = responsible.data === true;
+  // Changed by a CompManager responsible for the ruleset, as the API requires.
+  const compManager = useHasPrivilege(["CompManager"]);
+  const editable = responsible.data === true && compManager;
   const changed = useRulesetChanged();
   const { outcome, busy, change, dismiss } = useChanges(async () => {
     if (rsetId !== undefined) await changed(rsetId);

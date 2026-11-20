@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { components } from "@/lib/api/schema";
-import { hasPrivilege, useEffectivePrivileges } from "@/lib/api/effective-privileges";
 import { useAmIResponsible } from "@/lib/api/am-i-responsible";
 import {
   attachComp,
@@ -51,17 +50,13 @@ function RunOutput({ value }: { value: string | undefined }) {
 
 /**
  * Whether the user may attach and detach the modulesets and rulesets of a node or
- * a service: a Manager or a CompExec, responsible for the object, as the historical
- * collector offered it. The collector checks the responsibility again on each
- * change.
+ * a service: a user responsible for the object, as the API requires. The collector
+ * checks the responsibility again on each change.
  */
 function useCanEditCompliance(target: CompTarget, readOnly: boolean) {
-  const privileges = useEffectivePrivileges();
-  const privileged =
-    !readOnly && privileges.data !== undefined && hasPrivilege(privileges.data, ["CompExec"]);
   // The same question as the tags of the object, from the same cache.
-  const responsible = useAmIResponsible(target.kind, target.id, privileged);
-  return privileged && responsible.data === true;
+  const responsible = useAmIResponsible(target.kind, target.id, !readOnly);
+  return !readOnly && responsible.data === true;
 }
 
 /**

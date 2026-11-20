@@ -23,6 +23,7 @@ import { useViewPrefs, withSavedSearch } from "@/lib/user-prefs";
 import { ChartCreatePanel } from "./ChartCreatePanel";
 import { ChartDetailPanel } from "./ChartDetailPanel";
 import { useChart } from "./use-chart";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 type ChartRow = components["schemas"]["ChartRow"];
 
@@ -132,6 +133,8 @@ function useCharts(search: ResolvedListSearch) {
  */
 export function ChartsPage() {
   const { t } = useTranslation();
+  // The charts are created by a ReportsManager.
+  const canCreate = useHasPrivilege(["ReportsManager"]);
   const prefs = useViewPrefs("charts");
   const search = resolveListSearch(
     withSavedSearch(useSearch({ from: "/charts" }), prefs),
@@ -176,17 +179,19 @@ export function ChartsPage() {
           <ObjectIcon kind="chart" className="h-5 w-5" />
           {t("charts.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            // The drawers share the right edge: opening the creation closes the detail.
-            update({ sel: undefined });
-            setForm("create");
-          }}
-          className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
-        >
-          {t("charts.form.open")}
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => {
+              // The drawers share the right edge: opening the creation closes the detail.
+              update({ sel: undefined });
+              setForm("create");
+            }}
+            className="h-7 rounded-(--radius-control) bg-accent px-3 font-medium text-accent-ink"
+          >
+            {t("charts.form.open")}
+          </button>
+        )}
       </div>
       <p className="mb-3 max-w-3xl text-ink-muted">{t("charts.intro")}</p>
 

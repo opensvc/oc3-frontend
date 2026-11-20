@@ -26,6 +26,7 @@ import {
   useSafeUsage,
   type SafeFileRow,
 } from "./use-safe";
+import { useHasPrivilege } from "@/lib/api/effective-privileges";
 
 const text = (prop: keyof SafeFileRow) => (row: SafeFileRow) => {
   const value = row[prop];
@@ -266,6 +267,8 @@ export function SafeDetailPanel({
   const { data: file, isPending, isError, error } = useSafeFile(fileId);
   const responsible = useSafeResponsible(fileId);
   const editable = responsible.data === true;
+  // A new version is stored by a SafeUploader, as any upload.
+  const uploader = useHasPrivilege(["SafeUploader"]);
   const groups = useComplianceGroups();
   const [newVersion, setNewVersion] = useState(false);
   const [teamError, setTeamError] = useState<string | null>(null);
@@ -362,7 +365,7 @@ export function SafeDetailPanel({
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-start gap-2">
                 <DownloadButton row={file} />
-                {editable && !newVersion && (
+                {editable && uploader && !newVersion && (
                   <button
                     type="button"
                     onClick={() => {

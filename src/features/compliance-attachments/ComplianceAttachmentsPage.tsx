@@ -319,7 +319,7 @@ function attachmentActions(
   return [
     {
       key: "attach",
-      privileges: ["CompExec"],
+      privileges: [],
       tone: "change",
       choice: {
         queryKey: ["compliance-attachments", "objects", table.object],
@@ -365,7 +365,7 @@ function attachmentActions(
     },
     {
       key: "detach",
-      privileges: ["CompExec"],
+      privileges: [],
       runAll: async (targets) => {
         const chosen: AttachmentRow[] = [];
         const failures: string[] = [];
