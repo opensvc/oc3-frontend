@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/icons";
 import { dateTimeFormat } from "@/lib/date-format";
 import { AnswerFeedback } from "./AnswerFeedback";
-import { type AssistantClient, type Conversation } from "./assistant-client";
+import { AssistantError, type AssistantClient, type Conversation } from "./assistant-client";
 import { Composer } from "./Composer";
 import { ConfirmationCard } from "./ConfirmationCard";
 import { groupConversations, useConversationsOpen } from "./conversations";
@@ -26,7 +26,8 @@ import { AnswerFooter, AnswerSteps, TARGET_ARGUMENTS, TargetBadge } from "./Step
 import { ToolsDialog } from "./ToolsDialog";
 import { AssistantChatProvider } from "./assistant-chat-context";
 import { useSharedAssistantChat } from "./assistant-chat";
-import { type AssistantChat, type ChatMessage } from "./use-assistant-chat";
+import { useConversationExport } from "./ConversationExport";
+import { type AssistantChat, type ChatMessage, type Rating } from "./use-assistant-chat";
 import { codeSpans, useTargets } from "./use-targets";
 import { useToolDocs } from "./use-tool-docs";
 
@@ -86,9 +87,10 @@ function AssistantView({ client, initialPrompt, onPromptTaken }: AssistantProps)
   const { attach } = shared;
   useEffect(() => attach(), [attach]);
   const toolDocs = useToolDocs(client, chat.confirmation !== null);
+  const conversationExport = useConversationExport();
   const panel = useConversationsOpen();
   const [search, setSearch] = useState("");
-  const { setDraft } = shared;
+  const { setDraft, setDraftSkill } = shared;
   const [dialog, setDialog] = useState<Dialog>("");
   // The dialog of the composer replacing the message queued is open.
   const [replacing, setReplacing] = useState(false);
@@ -375,6 +377,7 @@ function AssistantView({ client, initialPrompt, onPromptTaken }: AssistantProps)
             )
           )}
           <div className="ml-auto flex gap-2">
+            {conversationExport.menu}
             <button
               type="button"
               aria-label={t("assistant.tips.open")}
@@ -444,7 +447,9 @@ function AssistantView({ client, initialPrompt, onPromptTaken }: AssistantProps)
           {empty && (
             <EmptyState
               onPick={(text) => {
+                // A question of its own, as one another page asks: no procedure.
                 setDraft(text);
+                setDraftSkill(null);
                 composer.current?.focus();
               }}
             />
@@ -498,8 +503,10 @@ function AssistantView({ client, initialPrompt, onPromptTaken }: AssistantProps)
             {t(`assistant.notice.${chat.notice}`)}
           </p>
         )}
+        {conversationExport.notices}
         <Composer inputRef={composer} onReplacingChange={setReplacing} />
       </section>
+      {conversationExport.frame}
 
       {dialog !== "" && (
         <Modal
@@ -638,7 +645,19 @@ export function UserMessage({
         <span aria-hidden="true">{t("assistant.message.you")}</span>
         <span className="sr-only">{t("assistant.you")}</span>
       </p>
-      <p className="[overflow-wrap:anywhere] whitespace-pre-wrap text-ink">{message.text}</p>
+      {/* The procedure the message asked. */}
+      {message.skill !== undefined && (
+        <p className="mb-1 flex flex-wrap items-center gap-1 text-data">
+          <span className="text-ink-muted">{t("assistant.skills.tag")}</span>{" "}
+          <span className="rounded-(--radius-control) border border-line bg-surface-raised px-1.5 font-mono [overflow-wrap:anywhere]">
+            /{message.skill}
+          </span>
+        </p>
+      )}
+      {/* Sent without words, the message is the procedure named, told above. */}
+      {(message.skill === undefined || message.text !== `/${message.skill}`) && (
+        <p className="[overflow-wrap:anywhere] whitespace-pre-wrap text-ink">{message.text}</p>
+      )}
       {!Number.isNaN(date.getTime()) && (
         <time
           dateTime={date.toISOString()}
@@ -684,6 +703,14 @@ export function Answer({
       {message.text !== "" && (
         <Markdown
           text={message.text}
+          copyCode={{
+            streaming: message.status === "running",
+            labels: {
+              copy: t("assistant.message.copyCode"),
+              copied: t("assistant.message.codeCopied"),
+              failed: t("assistant.message.codeCopyFailed"),
+            },
+          }}
           renderCode={(code) =>
             targets.has(code) ? <TargetBadge value={code} targets={targets} /> : undefined
           }
@@ -696,14 +723,31 @@ export function Answer({
         <p className="text-state-warn">{t(`assistant.message.${message.status}`)}</p>
       )}
       {message.status !== "running" && <AnswerFooter message={message} />}
-      {rateable && turnId !== undefined && (
+      {/* The feedback the operator turned off is not shown, not even one given before. */}
+      {rateable && chat.feedbackEnabled && turnId !== undefined && (
         <AnswerFeedback
           rating={chat.ratings[turnId]}
           onRate={(feedback) => chat.rate(turnId, feedback)}
           onUnrate={() => chat.unrate(turnId)}
         />
       )}
+      {/* Turned off while the user rated this answer: the rating goes, the reason stays. */}
+      {rateable && !chat.feedbackEnabled && turnId !== undefined && (
+        <FeedbackTurnedOff rating={chat.ratings[turnId]} />
+      )}
     </AssistantMessage>
+  );
+}
+
+/** Why the rating of an answer went: the agent refused it as turned off. */
+function FeedbackTurnedOff({ rating }: { rating: Rating | undefined }) {
+  const { t } = useTranslation();
+  const error = rating?.error;
+  if (!(error instanceof AssistantError) || error.code !== "feedback_disabled") return null;
+  return (
+    <p role="alert" className="text-state-down">
+      ■ {t("assistant.feedback.failed", { message: errorText(t, error) })}
+    </p>
   );
 }
 

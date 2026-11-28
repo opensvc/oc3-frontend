@@ -1223,6 +1223,64 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/assistant/models": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description The models the runs of the caller choose from, the default first: their
+     *     ID, which the forwardedProps.model of a run names, their label, whether
+     *     each is the default, and whether the caller can run on it. An agent that
+     *     offers no choice does not tell custom.models in its capabilities.
+     *
+     *     Relayed by oc3 to the AI agent, at the base_url and path of
+     *     server.assistant, with the access token of the caller's single sign-on
+     *     session, or the bearer token of the request; nothing else of the
+     *     browser's request is forwarded. The agent's answers and error codes are
+     *     returned as they are.
+     */
+    get: operations["GetAssistantModels"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/assistant/skills": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description The skills a run of the caller may ask, as the MCP of the collector
+     *     serves them to the user: their name, which the forwardedProps.skill of
+     *     a run names, and their description, at most 32. The procedure of an
+     *     asked skill is loaded by the agent before the model answers. An agent
+     *     that offers no such choice does not tell custom.skills in its
+     *     capabilities.
+     *
+     *     Relayed by oc3 to the AI agent, at the base_url and path of
+     *     server.assistant, with the access token of the caller's single sign-on
+     *     session, or the bearer token of the request; nothing else of the
+     *     browser's request is forwarded. The agent's answers and error codes are
+     *     returned as they are.
+     */
+    get: operations["GetAssistantSkills"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/assistant/status": {
     parameters: {
       query?: never;
@@ -10057,8 +10115,12 @@ export interface components {
       /** @description On an assistant message, the feedback of the user on its turn, if any. */
       feedback?: components["schemas"]["AssistantFeedback"];
       id: string;
+      /** @description On the last assistant message of a turn, the id of the model the turn last ran on; absent for a turn recorded before. */
+      model_id?: string;
       /** @enum {string} */
       role: "user" | "assistant";
+      /** @description On the message of the user that starts a turn, the name of the skill it asked with forwardedProps.skill, which the agent loaded first; absent when it asked none, or for a turn recorded before. */
+      skill?: string;
       text: string;
       turn_id: string;
     };
@@ -10067,6 +10129,30 @@ export interface components {
       messages: components["schemas"]["AssistantMessage"][];
       /** @description Pass it as `before` to read the previous page; empty when there is none. */
       next_cursor: string;
+    };
+    AssistantModel: {
+      /** @description Whether a run that names no model runs on it. */
+      default: boolean;
+      /** @description The ID of the model, opaque, for forwardedProps.model. */
+      id: string;
+      /** @description The name to show. */
+      label: string;
+      /** @description Whether the caller can run on it. */
+      ready: boolean;
+    };
+    /** @description The skills a run may ask, as the agent gives them. */
+    AssistantSkills: {
+      skills: components["schemas"]["AssistantSkill"][];
+    };
+    AssistantSkill: {
+      /** @description The name of the skill, for forwardedProps.skill. */
+      name: string;
+      /** @description What the skill does, at most 300 bytes. */
+      description: string;
+    };
+    /** @description The models the agent offers, as it gives them. */
+    AssistantModels: {
+      models: components["schemas"]["AssistantModel"][];
     };
     /**
      * @description One AG-UI event of a run. RUN_STARTED, then the answers of the model
@@ -10133,10 +10219,25 @@ export interface components {
     /**
      * @description The AG-UI RunAgentInput of a run. The agent reads threadId, runId,
      *     protocolVersion, the last message, a message of the user, the ids of the
-     *     others, the tools of the client and resume; not the state, the context or
-     *     the forwarded properties.
+     *     others, the tools of the client, resume, and of the forwarded properties
+     *     model and skill; not the state, nor the context.
      */
     AssistantRunInput: {
+      /**
+       * @description Properties for the agent. model, the id of a model GET
+       *     /assistant/models lists, chooses the model a new turn runs on; absent,
+       *     the default model. A resumed turn keeps the model it started on. A
+       *     model the agent does not offer is refused with 400 model_unknown.
+       *     skill, the name of a skill GET /assistant/skills lists, has the
+       *     agent load its procedure before the model answers a new turn;
+       *     absent or null, none. A name not shaped as one is refused with 400
+       *     invalid_skill; a skill the user is not served, or whose load is
+       *     refused, fails the run with RUN_ERROR skill_unavailable.
+       */
+      forwardedProps?: {
+        model?: string;
+        skill?: string | null;
+      };
       messages: components["schemas"]["AssistantRunMessage"][];
       /** @description The version of AG-UI the client speaks, MAJOR.MINOR. */
       protocolVersion?: string;
@@ -18467,6 +18568,136 @@ export interface operations {
         };
       };
       /** @description The agent could not be reached, or answered badly (assistant_unreachable). */
+      502: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+      /** @description The agent is unavailable. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+    };
+  };
+  GetAssistantModels: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The models. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantModels"];
+        };
+      };
+      /** @description No access token for the caller (assistant_token_unavailable), or the agent refused it. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+      /** @description Not while impersonating (assistant_forbidden). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+      /** @description The assistant is not configured (assistant_disabled). */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+      /** @description The agent could not be reached, or answered badly (assistant_unreachable). */
+      502: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+      /** @description The agent is unavailable. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+    };
+  };
+  GetAssistantSkills: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The skills. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantSkills"];
+        };
+      };
+      /** @description No access token for the caller (assistant_token_unavailable), or the agent refused it. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+      /** @description Not while impersonating (assistant_forbidden). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+      /** @description The assistant is not configured (assistant_disabled), or the agent lists no skills for this backend (not_found). */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssistantError"];
+        };
+      };
+      /** @description The agent could not be reached, or answered badly (assistant_unreachable), or could not read the skills of the MCP (skills_unavailable). */
       502: {
         headers: {
           [name: string]: unknown;

@@ -4617,7 +4617,10 @@
       "awaiting": "Waiting for your decision on the action below.",
       "stopped": "Incomplete answer, stopped. It was not retried.",
       "failed": "Incomplete answer, failed. It was not retried.",
-      "tokens": "Tokens: {{total}}"
+      "tokens": "Tokens: {{total}}",
+      "copyCode": "Copy the code",
+      "codeCopied": "Code copied",
+      "codeCopyFailed": "The code could not be copied"
     },
     "notice": {
       "stopped": "Stopped. The turn was not retried; the actions already run are not undone.",
@@ -4761,11 +4764,20 @@
       "send": "Send",
       "queue": "Queue",
       "stop": "Stop",
-      "scope": "Answers use only what you are allowed to see. Actions always ask for your confirmation.",
       "keys": "Enter to send · Shift+Enter for a new line",
       "tooLarge": "The message must not exceed 32 KiB.",
       "queuedHint": "The answer is running: your message will be sent once it ends.",
-      "queuedDuringConfirmation": "Your message will be sent after your decision; it does not answer the confirmation."
+      "queuedDuringConfirmation": "Your message will be sent after your decision; it does not answer the confirmation.",
+      "model": "Model",
+      "modelHint": "The model of the messages you send",
+      "skillsHint": "Type / at the start to follow a procedure of the assistant."
+    },
+    "skills": {
+      "tag": "Procedure",
+      "remove": "Remove the procedure “{{skill}}”",
+      "list": "Procedures matching what you type",
+      "chosen": "Procedure /{{skill}} chosen",
+      "gone": "The procedure “{{skill}}” is no longer available to you: it was removed from your message."
     },
     "queue": {
       "label": "Queued message",
@@ -4808,8 +4820,12 @@
         "feedback_invalid": "The feedback is invalid.",
         "feedback_gone": "This answer can no longer be rated.",
         "feedback_limit": "The assistant takes no more feedback for now.",
+        "feedback_disabled": "Feedback is turned off on this assistant.",
         "tools_unavailable": "The agent could not read its tools. Try again later.",
-        "tools_unlisted": "The assistant does not list its tools on this collector."
+        "tools_unlisted": "The assistant does not list its tools on this collector.",
+        "model_unknown": "This model is no longer available: the default model is selected. Send your message again.",
+        "skill_unavailable": "This procedure is not available to you now: choose another, or send your message without it.",
+        "invalid_skill": "The agent refused the name of this procedure. Choose it again in the list."
       },
       "status": {
         "401": "Your session no longer authenticates you to the assistant: sign in again.",
@@ -4831,6 +4847,7 @@
     "activity": {
       "answering": "The assistant is answering",
       "ended": "The assistant has finished",
+      "failed": "The answer of the assistant failed",
       "waiting": "An action of the assistant waits for your decision"
     },
     "promptDropped": "The question prepared was not taken: a turn runs, or an action waits for your decision. Open it again from the object once done.",
@@ -4841,13 +4858,48 @@
       "expand": "Open in the assistant page",
       "fold": "Fold",
       "foldAssistant": "Fold the assistant",
-      "move": "Move the assistant: drag it, or use the Left and Right arrows, Home to put it back",
+      "move": "Move or size the assistant",
+      "moveHelp": "Drag its title bar to move it, an edge or a corner to size it. On this handle, the arrows move it, Shift and the arrows size it, Home puts it back.",
       "empty": "Ask a question about the estate, or about what the page shows: the record open on it, the rows ticked.",
       "waitingLabel": "Action waiting for a decision",
       "waiting": "The assistant waits for your decision on the action “{{action}}”.",
       "destructive": "A destructive action.",
       "detail": "Decide on it",
       "decideTitle": "Decide on the action “{{action}}”"
+    },
+    "export": {
+      "open": "Export the conversation",
+      "markdown": "Download the conversation in Markdown",
+      "pdf": "Download the conversation in PDF",
+      "exporting": "Exporting the conversation…",
+      "done": "The conversation is exported.",
+      "tooLong": "The conversation is too long to be exported.",
+      "empty": "Nothing to export: no turn of this conversation is stored.",
+      "printFailed": "The browser could not open its print dialog: the PDF was not made.",
+      "printReady": "The conversation is ready to be saved as a PDF.",
+      "print": "Open the print dialog",
+      "dismiss": "Dismiss",
+      "collector": "Collector: {{name}}",
+      "exportedAt": "Exported on {{date}}",
+      "timeZone": "Times in {{zone}}",
+      "steps": "Steps",
+      "stepsOmitted_one": "{{count}} step not kept in the history",
+      "stepsOmitted_other": "{{count}} steps not kept in the history",
+      "model": "Model: {{model}}",
+      "unstored": "The answers stopped or failed are not stored, nor exported."
+    },
+    "endNotice": {
+      "ended": "Your analysis is done.",
+      "failed": "Your analysis failed: its answer is incomplete.",
+      "waiting": "Your analysis waits for your decision on an action.",
+      "see": "See the answer",
+      "seeAction": "See the action",
+      "dismiss": "Dismiss",
+      "tab": {
+        "ended": "✓ Analysis done",
+        "failed": "✕ Analysis failed",
+        "waiting": "● Decision awaited"
+      }
     }
   },
   "checks": {

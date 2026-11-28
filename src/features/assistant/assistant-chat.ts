@@ -8,8 +8,15 @@ export interface AssistantActivity {
   answering: boolean;
   /** A turn ended while no view showed it, answered, stopped or failed. */
   ended: boolean;
+  /** The turn that ended so failed: its answer is incomplete. */
+  failed: boolean;
   /** An action waits for the decision of the user. */
   waiting: boolean;
+  /**
+   * What the folded dock tells, once: an action that began to wait out of
+   * sight, else a turn that ended so; null when nothing.
+   */
+  notice: "ended" | "failed" | "waiting" | null;
 }
 
 export interface SharedChat {
@@ -24,6 +31,15 @@ export interface SharedChat {
    */
   draft: string;
   setDraft: (draft: string) => void;
+  /**
+   * The skill the message typed asks, chosen with / in the message box: it goes
+   * with the draft from the dock to the page.
+   */
+  draftSkill: string | null;
+  setDraftSkill: (skill: string | null) => void;
+  /** The skill removed from the message as the list no longer holds it, said once. */
+  skillGone: string | null;
+  setSkillGone: (skill: string | null) => void;
   /**
    * A question to open the chat with (`ask`), until the view on display puts it
    * in the message box of a new conversation (`takePrompt`).

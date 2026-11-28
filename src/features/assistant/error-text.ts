@@ -31,8 +31,12 @@ const EXPLAINED = new Set([
   "feedback_invalid",
   "feedback_gone",
   "feedback_limit",
+  "feedback_disabled",
+  "model_unknown",
   "tools_unavailable",
   "tools_unlisted",
+  "skill_unavailable",
+  "invalid_skill",
 ]);
 
 /** The statuses said when the code of a refusal is not one the page explains. */

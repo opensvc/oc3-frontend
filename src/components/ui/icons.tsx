@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import { useId, type SVGProps } from "react";
 
 /**
  * Menu icons, drawn here rather than imported from a library.
@@ -559,6 +559,15 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
+/** Copying to the clipboard: two sheets, one over the other. */
+export function CopyIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M9 2.5h9.5A2.5 2.5 0 0 1 21 5v11.5a2.5 2.5 0 0 1-2.5 2.5H17v-2.2h1.5c.2 0 .3-.1.3-.3V5c0-.2-.1-.3-.3-.3H9c-.2 0-.3.1-.3.3v.8H6.5V5A2.5 2.5 0 0 1 9 2.5ZM5.5 7h9.5a2.5 2.5 0 0 1 2.5 2.5V19a2.5 2.5 0 0 1-2.5 2.5H5.5A2.5 2.5 0 0 1 3 19V9.5A2.5 2.5 0 0 1 5.5 7Zm0 2.2c-.2 0-.3.1-.3.3V19c0 .2.1.3.3.3H15c.2 0 .3-.1.3-.3V9.5c0-.2-.1-.3-.3-.3H5.5Z" />
+    </Svg>
+  );
+}
+
 /** Folder of forms, in the request catalog (fa-folder-open). */
 export function FolderIcon(props: IconProps) {
   return (
@@ -772,6 +781,47 @@ export function FileIcon(props: IconProps) {
       <path d="M6.5 2H13v5.5c0 .8.7 1.5 1.5 1.5H20v11.5c0 .8-.7 1.5-1.5 1.5h-12c-.8 0-1.5-.7-1.5-1.5v-17C5 2.7 5.7 2 6.5 2Zm8 .4 5.1 5.1h-5.1V2.4Z" />
     </Svg>
   );
+}
+
+/**
+ * A file of a format, the file above with the name of its format cut out of
+ * it, as the downloads name it (fa-file-pdf): `label`, a few capitals.
+ */
+function FileFormatIcon({ label, ...props }: IconProps & { label: string }) {
+  // A mask of each icon its own: several are in the page at once.
+  const mask = `file-format-${useId().replace(/[^A-Za-z0-9_-]/g, "")}`;
+  return (
+    <Svg {...props}>
+      <mask id={mask}>
+        <rect width="24" height="24" fill="#fff" />
+        <text
+          x="12.5"
+          y="18.6"
+          textAnchor="middle"
+          fontFamily="system-ui, sans-serif"
+          fontSize={label.length > 2 ? 6.2 : 7.4}
+          fontWeight="700"
+          fill="#000"
+        >
+          {label}
+        </text>
+      </mask>
+      <path
+        mask={`url(#${mask})`}
+        d="M6.5 2H13v5.5c0 .8.7 1.5 1.5 1.5H20v11.5c0 .8-.7 1.5-1.5 1.5h-12c-.8 0-1.5-.7-1.5-1.5v-17C5 2.7 5.7 2 6.5 2Zm8 .4 5.1 5.1h-5.1V2.4Z"
+      />
+    </Svg>
+  );
+}
+
+/** A Markdown file, to download. */
+export function FileMarkdownIcon(props: IconProps) {
+  return <FileFormatIcon label="MD" {...props} />;
+}
+
+/** A PDF file, to download. */
+export function FilePdfIcon(props: IconProps) {
+  return <FileFormatIcon label="PDF" {...props} />;
 }
 
 /** Locked, safe (`safe16`, fa-lock). */

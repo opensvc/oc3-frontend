@@ -4617,7 +4617,10 @@
       "awaiting": "En attente de votre décision sur l'action ci-dessous.",
       "stopped": "Réponse incomplète, arrêtée. Elle n'a pas été relancée.",
       "failed": "Réponse incomplète, en échec. Elle n'a pas été relancée.",
-      "tokens": "Jetons : {{total}}"
+      "tokens": "Jetons : {{total}}",
+      "copyCode": "Copier le code",
+      "codeCopied": "Code copié",
+      "codeCopyFailed": "Le code n'a pas pu être copié"
     },
     "notice": {
       "stopped": "Arrêté. Le tour n'a pas été relancé ; les actions déjà exécutées ne sont pas annulées.",
@@ -4761,11 +4764,20 @@
       "send": "Envoyer",
       "queue": "Mettre en file",
       "stop": "Arrêter",
-      "scope": "Les réponses n'utilisent que ce que vous avez le droit de voir. Les actions demandent toujours votre confirmation.",
       "keys": "Entrée pour envoyer · Maj+Entrée pour une nouvelle ligne",
       "tooLarge": "Le message ne doit pas dépasser 32 Kio.",
       "queuedHint": "La réponse est en cours : votre message partira à la fin.",
-      "queuedDuringConfirmation": "Votre message partira après votre décision ; il ne répond pas à la confirmation."
+      "queuedDuringConfirmation": "Votre message partira après votre décision ; il ne répond pas à la confirmation.",
+      "model": "Modèle",
+      "modelHint": "Le modèle des messages que vous envoyez",
+      "skillsHint": "Tapez / en début de message pour suivre une procédure de l'assistant."
+    },
+    "skills": {
+      "tag": "Procédure",
+      "remove": "Retirer la procédure « {{skill}} »",
+      "list": "Procédures correspondant à votre saisie",
+      "chosen": "Procédure /{{skill}} choisie",
+      "gone": "La procédure « {{skill}} » ne vous est plus disponible : elle a été retirée de votre message."
     },
     "queue": {
       "label": "Message en file",
@@ -4808,8 +4820,12 @@
         "feedback_invalid": "L'avis est invalide.",
         "feedback_gone": "Cette réponse ne peut plus être évaluée.",
         "feedback_limit": "L'assistant ne prend plus d'avis pour le moment.",
+        "feedback_disabled": "Les avis sont désactivés sur cet assistant.",
         "tools_unavailable": "L'agent n'a pas pu lire ses outils. Réessayez plus tard.",
-        "tools_unlisted": "L'assistant ne liste pas ses outils sur ce collector."
+        "tools_unlisted": "L'assistant ne liste pas ses outils sur ce collector.",
+        "model_unknown": "Ce modèle n'est plus disponible : le modèle par défaut est sélectionné. Renvoyez votre message.",
+        "skill_unavailable": "Cette procédure ne vous est pas disponible pour le moment : choisissez-en une autre, ou envoyez votre message sans elle.",
+        "invalid_skill": "L'agent a refusé le nom de cette procédure. Choisissez-la de nouveau dans la liste."
       },
       "status": {
         "401": "Votre session ne vous authentifie plus auprès de l'assistant : reconnectez-vous.",
@@ -4831,6 +4847,7 @@
     "activity": {
       "answering": "L'assistant répond",
       "ended": "L'assistant a terminé",
+      "failed": "La réponse de l'assistant a échoué",
       "waiting": "Une action de l'assistant attend votre décision"
     },
     "promptDropped": "La question préparée n'a pas été reprise : un tour est en cours, ou une action attend votre décision. Rouvrez-la depuis l'objet une fois terminé.",
@@ -4841,13 +4858,48 @@
       "expand": "Ouvrir dans la page de l'assistant",
       "fold": "Réduire",
       "foldAssistant": "Réduire l'assistant",
-      "move": "Déplacer l'assistant : glissez-le, ou utilisez les flèches gauche et droite, Début pour le remettre",
+      "move": "Déplacer ou redimensionner l'assistant",
+      "moveHelp": "Glissez sa barre de titre pour le déplacer, un bord ou un coin pour le redimensionner. Sur cette poignée, les flèches le déplacent, Maj et les flèches le redimensionnent, Début le remet en place.",
       "empty": "Posez une question sur le parc, ou sur ce que montre la page : la fiche ouverte, les lignes cochées.",
       "waitingLabel": "Action en attente de décision",
       "waiting": "L'assistant attend votre décision sur l'action « {{action}} ».",
       "destructive": "Action destructive.",
       "detail": "Décider",
       "decideTitle": "Décider de l'action « {{action}} »"
+    },
+    "export": {
+      "open": "Exporter la conversation",
+      "markdown": "Télécharger la conversation en Markdown",
+      "pdf": "Télécharger la conversation en PDF",
+      "exporting": "Export de la conversation…",
+      "done": "La conversation est exportée.",
+      "tooLong": "La conversation est trop longue pour être exportée.",
+      "empty": "Rien à exporter : aucun tour de cette conversation n'est enregistré.",
+      "printFailed": "Le navigateur n'a pas pu ouvrir l'impression : le PDF n'a pas été produit.",
+      "printReady": "La conversation est prête à être enregistrée en PDF.",
+      "print": "Ouvrir l'impression",
+      "dismiss": "Fermer",
+      "collector": "Collecteur : {{name}}",
+      "exportedAt": "Exportée le {{date}}",
+      "timeZone": "Heures en {{zone}}",
+      "steps": "Étapes",
+      "stepsOmitted_one": "{{count}} étape non conservée dans l'historique",
+      "stepsOmitted_other": "{{count}} étapes non conservées dans l'historique",
+      "model": "Modèle : {{model}}",
+      "unstored": "Les réponses arrêtées ou en échec ne sont pas enregistrées, ni exportées."
+    },
+    "endNotice": {
+      "ended": "Votre analyse est terminée.",
+      "failed": "Votre analyse a échoué : sa réponse est incomplète.",
+      "waiting": "Votre analyse attend votre décision sur une action.",
+      "see": "Voir la réponse",
+      "seeAction": "Voir l'action",
+      "dismiss": "Fermer",
+      "tab": {
+        "ended": "✓ Analyse terminée",
+        "failed": "✕ Analyse en échec",
+        "waiting": "● Décision attendue"
+      }
     }
   },
   "checks": {
