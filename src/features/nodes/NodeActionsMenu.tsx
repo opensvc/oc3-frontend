@@ -16,15 +16,17 @@ import { api } from "@/lib/api/client";
  * to the disruptive: what refreshes the collector's data and changes nothing on the
  * node; compliance; orchestration, where services may run; maintenance of the agent
  * and of the node's view of its storage; then, apart, the reboot and the shutdown.
- * Within a submenu the reversible entries come first. Wake On LAN, which goes
- * through another node, the provisioning from a template and the root password
- * rotation are not offered, as the API does not accept them.
+ * Within a submenu the reversible entries come first. The wake starts a node down:
+ * the collector queues it on a live peer of its cluster, which starts the virtual
+ * machine through its hypervisor or sends Wake-on-LAN packets to a physical node.
+ * The provisioning from a template and the root password rotation are not
+ * offered, as the API does not accept them.
  *
  * Each action is explained, as in the node actions menu of the om3 webapp: its
  * icon, what it does, the ones that stop the services of the node red and badged
  * (see ActionsMenu).
  */
-const ACTIONS: readonly ActionEntry[] = [
+export const ACTIONS: readonly ActionEntry[] = [
   { action: "pushasset", group: "refresh" },
   { action: "checks", group: "refresh" },
   { action: "sysreport", group: "refresh" },
@@ -40,6 +42,7 @@ const ACTIONS: readonly ActionEntry[] = [
   { action: "drain", group: "orchestration", separatorBefore: true },
   { action: "updatepkg", group: "maintenance" },
   { action: "scanscsi", group: "maintenance" },
+  { action: "wake", group: "power" },
   { action: "schedule_reboot", group: "power", separatorBefore: true },
   { action: "unschedule_reboot", group: "power" },
   { action: "reboot", group: "power", separatorBefore: true },

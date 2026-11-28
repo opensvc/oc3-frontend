@@ -11,18 +11,28 @@ export type ActionEnqueue = components["schemas"]["ActionEnqueue"];
 const CHUNK = 50;
 
 /**
+ * The answer for one entry: the reason it was refused, or the reason nothing
+ * was queued for it though accepted, as the wake of a node already up; both
+ * null once queued.
+ */
+export interface QueueResult {
+  refusal: string | null;
+  notice: string | null;
+}
+
+/**
  * Queues agent actions as lists, CHUNK entries per request one after the other,
  * rather than a request per action: a selection of a thousand nodes makes twenty
- * requests, not a thousand at once. Returns, for each entry in order, the reason
- * it was refused, or null once queued; an entry given as a string is a refusal
- * already, kept as it is.
+ * requests, not a thousand at once. Returns, for each entry in order, its
+ * result; an entry given as a string is a refusal already, kept as it is.
  */
 export async function queueActionList(
   entries: readonly (ActionEnqueue | string)[],
-): Promise<(string | null)[]> {
-  const results: (string | null)[] = entries.map((entry) =>
-    typeof entry === "string" ? entry : null,
-  );
+): Promise<QueueResult[]> {
+  const results: QueueResult[] = entries.map((entry) => ({
+    refusal: typeof entry === "string" ? entry : null,
+    notice: null,
+  }));
   const sendable = entries.flatMap((entry, index) =>
     typeof entry === "string" ? [] : [{ entry, index }],
   );
@@ -31,14 +41,19 @@ export async function queueActionList(
     const { data, error } = await api.PUT("/actions", { body: chunk.map((item) => item.entry) });
     if (error !== undefined) {
       const message = problemText(error);
-      for (const item of chunk) results[item.index] = message;
+      for (const item of chunk) results[item.index] = { refusal: message, notice: null };
       continue;
     }
-    // A list is answered with the refusals by index in the list sent.
+    // A list is answered with the refusals, and the entries with nothing to
+    // queue, by index in the list sent.
     if ("refusals" in data) {
       for (const refusal of data.refusals) {
         const item = chunk[refusal.index];
-        if (item !== undefined) results[item.index] = refusal.message;
+        if (item !== undefined) results[item.index] = { refusal: refusal.message, notice: null };
+      }
+      for (const notice of data.notices ?? []) {
+        const item = chunk[notice.index];
+        if (item !== undefined) results[item.index] = { refusal: null, notice: notice.message };
       }
     }
   }

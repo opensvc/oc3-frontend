@@ -293,7 +293,8 @@
         "schedule_reboot": "Programmer un redémarrage",
         "unschedule_reboot": "Annuler le redémarrage programmé",
         "drain": "Drainer",
-        "shutdown": "Arrêter"
+        "shutdown": "Arrêter",
+        "wake": "Réveiller"
       },
       "menu": {
         "pushasset": "Inventaire du nœud",
@@ -431,7 +432,8 @@
         "schedule_reboot": "Le nœud redémarre à sa prochaine plage de redémarrage.",
         "unschedule_reboot": "Le redémarrage programmé n'a pas lieu.",
         "reboot": "Redémarrer le nœud maintenant : les instances qu'il héberge s'arrêtent.",
-        "shutdown": "Éteindre le nœud : les instances qu'il héberge s'arrêtent."
+        "shutdown": "Éteindre le nœud : les instances qu'il héberge s'arrêtent.",
+        "wake": "Démarrer le nœud s'il est arrêté : son hyperviseur démarre la machine virtuelle, ou un pair de son cluster lui envoie des paquets Wake-on-LAN."
       }
     },
     "hardware": {

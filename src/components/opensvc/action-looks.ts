@@ -107,7 +107,8 @@ const ACTIONS: Readonly<Record<string, ActionLook>> = {
   start: { icon: icon(PlayIcon) },
   restart: { icon: icon(RefreshIcon), impacts: ["downTime"] },
   stop: { icon: icon(StopIcon), impacts: ["downTime"] },
-  // Reboot and shutdown of a node.
+  // Wake, reboot and shutdown of a node.
+  wake: { icon: icon(PowerIcon) },
   schedule_reboot: { icon: icon(CalendarIcon) },
   unschedule_reboot: { icon: icon(CloseIcon) },
   reboot: { icon: icon(RefreshIcon, true), danger: true, impacts: ["downTime"] },

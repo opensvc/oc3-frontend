@@ -139,11 +139,20 @@ interface Outcome {
   /** The success message, or null when nothing succeeded. */
   done: string | null;
   failures: string[];
+  /**
+   * The objects accepted with nothing to do, each naming its object and why, as
+   * the wake of a node already up.
+   */
+  notices: string[];
 }
 
-/** The tint of a report: done, failed, or both at once, which a warning says. */
+/**
+ * The tint of a report: done, failed, or both at once, which a warning says; an
+ * information when nothing was done, failed or not, as every node to wake up.
+ */
 function outcomeTone(outcome: Outcome): NoticeTone {
-  if (outcome.failures.length === 0) return "success";
+  if (outcome.failures.length === 0)
+    return outcome.done === null && outcome.notices.length > 0 ? "info" : "success";
   return outcome.done === null ? "error" : "warning";
 }
 
@@ -259,7 +268,8 @@ export function ActionsMenu({
   }
   // The report leaves after the time to read it, longer when something failed;
   // hovered or focused, it waits.
-  const reportText = outcome === null ? "" : [outcome.done ?? "", ...outcome.failures].join(" ");
+  const reportText =
+    outcome === null ? "" : [outcome.done ?? "", ...outcome.notices, ...outcome.failures].join(" ");
   const dismissal = useAutoDismiss(
     outcome?.id ?? null,
     noticeTime(reportText, outcome !== null && outcome.failures.length > 0),
@@ -277,21 +287,33 @@ export function ActionsMenu({
       const results =
         enqueue === undefined
           ? await Promise.all(
-              targets.map(async (target) => ({ target, message: await queueOne(target, action) })),
+              targets.map(async (target) => ({
+                target,
+                message: await queueOne(target, action),
+                notice: null,
+              })),
             )
           : (await queueActionList(targets.map((target) => enqueue(target, action)))).map(
-              (message, index) => ({ target: targets[index] as ActionTarget, message }),
+              (result, index) => ({
+                target: targets[index] as ActionTarget,
+                message: result.refusal,
+                notice: result.notice,
+              }),
             );
       const failures = results
         .filter((result) => result.message !== null)
         .map((result) => failureText(result.target, result.message));
-      const queued = results.length - failures.length;
+      const notices = results
+        .filter((result) => result.message === null && result.notice !== null)
+        .map((result) => failureText(result.target, result.notice));
+      const queued = results.length - failures.length - notices.length;
       return {
         done:
           queued === 0
             ? null
             : t(`${prefix}.queued`, { action: t(`${prefix}.items.${action}`), count: queued }),
         failures,
+        notices,
       };
     },
     onSuccess: (result) => {
@@ -328,6 +350,7 @@ export function ActionsMenu({
       }
       entry.onDone?.(done);
       return {
+        notices: [],
         done:
           done.length === 0
             ? null
@@ -573,6 +596,18 @@ export function ActionsMenu({
                   </span>
                   {outcome.done}
                 </span>
+              )}
+              {outcome.notices.length > 0 && (
+                <ul role="status">
+                  {outcome.notices.map((notice) => (
+                    <li key={notice}>
+                      <span aria-hidden="true" className={NOTICE_TONES.info.markClass}>
+                        {NOTICE_TONES.info.mark}{" "}
+                      </span>
+                      {notice}
+                    </li>
+                  ))}
+                </ul>
               )}
               {outcome.failures.length > 0 && (
                 <ul role="alert">

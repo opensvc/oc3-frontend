@@ -9756,6 +9756,15 @@ export interface components {
       /** @description One message per refused entry, naming its target */
       error: string[];
       info: string[];
+      /**
+       * @description The entries accepted with nothing to queue, as the wake of a node
+       *     already up, by index in the list sent with the reason.
+       */
+      notices?: {
+        /** @description Index of the entry in the list sent, from 0 */
+        index: number;
+        message: string;
+      }[];
       refusals: {
         /** @description Index of the refused entry in the list sent, from 0 */
         index: number;

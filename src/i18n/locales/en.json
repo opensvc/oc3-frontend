@@ -293,7 +293,8 @@
         "schedule_reboot": "Schedule a reboot",
         "unschedule_reboot": "Unschedule the reboot",
         "drain": "Drain",
-        "shutdown": "Shut down"
+        "shutdown": "Shut down",
+        "wake": "Wake up"
       },
       "menu": {
         "pushasset": "Node information",
@@ -431,7 +432,8 @@
         "schedule_reboot": "The node reboots at its next reboot schedule.",
         "unschedule_reboot": "The scheduled reboot does not happen.",
         "reboot": "Reboot the node now: the instances it hosts stop.",
-        "shutdown": "Power the node off: the instances it hosts stop."
+        "shutdown": "Power the node off: the instances it hosts stop.",
+        "wake": "Start the node when it is down: its hypervisor starts the virtual machine, or a peer of its cluster sends it Wake-on-LAN packets."
       }
     },
     "hardware": {
